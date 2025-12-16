@@ -8,7 +8,9 @@
  * - Admin password is required to access
  */
 
-const ADMIN_PASSWORD = "equi2024!admin"; // Change this in production
+// Admin password should be set via environment variable
+// For development, defaults to a placeholder that must be changed in production
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || "equi2024!admin";
 const ADMIN_VISIBLE_KEY = "equiprofile_admin_visible";
 const ADMIN_AUTHENTICATED_KEY = "equiprofile_admin_auth";
 

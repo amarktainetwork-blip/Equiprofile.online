@@ -1,5 +1,4 @@
 import { trpc } from "@/lib/trpc";
-import { adminToggle } from "@/lib/adminToggle";
 import { UNAUTHED_ERR_MSG } from '@shared/const';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink, TRPCClientError } from "@trpc/client";
@@ -9,9 +8,9 @@ import App from "./App";
 import { getLoginUrl } from "./const";
 import "./index.css";
 
-// Initialize admin toggle system
-// This sets up console commands: showAdmin() and hideAdmin()
-adminToggle;
+// Initialize admin toggle system - sets up console commands
+// This must be imported to register showAdmin() and hideAdmin() functions
+import "@/lib/adminToggle";
 
 const queryClient = new QueryClient();
 

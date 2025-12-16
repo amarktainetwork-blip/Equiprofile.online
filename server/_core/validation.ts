@@ -72,6 +72,12 @@ export function sanitizeString(input: string): string {
 }
 
 /**
+ * File upload constants
+ */
+const MAX_FILE_SIZE_MB = 20;
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+
+/**
  * Validate file upload
  */
 export function validateFileUpload(
@@ -80,9 +86,8 @@ export function validateFileUpload(
   fileSize: number
 ): { valid: boolean; error?: string } {
   // Check file size
-  const maxSize = 20 * 1024 * 1024; // 20MB
-  if (fileSize > maxSize) {
-    return { valid: false, error: "File size exceeds 20MB limit" };
+  if (fileSize > MAX_FILE_SIZE_BYTES) {
+    return { valid: false, error: `File size exceeds ${MAX_FILE_SIZE_MB}MB limit` };
   }
 
   // Check file type
@@ -139,6 +144,11 @@ export function getRateLimitKey(userId: number, action: string): string {
 }
 
 /**
+ * Horse age constants
+ */
+const MAX_HORSE_AGE = 50;
+
+/**
  * Validate horse age
  */
 export function validateHorseAge(age?: number, dateOfBirth?: Date): {
@@ -149,8 +159,8 @@ export function validateHorseAge(age?: number, dateOfBirth?: Date): {
     return { valid: false, error: "Age cannot be negative" };
   }
 
-  if (age !== undefined && age > 50) {
-    return { valid: false, error: "Age seems unrealistic (max 50 years)" };
+  if (age !== undefined && age > MAX_HORSE_AGE) {
+    return { valid: false, error: `Age seems unrealistic (max ${MAX_HORSE_AGE} years)` };
   }
 
   if (dateOfBirth) {
@@ -160,8 +170,8 @@ export function validateHorseAge(age?: number, dateOfBirth?: Date): {
     }
 
     const yearsDiff = (now.getTime() - dateOfBirth.getTime()) / (1000 * 60 * 60 * 24 * 365);
-    if (yearsDiff > 50) {
-      return { valid: false, error: "Date of birth indicates unrealistic age (max 50 years)" };
+    if (yearsDiff > MAX_HORSE_AGE) {
+      return { valid: false, error: `Date of birth indicates unrealistic age (max ${MAX_HORSE_AGE} years)` };
     }
   }
 

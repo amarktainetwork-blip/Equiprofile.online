@@ -10,7 +10,11 @@ interface RateLimitEntry {
   resetAt: number;
 }
 
-// In-memory store (in production, use Redis)
+// In-memory store for development
+// WARNING: This will not work correctly in multi-instance production environments
+// and will lose data on server restarts. For production, implement Redis-backed
+// storage using a library like ioredis or connect-redis.
+// See: https://github.com/express-rate-limit/rate-limit-redis
 const rateLimitStore = new Map<string, RateLimitEntry>();
 
 /**
