@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
+import { useAdminToggle } from "@/hooks/useAdminToggle";
 import { 
   LayoutDashboard, 
   LogOut, 
@@ -135,6 +136,7 @@ function DashboardLayoutContent({
   const sidebarRef = useRef<HTMLDivElement>(null);
   const activeMenuItem = menuItems.find(item => item.path === location);
   const isMobile = useIsMobile();
+  const { isAdminVisible } = useAdminToggle();
 
   useEffect(() => {
     if (isCollapsed) {
@@ -219,8 +221,8 @@ function DashboardLayoutContent({
                   </SidebarMenuItem>
                 );
               })}
-              {/* Admin menu items - shown to admin users */}
-              {user?.role === 'admin' && (
+              {/* Admin menu items - shown to admin users when toggle is active */}
+              {user?.role === 'admin' && isAdminVisible && (
                 <>
                   <div className="my-2 px-2">
                     <div className="h-px bg-border" />
