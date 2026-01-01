@@ -3,11 +3,16 @@ module.exports = {
     {
       name: 'equiprofile',
       script: 'dist/index.js',
-      instances: 2,
+      // For low-memory VPS (< 4GB RAM): use instances: 1
+      // For higher-memory VPS (>= 4GB RAM): use instances: 2
+      instances: 1,  // Changed to 1 for low-memory deployment
       exec_mode: 'cluster',
       autorestart: true,
       watch: false,
-      max_memory_restart: '1G',
+      // Restart if memory exceeds 500MB (conservative for low-memory VPS)
+      max_memory_restart: '500M',  // Changed from 1G
+      min_uptime: '10s',
+      max_restarts: 10,
       env: {
         NODE_ENV: 'production',
         PORT: 3000,
@@ -19,6 +24,8 @@ module.exports = {
       error_file: '/var/log/equiprofile/error.log',
       out_file: '/var/log/equiprofile/out.log',
       log_file: '/var/log/equiprofile/combined.log',
+      log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+      merge_logs: true,
       time: true,
     },
   ],
