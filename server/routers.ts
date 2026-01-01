@@ -8,6 +8,7 @@ import * as db from "./db";
 import { invokeLLM } from "./_core/llm";
 import { storagePut } from "./storage";
 import { nanoid } from "nanoid";
+import { createCheckoutSession, createPortalSession, STRIPE_PRICING } from "./stripe";
 
 // Admin procedure middleware
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -53,6 +54,110 @@ export const appRouter = router({
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
       return { success: true } as const;
+    }),
+  }),
+
+  // Billing and subscription management
+  billing: router({
+    getPricing: publicProcedure.query(() => {
+      return {
+        monthly: {
+          amount: STRIPE_PRICING.monthly.amount,
+          currency: STRIPE_PRICING.monthly.currency,
+          interval: STRIPE_PRICING.monthly.interval,
+        },
+        yearly: {
+          amount: STRIPE_PRICING.yearly.amount,
+          currency: STRIPE_PRICING.yearly.currency,
+          interval: STRIPE_PRICING.yearly.interval,
+        },
+      };
+    }),
+
+    createCheckout: protectedProcedure
+      .input(z.object({
+        plan: z.enum(['monthly', 'yearly']),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const user = await db.getUserById(ctx.user.id);
+        if (!user) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'User not found' });
+        }
+
+        const priceId = input.plan === 'monthly' 
+          ? STRIPE_PRICING.monthly.priceId 
+          : STRIPE_PRICING.yearly.priceId;
+
+        if (!priceId) {
+          throw new TRPCError({ 
+            code: 'INTERNAL_SERVER_ERROR', 
+            message: 'Stripe price ID not configured' 
+          });
+        }
+
+        const protocol = ctx.req.protocol || 'https';
+        const host = ctx.req.headers.host || 'equiprofile.online';
+        const baseUrl = `${protocol}://${host}`;
+
+        const session = await createCheckoutSession(
+          user.id,
+          user.email || '',
+          priceId,
+          `${baseUrl}/dashboard?success=true`,
+          `${baseUrl}/pricing?cancelled=true`,
+          user.stripeCustomerId || undefined
+        );
+
+        if (!session) {
+          throw new TRPCError({ 
+            code: 'INTERNAL_SERVER_ERROR', 
+            message: 'Failed to create checkout session' 
+          });
+        }
+
+        return { url: session.url };
+      }),
+
+    createPortal: protectedProcedure.mutation(async ({ ctx }) => {
+      const user = await db.getUserById(ctx.user.id);
+      if (!user || !user.stripeCustomerId) {
+        throw new TRPCError({ 
+          code: 'BAD_REQUEST', 
+          message: 'No active subscription found' 
+        });
+      }
+
+      const protocol = ctx.req.protocol || 'https';
+      const host = ctx.req.headers.host || 'equiprofile.online';
+      const baseUrl = `${protocol}://${host}`;
+
+      const portalUrl = await createPortalSession(
+        user.stripeCustomerId,
+        `${baseUrl}/dashboard`
+      );
+
+      if (!portalUrl) {
+        throw new TRPCError({ 
+          code: 'INTERNAL_SERVER_ERROR', 
+          message: 'Failed to create portal session' 
+        });
+      }
+
+      return { url: portalUrl };
+    }),
+
+    getStatus: protectedProcedure.query(async ({ ctx }) => {
+      const user = await db.getUserById(ctx.user.id);
+      if (!user) return null;
+
+      return {
+        status: user.subscriptionStatus,
+        plan: user.subscriptionPlan,
+        trialEndsAt: user.trialEndsAt,
+        subscriptionEndsAt: user.subscriptionEndsAt,
+        lastPaymentAt: user.lastPaymentAt,
+        hasActiveSubscription: ['trial', 'active'].includes(user.subscriptionStatus),
+      };
     }),
   }),
 

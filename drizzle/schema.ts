@@ -186,6 +186,188 @@ export const backupLogs = mysqlTable("backupLogs", {
   completedAt: timestamp("completedAt"),
 });
 
+// Stables/Teams for multi-user management
+export const stables = mysqlTable("stables", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 200 }).notNull(),
+  description: text("description"),
+  ownerId: int("ownerId").notNull(), // The user who created the stable
+  location: varchar("location", { length: 255 }),
+  logo: text("logo"),
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+// Stable members with role-based permissions
+export const stableMembers = mysqlTable("stableMembers", {
+  id: int("id").autoincrement().primaryKey(),
+  stableId: int("stableId").notNull(),
+  userId: int("userId").notNull(),
+  role: mysqlEnum("role", ["owner", "admin", "trainer", "member", "viewer"]).notNull(),
+  permissions: text("permissions"), // JSON string of specific permissions
+  isActive: boolean("isActive").default(true).notNull(),
+  joinedAt: timestamp("joinedAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+// Invitations to join stables
+export const stableInvites = mysqlTable("stableInvites", {
+  id: int("id").autoincrement().primaryKey(),
+  stableId: int("stableId").notNull(),
+  invitedByUserId: int("invitedByUserId").notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  role: mysqlEnum("role", ["admin", "trainer", "member", "viewer"]).notNull(),
+  token: varchar("token", { length: 100 }).notNull().unique(),
+  status: mysqlEnum("status", ["pending", "accepted", "declined", "expired"]).default("pending").notNull(),
+  expiresAt: timestamp("expiresAt").notNull(),
+  acceptedAt: timestamp("acceptedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+// Events and calendar
+export const events = mysqlTable("events", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  stableId: int("stableId"),
+  horseId: int("horseId"),
+  title: varchar("title", { length: 200 }).notNull(),
+  description: text("description"),
+  eventType: mysqlEnum("eventType", ["training", "competition", "veterinary", "farrier", "lesson", "meeting", "other"]).notNull(),
+  startDate: timestamp("startDate").notNull(),
+  endDate: timestamp("endDate"),
+  location: varchar("location", { length: 255 }),
+  isAllDay: boolean("isAllDay").default(false).notNull(),
+  isRecurring: boolean("isRecurring").default(false).notNull(),
+  recurrenceRule: text("recurrenceRule"), // iCal RRULE format
+  color: varchar("color", { length: 7 }), // Hex color code
+  isCompleted: boolean("isCompleted").default(false).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+// Event reminders
+export const eventReminders = mysqlTable("eventReminders", {
+  id: int("id").autoincrement().primaryKey(),
+  eventId: int("eventId").notNull(),
+  userId: int("userId").notNull(),
+  reminderTime: timestamp("reminderTime").notNull(),
+  reminderType: mysqlEnum("reminderType", ["email", "push", "sms"]).notNull(),
+  isSent: boolean("isSent").default(false).notNull(),
+  sentAt: timestamp("sentAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+// Feed costs tracking
+export const feedCosts = mysqlTable("feedCosts", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  horseId: int("horseId"),
+  feedType: varchar("feedType", { length: 100 }).notNull(),
+  brandName: varchar("brandName", { length: 100 }),
+  quantity: varchar("quantity", { length: 50 }).notNull(),
+  unit: varchar("unit", { length: 20 }),
+  costPerUnit: int("costPerUnit").notNull(), // in pence/cents
+  purchaseDate: date("purchaseDate").notNull(),
+  supplier: varchar("supplier", { length: 200 }),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+// Vaccinations tracking
+export const vaccinations = mysqlTable("vaccinations", {
+  id: int("id").autoincrement().primaryKey(),
+  horseId: int("horseId").notNull(),
+  userId: int("userId").notNull(),
+  vaccineName: varchar("vaccineName", { length: 200 }).notNull(),
+  vaccineType: varchar("vaccineType", { length: 100 }), // flu, tetanus, etc.
+  dateAdministered: date("dateAdministered").notNull(),
+  nextDueDate: date("nextDueDate"),
+  batchNumber: varchar("batchNumber", { length: 100 }),
+  vetName: varchar("vetName", { length: 100 }),
+  vetClinic: varchar("vetClinic", { length: 200 }),
+  cost: int("cost"), // in pence/cents
+  notes: text("notes"),
+  documentUrl: text("documentUrl"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+// Deworming tracking
+export const dewormings = mysqlTable("dewormings", {
+  id: int("id").autoincrement().primaryKey(),
+  horseId: int("horseId").notNull(),
+  userId: int("userId").notNull(),
+  productName: varchar("productName", { length: 200 }).notNull(),
+  activeIngredient: varchar("activeIngredient", { length: 200 }),
+  dateAdministered: date("dateAdministered").notNull(),
+  nextDueDate: date("nextDueDate"),
+  dosage: varchar("dosage", { length: 100 }),
+  weight: int("weight"), // horse weight at time of treatment
+  cost: int("cost"), // in pence/cents
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+// Shareable profile links
+export const shareLinks = mysqlTable("shareLinks", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  horseId: int("horseId"),
+  linkType: mysqlEnum("linkType", ["horse", "stable", "medical_passport"]).notNull(),
+  token: varchar("token", { length: 100 }).notNull().unique(),
+  isPublic: boolean("isPublic").default(false).notNull(),
+  isActive: boolean("isActive").default(true).notNull(),
+  expiresAt: timestamp("expiresAt"),
+  viewCount: int("viewCount").default(0).notNull(),
+  lastViewedAt: timestamp("lastViewedAt"),
+  settings: text("settings"), // JSON string for privacy settings
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+// Competitions tracking
+export const competitions = mysqlTable("competitions", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  horseId: int("horseId").notNull(),
+  competitionName: varchar("competitionName", { length: 200 }).notNull(),
+  venue: varchar("venue", { length: 200 }),
+  date: date("date").notNull(),
+  discipline: varchar("discipline", { length: 100 }), // dressage, jumping, etc.
+  level: varchar("level", { length: 50 }),
+  class: varchar("class", { length: 100 }), // specific class/event name
+  placement: varchar("placement", { length: 50 }), // 1st, 2nd, etc. or score
+  score: varchar("score", { length: 50 }),
+  notes: text("notes"),
+  cost: int("cost"), // entry fee in pence/cents
+  winnings: int("winnings"), // prize money in pence/cents
+  documentUrl: text("documentUrl"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+// Document tags for better organization
+export const documentTags = mysqlTable("documentTags", {
+  id: int("id").autoincrement().primaryKey(),
+  documentId: int("documentId").notNull(),
+  tag: varchar("tag", { length: 50 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+// Stripe webhook events for idempotency
+export const stripeEvents = mysqlTable("stripeEvents", {
+  id: int("id").autoincrement().primaryKey(),
+  eventId: varchar("eventId", { length: 255 }).notNull().unique(),
+  eventType: varchar("eventType", { length: 100 }).notNull(),
+  processed: boolean("processed").default(false).notNull(),
+  payload: text("payload"), // Full event payload for debugging
+  error: text("error"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  processedAt: timestamp("processedAt"),
+});
+
 // Type exports
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
@@ -207,3 +389,27 @@ export type ActivityLog = typeof activityLogs.$inferSelect;
 export type InsertActivityLog = typeof activityLogs.$inferInsert;
 export type BackupLog = typeof backupLogs.$inferSelect;
 export type InsertBackupLog = typeof backupLogs.$inferInsert;
+export type Stable = typeof stables.$inferSelect;
+export type InsertStable = typeof stables.$inferInsert;
+export type StableMember = typeof stableMembers.$inferSelect;
+export type InsertStableMember = typeof stableMembers.$inferInsert;
+export type StableInvite = typeof stableInvites.$inferSelect;
+export type InsertStableInvite = typeof stableInvites.$inferInsert;
+export type Event = typeof events.$inferSelect;
+export type InsertEvent = typeof events.$inferInsert;
+export type EventReminder = typeof eventReminders.$inferSelect;
+export type InsertEventReminder = typeof eventReminders.$inferInsert;
+export type FeedCost = typeof feedCosts.$inferSelect;
+export type InsertFeedCost = typeof feedCosts.$inferInsert;
+export type Vaccination = typeof vaccinations.$inferSelect;
+export type InsertVaccination = typeof vaccinations.$inferInsert;
+export type Deworming = typeof dewormings.$inferSelect;
+export type InsertDeworming = typeof dewormings.$inferInsert;
+export type ShareLink = typeof shareLinks.$inferSelect;
+export type InsertShareLink = typeof shareLinks.$inferInsert;
+export type Competition = typeof competitions.$inferSelect;
+export type InsertCompetition = typeof competitions.$inferInsert;
+export type DocumentTag = typeof documentTags.$inferSelect;
+export type InsertDocumentTag = typeof documentTags.$inferInsert;
+export type StripeEvent = typeof stripeEvents.$inferSelect;
+export type InsertStripeEvent = typeof stripeEvents.$inferInsert;
