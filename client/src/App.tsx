@@ -4,6 +4,7 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { SkipToContent, useKeyboardNavigation } from "./components/AccessibilityHelpers";
 import "./i18n/config";
 
 // Pages
@@ -25,57 +26,64 @@ import Reports from "./pages/Reports";
 import Calendar from "./pages/Calendar";
 
 function Router() {
+  useKeyboardNavigation();
+  
   return (
-    <Switch>
-      {/* Public landing page */}
-      <Route path="/" component={Home} />
-      
-      {/* Dashboard - requires auth */}
-      <Route path="/dashboard" component={Dashboard} />
-      
-      {/* Horse management */}
-      <Route path="/horses" component={Horses} />
-      <Route path="/horses/new" component={HorseForm} />
-      <Route path="/horses/:id/edit" component={HorseForm} />
-      <Route path="/horses/:id" component={HorseDetail} />
-      
-      {/* Health records */}
-      <Route path="/health" component={Health} />
-      
-      {/* Training */}
-      <Route path="/training" component={Training} />
-      
-      {/* Feeding plans */}
-      <Route path="/feeding" component={Feeding} />
-      
-      {/* Weather */}
-      <Route path="/weather" component={Weather} />
-      
-      {/* Documents */}
-      <Route path="/documents" component={Documents} />
-      
-      {/* Stable Management */}
-      <Route path="/stable" component={Stable} />
-      
-      {/* Messaging */}
-      <Route path="/messages" component={Messages} />
-      
-      {/* Analytics */}
-      <Route path="/analytics" component={Analytics} />
-      
-      {/* Reports */}
-      <Route path="/reports" component={Reports} />
-      
-      {/* Calendar */}
-      <Route path="/calendar" component={Calendar} />
-      
-      {/* Admin panel - requires admin role */}
-      <Route path="/admin" component={Admin} />
-      
-      {/* 404 */}
-      <Route path="/404" component={NotFound} />
-      <Route component={NotFound} />
-    </Switch>
+    <>
+      <SkipToContent />
+      <main id="main-content">
+        <Switch>
+          {/* Public landing page */}
+          <Route path="/" component={Home} />
+          
+          {/* Dashboard - requires auth */}
+          <Route path="/dashboard" component={Dashboard} />
+          
+          {/* Horse management */}
+          <Route path="/horses" component={Horses} />
+          <Route path="/horses/new" component={HorseForm} />
+          <Route path="/horses/:id/edit" component={HorseForm} />
+          <Route path="/horses/:id" component={HorseDetail} />
+          
+          {/* Health records */}
+          <Route path="/health" component={Health} />
+          
+          {/* Training */}
+          <Route path="/training" component={Training} />
+          
+          {/* Feeding plans */}
+          <Route path="/feeding" component={Feeding} />
+          
+          {/* Weather */}
+          <Route path="/weather" component={Weather} />
+          
+          {/* Documents */}
+          <Route path="/documents" component={Documents} />
+          
+          {/* Stable Management */}
+          <Route path="/stable" component={Stable} />
+          
+          {/* Messaging */}
+          <Route path="/messages" component={Messages} />
+          
+          {/* Analytics */}
+          <Route path="/analytics" component={Analytics} />
+          
+          {/* Reports */}
+          <Route path="/reports" component={Reports} />
+          
+          {/* Calendar */}
+          <Route path="/calendar" component={Calendar} />
+          
+          {/* Admin panel - requires admin role */}
+          <Route path="/admin" component={Admin} />
+          
+          {/* 404 */}
+          <Route path="/404" component={NotFound} />
+          <Route component={NotFound} />
+        </Switch>
+      </main>
+    </>
   );
 }
 
