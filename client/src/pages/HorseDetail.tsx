@@ -327,24 +327,24 @@ function HorseDetailContent() {
                 horse={{
                   id: horse.id,
                   name: horse.name,
-                  breed: horse.breed,
-                  age: horse.age,
-                  microchipNumber: horse.microchipNumber,
-                  registrationNumber: horse.registrationNumber,
+                  breed: horse.breed || undefined,
+                  age: horse.age || undefined,
+                  microchipNumber: horse.microchipNumber || undefined,
+                  registrationNumber: horse.registrationNumber || undefined,
                 }}
                 vaccinations={healthRecords?.filter(r => r.recordType === 'vaccination').map(r => ({
                   vaccineName: r.title || 'Vaccination',
-                  dateAdministered: r.recordDate,
-                  nextDueDate: r.nextDueDate,
+                  dateAdministered: r.recordDate instanceof Date ? r.recordDate.toISOString() : r.recordDate,
+                  nextDueDate: r.nextDueDate ? (r.nextDueDate instanceof Date ? r.nextDueDate.toISOString() : r.nextDueDate) : undefined,
                 }))}
                 dewormings={healthRecords?.filter(r => r.recordType === 'deworming').map(r => ({
                   productName: r.title || 'Deworming',
-                  dateAdministered: r.recordDate,
-                  nextDueDate: r.nextDueDate,
+                  dateAdministered: r.recordDate instanceof Date ? r.recordDate.toISOString() : r.recordDate,
+                  nextDueDate: r.nextDueDate ? (r.nextDueDate instanceof Date ? r.nextDueDate.toISOString() : r.nextDueDate) : undefined,
                 }))}
                 healthRecords={healthRecords?.map(r => ({
                   title: r.title,
-                  recordDate: r.recordDate,
+                  recordDate: r.recordDate instanceof Date ? r.recordDate.toISOString() : r.recordDate,
                   recordType: r.recordType,
                 }))}
               />

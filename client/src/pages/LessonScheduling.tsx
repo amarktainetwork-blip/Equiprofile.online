@@ -9,14 +9,13 @@ import { Textarea } from "../components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 import { Badge } from "../components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
-import { useToast } from "../hooks/use-toast";
+import { toast } from "sonner";
 import { trpc } from "../lib/trpc";
 import { format } from "date-fns";
 
 const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 export default function LessonScheduling() {
-  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<'bookings' | 'availability'>('bookings');
   
   // Bookings state
@@ -45,7 +44,9 @@ export default function LessonScheduling() {
   const { data: myTrainingBookings = [], refetch: refetchMyTraining } = trpc.lessonBookings.list.useQuery({ asTrainer: true });
   const { data: availability = [], refetch: refetchAvailability } = trpc.trainerAvailability.list.useQuery();
   const { data: horses = [] } = trpc.horses.list.useQuery();
-  const { data: users = [] } = trpc.users?.list?.useQuery() || { data: [] };
+  const { data: currentUser } = trpc.user.me.useQuery();
+  // For trainer list, we'll use a placeholder or fetch from a trainers endpoint when available
+  const trainers = [];
 
   // Mutations
   const createBooking = trpc.lessonBookings.create.useMutation({

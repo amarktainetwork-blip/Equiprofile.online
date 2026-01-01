@@ -18,7 +18,7 @@ import {
   exportDocumentsCSV,
   generateCSVFilename,
 } from "./csvExport";
-import { eq, and, desc, sql, gte, lte, or } from "drizzle-orm";
+import { eq, and, desc, sql, gte, lte, or, inArray } from "drizzle-orm";
 import { getDb } from "./db";
 import {
   stables,
@@ -1946,13 +1946,23 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         const db = await getDb();
         if (!db) return [];
         
-        let query = db.select().from(breeding).where(eq(breeding.userId, ctx.user.id));
+        // Join with horses table to filter by user ownership
+        const userHorses = await db.select({ id: horses.id })
+          .from(horses)
+          .where(eq(horses.userId, ctx.user.id));
+        
+        const horseIds = userHorses.map(h => h.id);
+        if (horseIds.length === 0) return [];
+        
+        let query = db.select().from(breeding)
+          .where(inArray(breeding.mareId, horseIds));
         
         if (input.mareId) {
-          query = query.where(and(
-            eq(breeding.userId, ctx.user.id),
-            eq(breeding.mareId, input.mareId)
-          ));
+          query = db.select().from(breeding)
+            .where(and(
+              inArray(breeding.mareId, horseIds),
+              eq(breeding.mareId, input.mareId)
+            ));
         }
         
         return query.orderBy(desc(breeding.breedingDate));
@@ -1964,11 +1974,18 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         const db = await getDb();
         if (!db) return null;
         
+        // Verify ownership through horses table
+        const userHorses = await db.select({ id: horses.id })
+          .from(horses)
+          .where(eq(horses.userId, ctx.user.id));
+        
+        const horseIds = userHorses.map(h => h.id);
+        
         const records = await db.select()
           .from(breeding)
           .where(and(
             eq(breeding.id, input.id),
-            eq(breeding.userId, ctx.user.id)
+            inArray(breeding.mareId, horseIds)
           ))
           .limit(1);
         
@@ -1991,12 +2008,18 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         
         const { id, ...updateData } = input;
         
-        // Verify ownership
+        // Verify ownership through horses table
+        const userHorses = await db.select({ id: horses.id })
+          .from(horses)
+          .where(eq(horses.userId, ctx.user.id));
+        
+        const horseIds = userHorses.map(h => h.id);
+        
         const existing = await db.select()
           .from(breeding)
           .where(and(
             eq(breeding.id, id),
-            eq(breeding.userId, ctx.user.id)
+            inArray(breeding.mareId, horseIds)
           ))
           .limit(1);
         
@@ -2022,12 +2045,18 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         const db = await getDb();
         if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
         
-        // Verify ownership
+        // Verify ownership through horses table
+        const userHorses = await db.select({ id: horses.id })
+          .from(horses)
+          .where(eq(horses.userId, ctx.user.id));
+        
+        const horseIds = userHorses.map(h => h.id);
+        
         const existing = await db.select()
           .from(breeding)
           .where(and(
             eq(breeding.id, input.id),
-            eq(breeding.userId, ctx.user.id)
+            inArray(breeding.mareId, horseIds)
           ))
           .limit(1);
         
@@ -2052,12 +2081,18 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         const db = await getDb();
         if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
         
-        // Verify ownership
+        // Verify ownership through horses table
+        const userHorses = await db.select({ id: horses.id })
+          .from(horses)
+          .where(eq(horses.userId, ctx.user.id));
+        
+        const horseIds = userHorses.map(h => h.id);
+        
         const existing = await db.select()
           .from(breeding)
           .where(and(
             eq(breeding.id, input.id),
-            eq(breeding.userId, ctx.user.id)
+            inArray(breeding.mareId, horseIds)
           ))
           .limit(1);
         
@@ -2112,13 +2147,14 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         const db = await getDb();
         if (!db) return [];
         
-        let query = db.select().from(foals);
-        
         if (input.breedingId) {
-          query = query.where(eq(foals.breedingId, input.breedingId));
+          return db.select().from(foals)
+            .where(eq(foals.breedingId, input.breedingId))
+            .orderBy(desc(foals.birthDate));
         }
         
-        return query.orderBy(desc(foals.birthDate));
+        return db.select().from(foals)
+          .orderBy(desc(foals.birthDate));
       }),
     
     exportCSV: subscribedProcedure.query(async ({ ctx }) => {

@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Badge } from "../components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { Checkbox } from "../components/ui/checkbox";
-import { useToast } from "../hooks/use-toast";
+import { toast } from "sonner";
 import { trpc } from "../lib/trpc";
 import { format } from "date-fns";
 
@@ -29,7 +29,6 @@ const FREQUENCIES = [
 ];
 
 export default function Reports() {
-  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<'generate' | 'history' | 'schedules'>('generate');
   
   // Generate report state
