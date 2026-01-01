@@ -79,6 +79,60 @@ Intelligent weather analysis for riding conditions. AI-generated summaries and r
 ### Weather Intelligence
 Real-time weather data integration with AI-powered riding condition analysis. Safety recommendations based on temperature, wind, precipitation, UV index, and visibility.
 
+### Admin Access & Unlock System
+EquiProfile implements a two-factor admin security system to protect sensitive administrative functions.
+
+**Admin Unlock Flow:**
+1. User must have `admin` role assigned in the database
+2. Admin must explicitly unlock admin mode via AI Chat by typing `show admin`
+3. System prompts for admin unlock password (default: `ashmor12@` - **CHANGE IN PRODUCTION**)
+4. Once unlocked, admin session is active for 30 minutes
+5. Admin panel becomes visible in sidebar with full administrative capabilities
+
+**Why This Design?**
+- Role-based access prevents unauthorized users from seeing admin features
+- Session-based unlock adds a second authentication factor
+- Time-limited sessions (30 minutes) reduce risk of unauthorized access
+- AI Chat integration hides admin unlock from UI, preventing casual discovery
+- Password-protected unlock ensures only authorized personnel can access admin functions
+
+**Admin Capabilities:**
+- ✅ View all users and their subscription details
+- ✅ Suspend/unsuspend user accounts
+- ✅ Change user roles and permissions
+- ✅ View system statistics and health metrics
+- ✅ Access activity logs and audit trails
+- ✅ Manage system settings and configuration
+- ✅ Create and manage API keys for integrations
+- ✅ Monitor environment health and configuration status
+- ✅ Access backup logs
+
+**Security Best Practices:**
+1. **Change default password immediately** - Set strong `ADMIN_UNLOCK_PASSWORD` in environment variables
+2. Rotate password regularly (recommended every 90 days)
+3. Monitor admin activity logs for suspicious access patterns
+4. Revoke admin sessions if device is lost or compromised
+5. Use strong passwords (16+ characters, mixed case, numbers, symbols)
+
+---
+
+## API Key Management
+
+EquiProfile provides secure API key generation and management for third-party integrations and custom applications.
+
+**Features:**
+- **Secure Generation**: API keys use bcrypt hashing (cost factor 10) with unique prefixes
+- **One-Time Display**: Full key shown only once during creation for maximum security
+- **Rate Limiting**: Configurable request limits per key (default: 100/hour)
+- **Revocation**: Instant key deactivation with audit trail
+- **Rotation**: Generate new key while maintaining the same API key ID
+- **Activity Tracking**: Last used timestamp and usage monitoring
+- **Expiration Dates**: Optional automatic key expiration
+
+**Key Format:** `ep_Xy9z_abc123...` (prefix + unique identifier)
+
+**Access:** Admin Panel → API Keys tab (requires unlocked admin session)
+
 ---
 
 ## Detailed Feature Breakdown
@@ -1404,12 +1458,59 @@ AWS S3 (Document Storage)
 - Never exposed to client
 
 **Critical Environment Variables:**
-- `DATABASE_URL` - MySQL connection string
-- `JWT_SECRET` - Session token signing key
-- `STRIPE_SECRET_KEY` - Stripe API key
-- `STRIPE_WEBHOOK_SECRET` - Webhook verification
-- `AWS_ACCESS_KEY_ID` - S3 credentials
-- `OPENAI_API_KEY` - AI service access
+
+EquiProfile requires specific environment variables to function correctly in production. The application will **refuse to start** in production mode if any critical variables are missing or improperly configured.
+
+**Required (Application will NOT start without these):**
+- `DATABASE_URL` - MySQL connection string (format: `mysql://user:pass@host:port/database`)
+- `JWT_SECRET` - Session token signing key (64+ random characters)
+- `ADMIN_UNLOCK_PASSWORD` - Admin mode unlock password (16+ characters, **NOT** default `ashmor12@`)
+- `STRIPE_SECRET_KEY` - Stripe API key for payment processing
+- `STRIPE_WEBHOOK_SECRET` - Webhook signature verification key
+- `AWS_ACCESS_KEY_ID` - AWS credentials for S3 file storage
+- `AWS_SECRET_ACCESS_KEY` - AWS secret key for S3
+- `AWS_S3_BUCKET` - S3 bucket name for file uploads
+- `AWS_REGION` - AWS region (default: `eu-west-2`)
+
+**Optional (Features may be degraded without these):**
+- `OPENAI_API_KEY` - AI service access for chat and insights
+- `SMTP_HOST` - Email notification server
+- `SMTP_PORT` - SMTP port (usually 587)
+- `SMTP_USER` - Email account username
+- `SMTP_PASS` - Email account password
+- `SMTP_FROM` - Sender address for system emails
+- `BASE_URL` - Application base URL (for emails and links)
+- `COOKIE_DOMAIN` - Cookie domain for session management
+- `COOKIE_SECURE` - Set to `true` in production for HTTPS-only cookies
+- `OAUTH_SERVER_URL` - External OAuth provider URL (if not using built-in)
+- `VITE_APP_ID` - Application identifier
+- `OWNER_OPEN_ID` - Owner account identifier for auto-admin assignment
+
+**Production Validation:**
+The application performs startup validation in production mode:
+1. ✅ Checks all critical environment variables are present
+2. ✅ Validates `ADMIN_UNLOCK_PASSWORD` is not the default value
+3. ✅ Exits with clear error message if validation fails
+4. ✅ Prevents insecure deployment configurations
+
+**Generating Secure Values:**
+```bash
+# Generate JWT secret (64 characters)
+openssl rand -base64 48
+
+# Generate admin unlock password (strong)
+openssl rand -base64 24
+
+# Generate webhook secret
+openssl rand -base64 32
+```
+
+**Environment Health Check:**
+Admins can monitor environment configuration status via:
+- Admin Panel → System tab
+- Shows all variables with Set/Missing status
+- Indicates Critical vs. Optional priority
+- Auto-refreshes every 30 seconds
 
 ### Webhook Handling
 

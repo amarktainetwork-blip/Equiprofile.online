@@ -1,7 +1,7 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
+import { publicProcedure, protectedProcedure, adminUnlockedProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import * as db from "./db";
@@ -29,24 +29,6 @@ import {
   healthRecords,
   feedCosts,
 } from "../drizzle/schema";
-
-// Admin procedure middleware - checks both role AND active admin session
-const adminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
-  if (ctx.user.role !== 'admin') {
-    throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
-  }
-  
-  // Check if admin session is active
-  const session = await db.getAdminSession(ctx.user.id);
-  if (!session || session.expiresAt < new Date()) {
-    throw new TRPCError({ 
-      code: 'FORBIDDEN', 
-      message: 'Admin session expired. Please unlock admin mode again.' 
-    });
-  }
-  
-  return next({ ctx });
-});
 
 // Subscription check middleware
 const subscribedProcedure = protectedProcedure.use(async ({ ctx, next }) => {
@@ -133,7 +115,7 @@ export const appRouter = router({
 
         if (input.password !== adminPassword) {
           await db.logActivity({
-            userId: ctx.user.id,
+            userId: ctx.user!.id,
             action: 'admin_unlock_failed',
             entityType: 'system',
             details: JSON.stringify({ attempts }),
@@ -150,7 +132,7 @@ export const appRouter = router({
         await db.resetUnlockAttempts(ctx.user.id);
         
         await db.logActivity({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           action: 'admin_unlocked',
           entityType: 'system',
           details: JSON.stringify({ expiresAt }),
@@ -341,7 +323,7 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         await db.updateUser(ctx.user.id, input);
         await db.logActivity({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           action: 'profile_updated',
           entityType: 'user',
           entityId: ctx.user.id,
@@ -414,11 +396,11 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         const id = await db.createHorse({
           ...input,
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           dateOfBirth: input.dateOfBirth ? new Date(input.dateOfBirth) : undefined,
         });
         await db.logActivity({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           action: 'horse_created',
           entityType: 'horse',
           entityId: id,
@@ -452,7 +434,7 @@ export const appRouter = router({
           dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : undefined,
         });
         await db.logActivity({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           action: 'horse_updated',
           entityType: 'horse',
           entityId: id,
@@ -465,7 +447,7 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         await db.deleteHorse(input.id, ctx.user.id);
         await db.logActivity({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           action: 'horse_deleted',
           entityType: 'horse',
           entityId: input.id,
@@ -514,12 +496,12 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         const id = await db.createHealthRecord({
           ...input,
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           recordDate: new Date(input.recordDate),
           nextDueDate: input.nextDueDate ? new Date(input.nextDueDate) : undefined,
         });
         await db.logActivity({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           action: 'health_record_created',
           entityType: 'health_record',
           entityId: id,
@@ -600,11 +582,11 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         const id = await db.createTrainingSession({
           ...input,
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           sessionDate: new Date(input.sessionDate),
         });
         await db.logActivity({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           action: 'training_session_created',
           entityType: 'training_session',
           entityId: id,
@@ -689,7 +671,7 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         const id = await db.createFeedingPlan({
           ...input,
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
         });
         return { id };
       }),
@@ -750,7 +732,7 @@ export const appRouter = router({
         const { url } = await storagePut(fileKey, buffer, input.fileType);
         
         const id = await db.createDocument({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           horseId: input.horseId,
           healthRecordId: input.healthRecordId,
           fileName: input.fileName,
@@ -763,7 +745,7 @@ export const appRouter = router({
         });
         
         await db.logActivity({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           action: 'document_uploaded',
           entityType: 'document',
           entityId: id,
@@ -847,7 +829,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
 
         // Save weather log
         await db.createWeatherLog({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           location: input.location,
           temperature: input.temperature,
           humidity: input.humidity,
@@ -880,11 +862,11 @@ Format your response as JSON with keys: recommendation, explanation, precautions
   // Admin routes
   admin: router({
     // User management
-    getUsers: adminProcedure.query(async () => {
+    getUsers: adminUnlockedProcedure.query(async () => {
       return db.getAllUsers();
     }),
     
-    getUserDetails: adminProcedure
+    getUserDetails: adminUnlockedProcedure
       .input(z.object({ userId: z.number() }))
       .query(async ({ input }) => {
         const user = await db.getUserById(input.userId);
@@ -896,7 +878,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         return { user, horses, activity };
       }),
     
-    suspendUser: adminProcedure
+    suspendUser: adminUnlockedProcedure
       .input(z.object({
         userId: z.number(),
         reason: z.string(),
@@ -904,7 +886,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
       .mutation(async ({ ctx, input }) => {
         await db.suspendUser(input.userId, input.reason);
         await db.logActivity({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           action: 'user_suspended',
           entityType: 'user',
           entityId: input.userId,
@@ -913,12 +895,12 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         return { success: true };
       }),
     
-    unsuspendUser: adminProcedure
+    unsuspendUser: adminUnlockedProcedure
       .input(z.object({ userId: z.number() }))
       .mutation(async ({ ctx, input }) => {
         await db.unsuspendUser(input.userId);
         await db.logActivity({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           action: 'user_unsuspended',
           entityType: 'user',
           entityId: input.userId,
@@ -926,12 +908,12 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         return { success: true };
       }),
     
-    deleteUser: adminProcedure
+    deleteUser: adminUnlockedProcedure
       .input(z.object({ userId: z.number() }))
       .mutation(async ({ ctx, input }) => {
         await db.deleteUser(input.userId);
         await db.logActivity({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           action: 'user_deleted',
           entityType: 'user',
           entityId: input.userId,
@@ -939,7 +921,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         return { success: true };
       }),
     
-    updateUserRole: adminProcedure
+    updateUserRole: adminUnlockedProcedure
       .input(z.object({
         userId: z.number(),
         role: z.enum(['user', 'admin']),
@@ -947,7 +929,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
       .mutation(async ({ ctx, input }) => {
         await db.updateUser(input.userId, { role: input.role });
         await db.logActivity({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           action: 'user_role_updated',
           entityType: 'user',
           entityId: input.userId,
@@ -957,31 +939,31 @@ Format your response as JSON with keys: recommendation, explanation, precautions
       }),
     
     // System stats
-    getStats: adminProcedure.query(async () => {
+    getStats: adminUnlockedProcedure.query(async () => {
       return db.getSystemStats();
     }),
     
-    getOverdueUsers: adminProcedure.query(async () => {
+    getOverdueUsers: adminUnlockedProcedure.query(async () => {
       return db.getOverdueSubscriptions();
     }),
     
-    getExpiredTrials: adminProcedure.query(async () => {
+    getExpiredTrials: adminUnlockedProcedure.query(async () => {
       return db.getExpiredTrials();
     }),
     
     // Activity logs
-    getActivityLogs: adminProcedure
+    getActivityLogs: adminUnlockedProcedure
       .input(z.object({ limit: z.number().default(100) }))
       .query(async ({ input }) => {
         return db.getActivityLogs(input.limit);
       }),
     
     // System settings
-    getSettings: adminProcedure.query(async () => {
+    getSettings: adminUnlockedProcedure.query(async () => {
       return db.getAllSettings();
     }),
     
-    updateSetting: adminProcedure
+    updateSetting: adminUnlockedProcedure
       .input(z.object({
         key: z.string(),
         value: z.string(),
@@ -989,9 +971,9 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         description: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        await db.upsertSetting(input.key, input.value, input.type, input.description, ctx.user.id);
+        await db.upsertSetting(input.key, input.value, input.type, input.description, ctx.user!.id);
         await db.logActivity({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           action: 'setting_updated',
           entityType: 'setting',
           details: JSON.stringify({ key: input.key }),
@@ -1000,11 +982,121 @@ Format your response as JSON with keys: recommendation, explanation, precautions
       }),
     
     // Backup logs
-    getBackupLogs: adminProcedure
+    getBackupLogs: adminUnlockedProcedure
       .input(z.object({ limit: z.number().default(10) }))
       .query(async ({ input }) => {
         return db.getRecentBackups(input.limit);
       }),
+    
+    // API Key Management
+    apiKeys: router({
+      list: adminUnlockedProcedure.query(async ({ ctx }) => {
+        return db.listApiKeys(ctx.user.id);
+      }),
+      
+      create: adminUnlockedProcedure
+        .input(z.object({
+          name: z.string().min(1).max(100),
+          rateLimit: z.number().min(1).max(10000).optional(),
+          permissions: z.array(z.string()).optional(),
+          expiresAt: z.string().optional(),
+        }))
+        .mutation(async ({ ctx, input }) => {
+          const result = await db.createApiKey({
+            userId: ctx.user!.id,
+            name: input.name,
+            rateLimit: input.rateLimit,
+            permissions: input.permissions,
+            expiresAt: input.expiresAt ? new Date(input.expiresAt) : undefined,
+          });
+          
+          await db.logActivity({
+            userId: ctx.user!.id,
+            action: 'api_key_created',
+            entityType: 'api_key',
+            entityId: result.id,
+            details: JSON.stringify({ name: input.name }),
+          });
+          
+          return result; // Contains { id, key }
+        }),
+      
+      revoke: adminUnlockedProcedure
+        .input(z.object({ id: z.number() }))
+        .mutation(async ({ ctx, input }) => {
+          await db.revokeApiKey(input.id, ctx.user.id);
+          await db.logActivity({
+            userId: ctx.user!.id,
+            action: 'api_key_revoked',
+            entityType: 'api_key',
+            entityId: input.id,
+          });
+          return { success: true };
+        }),
+      
+      rotate: adminUnlockedProcedure
+        .input(z.object({ id: z.number() }))
+        .mutation(async ({ ctx, input }) => {
+          const result = await db.rotateApiKey(input.id, ctx.user.id);
+          if (!result) {
+            throw new TRPCError({ code: 'NOT_FOUND', message: 'API key not found' });
+          }
+          
+          await db.logActivity({
+            userId: ctx.user!.id,
+            action: 'api_key_rotated',
+            entityType: 'api_key',
+            entityId: input.id,
+          });
+          
+          return result; // Contains { key }
+        }),
+      
+      updateSettings: adminUnlockedProcedure
+        .input(z.object({
+          id: z.number(),
+          name: z.string().optional(),
+          rateLimit: z.number().optional(),
+          permissions: z.array(z.string()).optional(),
+          isActive: z.boolean().optional(),
+        }))
+        .mutation(async ({ ctx, input }) => {
+          const { id, ...data } = input;
+          await db.updateApiKeySettings(id, ctx.user.id, data);
+          await db.logActivity({
+            userId: ctx.user!.id,
+            action: 'api_key_updated',
+            entityType: 'api_key',
+            entityId: id,
+          });
+          return { success: true };
+        }),
+    }),
+    
+    // Environment Health Check
+    getEnvHealth: adminUnlockedProcedure.query(() => {
+      const checks = [
+        { name: 'DATABASE_URL', status: !!process.env.DATABASE_URL, critical: true },
+        { name: 'JWT_SECRET', status: !!process.env.JWT_SECRET, critical: true },
+        { name: 'ADMIN_UNLOCK_PASSWORD', status: !!process.env.ADMIN_UNLOCK_PASSWORD, critical: true },
+        { name: 'STRIPE_SECRET_KEY', status: !!process.env.STRIPE_SECRET_KEY, critical: true },
+        { name: 'STRIPE_WEBHOOK_SECRET', status: !!process.env.STRIPE_WEBHOOK_SECRET, critical: true },
+        { name: 'AWS_ACCESS_KEY_ID', status: !!process.env.AWS_ACCESS_KEY_ID, critical: true },
+        { name: 'AWS_SECRET_ACCESS_KEY', status: !!process.env.AWS_SECRET_ACCESS_KEY, critical: true },
+        { name: 'AWS_S3_BUCKET', status: !!process.env.AWS_S3_BUCKET, critical: true },
+        { name: 'OPENAI_API_KEY', status: !!process.env.OPENAI_API_KEY, critical: false },
+        { name: 'SMTP_HOST', status: !!process.env.SMTP_HOST, critical: false },
+      ];
+      
+      const allCriticalOk = checks.filter(c => c.critical).every(c => c.status);
+      
+      return {
+        healthy: allCriticalOk,
+        checks,
+        environment: process.env.NODE_ENV || 'development',
+        timestamp: new Date().toISOString(),
+      };
+    }),
   }),
 
   // Stable management
@@ -1030,7 +1122,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         // Add creator as owner member
         await db.insert(stableMembers).values({
           stableId: result[0].insertId,
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           role: 'owner',
         });
         
@@ -1354,7 +1446,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         let reportData = {};
         
         const result = await db.insert(reports).values({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           stableId: input.stableId,
           horseId: input.horseId,
           reportType: input.reportType,
@@ -1392,7 +1484,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
         
         const result = await db.insert(reportSchedules).values({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           stableId: input.stableId,
           reportType: input.reportType,
           frequency: input.frequency,
@@ -1445,7 +1537,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         
         const result = await db.insert(events).values({
           ...input,
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           startDate: new Date(input.startDate),
           endDate: input.endDate ? new Date(input.endDate) : null,
         });
@@ -1521,7 +1613,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         
         const result = await db.insert(competitions).values({
           ...input,
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           date: new Date(input.date),
         });
         
@@ -1575,7 +1667,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         
         const result = await db.insert(trainingProgramTemplates).values({
           ...input,
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
         });
         
         return { id: result[0].insertId };
@@ -1604,7 +1696,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         // Create program instance
         const result = await db.insert(trainingPrograms).values({
           horseId: input.horseId,
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           templateId: input.templateId,
           name: template[0].name,
           startDate: new Date(input.startDate),
