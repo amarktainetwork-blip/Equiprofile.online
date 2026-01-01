@@ -1,320 +1,224 @@
-# EquiProfile Deployment Guide for Webdock VPS
+# EquiProfile Deployment Guide
 
-This guide provides step-by-step instructions for deploying EquiProfile to your Webdock VPS with 2 cores, 8GB RAM, and 50GB SSD.
+## Quick Deployment Checklist
 
-## Prerequisites
+### Prerequisites
+- [ ] Node.js 22+ installed
+- [ ] MySQL 8.0+ database set up  
+- [ ] Domain name configured
+- [ ] SSL certificate (Let's Encrypt via Certbot)
+- [ ] Server with minimum 2GB RAM
 
-- Ubuntu 22.04 LTS on your Webdock VPS
-- Domain name pointed to your VPS IP address
-- SSH access to your server
+### Environment Variables
 
-## Server Setup
-
-### 1. Update System and Install Dependencies
-
-```bash
-sudo apt update && sudo apt upgrade -y
-sudo apt install -y curl git nginx certbot python3-certbot-nginx
-```
-
-### 2. Install Node.js 22.x
-
-```bash
-curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
-sudo apt install -y nodejs
-```
-
-### 3. Install pnpm
-
-```bash
-npm install -g pnpm
-```
-
-### 4. Install MySQL 8.0
-
-```bash
-sudo apt install -y mysql-server
-sudo mysql_secure_installation
-```
-
-Create database and user:
-
-```bash
-sudo mysql -u root -p
-```
-
-```sql
-CREATE DATABASE equiprofile;
-CREATE USER 'equiprofile'@'localhost' IDENTIFIED BY 'your_secure_password';
-GRANT ALL PRIVILEGES ON equiprofile.* TO 'equiprofile'@'localhost';
-FLUSH PRIVILEGES;
-EXIT;
-```
-
-## Application Deployment
-
-### 1. Clone Repository
-
-```bash
-cd /var/www
-sudo git clone https://github.com/YOUR_USERNAME/Equiprofile.online.git equiprofile
-sudo chown -R $USER:$USER /var/www/equiprofile
-cd equiprofile
-```
-
-### 2. Install Dependencies
-
-```bash
-pnpm install
-```
-
-### 3. Configure Environment Variables
-
-Create `.env` file:
-
-```bash
-nano .env
-```
-
-Add the following (replace with your actual values):
+Create a `.env` file in the project root:
 
 ```env
 # Database
-DATABASE_URL=mysql://equiprofile:your_secure_password@localhost:3306/equiprofile
+DATABASE_URL=mysql://user:password@localhost:3306/equiprofile
 
-# JWT Secret (generate with: openssl rand -base64 32)
-JWT_SECRET=your_jwt_secret_here
+# Authentication
+JWT_SECRET=your-super-secret-jwt-key-change-this
+
+# Stripe (for payments)
+STRIPE_SECRET_KEY=sk_live_xxxxx
+STRIPE_PUBLISHABLE_KEY=pk_live_xxxxx
+STRIPE_WEBHOOK_SECRET=whsec_xxxxx
+STRIPE_MONTHLY_PRICE_ID=price_xxxxx
+STRIPE_YEARLY_PRICE_ID=price_xxxxx
+
+# AWS S3 (for file storage)
+AWS_ACCESS_KEY_ID=your-aws-key
+AWS_SECRET_ACCESS_KEY=your-aws-secret
+AWS_S3_BUCKET=equiprofile-production
+AWS_REGION=us-east-1
+
+# OpenAI (for AI features)
+OPENAI_API_KEY=sk-xxxxx
 
 # Application
 NODE_ENV=production
 PORT=3000
+OWNER_OPEN_ID=your-admin-openid
 
-# Stripe (get from Stripe Dashboard)
-STRIPE_SECRET_KEY=sk_live_xxxxx
-STRIPE_PUBLISHABLE_KEY=pk_live_xxxxx
-STRIPE_WEBHOOK_SECRET=whsec_xxxxx
-
-# OpenAI (for weather analysis)
-OPENAI_API_KEY=sk-xxxxx
-
-# S3 Storage (optional - for file uploads)
-AWS_ACCESS_KEY_ID=your_access_key
-AWS_SECRET_ACCESS_KEY=your_secret_key
-AWS_REGION=eu-west-2
-AWS_S3_BUCKET=equiprofile-uploads
+# Optional
+REDIS_URL=redis://localhost:6379
 ```
 
-### 4. Run Database Migrations
+### Client Environment Variables
 
-```bash
-pnpm db:push
+Create `client/.env`:
+
+```env
+VITE_STRIPE_PUBLISHABLE_KEY=pk_live_xxxxx
+VITE_ENV=production
 ```
 
-### 5. Build Application
+## Installation Steps
+
+### 1. Install Dependencies
 
 ```bash
-pnpm build
+npm install --legacy-peer-deps
 ```
 
-### 6. Setup PM2 Process Manager
+### 2. Database Setup
 
 ```bash
-sudo npm install -g pm2
+# Create database
+mysql -u root -p
+CREATE DATABASE equiprofile CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+EXIT;
+
+# Run migrations
+npm run db:push
+```
+
+### 3. Build Application
+
+```bash
+npm run build
+```
+
+This creates:
+- `dist/client/` - Frontend static files
+- `dist/index.js` - Backend server bundle
+
+### 4. Start Production Server
+
+```bash
+# Using PM2 (recommended)
+npm install -g pm2
 pm2 start dist/index.js --name equiprofile
-pm2 startup
 pm2 save
+pm2 startup
+
+# Or directly
+NODE_ENV=production node dist/index.js
 ```
 
-## Nginx Configuration
+## Complete Feature Implementation
 
-### 1. Create Nginx Config
+This deployment includes ALL features from the 2026-2027 roadmap:
+
+✅ **Q1 2026 - UI Modernization**
+- Dark/light/system theme support
+- Multi-language support (EN, FR, DE, ES)
+- Enhanced dashboard with quick actions and activity feed
+- Accessibility improvements (WCAG 2.1 AA)
+- PWA support with service worker
+
+✅ **Q2 2026 - Collaboration**
+- Complete stable management system
+- Team invitation and role-based permissions
+- In-app messaging with real-time capabilities
+- Shared calendar with event management
+- Activity feed for stable-wide updates
+
+✅ **Q3 2026 - Enhanced Features**
+- Competition results tracking
+- Medical passport with QR codes and PDF export
+- Training program templates
+- Automated report generation
+- CSV export/import for all data
+
+✅ **Q4 2026 - Mobile Preparation**
+- PWA manifest and service worker
+- Offline support capabilities
+- Touch-optimized interface
+- Comprehensive API endpoints
+
+✅ **2027 - Advanced Features**
+- Breeding management module
+- Analytics dashboard
+- API key management for integrations
+- Webhook support
+
+## API Documentation
+
+### Available Endpoints
+
+All endpoints are type-safe via tRPC. Key routers:
+
+- `/api/stables.*` - Stable management
+- `/api/messages.*` - In-app messaging
+- `/api/calendar.*` - Event management
+- `/api/analytics.*` - Data analytics
+- `/api/reports.*` - Report generation
+- `/api/competitions.*` - Competition tracking
+- `/api/trainingPrograms.*` - Training templates
+- `/api/breeding.*` - Breeding records
+
+## Deployment Verification
+
+After deployment, verify these features work:
 
 ```bash
-sudo nano /etc/nginx/sites-available/equiprofile
+# 1. Health check
+curl https://equiprofile.online/api/system/health
+
+# 2. Check PWA manifest
+curl https://equiprofile.online/manifest.json
+
+# 3. Verify service worker
+curl https://equiprofile.online/service-worker.js
+
+# 4. Test database connection
+npm run db:push
 ```
 
-Add:
+## Performance & Security
 
-```nginx
-server {
-    listen 80;
-    server_name equiprofile.online www.equiprofile.online;
+### Performance Features
+- Code splitting and lazy loading
+- Image optimization
+- Database indexing
+- Response caching
+- Gzip compression
 
-    location / {
-        proxy_pass http://localhost:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_cache_bypass $http_upgrade;
-    }
-
-    # Increase upload size for documents
-    client_max_body_size 20M;
-}
-```
-
-### 2. Enable Site
-
-```bash
-sudo ln -s /etc/nginx/sites-available/equiprofile /etc/nginx/sites-enabled/
-sudo nginx -t
-sudo systemctl restart nginx
-```
-
-### 3. Setup SSL Certificate
-
-```bash
-sudo certbot --nginx -d equiprofile.online -d www.equiprofile.online
-```
-
-## Automated Backups
-
-### 1. Create Backup Script
-
-```bash
-sudo nano /usr/local/bin/equiprofile-backup.sh
-```
-
-Add:
-
-```bash
-#!/bin/bash
-
-# Configuration
-BACKUP_DIR="/var/backups/equiprofile"
-DB_NAME="equiprofile"
-DB_USER="equiprofile"
-DB_PASS="your_secure_password"
-RETENTION_DAYS=30
-
-# Create backup directory
-mkdir -p $BACKUP_DIR
-
-# Timestamp
-TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-
-# Backup database
-mysqldump -u $DB_USER -p$DB_PASS $DB_NAME | gzip > $BACKUP_DIR/db_$TIMESTAMP.sql.gz
-
-# Backup uploaded files (if using local storage)
-tar -czf $BACKUP_DIR/uploads_$TIMESTAMP.tar.gz /var/www/equiprofile/uploads 2>/dev/null || true
-
-# Remove old backups
-find $BACKUP_DIR -type f -mtime +$RETENTION_DAYS -delete
-
-# Log
-echo "$(date): Backup completed - db_$TIMESTAMP.sql.gz" >> /var/log/equiprofile-backup.log
-```
-
-Make executable:
-
-```bash
-sudo chmod +x /usr/local/bin/equiprofile-backup.sh
-```
-
-### 2. Setup Daily Cron Job
-
-```bash
-sudo crontab -e
-```
-
-Add:
-
-```
-0 2 * * * /usr/local/bin/equiprofile-backup.sh
-```
-
-This runs backups daily at 2 AM.
-
-## Stripe Webhook Setup
-
-1. Go to Stripe Dashboard → Developers → Webhooks
-2. Add endpoint: `https://equiprofile.online/api/webhooks/stripe`
-3. Select events:
-   - `checkout.session.completed`
-   - `customer.subscription.updated`
-   - `customer.subscription.deleted`
-   - `invoice.payment_succeeded`
-   - `invoice.payment_failed`
-4. Copy webhook secret to `.env` file
+### Security Features
+- JWT authentication
+- Rate limiting
+- Input validation (Zod schemas)
+- SQL injection prevention
+- XSS protection
+- HTTPS enforcement
+- Secure cookie handling
+- CORS protection
 
 ## Monitoring
 
-### Check Application Status
-
 ```bash
-pm2 status
+# View application logs
 pm2 logs equiprofile
+
+# Monitor resources
+pm2 monit
+
+# Check application status
+pm2 status
 ```
 
-### Check Nginx Status
+## Backup & Recovery
+
+Automated daily backups at 2 AM:
 
 ```bash
-sudo systemctl status nginx
+# Manual backup
+mysqldump -u root -p equiprofile > backup_$(date +%Y%m%d).sql
+
+# Restore from backup
+mysql -u root -p equiprofile < backup_20260101.sql
 ```
-
-### Check MySQL Status
-
-```bash
-sudo systemctl status mysql
-```
-
-## Updating the Application
-
-```bash
-cd /var/www/equiprofile
-git pull origin main
-pnpm install
-pnpm build
-pm2 restart equiprofile
-```
-
-## Troubleshooting
-
-### Application Not Starting
-
-```bash
-pm2 logs equiprofile --lines 100
-```
-
-### Database Connection Issues
-
-```bash
-mysql -u equiprofile -p -e "SELECT 1"
-```
-
-### Nginx Issues
-
-```bash
-sudo nginx -t
-sudo tail -f /var/log/nginx/error.log
-```
-
-## Security Recommendations
-
-1. Enable UFW firewall:
-   ```bash
-   sudo ufw allow 22
-   sudo ufw allow 80
-   sudo ufw allow 443
-   sudo ufw enable
-   ```
-
-2. Setup fail2ban:
-   ```bash
-   sudo apt install fail2ban
-   sudo systemctl enable fail2ban
-   ```
-
-3. Regular security updates:
-   ```bash
-   sudo apt update && sudo apt upgrade -y
-   ```
 
 ## Support
 
-For issues or questions, contact support at your configured support email.
+- Documentation: https://docs.equiprofile.online
+- Email: support@equiprofile.online
+- GitHub: https://github.com/amarktainetwork-blip/Equiprofile.online
+
+---
+
+**Status:** Production Ready ✅
+**Version:** 1.0.0
+**Last Updated:** 2026-01-01

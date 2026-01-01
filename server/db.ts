@@ -22,7 +22,21 @@ import {
   shareLinks, InsertShareLink,
   competitions, InsertCompetition,
   documentTags, InsertDocumentTag,
-  stripeEvents, InsertStripeEvent
+  stripeEvents, InsertStripeEvent,
+  messageThreads, InsertMessageThread,
+  messages, InsertMessage,
+  competitionResults, InsertCompetitionResult,
+  trainingProgramTemplates, InsertTrainingProgramTemplate,
+  trainingPrograms, InsertTrainingProgram,
+  reports, InsertReport,
+  reportSchedules, InsertReportSchedule,
+  breeding, InsertBreeding,
+  foals, InsertFoal,
+  pedigree, InsertPedigree,
+  lessonBookings, InsertLessonBooking,
+  trainerAvailability, InsertTrainerAvailability,
+  apiKeys, InsertApiKey,
+  webhooks, InsertWebhook
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
