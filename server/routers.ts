@@ -1,7 +1,7 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
+import { publicProcedure, protectedProcedure, adminUnlockedProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import * as db from "./db";
@@ -29,24 +29,6 @@ import {
   healthRecords,
   feedCosts,
 } from "../drizzle/schema";
-
-// Admin procedure middleware - checks both role AND active admin session
-const adminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
-  if (ctx.user.role !== 'admin') {
-    throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
-  }
-  
-  // Check if admin session is active
-  const session = await db.getAdminSession(ctx.user.id);
-  if (!session || session.expiresAt < new Date()) {
-    throw new TRPCError({ 
-      code: 'FORBIDDEN', 
-      message: 'Admin session expired. Please unlock admin mode again.' 
-    });
-  }
-  
-  return next({ ctx });
-});
 
 // Subscription check middleware
 const subscribedProcedure = protectedProcedure.use(async ({ ctx, next }) => {
@@ -880,11 +862,11 @@ Format your response as JSON with keys: recommendation, explanation, precautions
   // Admin routes
   admin: router({
     // User management
-    getUsers: adminProcedure.query(async () => {
+    getUsers: adminUnlockedProcedure.query(async () => {
       return db.getAllUsers();
     }),
     
-    getUserDetails: adminProcedure
+    getUserDetails: adminUnlockedProcedure
       .input(z.object({ userId: z.number() }))
       .query(async ({ input }) => {
         const user = await db.getUserById(input.userId);
@@ -896,7 +878,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         return { user, horses, activity };
       }),
     
-    suspendUser: adminProcedure
+    suspendUser: adminUnlockedProcedure
       .input(z.object({
         userId: z.number(),
         reason: z.string(),
@@ -913,7 +895,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         return { success: true };
       }),
     
-    unsuspendUser: adminProcedure
+    unsuspendUser: adminUnlockedProcedure
       .input(z.object({ userId: z.number() }))
       .mutation(async ({ ctx, input }) => {
         await db.unsuspendUser(input.userId);
@@ -926,7 +908,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         return { success: true };
       }),
     
-    deleteUser: adminProcedure
+    deleteUser: adminUnlockedProcedure
       .input(z.object({ userId: z.number() }))
       .mutation(async ({ ctx, input }) => {
         await db.deleteUser(input.userId);
@@ -939,7 +921,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         return { success: true };
       }),
     
-    updateUserRole: adminProcedure
+    updateUserRole: adminUnlockedProcedure
       .input(z.object({
         userId: z.number(),
         role: z.enum(['user', 'admin']),
@@ -957,31 +939,31 @@ Format your response as JSON with keys: recommendation, explanation, precautions
       }),
     
     // System stats
-    getStats: adminProcedure.query(async () => {
+    getStats: adminUnlockedProcedure.query(async () => {
       return db.getSystemStats();
     }),
     
-    getOverdueUsers: adminProcedure.query(async () => {
+    getOverdueUsers: adminUnlockedProcedure.query(async () => {
       return db.getOverdueSubscriptions();
     }),
     
-    getExpiredTrials: adminProcedure.query(async () => {
+    getExpiredTrials: adminUnlockedProcedure.query(async () => {
       return db.getExpiredTrials();
     }),
     
     // Activity logs
-    getActivityLogs: adminProcedure
+    getActivityLogs: adminUnlockedProcedure
       .input(z.object({ limit: z.number().default(100) }))
       .query(async ({ input }) => {
         return db.getActivityLogs(input.limit);
       }),
     
     // System settings
-    getSettings: adminProcedure.query(async () => {
+    getSettings: adminUnlockedProcedure.query(async () => {
       return db.getAllSettings();
     }),
     
-    updateSetting: adminProcedure
+    updateSetting: adminUnlockedProcedure
       .input(z.object({
         key: z.string(),
         value: z.string(),
@@ -1000,11 +982,121 @@ Format your response as JSON with keys: recommendation, explanation, precautions
       }),
     
     // Backup logs
-    getBackupLogs: adminProcedure
+    getBackupLogs: adminUnlockedProcedure
       .input(z.object({ limit: z.number().default(10) }))
       .query(async ({ input }) => {
         return db.getRecentBackups(input.limit);
       }),
+    
+    // API Key Management
+    apiKeys: router({
+      list: adminUnlockedProcedure.query(async ({ ctx }) => {
+        return db.listApiKeys(ctx.user.id);
+      }),
+      
+      create: adminUnlockedProcedure
+        .input(z.object({
+          name: z.string().min(1).max(100),
+          rateLimit: z.number().min(1).max(10000).optional(),
+          permissions: z.array(z.string()).optional(),
+          expiresAt: z.string().optional(),
+        }))
+        .mutation(async ({ ctx, input }) => {
+          const result = await db.createApiKey({
+            userId: ctx.user.id,
+            name: input.name,
+            rateLimit: input.rateLimit,
+            permissions: input.permissions,
+            expiresAt: input.expiresAt ? new Date(input.expiresAt) : undefined,
+          });
+          
+          await db.logActivity({
+            userId: ctx.user.id,
+            action: 'api_key_created',
+            entityType: 'api_key',
+            entityId: result.id,
+            details: JSON.stringify({ name: input.name }),
+          });
+          
+          return result; // Contains { id, key }
+        }),
+      
+      revoke: adminUnlockedProcedure
+        .input(z.object({ id: z.number() }))
+        .mutation(async ({ ctx, input }) => {
+          await db.revokeApiKey(input.id, ctx.user.id);
+          await db.logActivity({
+            userId: ctx.user.id,
+            action: 'api_key_revoked',
+            entityType: 'api_key',
+            entityId: input.id,
+          });
+          return { success: true };
+        }),
+      
+      rotate: adminUnlockedProcedure
+        .input(z.object({ id: z.number() }))
+        .mutation(async ({ ctx, input }) => {
+          const result = await db.rotateApiKey(input.id, ctx.user.id);
+          if (!result) {
+            throw new TRPCError({ code: 'NOT_FOUND', message: 'API key not found' });
+          }
+          
+          await db.logActivity({
+            userId: ctx.user.id,
+            action: 'api_key_rotated',
+            entityType: 'api_key',
+            entityId: input.id,
+          });
+          
+          return result; // Contains { key }
+        }),
+      
+      updateSettings: adminUnlockedProcedure
+        .input(z.object({
+          id: z.number(),
+          name: z.string().optional(),
+          rateLimit: z.number().optional(),
+          permissions: z.array(z.string()).optional(),
+          isActive: z.boolean().optional(),
+        }))
+        .mutation(async ({ ctx, input }) => {
+          const { id, ...data } = input;
+          await db.updateApiKeySettings(id, ctx.user.id, data);
+          await db.logActivity({
+            userId: ctx.user.id,
+            action: 'api_key_updated',
+            entityType: 'api_key',
+            entityId: id,
+          });
+          return { success: true };
+        }),
+    }),
+    
+    // Environment Health Check
+    getEnvHealth: adminUnlockedProcedure.query(() => {
+      const checks = [
+        { name: 'DATABASE_URL', status: !!process.env.DATABASE_URL, critical: true },
+        { name: 'JWT_SECRET', status: !!process.env.JWT_SECRET, critical: true },
+        { name: 'ADMIN_UNLOCK_PASSWORD', status: !!process.env.ADMIN_UNLOCK_PASSWORD, critical: true },
+        { name: 'STRIPE_SECRET_KEY', status: !!process.env.STRIPE_SECRET_KEY, critical: true },
+        { name: 'STRIPE_WEBHOOK_SECRET', status: !!process.env.STRIPE_WEBHOOK_SECRET, critical: true },
+        { name: 'AWS_ACCESS_KEY_ID', status: !!process.env.AWS_ACCESS_KEY_ID, critical: true },
+        { name: 'AWS_SECRET_ACCESS_KEY', status: !!process.env.AWS_SECRET_ACCESS_KEY, critical: true },
+        { name: 'AWS_S3_BUCKET', status: !!process.env.AWS_S3_BUCKET, critical: true },
+        { name: 'OPENAI_API_KEY', status: !!process.env.OPENAI_API_KEY, critical: false },
+        { name: 'SMTP_HOST', status: !!process.env.SMTP_HOST, critical: false },
+      ];
+      
+      const allCriticalOk = checks.filter(c => c.critical).every(c => c.status);
+      
+      return {
+        healthy: allCriticalOk,
+        checks,
+        environment: process.env.NODE_ENV || 'development',
+        timestamp: new Date().toISOString(),
+      };
+    }),
   }),
 
   // Stable management

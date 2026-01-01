@@ -39,6 +39,7 @@ import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
+import { trpc } from "@/lib/trpc";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
@@ -138,6 +139,16 @@ function DashboardLayoutContent({
   const activeMenuItem = menuItems.find(item => item.path === location);
   const isMobile = useIsMobile();
 
+  // Check admin unlock status
+  const { data: adminStatus } = trpc.adminUnlock.getStatus.useQuery(
+    undefined,
+    {
+      enabled: user?.role === 'admin', // Only fetch if admin
+      staleTime: 60 * 1000, // Cache for 1 minute
+      refetchInterval: 60 * 1000, // Refresh every minute
+    }
+  );
+
   useEffect(() => {
     if (isCollapsed) {
       setIsResizing(false);
@@ -221,8 +232,8 @@ function DashboardLayoutContent({
                   </SidebarMenuItem>
                 );
               })}
-              {/* Admin menu items - shown to admin users */}
-              {user?.role === 'admin' && (
+              {/* Admin menu items - shown to admin users who have unlocked admin mode */}
+              {user?.role === 'admin' && adminStatus?.isUnlocked && (
                 <>
                   <div className="my-2 px-2">
                     <div className="h-px bg-border" />
@@ -235,7 +246,7 @@ function DashboardLayoutContent({
                           isActive={isActive}
                           onClick={() => setLocation(item.path)}
                           tooltip={item.label}
-                          className={`h-10 transition-all font-normal`}
+                          className="h-10 transition-all font-normal"
                         >
                           <item.icon
                             className={`h-4 w-4 ${isActive ? "text-primary" : ""}`}

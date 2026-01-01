@@ -1,5 +1,7 @@
 import { eq, and, desc, sql, gte, lte, isNull, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
+import bcrypt from "bcrypt";
+import { nanoid } from "nanoid";
 import { 
   InsertUser, users, 
   horses, InsertHorse,
@@ -786,4 +788,145 @@ export async function getUnlockLockoutTime(userId: number): Promise<Date | null>
     .limit(1);
   
   return record[0]?.lockedUntil || null;
+}
+
+// ============ API KEY QUERIES ============
+
+export async function createApiKey(data: {
+  userId: number;
+  stableId?: number;
+  name: string;
+  permissions?: string[];
+  rateLimit?: number;
+  expiresAt?: Date;
+}): Promise<{ id: number; key: string }> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Generate secure API key: prefix + random string
+  const prefix = 'ep_' + nanoid(4);
+  const secret = nanoid(32);
+  const fullKey = prefix + '_' + secret;
+  
+  // Hash the full key for storage
+  const keyHash = await bcrypt.hash(fullKey, 10);
+  
+  const result = await db.insert(apiKeys).values({
+    userId: data.userId,
+    stableId: data.stableId,
+    name: data.name,
+    keyHash,
+    keyPrefix: prefix,
+    permissions: data.permissions ? JSON.stringify(data.permissions) : null,
+    rateLimit: data.rateLimit ?? 100,
+    expiresAt: data.expiresAt,
+  });
+  
+  // Return the PLAIN KEY only once (never stored)
+  return { id: result[0].insertId, key: fullKey };
+}
+
+export async function listApiKeys(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select({
+    id: apiKeys.id,
+    name: apiKeys.name,
+    keyPrefix: apiKeys.keyPrefix,
+    isActive: apiKeys.isActive,
+    rateLimit: apiKeys.rateLimit,
+    lastUsedAt: apiKeys.lastUsedAt,
+    expiresAt: apiKeys.expiresAt,
+    createdAt: apiKeys.createdAt,
+  }).from(apiKeys).where(eq(apiKeys.userId, userId)).orderBy(desc(apiKeys.createdAt));
+}
+
+export async function revokeApiKey(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(apiKeys).set({ isActive: false }).where(
+    and(eq(apiKeys.id, id), eq(apiKeys.userId, userId))
+  );
+}
+
+export async function rotateApiKey(id: number, userId: number): Promise<{ key: string } | null> {
+  const db = await getDb();
+  if (!db) return null;
+  
+  // Get existing key
+  const existing = await db.select().from(apiKeys).where(
+    and(eq(apiKeys.id, id), eq(apiKeys.userId, userId))
+  ).limit(1);
+  
+  if (!existing[0]) return null;
+  
+  // Generate new key
+  const prefix = 'ep_' + nanoid(4);
+  const secret = nanoid(32);
+  const fullKey = prefix + '_' + secret;
+  const keyHash = await bcrypt.hash(fullKey, 10);
+  
+  // Update
+  await db.update(apiKeys).set({
+    keyHash,
+    keyPrefix: prefix,
+  }).where(and(eq(apiKeys.id, id), eq(apiKeys.userId, userId)));
+  
+  return { key: fullKey };
+}
+
+export async function updateApiKeySettings(id: number, userId: number, data: {
+  name?: string;
+  rateLimit?: number;
+  permissions?: string[];
+  isActive?: boolean;
+}) {
+  const db = await getDb();
+  if (!db) return;
+  
+  const updateData: any = {};
+  if (data.name !== undefined) updateData.name = data.name;
+  if (data.rateLimit !== undefined) updateData.rateLimit = data.rateLimit;
+  if (data.permissions !== undefined) updateData.permissions = JSON.stringify(data.permissions);
+  if (data.isActive !== undefined) updateData.isActive = data.isActive;
+  
+  await db.update(apiKeys).set(updateData).where(
+    and(eq(apiKeys.id, id), eq(apiKeys.userId, userId))
+  );
+}
+
+export async function verifyApiKey(key: string): Promise<{ userId: number; permissions: string[] } | null> {
+  const db = await getDb();
+  if (!db) return null;
+  
+  // Extract prefix
+  const prefix = key.substring(0, 7); // "ep_xxxx"
+  
+  // Find keys with this prefix
+  const keys = await db.select().from(apiKeys).where(
+    and(
+      eq(apiKeys.keyPrefix, prefix),
+      eq(apiKeys.isActive, true)
+    )
+  );
+  
+  // Check each key with bcrypt
+  for (const apiKey of keys) {
+    const match = await bcrypt.compare(key, apiKey.keyHash);
+    if (match) {
+      // Check expiration
+      if (apiKey.expiresAt && apiKey.expiresAt < new Date()) {
+        return null; // Expired
+      }
+      
+      // Update last used
+      await db.update(apiKeys).set({ lastUsedAt: new Date() }).where(eq(apiKeys.id, apiKey.id));
+      
+      // Parse permissions
+      const permissions = apiKey.permissions ? JSON.parse(apiKey.permissions) : [];
+      return { userId: apiKey.userId, permissions };
+    }
+  }
+  
+  return null;
 }
