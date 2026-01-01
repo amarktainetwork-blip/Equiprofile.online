@@ -4,6 +4,7 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import "./i18n/config";
 
 // Pages
 import Home from "./pages/Home";
@@ -17,6 +18,11 @@ import Feeding from "./pages/Feeding";
 import Weather from "./pages/Weather";
 import Documents from "./pages/Documents";
 import Admin from "./pages/Admin";
+import Stable from "./pages/Stable";
+import Messages from "./pages/Messages";
+import Analytics from "./pages/Analytics";
+import Reports from "./pages/Reports";
+import Calendar from "./pages/Calendar";
 
 function Router() {
   return (
@@ -48,6 +54,21 @@ function Router() {
       {/* Documents */}
       <Route path="/documents" component={Documents} />
       
+      {/* Stable Management */}
+      <Route path="/stable" component={Stable} />
+      
+      {/* Messaging */}
+      <Route path="/messages" component={Messages} />
+      
+      {/* Analytics */}
+      <Route path="/analytics" component={Analytics} />
+      
+      {/* Reports */}
+      <Route path="/reports" component={Reports} />
+      
+      {/* Calendar */}
+      <Route path="/calendar" component={Calendar} />
+      
       {/* Admin panel - requires admin role */}
       <Route path="/admin" component={Admin} />
       
@@ -61,7 +82,7 @@ function Router() {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="light">
+      <ThemeProvider defaultTheme="system" switchable={true}>
         <TooltipProvider>
           <Toaster />
           <Router />
