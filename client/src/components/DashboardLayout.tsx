@@ -35,7 +35,8 @@ import {
   Shield,
   MessageSquare,
   ListChecks,
-  Baby
+  Baby,
+  Calendar
 } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
@@ -51,6 +52,7 @@ const menuItems = [
   { icon: Activity, label: "Training", path: "/training" },
   { icon: ListChecks, label: "Training Templates", path: "/training-templates" },
   { icon: Baby, label: "Breeding", path: "/breeding" },
+  { icon: Calendar, label: "Lessons", path: "/lessons" },
   { icon: Utensils, label: "Feeding Plans", path: "/feeding" },
   { icon: Cloud, label: "Weather", path: "/weather" },
   { icon: FileText, label: "Documents", path: "/documents" },

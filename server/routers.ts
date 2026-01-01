@@ -37,6 +37,8 @@ import {
   trainingSessions,
   healthRecords,
   feedCosts,
+  lessonBookings,
+  trainerAvailability,
 } from "../drizzle/schema";
 
 // Subscription check middleware
@@ -2156,6 +2158,320 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         mimeType: 'text/csv',
       };
     }),
+  }),
+
+  // Trainer availability management
+  trainerAvailability: router({
+    create: protectedProcedure
+      .input(z.object({
+        dayOfWeek: z.number().min(0).max(6),
+        startTime: z.string().regex(/^\d{2}:\d{2}$/),
+        endTime: z.string().regex(/^\d{2}:\d{2}$/),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        }
+        
+        const result = await db.insert(trainerAvailability).values({
+          trainerId: ctx.user.id,
+          dayOfWeek: input.dayOfWeek,
+          startTime: input.startTime,
+          endTime: input.endTime,
+          isActive: true,
+        });
+        
+        return { id: result[0].insertId };
+      }),
+
+    list: protectedProcedure.query(async ({ ctx }) => {
+      const db = await getDb();
+      if (!db) return [];
+      
+      return db.select()
+        .from(trainerAvailability)
+        .where(and(
+          eq(trainerAvailability.trainerId, ctx.user.id),
+          eq(trainerAvailability.isActive, true)
+        ))
+        .orderBy(trainerAvailability.dayOfWeek, trainerAvailability.startTime);
+    }),
+
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        dayOfWeek: z.number().min(0).max(6).optional(),
+        startTime: z.string().regex(/^\d{2}:\d{2}$/).optional(),
+        endTime: z.string().regex(/^\d{2}:\d{2}$/).optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        }
+
+        const existing = await db.select().from(trainerAvailability)
+          .where(eq(trainerAvailability.id, input.id))
+          .limit(1);
+        
+        if (!existing.length || existing[0].trainerId !== ctx.user.id) {
+          throw new TRPCError({ code: 'NOT_FOUND' });
+        }
+
+        const updateData: any = {};
+        if (input.dayOfWeek !== undefined) updateData.dayOfWeek = input.dayOfWeek;
+        if (input.startTime) updateData.startTime = input.startTime;
+        if (input.endTime) updateData.endTime = input.endTime;
+
+        await db.update(trainerAvailability)
+          .set(updateData)
+          .where(eq(trainerAvailability.id, input.id));
+
+        return { success: true };
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        }
+
+        const existing = await db.select().from(trainerAvailability)
+          .where(eq(trainerAvailability.id, input.id))
+          .limit(1);
+        
+        if (!existing.length || existing[0].trainerId !== ctx.user.id) {
+          throw new TRPCError({ code: 'NOT_FOUND' });
+        }
+
+        await db.update(trainerAvailability)
+          .set({ isActive: false })
+          .where(eq(trainerAvailability.id, input.id));
+
+        return { success: true };
+      }),
+  }),
+
+  // Lesson bookings management
+  lessonBookings: router({
+    create: protectedProcedure
+      .input(z.object({
+        trainerId: z.number(),
+        horseId: z.number().optional(),
+        lessonDate: z.string(),
+        duration: z.number(),
+        lessonType: z.string().optional(),
+        location: z.string().optional(),
+        fee: z.number().optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        }
+        
+        const result = await db.insert(lessonBookings).values({
+          trainerId: input.trainerId,
+          clientId: ctx.user.id,
+          horseId: input.horseId,
+          lessonDate: new Date(input.lessonDate),
+          duration: input.duration,
+          lessonType: input.lessonType,
+          location: input.location,
+          status: 'scheduled',
+          fee: input.fee,
+          paid: false,
+          notes: input.notes,
+        });
+        
+        return { id: result[0].insertId };
+      }),
+
+    list: protectedProcedure
+      .input(z.object({
+        asTrainer: z.boolean().optional(),
+        status: z.enum(['scheduled', 'completed', 'cancelled', 'no_show']).optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) return [];
+        
+        let conditions: any[] = [];
+        
+        if (input.asTrainer) {
+          conditions.push(eq(lessonBookings.trainerId, ctx.user.id));
+        } else {
+          conditions.push(eq(lessonBookings.clientId, ctx.user.id));
+        }
+        
+        if (input.status) {
+          conditions.push(eq(lessonBookings.status, input.status));
+        }
+        
+        return db.select()
+          .from(lessonBookings)
+          .where(and(...conditions))
+          .orderBy(desc(lessonBookings.lessonDate));
+      }),
+
+    get: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({ code: 'NOT_FOUND' });
+        }
+
+        const lessons = await db.select()
+          .from(lessonBookings)
+          .where(eq(lessonBookings.id, input.id))
+          .limit(1);
+
+        if (!lessons.length) {
+          throw new TRPCError({ code: 'NOT_FOUND' });
+        }
+
+        const lesson = lessons[0];
+        if (lesson.trainerId !== ctx.user.id && lesson.clientId !== ctx.user.id) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+
+        return lesson;
+      }),
+
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        lessonDate: z.string().optional(),
+        duration: z.number().optional(),
+        lessonType: z.string().optional(),
+        location: z.string().optional(),
+        status: z.enum(['scheduled', 'completed', 'cancelled', 'no_show']).optional(),
+        fee: z.number().optional(),
+        paid: z.boolean().optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        }
+
+        const existing = await db.select().from(lessonBookings)
+          .where(eq(lessonBookings.id, input.id))
+          .limit(1);
+        
+        if (!existing.length) {
+          throw new TRPCError({ code: 'NOT_FOUND' });
+        }
+
+        const lesson = existing[0];
+        if (lesson.trainerId !== ctx.user.id && lesson.clientId !== ctx.user.id) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+
+        const updateData: any = {};
+        if (input.lessonDate) updateData.lessonDate = new Date(input.lessonDate);
+        if (input.duration) updateData.duration = input.duration;
+        if (input.lessonType) updateData.lessonType = input.lessonType;
+        if (input.location) updateData.location = input.location;
+        if (input.status) updateData.status = input.status;
+        if (input.fee !== undefined) updateData.fee = input.fee;
+        if (input.paid !== undefined) updateData.paid = input.paid;
+        if (input.notes) updateData.notes = input.notes;
+
+        await db.update(lessonBookings)
+          .set(updateData)
+          .where(eq(lessonBookings.id, input.id));
+
+        return { success: true };
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        }
+
+        const existing = await db.select().from(lessonBookings)
+          .where(eq(lessonBookings.id, input.id))
+          .limit(1);
+        
+        if (!existing.length) {
+          throw new TRPCError({ code: 'NOT_FOUND' });
+        }
+
+        const lesson = existing[0];
+        if (lesson.trainerId !== ctx.user.id && lesson.clientId !== ctx.user.id) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+
+        await db.delete(lessonBookings)
+          .where(eq(lessonBookings.id, input.id));
+
+        return { success: true };
+      }),
+
+    markCompleted: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        }
+
+        const existing = await db.select().from(lessonBookings)
+          .where(eq(lessonBookings.id, input.id))
+          .limit(1);
+        
+        if (!existing.length) {
+          throw new TRPCError({ code: 'NOT_FOUND' });
+        }
+
+        if (existing[0].trainerId !== ctx.user.id) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+
+        await db.update(lessonBookings)
+          .set({ status: 'completed' })
+          .where(eq(lessonBookings.id, input.id));
+
+        return { success: true };
+      }),
+
+    markCancelled: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        }
+
+        const existing = await db.select().from(lessonBookings)
+          .where(eq(lessonBookings.id, input.id))
+          .limit(1);
+        
+        if (!existing.length) {
+          throw new TRPCError({ code: 'NOT_FOUND' });
+        }
+
+        const lesson = existing[0];
+        if (lesson.trainerId !== ctx.user.id && lesson.clientId !== ctx.user.id) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+
+        await db.update(lessonBookings)
+          .set({ status: 'cancelled' })
+          .where(eq(lessonBookings.id, input.id));
+
+        return { success: true };
+      }),
   }),
 });
 

@@ -28,6 +28,7 @@ import Calendar from "./pages/Calendar";
 import AIChat from "./pages/AIChat";
 import TrainingTemplates from "./pages/TrainingTemplates";
 import BreedingManagement from "./pages/BreedingManagement";
+import LessonScheduling from "./pages/LessonScheduling";
 
 function Router() {
   useKeyboardNavigation();
@@ -63,6 +64,9 @@ function Router() {
           
           {/* Breeding Management */}
           <Route path="/breeding" component={BreedingManagement} />
+          
+          {/* Lesson Scheduling */}
+          <Route path="/lessons" component={LessonScheduling} />
           
           {/* Feeding plans */}
           <Route path="/feeding" component={Feeding} />
