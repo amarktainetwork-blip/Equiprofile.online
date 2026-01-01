@@ -26,6 +26,7 @@ import Analytics from "./pages/Analytics";
 import Reports from "./pages/Reports";
 import Calendar from "./pages/Calendar";
 import AIChat from "./pages/AIChat";
+import TrainingTemplates from "./pages/TrainingTemplates";
 
 function Router() {
   useKeyboardNavigation();
@@ -55,6 +56,9 @@ function Router() {
           
           {/* Training */}
           <Route path="/training" component={Training} />
+          
+          {/* Training Templates */}
+          <Route path="/training-templates" component={TrainingTemplates} />
           
           {/* Feeding plans */}
           <Route path="/feeding" component={Feeding} />

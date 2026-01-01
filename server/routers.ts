@@ -1759,6 +1759,124 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         return { id: result[0].insertId };
       }),
 
+    getTemplate: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) return null;
+        
+        const templates = await db.select()
+          .from(trainingProgramTemplates)
+          .where(eq(trainingProgramTemplates.id, input.id))
+          .limit(1);
+        
+        if (templates.length === 0) return null;
+        
+        // Check permissions
+        const template = templates[0];
+        if (template.userId !== ctx.user.id && !template.isPublic) {
+          return null;
+        }
+        
+        return template;
+      }),
+
+    updateTemplate: subscribedProcedure
+      .input(z.object({
+        id: z.number(),
+        name: z.string().min(1).max(200).optional(),
+        description: z.string().optional(),
+        duration: z.number().optional(),
+        discipline: z.string().optional(),
+        level: z.string().optional(),
+        goals: z.string().optional(),
+        programData: z.string().optional(),
+        isPublic: z.boolean().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        
+        const { id, ...updateData } = input;
+        
+        // Verify ownership
+        const existing = await db.select()
+          .from(trainingProgramTemplates)
+          .where(eq(trainingProgramTemplates.id, id))
+          .limit(1);
+        
+        if (existing.length === 0 || existing[0].userId !== ctx.user.id) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+        
+        await db.update(trainingProgramTemplates)
+          .set(updateData)
+          .where(eq(trainingProgramTemplates.id, id));
+        
+        return { success: true };
+      }),
+
+    deleteTemplate: subscribedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        
+        // Verify ownership
+        const existing = await db.select()
+          .from(trainingProgramTemplates)
+          .where(eq(trainingProgramTemplates.id, input.id))
+          .limit(1);
+        
+        if (existing.length === 0 || existing[0].userId !== ctx.user.id) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+        
+        await db.delete(trainingProgramTemplates)
+          .where(eq(trainingProgramTemplates.id, input.id));
+        
+        return { success: true };
+      }),
+
+    duplicateTemplate: subscribedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        
+        // Get existing template
+        const existing = await db.select()
+          .from(trainingProgramTemplates)
+          .where(eq(trainingProgramTemplates.id, input.id))
+          .limit(1);
+        
+        if (existing.length === 0) {
+          throw new TRPCError({ code: 'NOT_FOUND' });
+        }
+        
+        const template = existing[0];
+        
+        // Check if user can access this template
+        if (template.userId !== ctx.user.id && !template.isPublic) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+        
+        // Create duplicate
+        const result = await db.insert(trainingProgramTemplates).values({
+          name: `${template.name} (Copy)`,
+          description: template.description,
+          duration: template.duration,
+          discipline: template.discipline,
+          level: template.level,
+          goals: template.goals,
+          programData: template.programData,
+          isPublic: false,
+          userId: ctx.user.id,
+        });
+        
+        return { id: result[0].insertId };
+      }),
+
     applyTemplate: subscribedProcedure
       .input(z.object({
         templateId: z.number(),
