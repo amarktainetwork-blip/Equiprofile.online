@@ -32,7 +32,8 @@ export const adminUnlockedProcedure = protectedProcedure.use(
   t.middleware(async opts => {
     const { ctx, next } = opts;
 
-    if (ctx.user.role !== 'admin') {
+    // At this point, ctx.user is guaranteed to exist because of protectedProcedure
+    if (!ctx.user || ctx.user.role !== 'admin') {
       throw new TRPCError({ code: "FORBIDDEN", message: NOT_ADMIN_ERR_MSG });
     }
 

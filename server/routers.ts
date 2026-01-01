@@ -115,7 +115,7 @@ export const appRouter = router({
 
         if (input.password !== adminPassword) {
           await db.logActivity({
-            userId: ctx.user.id,
+            userId: ctx.user!.id,
             action: 'admin_unlock_failed',
             entityType: 'system',
             details: JSON.stringify({ attempts }),
@@ -132,7 +132,7 @@ export const appRouter = router({
         await db.resetUnlockAttempts(ctx.user.id);
         
         await db.logActivity({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           action: 'admin_unlocked',
           entityType: 'system',
           details: JSON.stringify({ expiresAt }),
@@ -323,7 +323,7 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         await db.updateUser(ctx.user.id, input);
         await db.logActivity({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           action: 'profile_updated',
           entityType: 'user',
           entityId: ctx.user.id,
@@ -396,11 +396,11 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         const id = await db.createHorse({
           ...input,
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           dateOfBirth: input.dateOfBirth ? new Date(input.dateOfBirth) : undefined,
         });
         await db.logActivity({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           action: 'horse_created',
           entityType: 'horse',
           entityId: id,
@@ -434,7 +434,7 @@ export const appRouter = router({
           dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : undefined,
         });
         await db.logActivity({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           action: 'horse_updated',
           entityType: 'horse',
           entityId: id,
@@ -447,7 +447,7 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         await db.deleteHorse(input.id, ctx.user.id);
         await db.logActivity({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           action: 'horse_deleted',
           entityType: 'horse',
           entityId: input.id,
@@ -496,12 +496,12 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         const id = await db.createHealthRecord({
           ...input,
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           recordDate: new Date(input.recordDate),
           nextDueDate: input.nextDueDate ? new Date(input.nextDueDate) : undefined,
         });
         await db.logActivity({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           action: 'health_record_created',
           entityType: 'health_record',
           entityId: id,
@@ -582,11 +582,11 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         const id = await db.createTrainingSession({
           ...input,
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           sessionDate: new Date(input.sessionDate),
         });
         await db.logActivity({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           action: 'training_session_created',
           entityType: 'training_session',
           entityId: id,
@@ -671,7 +671,7 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         const id = await db.createFeedingPlan({
           ...input,
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
         });
         return { id };
       }),
@@ -732,7 +732,7 @@ export const appRouter = router({
         const { url } = await storagePut(fileKey, buffer, input.fileType);
         
         const id = await db.createDocument({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           horseId: input.horseId,
           healthRecordId: input.healthRecordId,
           fileName: input.fileName,
@@ -745,7 +745,7 @@ export const appRouter = router({
         });
         
         await db.logActivity({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           action: 'document_uploaded',
           entityType: 'document',
           entityId: id,
@@ -829,7 +829,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
 
         // Save weather log
         await db.createWeatherLog({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           location: input.location,
           temperature: input.temperature,
           humidity: input.humidity,
@@ -886,7 +886,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
       .mutation(async ({ ctx, input }) => {
         await db.suspendUser(input.userId, input.reason);
         await db.logActivity({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           action: 'user_suspended',
           entityType: 'user',
           entityId: input.userId,
@@ -900,7 +900,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
       .mutation(async ({ ctx, input }) => {
         await db.unsuspendUser(input.userId);
         await db.logActivity({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           action: 'user_unsuspended',
           entityType: 'user',
           entityId: input.userId,
@@ -913,7 +913,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
       .mutation(async ({ ctx, input }) => {
         await db.deleteUser(input.userId);
         await db.logActivity({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           action: 'user_deleted',
           entityType: 'user',
           entityId: input.userId,
@@ -929,7 +929,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
       .mutation(async ({ ctx, input }) => {
         await db.updateUser(input.userId, { role: input.role });
         await db.logActivity({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           action: 'user_role_updated',
           entityType: 'user',
           entityId: input.userId,
@@ -971,9 +971,9 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         description: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        await db.upsertSetting(input.key, input.value, input.type, input.description, ctx.user.id);
+        await db.upsertSetting(input.key, input.value, input.type, input.description, ctx.user!.id);
         await db.logActivity({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           action: 'setting_updated',
           entityType: 'setting',
           details: JSON.stringify({ key: input.key }),
@@ -1003,7 +1003,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         }))
         .mutation(async ({ ctx, input }) => {
           const result = await db.createApiKey({
-            userId: ctx.user.id,
+            userId: ctx.user!.id,
             name: input.name,
             rateLimit: input.rateLimit,
             permissions: input.permissions,
@@ -1011,7 +1011,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
           });
           
           await db.logActivity({
-            userId: ctx.user.id,
+            userId: ctx.user!.id,
             action: 'api_key_created',
             entityType: 'api_key',
             entityId: result.id,
@@ -1026,7 +1026,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         .mutation(async ({ ctx, input }) => {
           await db.revokeApiKey(input.id, ctx.user.id);
           await db.logActivity({
-            userId: ctx.user.id,
+            userId: ctx.user!.id,
             action: 'api_key_revoked',
             entityType: 'api_key',
             entityId: input.id,
@@ -1043,7 +1043,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
           }
           
           await db.logActivity({
-            userId: ctx.user.id,
+            userId: ctx.user!.id,
             action: 'api_key_rotated',
             entityType: 'api_key',
             entityId: input.id,
@@ -1064,7 +1064,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
           const { id, ...data } = input;
           await db.updateApiKeySettings(id, ctx.user.id, data);
           await db.logActivity({
-            userId: ctx.user.id,
+            userId: ctx.user!.id,
             action: 'api_key_updated',
             entityType: 'api_key',
             entityId: id,
@@ -1122,7 +1122,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         // Add creator as owner member
         await db.insert(stableMembers).values({
           stableId: result[0].insertId,
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           role: 'owner',
         });
         
@@ -1446,7 +1446,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         let reportData = {};
         
         const result = await db.insert(reports).values({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           stableId: input.stableId,
           horseId: input.horseId,
           reportType: input.reportType,
@@ -1484,7 +1484,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
         
         const result = await db.insert(reportSchedules).values({
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           stableId: input.stableId,
           reportType: input.reportType,
           frequency: input.frequency,
@@ -1537,7 +1537,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         
         const result = await db.insert(events).values({
           ...input,
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           startDate: new Date(input.startDate),
           endDate: input.endDate ? new Date(input.endDate) : null,
         });
@@ -1613,7 +1613,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         
         const result = await db.insert(competitions).values({
           ...input,
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           date: new Date(input.date),
         });
         
@@ -1667,7 +1667,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         
         const result = await db.insert(trainingProgramTemplates).values({
           ...input,
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
         });
         
         return { id: result[0].insertId };
@@ -1696,7 +1696,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         // Create program instance
         const result = await db.insert(trainingPrograms).values({
           horseId: input.horseId,
-          userId: ctx.user.id,
+          userId: ctx.user!.id,
           templateId: input.templateId,
           name: template[0].name,
           startDate: new Date(input.startDate),
