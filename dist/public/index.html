@@ -6,14 +6,18 @@
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <meta name="description" content="Professional equine management for the modern equestrian. Track health, training, feeding, and more." />
+    <meta name="theme-color" content="#3b82f6" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
     <title>EquiProfile - Professional Horse Management System</title>    
     <!-- THIS IS THE START OF A COMMENT BLOCK, BLOCK TO BE DELETED: Google Fonts here, example:
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     THIS IS THE END OF A COMMENT BLOCK, BLOCK TO BE DELETED -->
-    <script type="module" crossorigin src="/assets/index-kQq9CkLD.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-7RLywCmw.css">
+    <script type="module" crossorigin src="/assets/index-BBmuPRWL.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-1OCEia2O.css">
   </head>
 
   <body>
@@ -78,10 +82,24 @@ Error generating stack: `+l.message+`
 </script>
 
     <div id="root"></div>
+    <script>
+      // Register service worker for PWA
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/service-worker.js')
+            .then(registration => {
+              console.log('ServiceWorker registration successful');
+            })
+            .catch(err => {
+              console.log('ServiceWorker registration failed: ', err);
+            });
+        });
+      }
+    </script>
     <script
       defer
-      src="https://manus-analytics.com/umami"
-      data-website-id="1b3092f6-ea04-4b6f-8855-39c8fde190d0"></script>
+      src="%VITE_ANALYTICS_ENDPOINT%/umami"
+      data-website-id="%VITE_ANALYTICS_WEBSITE_ID%"></script>
   </body>
 
 </html>

@@ -3,6 +3,8 @@ import "dotenv/config";
 import express2 from "express";
 import { createServer } from "http";
 import net from "net";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 
 // shared/const.ts
@@ -41,6 +43,11 @@ var users = mysqlTable("users", {
   phone: varchar("phone", { length: 20 }),
   location: varchar("location", { length: 255 }),
   profileImageUrl: text("profileImageUrl"),
+  // User preferences and settings
+  preferences: text("preferences"),
+  // JSON: theme, language, dashboard layout
+  language: varchar("language", { length: 10 }).default("en"),
+  theme: mysqlEnum("theme", ["light", "dark", "system"]).default("system"),
   // Timestamps
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
@@ -182,6 +189,20 @@ var systemSettings = mysqlTable("systemSettings", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
 });
+var adminSessions = mysqlTable("adminSessions", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  expiresAt: timestamp("expiresAt").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull()
+});
+var adminUnlockAttempts = mysqlTable("adminUnlockAttempts", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().unique(),
+  attempts: int("attempts").default(0).notNull(),
+  lockedUntil: timestamp("lockedUntil"),
+  lastAttemptAt: timestamp("lastAttemptAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
+});
 var activityLogs = mysqlTable("activityLogs", {
   id: int("id").autoincrement().primaryKey(),
   userId: int("userId"),
@@ -204,6 +225,403 @@ var backupLogs = mysqlTable("backupLogs", {
   errorMessage: text("errorMessage"),
   startedAt: timestamp("startedAt").defaultNow().notNull(),
   completedAt: timestamp("completedAt")
+});
+var stables = mysqlTable("stables", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 200 }).notNull(),
+  description: text("description"),
+  ownerId: int("ownerId").notNull(),
+  // The user who created the stable
+  location: varchar("location", { length: 255 }),
+  logo: text("logo"),
+  // Branding and customization
+  primaryColor: varchar("primaryColor", { length: 7 }),
+  // Hex color
+  secondaryColor: varchar("secondaryColor", { length: 7 }),
+  customDomain: varchar("customDomain", { length: 255 }),
+  branding: text("branding"),
+  // JSON: additional branding settings
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
+});
+var stableMembers = mysqlTable("stableMembers", {
+  id: int("id").autoincrement().primaryKey(),
+  stableId: int("stableId").notNull(),
+  userId: int("userId").notNull(),
+  role: mysqlEnum("role", ["owner", "admin", "trainer", "member", "viewer"]).notNull(),
+  permissions: text("permissions"),
+  // JSON string of specific permissions
+  isActive: boolean("isActive").default(true).notNull(),
+  joinedAt: timestamp("joinedAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
+});
+var stableInvites = mysqlTable("stableInvites", {
+  id: int("id").autoincrement().primaryKey(),
+  stableId: int("stableId").notNull(),
+  invitedByUserId: int("invitedByUserId").notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  role: mysqlEnum("role", ["admin", "trainer", "member", "viewer"]).notNull(),
+  token: varchar("token", { length: 100 }).notNull().unique(),
+  status: mysqlEnum("status", ["pending", "accepted", "declined", "expired"]).default("pending").notNull(),
+  expiresAt: timestamp("expiresAt").notNull(),
+  acceptedAt: timestamp("acceptedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull()
+});
+var events = mysqlTable("events", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  stableId: int("stableId"),
+  horseId: int("horseId"),
+  title: varchar("title", { length: 200 }).notNull(),
+  description: text("description"),
+  eventType: mysqlEnum("eventType", ["training", "competition", "veterinary", "farrier", "lesson", "meeting", "other"]).notNull(),
+  startDate: timestamp("startDate").notNull(),
+  endDate: timestamp("endDate"),
+  location: varchar("location", { length: 255 }),
+  isAllDay: boolean("isAllDay").default(false).notNull(),
+  isRecurring: boolean("isRecurring").default(false).notNull(),
+  recurrenceRule: text("recurrenceRule"),
+  // iCal RRULE format
+  color: varchar("color", { length: 7 }),
+  // Hex color code
+  isCompleted: boolean("isCompleted").default(false).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
+});
+var eventReminders = mysqlTable("eventReminders", {
+  id: int("id").autoincrement().primaryKey(),
+  eventId: int("eventId").notNull(),
+  userId: int("userId").notNull(),
+  reminderTime: timestamp("reminderTime").notNull(),
+  reminderType: mysqlEnum("reminderType", ["email", "push", "sms"]).notNull(),
+  isSent: boolean("isSent").default(false).notNull(),
+  sentAt: timestamp("sentAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull()
+});
+var feedCosts = mysqlTable("feedCosts", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  horseId: int("horseId"),
+  feedType: varchar("feedType", { length: 100 }).notNull(),
+  brandName: varchar("brandName", { length: 100 }),
+  quantity: varchar("quantity", { length: 50 }).notNull(),
+  unit: varchar("unit", { length: 20 }),
+  costPerUnit: int("costPerUnit").notNull(),
+  // in pence/cents
+  purchaseDate: date("purchaseDate").notNull(),
+  supplier: varchar("supplier", { length: 200 }),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull()
+});
+var vaccinations = mysqlTable("vaccinations", {
+  id: int("id").autoincrement().primaryKey(),
+  horseId: int("horseId").notNull(),
+  userId: int("userId").notNull(),
+  vaccineName: varchar("vaccineName", { length: 200 }).notNull(),
+  vaccineType: varchar("vaccineType", { length: 100 }),
+  // flu, tetanus, etc.
+  dateAdministered: date("dateAdministered").notNull(),
+  nextDueDate: date("nextDueDate"),
+  batchNumber: varchar("batchNumber", { length: 100 }),
+  vetName: varchar("vetName", { length: 100 }),
+  vetClinic: varchar("vetClinic", { length: 200 }),
+  cost: int("cost"),
+  // in pence/cents
+  notes: text("notes"),
+  documentUrl: text("documentUrl"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
+});
+var dewormings = mysqlTable("dewormings", {
+  id: int("id").autoincrement().primaryKey(),
+  horseId: int("horseId").notNull(),
+  userId: int("userId").notNull(),
+  productName: varchar("productName", { length: 200 }).notNull(),
+  activeIngredient: varchar("activeIngredient", { length: 200 }),
+  dateAdministered: date("dateAdministered").notNull(),
+  nextDueDate: date("nextDueDate"),
+  dosage: varchar("dosage", { length: 100 }),
+  weight: int("weight"),
+  // horse weight at time of treatment
+  cost: int("cost"),
+  // in pence/cents
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
+});
+var shareLinks = mysqlTable("shareLinks", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  horseId: int("horseId"),
+  linkType: mysqlEnum("linkType", ["horse", "stable", "medical_passport"]).notNull(),
+  token: varchar("token", { length: 100 }).notNull().unique(),
+  isPublic: boolean("isPublic").default(false).notNull(),
+  isActive: boolean("isActive").default(true).notNull(),
+  expiresAt: timestamp("expiresAt"),
+  viewCount: int("viewCount").default(0).notNull(),
+  lastViewedAt: timestamp("lastViewedAt"),
+  settings: text("settings"),
+  // JSON string for privacy settings
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
+});
+var competitions = mysqlTable("competitions", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  horseId: int("horseId").notNull(),
+  competitionName: varchar("competitionName", { length: 200 }).notNull(),
+  venue: varchar("venue", { length: 200 }),
+  date: date("date").notNull(),
+  discipline: varchar("discipline", { length: 100 }),
+  // dressage, jumping, etc.
+  level: varchar("level", { length: 50 }),
+  class: varchar("class", { length: 100 }),
+  // specific class/event name
+  placement: varchar("placement", { length: 50 }),
+  // 1st, 2nd, etc. or score
+  score: varchar("score", { length: 50 }),
+  notes: text("notes"),
+  cost: int("cost"),
+  // entry fee in pence/cents
+  winnings: int("winnings"),
+  // prize money in pence/cents
+  documentUrl: text("documentUrl"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
+});
+var documentTags = mysqlTable("documentTags", {
+  id: int("id").autoincrement().primaryKey(),
+  documentId: int("documentId").notNull(),
+  tag: varchar("tag", { length: 50 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull()
+});
+var stripeEvents = mysqlTable("stripeEvents", {
+  id: int("id").autoincrement().primaryKey(),
+  eventId: varchar("eventId", { length: 255 }).notNull().unique(),
+  eventType: varchar("eventType", { length: 100 }).notNull(),
+  processed: boolean("processed").default(false).notNull(),
+  payload: text("payload"),
+  // Full event payload for debugging
+  error: text("error"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  processedAt: timestamp("processedAt")
+});
+var messageThreads = mysqlTable("messageThreads", {
+  id: int("id").autoincrement().primaryKey(),
+  stableId: int("stableId").notNull(),
+  title: varchar("title", { length: 200 }),
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
+});
+var messages = mysqlTable("messages", {
+  id: int("id").autoincrement().primaryKey(),
+  threadId: int("threadId").notNull(),
+  senderId: int("senderId").notNull(),
+  content: text("content").notNull(),
+  attachments: text("attachments"),
+  // JSON array of file URLs
+  isRead: boolean("isRead").default(false).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull()
+});
+var competitionResults = mysqlTable("competitionResults", {
+  id: int("id").autoincrement().primaryKey(),
+  competitionId: int("competitionId").notNull(),
+  userId: int("userId").notNull(),
+  horseId: int("horseId").notNull(),
+  roundNumber: int("roundNumber").default(1),
+  score: varchar("score", { length: 50 }),
+  penalties: int("penalties"),
+  time: varchar("time", { length: 20 }),
+  judgeScores: text("judgeScores"),
+  // JSON array of judge scores
+  technicalScore: int("technicalScore"),
+  artisticScore: int("artisticScore"),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull()
+});
+var trainingProgramTemplates = mysqlTable("trainingProgramTemplates", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  stableId: int("stableId"),
+  name: varchar("name", { length: 200 }).notNull(),
+  description: text("description"),
+  duration: int("duration"),
+  // in weeks
+  discipline: varchar("discipline", { length: 100 }),
+  level: varchar("level", { length: 50 }),
+  goals: text("goals"),
+  programData: text("programData").notNull(),
+  // JSON: weekly schedule
+  isPublic: boolean("isPublic").default(false).notNull(),
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
+});
+var trainingPrograms = mysqlTable("trainingPrograms", {
+  id: int("id").autoincrement().primaryKey(),
+  horseId: int("horseId").notNull(),
+  userId: int("userId").notNull(),
+  templateId: int("templateId"),
+  name: varchar("name", { length: 200 }).notNull(),
+  startDate: date("startDate").notNull(),
+  endDate: date("endDate"),
+  status: mysqlEnum("status", ["active", "completed", "paused", "cancelled"]).default("active").notNull(),
+  progress: int("progress").default(0),
+  // percentage
+  programData: text("programData").notNull(),
+  // JSON: customized schedule
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
+});
+var reports = mysqlTable("reports", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  stableId: int("stableId"),
+  horseId: int("horseId"),
+  reportType: mysqlEnum("reportType", ["monthly_summary", "health_report", "training_progress", "cost_analysis", "competition_summary"]).notNull(),
+  title: varchar("title", { length: 200 }).notNull(),
+  reportData: text("reportData").notNull(),
+  // JSON: report content
+  fileUrl: text("fileUrl"),
+  // PDF URL
+  generatedAt: timestamp("generatedAt").defaultNow().notNull()
+});
+var reportSchedules = mysqlTable("reportSchedules", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  stableId: int("stableId"),
+  reportType: mysqlEnum("reportType", ["monthly_summary", "health_report", "training_progress", "cost_analysis", "competition_summary"]).notNull(),
+  frequency: mysqlEnum("frequency", ["daily", "weekly", "monthly", "quarterly"]).notNull(),
+  recipients: text("recipients"),
+  // JSON array of email addresses
+  isActive: boolean("isActive").default(true).notNull(),
+  lastRunAt: timestamp("lastRunAt"),
+  nextRunAt: timestamp("nextRunAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull()
+});
+var breeding = mysqlTable("breeding", {
+  id: int("id").autoincrement().primaryKey(),
+  mareId: int("mareId").notNull(),
+  // horseId of mare
+  stallionId: int("stallionId"),
+  // horseId of stallion (if owned)
+  stallionName: varchar("stallionName", { length: 200 }),
+  breedingDate: date("breedingDate").notNull(),
+  method: mysqlEnum("method", ["natural", "artificial", "embryo_transfer"]).notNull(),
+  veterinarianName: varchar("veterinarianName", { length: 100 }),
+  cost: int("cost"),
+  pregnancyConfirmed: boolean("pregnancyConfirmed").default(false),
+  confirmationDate: date("confirmationDate"),
+  dueDate: date("dueDate"),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
+});
+var foals = mysqlTable("foals", {
+  id: int("id").autoincrement().primaryKey(),
+  breedingId: int("breedingId").notNull(),
+  horseId: int("horseId"),
+  // linked to horses table after birth
+  birthDate: date("birthDate").notNull(),
+  gender: mysqlEnum("gender", ["colt", "filly"]),
+  name: varchar("name", { length: 100 }),
+  color: varchar("color", { length: 50 }),
+  markings: text("markings"),
+  birthWeight: int("birthWeight"),
+  // in kg
+  currentWeight: int("currentWeight"),
+  healthStatus: varchar("healthStatus", { length: 100 }),
+  milestones: text("milestones"),
+  // JSON array of development milestones
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
+});
+var pedigree = mysqlTable("pedigree", {
+  id: int("id").autoincrement().primaryKey(),
+  horseId: int("horseId").notNull(),
+  sireId: int("sireId"),
+  // horseId of sire
+  sireName: varchar("sireName", { length: 200 }),
+  damId: int("damId"),
+  // horseId of dam
+  damName: varchar("damName", { length: 200 }),
+  sireOfSireId: int("sireOfSireId"),
+  sireOfSireName: varchar("sireOfSireName", { length: 200 }),
+  damOfSireId: int("damOfSireId"),
+  damOfSireName: varchar("damOfSireName", { length: 200 }),
+  sireOfDamId: int("sireOfDamId"),
+  sireOfDamName: varchar("sireOfDamName", { length: 200 }),
+  damOfDamId: int("damOfDamId"),
+  damOfDamName: varchar("damOfDamName", { length: 200 }),
+  geneticInfo: text("geneticInfo"),
+  // JSON: genetic markers, health predispositions
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
+});
+var lessonBookings = mysqlTable("lessonBookings", {
+  id: int("id").autoincrement().primaryKey(),
+  trainerId: int("trainerId").notNull(),
+  clientId: int("clientId").notNull(),
+  horseId: int("horseId"),
+  lessonDate: timestamp("lessonDate").notNull(),
+  duration: int("duration").notNull(),
+  // in minutes
+  lessonType: varchar("lessonType", { length: 100 }),
+  location: varchar("location", { length: 200 }),
+  status: mysqlEnum("status", ["scheduled", "completed", "cancelled", "no_show"]).default("scheduled").notNull(),
+  fee: int("fee"),
+  // in pence/cents
+  paid: boolean("paid").default(false).notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
+});
+var trainerAvailability = mysqlTable("trainerAvailability", {
+  id: int("id").autoincrement().primaryKey(),
+  trainerId: int("trainerId").notNull(),
+  dayOfWeek: int("dayOfWeek").notNull(),
+  // 0-6 (Sunday-Saturday)
+  startTime: varchar("startTime", { length: 5 }).notNull(),
+  // HH:MM
+  endTime: varchar("endTime", { length: 5 }).notNull(),
+  // HH:MM
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull()
+});
+var apiKeys = mysqlTable("apiKeys", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  stableId: int("stableId"),
+  name: varchar("name", { length: 100 }).notNull(),
+  keyHash: varchar("keyHash", { length: 255 }).notNull(),
+  // bcrypt hash of key
+  keyPrefix: varchar("keyPrefix", { length: 20 }).notNull(),
+  // first few chars for identification
+  permissions: text("permissions"),
+  // JSON array of allowed endpoints
+  rateLimit: int("rateLimit").default(100).notNull(),
+  // requests per hour
+  isActive: boolean("isActive").default(true).notNull(),
+  lastUsedAt: timestamp("lastUsedAt"),
+  expiresAt: timestamp("expiresAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull()
+});
+var webhooks = mysqlTable("webhooks", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  stableId: int("stableId"),
+  url: text("url").notNull(),
+  events: text("events").notNull(),
+  // JSON array of subscribed events
+  secret: varchar("secret", { length: 255 }).notNull(),
+  isActive: boolean("isActive").default(true).notNull(),
+  lastTriggeredAt: timestamp("lastTriggeredAt"),
+  failureCount: int("failureCount").default(0),
+  createdAt: timestamp("createdAt").defaultNow().notNull()
 });
 
 // server/_core/env.ts
@@ -645,6 +1063,101 @@ async function getSystemStats() {
     healthRecords: recordStats,
     trainingSessions: sessionStats
   };
+}
+async function createStripeEvent(eventId, eventType, payload) {
+  const db = await getDb();
+  if (!db) return null;
+  try {
+    const result = await db.insert(stripeEvents).values({
+      eventId,
+      eventType,
+      payload
+    });
+    return result[0].insertId;
+  } catch (error) {
+    return null;
+  }
+}
+async function markStripeEventProcessed(eventId, error) {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(stripeEvents).set({
+    processed: true,
+    processedAt: /* @__PURE__ */ new Date(),
+    error
+  }).where(eq(stripeEvents.eventId, eventId));
+}
+async function isStripeEventProcessed(eventId) {
+  const db = await getDb();
+  if (!db) return false;
+  const result = await db.select().from(stripeEvents).where(
+    eq(stripeEvents.eventId, eventId)
+  ).limit(1);
+  return result.length > 0;
+}
+async function getAdminSession(userId) {
+  const db = await getDb();
+  if (!db) return null;
+  const sessions = await db.select().from(adminSessions).where(and(
+    eq(adminSessions.userId, userId),
+    gte(adminSessions.expiresAt, /* @__PURE__ */ new Date())
+  )).limit(1);
+  return sessions[0] || null;
+}
+async function createAdminSession(userId, expiresAt) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(adminSessions).where(eq(adminSessions.userId, userId));
+  await db.insert(adminSessions).values({ userId, expiresAt });
+}
+async function revokeAdminSession(userId) {
+  const db = await getDb();
+  if (!db) return;
+  await db.delete(adminSessions).where(eq(adminSessions.userId, userId));
+}
+async function getUnlockAttempts(userId) {
+  const db = await getDb();
+  if (!db) return 0;
+  const record = await db.select().from(adminUnlockAttempts).where(eq(adminUnlockAttempts.userId, userId)).limit(1);
+  if (!record[0]) return 0;
+  if (record[0].lockedUntil && record[0].lockedUntil < /* @__PURE__ */ new Date()) {
+    await db.update(adminUnlockAttempts).set({ attempts: 0, lockedUntil: null }).where(eq(adminUnlockAttempts.userId, userId));
+    return 0;
+  }
+  return record[0].attempts;
+}
+async function incrementUnlockAttempts(userId) {
+  const db = await getDb();
+  if (!db) return 0;
+  const existing = await db.select().from(adminUnlockAttempts).where(eq(adminUnlockAttempts.userId, userId)).limit(1);
+  if (!existing[0]) {
+    await db.insert(adminUnlockAttempts).values({
+      userId,
+      attempts: 1,
+      lastAttemptAt: /* @__PURE__ */ new Date()
+    });
+    return 1;
+  }
+  const newAttempts = existing[0].attempts + 1;
+  await db.update(adminUnlockAttempts).set({ attempts: newAttempts, lastAttemptAt: /* @__PURE__ */ new Date() }).where(eq(adminUnlockAttempts.userId, userId));
+  return newAttempts;
+}
+async function resetUnlockAttempts(userId) {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(adminUnlockAttempts).set({ attempts: 0, lockedUntil: null }).where(eq(adminUnlockAttempts.userId, userId));
+}
+async function setUnlockLockout(userId, minutes) {
+  const db = await getDb();
+  if (!db) return;
+  const lockedUntil = new Date(Date.now() + minutes * 60 * 1e3);
+  await db.update(adminUnlockAttempts).set({ lockedUntil }).where(eq(adminUnlockAttempts.userId, userId));
+}
+async function getUnlockLockoutTime(userId) {
+  const db = await getDb();
+  if (!db) return null;
+  const record = await db.select().from(adminUnlockAttempts).where(eq(adminUnlockAttempts.userId, userId)).limit(1);
+  return record[0]?.lockedUntil || null;
 }
 
 // server/_core/cookies.ts
@@ -1188,7 +1701,7 @@ var normalizeResponseFormat = ({
 async function invokeLLM(params) {
   assertApiKey();
   const {
-    messages,
+    messages: messages3,
     tools,
     toolChoice,
     tool_choice,
@@ -1199,7 +1712,7 @@ async function invokeLLM(params) {
   } = params;
   const payload = {
     model: "gemini-2.5-flash",
-    messages: messages.map(normalizeMessage)
+    messages: messages3.map(normalizeMessage)
   };
   if (tools && tools.length > 0) {
     payload.tools = tools;
@@ -1294,9 +1807,96 @@ async function storagePut(relKey, data, contentType = "application/octet-stream"
 
 // server/routers.ts
 import { nanoid } from "nanoid";
-var adminProcedure2 = protectedProcedure.use(({ ctx, next }) => {
+
+// server/stripe.ts
+import Stripe from "stripe";
+function getStripe() {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    console.warn("[Stripe] Secret key not configured");
+    return null;
+  }
+  return new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: "2025-12-15.clover",
+    typescript: true
+  });
+}
+var STRIPE_PRICING = {
+  monthly: {
+    priceId: process.env.STRIPE_MONTHLY_PRICE_ID || "",
+    amount: 799,
+    // £7.99 in pence
+    currency: "gbp",
+    interval: "month"
+  },
+  yearly: {
+    priceId: process.env.STRIPE_YEARLY_PRICE_ID || "",
+    amount: 7990,
+    // £79.90 in pence (equivalent to ~£6.66/month)
+    currency: "gbp",
+    interval: "year"
+  }
+};
+async function createCheckoutSession(userId, userEmail, priceId, successUrl, cancelUrl, customerId) {
+  const stripe = getStripe();
+  if (!stripe) return null;
+  try {
+    const sessionParams = {
+      mode: "subscription",
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price: priceId,
+          quantity: 1
+        }
+      ],
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+      metadata: {
+        userId: userId.toString()
+      },
+      customer_email: customerId ? void 0 : userEmail,
+      allow_promotion_codes: true
+    };
+    if (customerId) {
+      sessionParams.customer = customerId;
+    }
+    const session = await stripe.checkout.sessions.create(sessionParams);
+    return {
+      sessionId: session.id,
+      url: session.url
+    };
+  } catch (error) {
+    console.error("[Stripe] Failed to create checkout session:", error);
+    return null;
+  }
+}
+async function createPortalSession(customerId, returnUrl) {
+  const stripe = getStripe();
+  if (!stripe) return null;
+  try {
+    const session = await stripe.billingPortal.sessions.create({
+      customer: customerId,
+      return_url: returnUrl
+    });
+    return session.url;
+  } catch (error) {
+    console.error("[Stripe] Failed to create portal session:", error);
+    return null;
+  }
+}
+
+// server/routers.ts
+import { eq as eq2, and as and2, desc as desc2, sql as sql2, gte as gte2, lte as lte2, or as or2 } from "drizzle-orm";
+var adminProcedure2 = protectedProcedure.use(async ({ ctx, next }) => {
   if (ctx.user.role !== "admin") {
     throw new TRPCError3({ code: "FORBIDDEN", message: "Admin access required" });
+  }
+  const session = await getAdminSession(ctx.user.id);
+  if (!session || session.expiresAt < /* @__PURE__ */ new Date()) {
+    throw new TRPCError3({
+      code: "FORBIDDEN",
+      message: "Admin session expired. Please unlock admin mode again."
+    });
   }
   return next({ ctx });
 });
@@ -1327,6 +1927,196 @@ var appRouter = router({
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
       return { success: true };
+    })
+  }),
+  // Admin unlock system
+  adminUnlock: router({
+    // Check if admin mode is unlocked
+    getStatus: protectedProcedure.query(async ({ ctx }) => {
+      const session = await getAdminSession(ctx.user.id);
+      return {
+        isUnlocked: session ? session.expiresAt > /* @__PURE__ */ new Date() : false,
+        expiresAt: session?.expiresAt
+      };
+    }),
+    // Initiate unlock (returns challenge)
+    requestUnlock: protectedProcedure.mutation(async ({ ctx }) => {
+      const attempts = await getUnlockAttempts(ctx.user.id);
+      if (attempts >= 5) {
+        const lockedUntil = await getUnlockLockoutTime(ctx.user.id);
+        if (lockedUntil && lockedUntil > /* @__PURE__ */ new Date()) {
+          throw new TRPCError3({
+            code: "TOO_MANY_REQUESTS",
+            message: `Too many attempts. Try again after ${lockedUntil.toISOString()}`
+          });
+        }
+      }
+      return {
+        challenge: "Admin mode requires password. Enter password:",
+        attemptsRemaining: Math.max(0, 5 - attempts)
+      };
+    }),
+    // Submit password
+    submitPassword: protectedProcedure.input(z2.object({ password: z2.string() })).mutation(async ({ ctx, input }) => {
+      const adminPassword = process.env.ADMIN_UNLOCK_PASSWORD || "ashmor12@";
+      const attempts = await incrementUnlockAttempts(ctx.user.id);
+      if (attempts > 5) {
+        await setUnlockLockout(ctx.user.id, 15);
+        throw new TRPCError3({ code: "TOO_MANY_REQUESTS", message: "Too many attempts. Account locked for 15 minutes." });
+      }
+      if (input.password !== adminPassword) {
+        await logActivity({
+          userId: ctx.user.id,
+          action: "admin_unlock_failed",
+          entityType: "system",
+          details: JSON.stringify({ attempts })
+        });
+        throw new TRPCError3({
+          code: "UNAUTHORIZED",
+          message: "Incorrect password"
+        });
+      }
+      const expiresAt = new Date(Date.now() + 30 * 60 * 1e3);
+      await createAdminSession(ctx.user.id, expiresAt);
+      await resetUnlockAttempts(ctx.user.id);
+      await logActivity({
+        userId: ctx.user.id,
+        action: "admin_unlocked",
+        entityType: "system",
+        details: JSON.stringify({ expiresAt })
+      });
+      return { success: true, expiresAt };
+    }),
+    // Revoke admin session
+    lock: protectedProcedure.mutation(async ({ ctx }) => {
+      await revokeAdminSession(ctx.user.id);
+      return { success: true };
+    })
+  }),
+  // AI chat
+  ai: router({
+    chat: protectedProcedure.input(z2.object({
+      messages: z2.array(z2.object({
+        role: z2.enum(["system", "user", "assistant"]),
+        content: z2.string()
+      }))
+    })).mutation(async ({ ctx, input }) => {
+      const userMessage = input.messages[input.messages.length - 1]?.content.toLowerCase().trim();
+      if (userMessage === "show admin") {
+        if (ctx.user.role !== "admin") {
+          return {
+            role: "assistant",
+            content: "You do not have admin privileges."
+          };
+        }
+        const session = await getAdminSession(ctx.user.id);
+        if (session && session.expiresAt > /* @__PURE__ */ new Date()) {
+          return {
+            role: "assistant",
+            content: `Admin mode is already unlocked. Session expires at ${session.expiresAt.toLocaleString()}.`
+          };
+        }
+        return {
+          role: "assistant",
+          content: "\u{1F510} **Admin Mode**\n\nPlease enter the admin password to unlock admin features.",
+          metadata: { adminChallenge: true }
+        };
+      }
+      const response = await invokeLLM({
+        messages: input.messages.map((m) => ({
+          role: m.role,
+          content: m.content
+        }))
+      });
+      return {
+        role: "assistant",
+        content: response.choices[0]?.message?.content || "No response"
+      };
+    })
+  }),
+  // Billing and subscription management
+  billing: router({
+    getPricing: publicProcedure.query(() => {
+      return {
+        monthly: {
+          amount: STRIPE_PRICING.monthly.amount,
+          currency: STRIPE_PRICING.monthly.currency,
+          interval: STRIPE_PRICING.monthly.interval
+        },
+        yearly: {
+          amount: STRIPE_PRICING.yearly.amount,
+          currency: STRIPE_PRICING.yearly.currency,
+          interval: STRIPE_PRICING.yearly.interval
+        }
+      };
+    }),
+    createCheckout: protectedProcedure.input(z2.object({
+      plan: z2.enum(["monthly", "yearly"])
+    })).mutation(async ({ ctx, input }) => {
+      const user = await getUserById(ctx.user.id);
+      if (!user) {
+        throw new TRPCError3({ code: "NOT_FOUND", message: "User not found" });
+      }
+      const priceId = input.plan === "monthly" ? STRIPE_PRICING.monthly.priceId : STRIPE_PRICING.yearly.priceId;
+      if (!priceId) {
+        throw new TRPCError3({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Stripe price ID not configured"
+        });
+      }
+      const protocol = ctx.req.protocol || "https";
+      const host = ctx.req.headers.host || "equiprofile.online";
+      const baseUrl = `${protocol}://${host}`;
+      const session = await createCheckoutSession(
+        user.id,
+        user.email || "",
+        priceId,
+        `${baseUrl}/dashboard?success=true`,
+        `${baseUrl}/pricing?cancelled=true`,
+        user.stripeCustomerId || void 0
+      );
+      if (!session) {
+        throw new TRPCError3({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create checkout session"
+        });
+      }
+      return { url: session.url };
+    }),
+    createPortal: protectedProcedure.mutation(async ({ ctx }) => {
+      const user = await getUserById(ctx.user.id);
+      if (!user || !user.stripeCustomerId) {
+        throw new TRPCError3({
+          code: "BAD_REQUEST",
+          message: "No active subscription found"
+        });
+      }
+      const protocol = ctx.req.protocol || "https";
+      const host = ctx.req.headers.host || "equiprofile.online";
+      const baseUrl = `${protocol}://${host}`;
+      const portalUrl = await createPortalSession(
+        user.stripeCustomerId,
+        `${baseUrl}/dashboard`
+      );
+      if (!portalUrl) {
+        throw new TRPCError3({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create portal session"
+        });
+      }
+      return { url: portalUrl };
+    }),
+    getStatus: protectedProcedure.query(async ({ ctx }) => {
+      const user = await getUserById(ctx.user.id);
+      if (!user) return null;
+      return {
+        status: user.subscriptionStatus,
+        plan: user.subscriptionPlan,
+        trialEndsAt: user.trialEndsAt,
+        subscriptionEndsAt: user.subscriptionEndsAt,
+        lastPaymentAt: user.lastPaymentAt,
+        hasActiveSubscription: ["trial", "active"].includes(user.subscriptionStatus)
+      };
     })
   }),
   // User profile and subscription
@@ -1884,6 +2674,473 @@ Format your response as JSON with keys: recommendation, explanation, precautions
     getBackupLogs: adminProcedure2.input(z2.object({ limit: z2.number().default(10) })).query(async ({ input }) => {
       return getRecentBackups(input.limit);
     })
+  }),
+  // Stable management
+  stables: router({
+    create: subscribedProcedure.input(z2.object({
+      name: z2.string().min(1).max(200),
+      description: z2.string().optional(),
+      location: z2.string().optional(),
+      logo: z2.string().optional(),
+      primaryColor: z2.string().optional(),
+      secondaryColor: z2.string().optional()
+    })).mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+      const result = await db.insert(stables).values({
+        ...input,
+        ownerId: ctx.user.id
+      });
+      await db.insert(stableMembers).values({
+        stableId: result[0].insertId,
+        userId: ctx.user.id,
+        role: "owner"
+      });
+      return { id: result[0].insertId };
+    }),
+    list: protectedProcedure.query(async ({ ctx }) => {
+      const db = await getDb();
+      if (!db) return [];
+      const members = await db.select().from(stableMembers).where(eq2(stableMembers.userId, ctx.user.id));
+      if (members.length === 0) return [];
+      const stableIds = members.map((m) => m.stableId);
+      return db.select().from(stables).where(and2(
+        sql2`id IN (${stableIds.join(",")})`,
+        eq2(stables.isActive, true)
+      ));
+    }),
+    getById: protectedProcedure.input(z2.object({ id: z2.number() })).query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) return null;
+      const member = await db.select().from(stableMembers).where(and2(
+        eq2(stableMembers.stableId, input.id),
+        eq2(stableMembers.userId, ctx.user.id)
+      )).limit(1);
+      if (member.length === 0) {
+        throw new TRPCError3({ code: "FORBIDDEN", message: "Access denied" });
+      }
+      const stable = await db.select().from(stables).where(eq2(stables.id, input.id)).limit(1);
+      return stable[0] || null;
+    }),
+    update: subscribedProcedure.input(z2.object({
+      id: z2.number(),
+      name: z2.string().optional(),
+      description: z2.string().optional(),
+      location: z2.string().optional(),
+      logo: z2.string().optional(),
+      primaryColor: z2.string().optional(),
+      secondaryColor: z2.string().optional()
+    })).mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR" });
+      const member = await db.select().from(stableMembers).where(and2(
+        eq2(stableMembers.stableId, input.id),
+        eq2(stableMembers.userId, ctx.user.id)
+      )).limit(1);
+      if (member.length === 0 || !["owner", "admin"].includes(member[0].role)) {
+        throw new TRPCError3({ code: "FORBIDDEN" });
+      }
+      const { id, ...updateData } = input;
+      await db.update(stables).set({ ...updateData, updatedAt: /* @__PURE__ */ new Date() }).where(eq2(stables.id, id));
+      return { success: true };
+    }),
+    inviteMember: subscribedProcedure.input(z2.object({
+      stableId: z2.number(),
+      email: z2.string().email(),
+      role: z2.enum(["admin", "trainer", "member", "viewer"])
+    })).mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR" });
+      const member = await db.select().from(stableMembers).where(and2(
+        eq2(stableMembers.stableId, input.stableId),
+        eq2(stableMembers.userId, ctx.user.id)
+      )).limit(1);
+      if (member.length === 0 || !["owner", "admin"].includes(member[0].role)) {
+        throw new TRPCError3({ code: "FORBIDDEN" });
+      }
+      const token = nanoid(32);
+      const expiresAt = /* @__PURE__ */ new Date();
+      expiresAt.setDate(expiresAt.getDate() + 7);
+      await db.insert(stableInvites).values({
+        stableId: input.stableId,
+        invitedByUserId: ctx.user.id,
+        email: input.email,
+        role: input.role,
+        token,
+        expiresAt
+      });
+      return { token, expiresAt };
+    }),
+    getMembers: protectedProcedure.input(z2.object({ stableId: z2.number() })).query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) return [];
+      const isMember = await db.select().from(stableMembers).where(and2(
+        eq2(stableMembers.stableId, input.stableId),
+        eq2(stableMembers.userId, ctx.user.id)
+      )).limit(1);
+      if (isMember.length === 0) {
+        throw new TRPCError3({ code: "FORBIDDEN" });
+      }
+      return db.select().from(stableMembers).where(and2(
+        eq2(stableMembers.stableId, input.stableId),
+        eq2(stableMembers.isActive, true)
+      ));
+    })
+  }),
+  // Messages
+  messages: router({
+    getThreads: protectedProcedure.input(z2.object({ stableId: z2.number() })).query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) return [];
+      return db.select().from(messageThreads).where(and2(
+        eq2(messageThreads.stableId, input.stableId),
+        eq2(messageThreads.isActive, true)
+      )).orderBy(desc2(messageThreads.updatedAt));
+    }),
+    getMessages: protectedProcedure.input(z2.object({
+      threadId: z2.number(),
+      limit: z2.number().default(50)
+    })).query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) return [];
+      return db.select().from(messages).where(eq2(messages.threadId, input.threadId)).orderBy(desc2(messages.createdAt)).limit(input.limit);
+    }),
+    sendMessage: protectedProcedure.input(z2.object({
+      threadId: z2.number(),
+      content: z2.string().min(1),
+      attachments: z2.array(z2.string()).optional()
+    })).mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR" });
+      const result = await db.insert(messages).values({
+        threadId: input.threadId,
+        senderId: ctx.user.id,
+        content: input.content,
+        attachments: input.attachments ? JSON.stringify(input.attachments) : null
+      });
+      return { id: result[0].insertId };
+    }),
+    createThread: protectedProcedure.input(z2.object({
+      stableId: z2.number(),
+      title: z2.string().optional()
+    })).mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR" });
+      const result = await db.insert(messageThreads).values({
+        stableId: input.stableId,
+        title: input.title
+      });
+      return { id: result[0].insertId };
+    })
+  }),
+  // Analytics
+  analytics: router({
+    getTrainingStats: protectedProcedure.input(z2.object({
+      horseId: z2.number().optional(),
+      startDate: z2.string().optional(),
+      endDate: z2.string().optional()
+    })).query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) return null;
+      let query = db.select({
+        totalSessions: sql2`COUNT(*)`,
+        completedSessions: sql2`SUM(CASE WHEN isCompleted = 1 THEN 1 ELSE 0 END)`,
+        totalDuration: sql2`SUM(duration)`,
+        avgPerformance: sql2`AVG(CASE 
+            WHEN performance = 'excellent' THEN 4
+            WHEN performance = 'good' THEN 3
+            WHEN performance = 'average' THEN 2
+            WHEN performance = 'poor' THEN 1
+            ELSE 0 END)`
+      }).from(trainingSessions).where(eq2(trainingSessions.userId, ctx.user.id));
+      if (input.horseId) {
+        query = query.where(eq2(trainingSessions.horseId, input.horseId));
+      }
+      const result = await query;
+      return result[0] || null;
+    }),
+    getHealthStats: protectedProcedure.input(z2.object({
+      horseId: z2.number().optional()
+    })).query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) return null;
+      const result = await db.select({
+        totalRecords: sql2`COUNT(*)`,
+        upcomingReminders: sql2`SUM(CASE WHEN nextDueDate >= CURDATE() THEN 1 ELSE 0 END)`,
+        overdueReminders: sql2`SUM(CASE WHEN nextDueDate < CURDATE() THEN 1 ELSE 0 END)`
+      }).from(healthRecords).where(eq2(healthRecords.userId, ctx.user.id));
+      return result[0] || null;
+    }),
+    getCostAnalysis: protectedProcedure.input(z2.object({
+      horseId: z2.number().optional(),
+      startDate: z2.string().optional(),
+      endDate: z2.string().optional()
+    })).query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) return null;
+      const feedCostsResult = await db.select({
+        totalCost: sql2`SUM(costPerUnit)`
+      }).from(feedCosts).where(eq2(feedCosts.userId, ctx.user.id));
+      const healthCostsResult = await db.select({
+        totalCost: sql2`SUM(cost)`
+      }).from(healthRecords).where(eq2(healthRecords.userId, ctx.user.id));
+      return {
+        feedCosts: feedCostsResult[0]?.totalCost || 0,
+        healthCosts: healthCostsResult[0]?.totalCost || 0,
+        totalCosts: (feedCostsResult[0]?.totalCost || 0) + (healthCostsResult[0]?.totalCost || 0)
+      };
+    })
+  }),
+  // Reports
+  reports: router({
+    generate: subscribedProcedure.input(z2.object({
+      reportType: z2.enum(["monthly_summary", "health_report", "training_progress", "cost_analysis", "competition_summary"]),
+      horseId: z2.number().optional(),
+      stableId: z2.number().optional(),
+      startDate: z2.string().optional(),
+      endDate: z2.string().optional()
+    })).mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR" });
+      let reportData = {};
+      const result = await db.insert(reports).values({
+        userId: ctx.user.id,
+        stableId: input.stableId,
+        horseId: input.horseId,
+        reportType: input.reportType,
+        title: `${input.reportType.replace("_", " ")} Report`,
+        reportData: JSON.stringify(reportData)
+      });
+      return { id: result[0].insertId };
+    }),
+    list: protectedProcedure.input(z2.object({
+      limit: z2.number().default(20)
+    })).query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) return [];
+      return db.select().from(reports).where(eq2(reports.userId, ctx.user.id)).orderBy(desc2(reports.generatedAt)).limit(input.limit);
+    }),
+    scheduleReport: subscribedProcedure.input(z2.object({
+      reportType: z2.enum(["monthly_summary", "health_report", "training_progress", "cost_analysis", "competition_summary"]),
+      frequency: z2.enum(["daily", "weekly", "monthly", "quarterly"]),
+      recipients: z2.array(z2.string().email()),
+      stableId: z2.number().optional()
+    })).mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR" });
+      const result = await db.insert(reportSchedules).values({
+        userId: ctx.user.id,
+        stableId: input.stableId,
+        reportType: input.reportType,
+        frequency: input.frequency,
+        recipients: JSON.stringify(input.recipients),
+        nextRunAt: /* @__PURE__ */ new Date()
+      });
+      return { id: result[0].insertId };
+    })
+  }),
+  // Calendar and Events
+  calendar: router({
+    getEvents: protectedProcedure.input(z2.object({
+      startDate: z2.string(),
+      endDate: z2.string(),
+      stableId: z2.number().optional()
+    })).query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) return [];
+      return db.select().from(events).where(and2(
+        eq2(events.userId, ctx.user.id),
+        gte2(events.startDate, new Date(input.startDate)),
+        lte2(events.startDate, new Date(input.endDate))
+      )).orderBy(events.startDate);
+    }),
+    createEvent: subscribedProcedure.input(z2.object({
+      title: z2.string().min(1).max(200),
+      description: z2.string().optional(),
+      eventType: z2.enum(["training", "competition", "veterinary", "farrier", "lesson", "meeting", "other"]),
+      startDate: z2.string(),
+      endDate: z2.string().optional(),
+      horseId: z2.number().optional(),
+      stableId: z2.number().optional(),
+      location: z2.string().optional(),
+      isAllDay: z2.boolean().default(false),
+      color: z2.string().optional()
+    })).mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR" });
+      const result = await db.insert(events).values({
+        ...input,
+        userId: ctx.user.id,
+        startDate: new Date(input.startDate),
+        endDate: input.endDate ? new Date(input.endDate) : null
+      });
+      return { id: result[0].insertId };
+    }),
+    updateEvent: subscribedProcedure.input(z2.object({
+      id: z2.number(),
+      title: z2.string().optional(),
+      description: z2.string().optional(),
+      startDate: z2.string().optional(),
+      endDate: z2.string().optional(),
+      isCompleted: z2.boolean().optional()
+    })).mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR" });
+      const { id, ...updateData } = input;
+      await db.update(events).set({
+        ...updateData,
+        startDate: updateData.startDate ? new Date(updateData.startDate) : void 0,
+        endDate: updateData.endDate ? new Date(updateData.endDate) : void 0,
+        updatedAt: /* @__PURE__ */ new Date()
+      }).where(and2(
+        eq2(events.id, id),
+        eq2(events.userId, ctx.user.id)
+      ));
+      return { success: true };
+    }),
+    deleteEvent: subscribedProcedure.input(z2.object({ id: z2.number() })).mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR" });
+      await db.delete(events).where(and2(
+        eq2(events.id, input.id),
+        eq2(events.userId, ctx.user.id)
+      ));
+      return { success: true };
+    })
+  }),
+  // Competition Management
+  competitions: router({
+    create: subscribedProcedure.input(z2.object({
+      horseId: z2.number(),
+      competitionName: z2.string().min(1).max(200),
+      venue: z2.string().optional(),
+      date: z2.string(),
+      discipline: z2.string().optional(),
+      level: z2.string().optional(),
+      class: z2.string().optional(),
+      placement: z2.string().optional(),
+      score: z2.string().optional(),
+      notes: z2.string().optional(),
+      cost: z2.number().optional(),
+      winnings: z2.number().optional()
+    })).mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR" });
+      const result = await db.insert(competitions).values({
+        ...input,
+        userId: ctx.user.id,
+        date: new Date(input.date)
+      });
+      return { id: result[0].insertId };
+    }),
+    list: protectedProcedure.input(z2.object({
+      horseId: z2.number().optional()
+    })).query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) return [];
+      if (input.horseId) {
+        return db.getCompetitionsByHorseId(input.horseId, ctx.user.id);
+      }
+      return db.getCompetitionsByUserId(ctx.user.id);
+    })
+  }),
+  // Training Program Templates
+  trainingPrograms: router({
+    listTemplates: protectedProcedure.query(async ({ ctx }) => {
+      const db = await getDb();
+      if (!db) return [];
+      return db.select().from(trainingProgramTemplates).where(or2(
+        eq2(trainingProgramTemplates.userId, ctx.user.id),
+        eq2(trainingProgramTemplates.isPublic, true)
+      )).orderBy(desc2(trainingProgramTemplates.createdAt));
+    }),
+    createTemplate: subscribedProcedure.input(z2.object({
+      name: z2.string().min(1).max(200),
+      description: z2.string().optional(),
+      duration: z2.number().optional(),
+      discipline: z2.string().optional(),
+      level: z2.string().optional(),
+      goals: z2.string().optional(),
+      programData: z2.string(),
+      isPublic: z2.boolean().default(false)
+    })).mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR" });
+      const result = await db.insert(trainingProgramTemplates).values({
+        ...input,
+        userId: ctx.user.id
+      });
+      return { id: result[0].insertId };
+    }),
+    applyTemplate: subscribedProcedure.input(z2.object({
+      templateId: z2.number(),
+      horseId: z2.number(),
+      startDate: z2.string()
+    })).mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR" });
+      const template = await db.select().from(trainingProgramTemplates).where(eq2(trainingProgramTemplates.id, input.templateId)).limit(1);
+      if (template.length === 0) {
+        throw new TRPCError3({ code: "NOT_FOUND" });
+      }
+      const result = await db.insert(trainingPrograms).values({
+        horseId: input.horseId,
+        userId: ctx.user.id,
+        templateId: input.templateId,
+        name: template[0].name,
+        startDate: new Date(input.startDate),
+        programData: template[0].programData
+      });
+      return { id: result[0].insertId };
+    })
+  }),
+  // Breeding Management
+  breeding: router({
+    createRecord: subscribedProcedure.input(z2.object({
+      mareId: z2.number(),
+      stallionId: z2.number().optional(),
+      stallionName: z2.string().optional(),
+      breedingDate: z2.string(),
+      method: z2.enum(["natural", "artificial", "embryo_transfer"]),
+      veterinarianName: z2.string().optional(),
+      cost: z2.number().optional(),
+      notes: z2.string().optional()
+    })).mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR" });
+      const result = await db.insert(breeding).values({
+        ...input,
+        breedingDate: new Date(input.breedingDate)
+      });
+      return { id: result[0].insertId };
+    }),
+    list: protectedProcedure.input(z2.object({
+      mareId: z2.number().optional()
+    })).query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) return [];
+      let query = db.select().from(breeding);
+      if (input.mareId) {
+        query = query.where(eq2(breeding.mareId, input.mareId));
+      }
+      return query.orderBy(desc2(breeding.breedingDate));
+    }),
+    addFoal: subscribedProcedure.input(z2.object({
+      breedingId: z2.number(),
+      birthDate: z2.string(),
+      gender: z2.enum(["colt", "filly"]),
+      name: z2.string().optional(),
+      color: z2.string().optional(),
+      birthWeight: z2.number().optional()
+    })).mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR" });
+      const result = await db.insert(foals).values({
+        ...input,
+        birthDate: new Date(input.birthDate)
+      });
+      return { id: result[0].insertId };
+    })
   })
 });
 
@@ -2001,6 +3258,7 @@ function serveStatic(app) {
 }
 
 // server/_core/index.ts
+import { nanoid as nanoid3 } from "nanoid";
 function isPortAvailable(port) {
   return new Promise((resolve) => {
     const server = net.createServer();
@@ -2021,8 +3279,159 @@ async function findAvailablePort(startPort = 3e3) {
 async function startServer() {
   const app = express2();
   const server = createServer(app);
+  app.use(helmet({
+    contentSecurityPolicy: process.env.NODE_ENV === "production" ? void 0 : false,
+    crossOriginEmbedderPolicy: false
+  }));
+  app.use((req, res, next) => {
+    req.headers["x-request-id"] = req.headers["x-request-id"] || nanoid3();
+    res.setHeader("X-Request-ID", req.headers["x-request-id"]);
+    next();
+  });
+  app.use((req, res, next) => {
+    const start = Date.now();
+    res.on("finish", () => {
+      const duration = Date.now() - start;
+      console.log(`[${req.headers["x-request-id"]}] ${req.method} ${req.path} ${res.statusCode} ${duration}ms`);
+    });
+    next();
+  });
+  const limiter = rateLimit({
+    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || "900000"),
+    // 15 minutes
+    max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || "100"),
+    message: "Too many requests from this IP, please try again later.",
+    standardHeaders: true,
+    legacyHeaders: false
+  });
+  app.use("/api", limiter);
+  app.post("/api/webhooks/stripe", express2.raw({ type: "application/json" }), async (req, res) => {
+    const stripe = getStripe();
+    if (!stripe) {
+      return res.status(500).json({ error: "Stripe not configured" });
+    }
+    const sig = req.headers["stripe-signature"];
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    if (!sig || !webhookSecret) {
+      return res.status(400).json({ error: "Missing signature or secret" });
+    }
+    let event;
+    try {
+      event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+    } catch (err) {
+      console.error(`[Stripe Webhook] Signature verification failed:`, err.message);
+      return res.status(400).json({ error: `Webhook signature verification failed: ${err.message}` });
+    }
+    const alreadyProcessed = await isStripeEventProcessed(event.id);
+    if (alreadyProcessed) {
+      console.log(`[Stripe Webhook] Event ${event.id} already processed`);
+      return res.json({ received: true, cached: true });
+    }
+    await createStripeEvent(event.id, event.type, JSON.stringify(event.data.object));
+    try {
+      switch (event.type) {
+        case "checkout.session.completed": {
+          const session = event.data.object;
+          const userId = parseInt(session.metadata?.userId || "0");
+          if (userId && session.customer && session.subscription) {
+            await updateUser(userId, {
+              stripeCustomerId: session.customer,
+              stripeSubscriptionId: session.subscription,
+              subscriptionStatus: "active",
+              lastPaymentAt: /* @__PURE__ */ new Date()
+            });
+            console.log(`[Stripe Webhook] User ${userId} subscription activated`);
+          }
+          break;
+        }
+        case "customer.subscription.updated": {
+          const subscription = event.data.object;
+          const userId = await getUserIdByStripeSubscription(subscription.id);
+          if (userId) {
+            let status = "active";
+            if (subscription.status === "past_due") status = "overdue";
+            if (subscription.status === "canceled" || subscription.status === "unpaid") status = "cancelled";
+            if (subscription.status === "incomplete_expired") status = "expired";
+            await updateUser(userId, {
+              subscriptionStatus: status,
+              subscriptionEndsAt: subscription.cancel_at ? new Date(subscription.cancel_at * 1e3) : null
+            });
+            console.log(`[Stripe Webhook] User ${userId} subscription updated to ${status}`);
+          }
+          break;
+        }
+        case "customer.subscription.deleted": {
+          const subscription = event.data.object;
+          const userId = await getUserIdByStripeSubscription(subscription.id);
+          if (userId) {
+            await updateUser(userId, {
+              subscriptionStatus: "cancelled",
+              subscriptionEndsAt: /* @__PURE__ */ new Date()
+            });
+            console.log(`[Stripe Webhook] User ${userId} subscription cancelled`);
+          }
+          break;
+        }
+        case "invoice.payment_succeeded": {
+          const invoice = event.data.object;
+          const subscriptionId = invoice.subscription;
+          if (subscriptionId) {
+            const userId = await getUserIdByStripeSubscription(subscriptionId);
+            if (userId) {
+              await updateUser(userId, {
+                subscriptionStatus: "active",
+                lastPaymentAt: /* @__PURE__ */ new Date()
+              });
+              console.log(`[Stripe Webhook] User ${userId} payment succeeded`);
+            }
+          }
+          break;
+        }
+        case "invoice.payment_failed": {
+          const invoice = event.data.object;
+          const subscriptionId = invoice.subscription;
+          if (subscriptionId) {
+            const userId = await getUserIdByStripeSubscription(subscriptionId);
+            if (userId) {
+              await updateUser(userId, {
+                subscriptionStatus: "overdue"
+              });
+              console.log(`[Stripe Webhook] User ${userId} payment failed`);
+            }
+          }
+          break;
+        }
+        default:
+          console.log(`[Stripe Webhook] Unhandled event type: ${event.type}`);
+      }
+      await markStripeEventProcessed(event.id);
+      res.json({ received: true });
+    } catch (error) {
+      console.error(`[Stripe Webhook] Error processing event ${event.id}:`, error);
+      await markStripeEventProcessed(event.id, error.message);
+      res.status(500).json({ error: "Webhook processing failed" });
+    }
+  });
+  async function getUserIdByStripeSubscription(subscriptionId) {
+    const users2 = await getAllUsers();
+    const user = users2.find((u) => u.stripeSubscriptionId === subscriptionId);
+    return user?.id || null;
+  }
   app.use(express2.json({ limit: "50mb" }));
   app.use(express2.urlencoded({ limit: "50mb", extended: true }));
+  app.get("/api/health", async (req, res) => {
+    const dbConnected = !!await getDb();
+    const stripeConfigured = !!getStripe();
+    res.json({
+      status: "healthy",
+      timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+      version: "1.0.0",
+      services: {
+        database: dbConnected,
+        stripe: stripeConfigured
+      }
+    });
+  });
   registerOAuthRoutes(app);
   app.use(
     "/api/trpc",

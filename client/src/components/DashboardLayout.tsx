@@ -32,7 +32,8 @@ import {
   Cloud,
   FileText,
   Settings,
-  Shield
+  Shield,
+  MessageSquare
 } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
@@ -47,6 +48,7 @@ const menuItems = [
   { icon: Utensils, label: "Feeding Plans", path: "/feeding" },
   { icon: Cloud, label: "Weather", path: "/weather" },
   { icon: FileText, label: "Documents", path: "/documents" },
+  { icon: MessageSquare, label: "AI Chat", path: "/ai-chat" },
 ];
 
 const adminMenuItems = [
