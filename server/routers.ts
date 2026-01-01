@@ -9,6 +9,15 @@ import { invokeLLM } from "./_core/llm";
 import { storagePut } from "./storage";
 import { nanoid } from "nanoid";
 import { createCheckoutSession, createPortalSession, STRIPE_PRICING } from "./stripe";
+import {
+  exportHorsesCSV,
+  exportHealthRecordsCSV,
+  exportTrainingSessionsCSV,
+  exportCompetitionsCSV,
+  exportFeedCostsCSV,
+  exportDocumentsCSV,
+  generateCSVFilename,
+} from "./csvExport";
 import { eq, and, desc, sql, gte, lte, or } from "drizzle-orm";
 import { getDb } from "./db";
 import {
@@ -454,6 +463,18 @@ export const appRouter = router({
         });
         return { success: true };
       }),
+    
+    exportCSV: subscribedProcedure.query(async ({ ctx }) => {
+      const horses = await db.getHorsesByUserId(ctx.user.id);
+      const csv = exportHorsesCSV(horses);
+      const filename = generateCSVFilename('horses');
+      
+      return {
+        csv,
+        filename,
+        mimeType: 'text/csv',
+      };
+    }),
   }),
 
   // Health records
@@ -546,6 +567,18 @@ export const appRouter = router({
       .query(async ({ ctx, input }) => {
         return db.getUpcomingReminders(ctx.user.id, input.days);
       }),
+    
+    exportCSV: subscribedProcedure.query(async ({ ctx }) => {
+      const records = await db.getHealthRecordsByUserId(ctx.user.id);
+      const csv = exportHealthRecordsCSV(records);
+      const filename = generateCSVFilename('health_records');
+      
+      return {
+        csv,
+        filename,
+        mimeType: 'text/csv',
+      };
+    }),
   }),
 
   // Training sessions
@@ -643,6 +676,18 @@ export const appRouter = router({
         });
         return { success: true };
       }),
+    
+    exportCSV: subscribedProcedure.query(async ({ ctx }) => {
+      const sessions = await db.getTrainingSessionsByUserId(ctx.user.id);
+      const csv = exportTrainingSessionsCSV(sessions);
+      const filename = generateCSVFilename('training_sessions');
+      
+      return {
+        csv,
+        filename,
+        mimeType: 'text/csv',
+      };
+    }),
   }),
 
   // Feeding plans
@@ -761,6 +806,18 @@ export const appRouter = router({
         await db.deleteDocument(input.id, ctx.user.id);
         return { success: true };
       }),
+    
+    exportCSV: subscribedProcedure.query(async ({ ctx }) => {
+      const documents = await db.getDocumentsByUserId(ctx.user.id);
+      const csv = exportDocumentsCSV(documents);
+      const filename = generateCSVFilename('documents');
+      
+      return {
+        csv,
+        filename,
+        mimeType: 'text/csv',
+      };
+    }),
   }),
 
   // Weather and AI analysis
@@ -1633,6 +1690,23 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         }
         return db.getCompetitionsByUserId(ctx.user.id);
       }),
+    
+    exportCSV: subscribedProcedure.query(async ({ ctx }) => {
+      const dbInstance = await getDb();
+      if (!dbInstance) {
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+      }
+      
+      const competitionData = await dbInstance.getCompetitionsByUserId(ctx.user.id);
+      const csv = exportCompetitionsCSV(competitionData);
+      const filename = generateCSVFilename('competitions');
+      
+      return {
+        csv,
+        filename,
+        mimeType: 'text/csv',
+      };
+    }),
   }),
 
   // Training Program Templates
