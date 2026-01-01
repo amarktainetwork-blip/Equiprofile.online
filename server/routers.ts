@@ -1944,13 +1944,141 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         const db = await getDb();
         if (!db) return [];
         
-        let query = db.select().from(breeding);
+        let query = db.select().from(breeding).where(eq(breeding.userId, ctx.user.id));
         
         if (input.mareId) {
-          query = query.where(eq(breeding.mareId, input.mareId));
+          query = query.where(and(
+            eq(breeding.userId, ctx.user.id),
+            eq(breeding.mareId, input.mareId)
+          ));
         }
         
         return query.orderBy(desc(breeding.breedingDate));
+      }),
+
+    get: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) return null;
+        
+        const records = await db.select()
+          .from(breeding)
+          .where(and(
+            eq(breeding.id, input.id),
+            eq(breeding.userId, ctx.user.id)
+          ))
+          .limit(1);
+        
+        return records.length > 0 ? records[0] : null;
+      }),
+
+    update: subscribedProcedure
+      .input(z.object({
+        id: z.number(),
+        stallionName: z.string().optional(),
+        breedingDate: z.string().optional(),
+        method: z.enum(['natural', 'artificial', 'embryo_transfer']).optional(),
+        veterinarianName: z.string().optional(),
+        cost: z.number().optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        
+        const { id, ...updateData } = input;
+        
+        // Verify ownership
+        const existing = await db.select()
+          .from(breeding)
+          .where(and(
+            eq(breeding.id, id),
+            eq(breeding.userId, ctx.user.id)
+          ))
+          .limit(1);
+        
+        if (existing.length === 0) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+        
+        const dataToUpdate: any = { ...updateData };
+        if (updateData.breedingDate) {
+          dataToUpdate.breedingDate = new Date(updateData.breedingDate);
+        }
+        
+        await db.update(breeding)
+          .set(dataToUpdate)
+          .where(eq(breeding.id, id));
+        
+        return { success: true };
+      }),
+
+    delete: subscribedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        
+        // Verify ownership
+        const existing = await db.select()
+          .from(breeding)
+          .where(and(
+            eq(breeding.id, input.id),
+            eq(breeding.userId, ctx.user.id)
+          ))
+          .limit(1);
+        
+        if (existing.length === 0) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+        
+        await db.delete(breeding)
+          .where(eq(breeding.id, input.id));
+        
+        return { success: true };
+      }),
+
+    confirmPregnancy: subscribedProcedure
+      .input(z.object({
+        id: z.number(),
+        confirmed: z.boolean(),
+        confirmationDate: z.string().optional(),
+        dueDate: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        
+        // Verify ownership
+        const existing = await db.select()
+          .from(breeding)
+          .where(and(
+            eq(breeding.id, input.id),
+            eq(breeding.userId, ctx.user.id)
+          ))
+          .limit(1);
+        
+        if (existing.length === 0) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+        
+        const updateData: any = {
+          pregnancyConfirmed: input.confirmed,
+        };
+        
+        if (input.confirmationDate) {
+          updateData.confirmationDate = new Date(input.confirmationDate);
+        }
+        if (input.dueDate) {
+          updateData.dueDate = new Date(input.dueDate);
+        }
+        
+        await db.update(breeding)
+          .set(updateData)
+          .where(eq(breeding.id, input.id));
+        
+        return { success: true };
       }),
 
     addFoal: subscribedProcedure
@@ -1972,6 +2100,23 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         });
         
         return { id: result[0].insertId };
+      }),
+
+    listFoals: protectedProcedure
+      .input(z.object({
+        breedingId: z.number().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) return [];
+        
+        let query = db.select().from(foals);
+        
+        if (input.breedingId) {
+          query = query.where(eq(foals.breedingId, input.breedingId));
+        }
+        
+        return query.orderBy(desc(foals.birthDate));
       }),
     
     exportCSV: subscribedProcedure.query(async ({ ctx }) => {
