@@ -29,6 +29,7 @@ import AIChat from "./pages/AIChat";
 import TrainingTemplates from "./pages/TrainingTemplates";
 import BreedingManagement from "./pages/BreedingManagement";
 import LessonScheduling from "./pages/LessonScheduling";
+import ClientPortal from "./pages/ClientPortal";
 
 function Router() {
   useKeyboardNavigation();
@@ -94,6 +95,9 @@ function Router() {
           
           {/* AI Chat */}
           <Route path="/ai-chat" component={AIChat} />
+          
+          {/* Client Portal */}
+          <Route path="/client/:clientId" component={ClientPortal} />
           
           {/* Admin panel - requires admin role */}
           <Route path="/admin" component={Admin} />
