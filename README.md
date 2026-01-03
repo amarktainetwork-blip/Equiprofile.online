@@ -1411,7 +1411,55 @@ Once unlocked, you can access:
 
 ## Deployment Overview
 
-EquiProfile is deployed on a single VPS with a traditional LAMP-style stack optimized for simplicity and reliability.
+EquiProfile supports plug-and-play deployment with minimal configuration. Use feature flags to control which features are enabled.
+
+### Quick Deployment (Minimal Configuration)
+
+**Required Environment Variables:**
+```env
+DATABASE_URL=mysql://user:pass@host:3306/database
+JWT_SECRET=your_secret_here
+ADMIN_UNLOCK_PASSWORD=your_password_here
+ENABLE_STRIPE=false
+ENABLE_UPLOADS=false
+```
+
+**Deployment Commands:**
+```bash
+# Using pnpm (recommended)
+pnpm install
+pnpm db:push
+pnpm build
+pm2 start ecosystem.config.js --env production
+
+# Validate environment before deploying
+./scripts/preflight.sh
+```
+
+### Feature Flags
+
+Control which features are enabled via environment variables:
+
+**`ENABLE_STRIPE`** (default: `false`)
+- When `true`: Enables billing, subscriptions, and payment processing
+- Requires: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
+
+**`ENABLE_UPLOADS`** (default: `false`)
+- When `true`: Enables document uploads and file storage
+- Requires: `BUILT_IN_FORGE_API_URL`, `BUILT_IN_FORGE_API_KEY`
+
+**Benefits:**
+- ✅ Deploy without payment processor initially
+- ✅ Deploy without file storage initially
+- ✅ Enable features incrementally as needed
+- ✅ Simpler initial configuration
+- ✅ Faster time to deployment
+
+### Deployment Guides
+
+- **Full Guide:** See [DEPLOYMENT_PLUG_AND_PLAY.md](docs/reports/DEPLOYMENT_PLUG_AND_PLAY.md)
+- **Audit Report:** See [AUDIT_REPORT.md](docs/reports/AUDIT_REPORT.md)
+- **Legacy Guide:** See [DEPLOYMENT.md](DEPLOYMENT.md)
 
 ### Architecture
 
@@ -1459,39 +1507,34 @@ AWS S3 (Document Storage)
 
 **Critical Environment Variables:**
 
-EquiProfile requires specific environment variables to function correctly in production. The application will **refuse to start** in production mode if any critical variables are missing or improperly configured.
+EquiProfile uses feature flags to control which environment variables are required. The application will **refuse to start** in production mode if critical variables are missing.
 
-**Required (Application will NOT start without these):**
+**Always Required (Core):**
 - `DATABASE_URL` - MySQL connection string (format: `mysql://user:pass@host:port/database`)
-- `JWT_SECRET` - Session token signing key (64+ random characters)
-- `ADMIN_UNLOCK_PASSWORD` - Admin mode unlock password (16+ characters, **NOT** default `ashmor12@`)
+- `JWT_SECRET` - Session token signing key (generate with: `openssl rand -base64 32`)
+- `ADMIN_UNLOCK_PASSWORD` - Admin mode unlock password (**NOT** default `ashmor12@`)
+
+**Required if `ENABLE_STRIPE=true`:**
 - `STRIPE_SECRET_KEY` - Stripe API key for payment processing
 - `STRIPE_WEBHOOK_SECRET` - Webhook signature verification key
-- `AWS_ACCESS_KEY_ID` - AWS credentials for S3 file storage
-- `AWS_SECRET_ACCESS_KEY` - AWS secret key for S3
-- `AWS_S3_BUCKET` - S3 bucket name for file uploads
-- `AWS_REGION` - AWS region (default: `eu-west-2`)
 
+**Required if `ENABLE_UPLOADS=true`:**
+- `BUILT_IN_FORGE_API_URL` - Storage API endpoint
+- `BUILT_IN_FORGE_API_KEY` - Storage API authentication key
 **Optional (Features may be degraded without these):**
 - `OPENAI_API_KEY` - AI service access for chat and insights
-- `SMTP_HOST` - Email notification server
-- `SMTP_PORT` - SMTP port (usually 587)
-- `SMTP_USER` - Email account username
-- `SMTP_PASS` - Email account password
-- `SMTP_FROM` - Sender address for system emails
+- `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` - Email notifications
 - `BASE_URL` - Application base URL (for emails and links)
-- `COOKIE_DOMAIN` - Cookie domain for session management
-- `COOKIE_SECURE` - Set to `true` in production for HTTPS-only cookies
-- `OAUTH_SERVER_URL` - External OAuth provider URL (if not using built-in)
-- `VITE_APP_ID` - Application identifier
+- `COOKIE_DOMAIN`, `COOKIE_SECURE` - Cookie configuration
 - `OWNER_OPEN_ID` - Owner account identifier for auto-admin assignment
 
 **Production Validation:**
 The application performs startup validation in production mode:
 1. ✅ Checks all critical environment variables are present
-2. ✅ Validates `ADMIN_UNLOCK_PASSWORD` is not the default value
-3. ✅ Exits with clear error message if validation fails
-4. ✅ Prevents insecure deployment configurations
+2. ✅ Validates feature flags and required credentials
+3. ✅ Validates `ADMIN_UNLOCK_PASSWORD` is not the default value
+4. ✅ Exits with clear error message if validation fails
+5. ✅ Prevents insecure deployment configurations
 
 **Generating Secure Values:**
 ```bash

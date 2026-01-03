@@ -1,20 +1,34 @@
+// Feature flags (default to false for plug-and-play deployment)
+const enableStripe = process.env.ENABLE_STRIPE === 'true';
+const enableUploads = process.env.ENABLE_UPLOADS === 'true';
+
 // Production startup validation
 if (process.env.NODE_ENV === 'production') {
-  const requiredVars = [
+  // Core required vars (always needed)
+  const coreRequiredVars = [
     'DATABASE_URL',
     'JWT_SECRET',
     'ADMIN_UNLOCK_PASSWORD',
-    'STRIPE_SECRET_KEY',
-    'STRIPE_WEBHOOK_SECRET',
-    'AWS_ACCESS_KEY_ID',
-    'AWS_SECRET_ACCESS_KEY',
-    'AWS_S3_BUCKET',
   ];
   
-  const missing = requiredVars.filter(v => !process.env[v]);
+  const missing = coreRequiredVars.filter(v => !process.env[v]);
+  
+  // Conditionally require Stripe vars if enabled
+  if (enableStripe) {
+    const stripeVars = ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET'];
+    missing.push(...stripeVars.filter(v => !process.env[v]));
+  }
+  
+  // Conditionally require upload/storage vars if enabled
+  if (enableUploads) {
+    const uploadVars = ['BUILT_IN_FORGE_API_URL', 'BUILT_IN_FORGE_API_KEY'];
+    missing.push(...uploadVars.filter(v => !process.env[v]));
+  }
+  
   if (missing.length > 0) {
     console.error(`❌ PRODUCTION ERROR: Missing required environment variables: ${missing.join(', ')}`);
     console.error('Application cannot start. Please configure all required environment variables.');
+    console.error(`Feature flags: ENABLE_STRIPE=${enableStripe}, ENABLE_UPLOADS=${enableUploads}`);
     process.exit(1);
   }
   
@@ -27,6 +41,10 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 export const ENV = {
+  // Feature flags
+  enableStripe,
+  enableUploads,
+  
   // App config
   appId: process.env.VITE_APP_ID ?? "",
   cookieSecret: process.env.JWT_SECRET ?? "",
@@ -45,11 +63,11 @@ export const ENV = {
   cookieDomain: process.env.COOKIE_DOMAIN ?? undefined,
   cookieSecure: process.env.COOKIE_SECURE === "true",
   
-  // Stripe
+  // Stripe (only used if enableStripe is true)
   stripeSecretKey: process.env.STRIPE_SECRET_KEY ?? "",
   stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET ?? "",
   
-  // AWS S3
+  // AWS S3 (legacy - kept for backward compatibility)
   awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID ?? "",
   awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? "",
   awsRegion: process.env.AWS_REGION ?? "eu-west-2",
