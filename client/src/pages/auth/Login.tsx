@@ -3,24 +3,30 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { getLoginUrl } from "@/const";
+import { getLoginUrl, isOAuthAvailable } from "@/const";
 import { Link, useLocation } from "wouter";
-import { useState } from "react";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { useState, FormEvent } from "react";
+import { Loader2, ArrowLeft, AlertCircle } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { PageTransition } from "@/components/PageTransition";
 import { MarketingNav } from "@/components/MarketingNav";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 /**
  * Login page
  * 
- * Currently redirects to external OAuth portal for authentication.
- * If you need a custom login form, implement it here with proper backend support.
+ * Supports both OAuth (if configured) and email/password authentication.
  */
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState("");
   const { isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
+
+  const oauthEnabled = isOAuthAvailable();
 
   // Redirect if already authenticated
   if (isAuthenticated) {
@@ -28,9 +34,43 @@ export default function Login() {
     return null;
   }
 
-  const handleLogin = () => {
+  const handleOAuthLogin = () => {
+    const loginUrl = getLoginUrl();
+    if (!loginUrl) {
+      setError("OAuth is not configured");
+      return;
+    }
     setIsLoading(true);
-    window.location.href = getLoginUrl();
+    window.location.href = loginUrl;
+  };
+
+  const handleEmailLogin = async (e: FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Login failed");
+        setIsLoading(false);
+        return;
+      }
+
+      // Redirect to dashboard on success
+      window.location.href = "/dashboard";
+    } catch (err) {
+      setError("An error occurred. Please try again.");
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -57,64 +97,107 @@ export default function Login() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Email field */}
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="you@example.com"
-                    disabled={isLoading}
-                  />
-                </div>
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
 
-                {/* Password field */}
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="••••••••"
-                    disabled={isLoading}
-                  />
-                </div>
-
-                {/* Remember me & Forgot password */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Checkbox id="remember" />
-                    <Label
-                      htmlFor="remember"
-                      className="text-sm font-normal cursor-pointer"
-                    >
-                      Remember me
-                    </Label>
+                <form onSubmit={handleEmailLogin} className="space-y-4">
+                  {/* Email field */}
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      disabled={isLoading}
+                      required
+                    />
                   </div>
-                  <a
-                    href="#"
-                    className="text-sm text-primary hover:underline"
-                    onClick={(e) => e.preventDefault()}
-                  >
-                    Forgot password?
-                  </a>
-                </div>
 
-                {/* Sign in button */}
-                <Button
-                  className="w-full"
-                  size="lg"
-                  onClick={handleLogin}
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Signing in...
-                    </>
-                  ) : (
-                    "Sign in"
-                  )}
-                </Button>
+                  {/* Password field */}
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={isLoading}
+                      required
+                    />
+                  </div>
+
+                  {/* Remember me & Forgot password */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Checkbox 
+                        id="remember"
+                        checked={rememberMe}
+                        onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+                      />
+                      <Label
+                        htmlFor="remember"
+                        className="text-sm font-normal cursor-pointer"
+                      >
+                        Remember me
+                      </Label>
+                    </div>
+                    <Link href="/forgot-password">
+                      <a className="text-sm text-primary hover:underline">
+                        Forgot password?
+                      </a>
+                    </Link>
+                  </div>
+
+                  {/* Sign in button */}
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    size="lg"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Signing in...
+                      </>
+                    ) : (
+                      "Sign in"
+                    )}
+                  </Button>
+                </form>
+
+                {/* OAuth option if available */}
+                {oauthEnabled && (
+                  <>
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t" />
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-card px-2 text-muted-foreground">
+                          Or continue with
+                        </span>
+                      </div>
+                    </div>
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full"
+                      onClick={handleOAuthLogin}
+                      disabled={isLoading}
+                    >
+                      OAuth Sign In
+                    </Button>
+                  </>
+                )}
 
                 {/* Divider */}
                 <div className="relative">
@@ -142,9 +225,11 @@ export default function Login() {
               </CardContent>
             </Card>
 
-            {/* Note about OAuth */}
+            {/* Note */}
             <p className="text-xs text-center text-muted-foreground mt-4">
-              This application uses secure OAuth authentication.
+              {oauthEnabled 
+                ? "Secure authentication with OAuth or email/password" 
+                : "Secure email/password authentication"}
             </p>
           </div>
         </div>
