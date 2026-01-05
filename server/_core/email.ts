@@ -26,7 +26,7 @@ function getTransporter(): Transporter | null {
 
   if (!transporter) {
     try {
-      transporter = nodemailer.createTransporter(SMTP_CONFIG);
+      transporter = nodemailer.createTransport(SMTP_CONFIG);
       console.log("[Email] SMTP transporter initialized");
     } catch (error) {
       console.error("[Email] Failed to initialize transporter:", error);

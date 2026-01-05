@@ -19,6 +19,14 @@ var init_schema = __esm({
       openId: varchar("openId", { length: 64 }).notNull().unique(),
       name: text("name"),
       email: varchar("email", { length: 320 }),
+      passwordHash: varchar("passwordHash", { length: 255 }),
+      // For local email/password auth
+      emailVerified: boolean("emailVerified").default(false),
+      // Email verification status
+      resetToken: varchar("resetToken", { length: 255 }),
+      // Password reset token
+      resetTokenExpiry: timestamp("resetTokenExpiry"),
+      // Reset token expiration
       loginMethod: varchar("loginMethod", { length: 64 }),
       role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
       // Subscription fields
@@ -1460,7 +1468,7 @@ var init_db = __esm({
 
 // server/_core/index.ts
 import "dotenv/config";
-import express2 from "express";
+import express3 from "express";
 import { createServer } from "http";
 import net from "net";
 import helmet from "helmet";
@@ -1764,6 +1772,409 @@ function registerOAuthRoutes(app) {
   });
 }
 
+// server/_core/authRouter.ts
+init_db();
+import express from "express";
+import bcrypt2 from "bcrypt";
+import { nanoid as nanoid2 } from "nanoid";
+import { SignJWT as SignJWT2 } from "jose";
+
+// server/_core/email.ts
+import nodemailer from "nodemailer";
+var SMTP_CONFIG = {
+  host: process.env.SMTP_HOST || "smtp.gmail.com",
+  port: parseInt(process.env.SMTP_PORT || "587"),
+  secure: false,
+  // Use STARTTLS
+  auth: {
+    user: process.env.SMTP_USER || "",
+    pass: process.env.SMTP_PASS || ""
+  }
+};
+var SMTP_FROM = process.env.SMTP_FROM || '"EquiProfile" <noreply@equiprofile.online>';
+var transporter = null;
+function getTransporter() {
+  if (!SMTP_CONFIG.auth.user || !SMTP_CONFIG.auth.pass) {
+    console.warn("[Email] SMTP not configured (SMTP_USER and SMTP_PASS required)");
+    return null;
+  }
+  if (!transporter) {
+    try {
+      transporter = nodemailer.createTransport(SMTP_CONFIG);
+      console.log("[Email] SMTP transporter initialized");
+    } catch (error) {
+      console.error("[Email] Failed to initialize transporter:", error);
+      return null;
+    }
+  }
+  return transporter;
+}
+async function sendEmail(to, subject, html, text2) {
+  const transporter2 = getTransporter();
+  if (!transporter2) {
+    console.warn("[Email] Skipping email send - SMTP not configured");
+    return;
+  }
+  try {
+    await transporter2.sendMail({
+      from: SMTP_FROM,
+      to,
+      subject,
+      html,
+      text: text2 || stripHtml(html)
+    });
+    console.log(`[Email] Sent "${subject}" to ${to}`);
+  } catch (error) {
+    console.error(`[Email] Failed to send "${subject}" to ${to}:`, error);
+  }
+}
+async function sendWelcomeEmail(user) {
+  if (!user.email) {
+    console.warn("[Email] Cannot send welcome email - user has no email");
+    return;
+  }
+  const trialDays = user.trialEndsAt ? Math.ceil((user.trialEndsAt.getTime() - Date.now()) / (1e3 * 60 * 60 * 24)) : 7;
+  const subject = "Welcome to EquiProfile!";
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h1 style="color: #1e40af;">Welcome to EquiProfile, ${user.name || "there"}! \u{1F434}</h1>
+      
+      <p>Thank you for joining EquiProfile, the comprehensive horse management platform!</p>
+      
+      <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h2 style="margin-top: 0; color: #1e40af;">Your ${trialDays}-Day Free Trial</h2>
+        <p>You have <strong>${trialDays} days</strong> to explore all premium features:</p>
+        <ul>
+          <li>\u{1F4CB} Health records and vaccination tracking</li>
+          <li>\u{1F3CB}\uFE0F Training session management</li>
+          <li>\u{1F37D}\uFE0F Feeding schedules and nutrition plans</li>
+          <li>\u{1F4C5} Calendar and event reminders</li>
+          <li>\u2601\uFE0F AI-powered weather analysis</li>
+          <li>\u{1F4C4} Secure document storage</li>
+        </ul>
+      </div>
+      
+      <h3>Getting Started:</h3>
+      <ol>
+        <li>Add your first horse profile</li>
+        <li>Log health records and vaccinations</li>
+        <li>Set up feeding schedules</li>
+        <li>Explore the dashboard analytics</li>
+      </ol>
+      
+      <p style="margin-top: 30px;">
+        <a href="${process.env.BASE_URL || "https://equiprofile.online"}/dashboard" 
+           style="background: #1e40af; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+          Go to Dashboard
+        </a>
+      </p>
+      
+      <p style="color: #6b7280; margin-top: 30px;">
+        Questions? Reply to this email or contact our support team.
+      </p>
+      
+      <p style="color: #6b7280;">
+        Best regards,<br/>
+        The EquiProfile Team
+      </p>
+    </div>
+  `;
+  await sendEmail(user.email, subject, html);
+}
+async function sendPaymentSuccessEmail(user, plan) {
+  if (!user.email) return;
+  const planName = plan === "yearly" ? "Yearly" : "Monthly";
+  const amount = plan === "yearly" ? "\xA379.90/year" : "\xA37.99/month";
+  const subject = "Payment successful - Welcome to EquiProfile Premium! \u{1F389}";
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h1 style="color: #10b981;">Payment Successful! \u{1F389}</h1>
+      
+      <p>Hi ${user.name || "there"},</p>
+      
+      <p>Thank you for subscribing to EquiProfile Premium! Your payment has been processed successfully.</p>
+      
+      <div style="background: #f0fdf4; border: 2px solid #10b981; border-radius: 8px; padding: 20px; margin: 20px 0;">
+        <h2 style="margin-top: 0; color: #10b981;">Subscription Details</h2>
+        <p><strong>Plan:</strong> ${planName}</p>
+        <p><strong>Amount:</strong> ${amount}</p>
+        <p><strong>Status:</strong> Active \u2705</p>
+        ${user.subscriptionEndsAt ? `<p><strong>Next billing date:</strong> ${user.subscriptionEndsAt.toLocaleDateString()}</p>` : ""}
+      </div>
+      
+      <p>You now have unlimited access to all premium features:</p>
+      <ul>
+        <li>\u2705 Unlimited horse profiles</li>
+        <li>\u2705 Complete health record tracking</li>
+        <li>\u2705 Training session management</li>
+        <li>\u2705 Document storage (up to 5GB)</li>
+        <li>\u2705 Advanced analytics and reports</li>
+        <li>\u2705 Calendar and reminders</li>
+        <li>\u2705 Priority support</li>
+      </ul>
+      
+      <p style="margin-top: 30px;">
+        <a href="${process.env.BASE_URL || "https://equiprofile.online"}/dashboard" 
+           style="background: #1e40af; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+          Go to Dashboard
+        </a>
+      </p>
+      
+      <p style="color: #6b7280; margin-top: 30px; font-size: 14px;">
+        You can manage your subscription, update payment methods, or view invoices anytime from your 
+        <a href="${process.env.BASE_URL || "https://equiprofile.online"}/billing">billing page</a>.
+      </p>
+      
+      <p style="color: #6b7280;">
+        Thank you for choosing EquiProfile!<br/>
+        The EquiProfile Team
+      </p>
+    </div>
+  `;
+  await sendEmail(user.email, subject, html);
+}
+async function sendPasswordResetEmail(email, resetToken, name) {
+  const resetUrl = `${process.env.BASE_URL || "https://equiprofile.online"}/reset-password?token=${resetToken}`;
+  const subject = "Reset your EquiProfile password";
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h1 style="color: #1e40af;">Password Reset Request</h1>
+      
+      <p>Hi ${name || "there"},</p>
+      
+      <p>We received a request to reset your EquiProfile password. Click the button below to create a new password:</p>
+      
+      <p style="text-align: center; margin: 30px 0;">
+        <a href="${resetUrl}" 
+           style="background: #1e40af; color: white; padding: 14px 32px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
+          Reset Password
+        </a>
+      </p>
+      
+      <p style="color: #dc2626; background: #fef2f2; padding: 15px; border-radius: 6px;">
+        \u26A0\uFE0F This link will expire in <strong>1 hour</strong> for security reasons.
+      </p>
+      
+      <p>If you didn't request a password reset, you can safely ignore this email. Your password will remain unchanged.</p>
+      
+      <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
+        If the button doesn't work, copy and paste this link into your browser:<br/>
+        <a href="${resetUrl}" style="color: #1e40af; word-break: break-all;">${resetUrl}</a>
+      </p>
+      
+      <p style="color: #6b7280; margin-top: 30px;">
+        Best regards,<br/>
+        The EquiProfile Team
+      </p>
+    </div>
+  `;
+  await sendEmail(email, subject, html);
+}
+async function sendTestEmail(to) {
+  try {
+    await sendEmail(
+      to,
+      "EquiProfile Test Email",
+      `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #1e40af;">Test Email</h1>
+          <p>This is a test email from EquiProfile SMTP configuration.</p>
+          <p>If you received this, your email settings are working correctly! \u2705</p>
+          <p style="color: #6b7280; margin-top: 30px;">
+            Sent at: ${(/* @__PURE__ */ new Date()).toISOString()}
+          </p>
+        </div>
+      `
+    );
+    return true;
+  } catch (error) {
+    console.error("[Email] Test email failed:", error);
+    return false;
+  }
+}
+function stripHtml(html) {
+  return html.replace(/<style[^>]*>.*<\/style>/gm, "").replace(/<script[^>]*>.*<\/script>/gm, "").replace(/<[^>]+>/gm, "").replace(/\s\s+/g, " ").trim();
+}
+
+// server/_core/authRouter.ts
+init_env();
+var router = express.Router();
+router.post("/signup", async (req, res) => {
+  try {
+    const { email: userEmail, password, name } = req.body;
+    if (!userEmail || !password) {
+      return res.status(400).json({ error: "Email and password are required" });
+    }
+    if (password.length < 8) {
+      return res.status(400).json({ error: "Password must be at least 8 characters" });
+    }
+    const existingUsers = await getAllUsers();
+    const existingUser = existingUsers.find((u) => u.email === userEmail);
+    if (existingUser) {
+      return res.status(400).json({ error: "Email already registered" });
+    }
+    const passwordHash = await bcrypt2.hash(password, 10);
+    const openId = `local_${nanoid2(16)}`;
+    const trialEnd = /* @__PURE__ */ new Date();
+    trialEnd.setDate(trialEnd.getDate() + 7);
+    await upsertUser({
+      openId,
+      email: userEmail,
+      passwordHash,
+      name: name || null,
+      loginMethod: "email",
+      emailVerified: false,
+      subscriptionStatus: "trial",
+      trialEndsAt: trialEnd,
+      lastSignedIn: /* @__PURE__ */ new Date()
+    });
+    const user = await getUserByOpenId(openId);
+    if (!user) {
+      return res.status(500).json({ error: "Failed to create user" });
+    }
+    const token = await new SignJWT2({ userId: user.id }).setProtectedHeader({ alg: "HS256" }).setExpirationTime("30d").sign(new TextEncoder().encode(ENV.cookieSecret));
+    res.cookie(COOKIE_NAME, token, {
+      httpOnly: true,
+      secure: ENV.cookieSecure,
+      sameSite: "lax",
+      maxAge: 30 * 24 * 60 * 60 * 1e3,
+      // 30 days
+      domain: ENV.cookieDomain
+    });
+    sendWelcomeEmail(user).catch(
+      (err) => console.error("[Auth] Failed to send welcome email:", err)
+    );
+    res.json({
+      success: true,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
+    });
+  } catch (error) {
+    console.error("[Auth] Signup error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+router.post("/login", async (req, res) => {
+  try {
+    const { email: userEmail, password } = req.body;
+    if (!userEmail || !password) {
+      return res.status(400).json({ error: "Email and password are required" });
+    }
+    const users2 = await getAllUsers();
+    const user = users2.find((u) => u.email === userEmail);
+    if (!user || !user.passwordHash) {
+      return res.status(401).json({ error: "Invalid email or password" });
+    }
+    const validPassword = await bcrypt2.compare(password, user.passwordHash);
+    if (!validPassword) {
+      return res.status(401).json({ error: "Invalid email or password" });
+    }
+    if (user.isSuspended) {
+      return res.status(403).json({
+        error: "Account suspended",
+        reason: user.suspendedReason
+      });
+    }
+    await updateUser(user.id, { lastSignedIn: /* @__PURE__ */ new Date() });
+    const token = await new SignJWT2({ userId: user.id }).setProtectedHeader({ alg: "HS256" }).setExpirationTime("30d").sign(new TextEncoder().encode(ENV.cookieSecret));
+    res.cookie(COOKIE_NAME, token, {
+      httpOnly: true,
+      secure: ENV.cookieSecure,
+      sameSite: "lax",
+      maxAge: 30 * 24 * 60 * 60 * 1e3,
+      // 30 days
+      domain: ENV.cookieDomain
+    });
+    res.json({
+      success: true,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
+    });
+  } catch (error) {
+    console.error("[Auth] Login error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+router.post("/request-reset", async (req, res) => {
+  try {
+    const { email: userEmail } = req.body;
+    if (!userEmail) {
+      return res.status(400).json({ error: "Email is required" });
+    }
+    const users2 = await getAllUsers();
+    const user = users2.find((u) => u.email === userEmail);
+    if (!user) {
+      console.log("[Auth] Password reset requested for non-existent email:", userEmail);
+      return res.json({ success: true, message: "If that email exists, a reset link has been sent" });
+    }
+    const resetToken = nanoid2(32);
+    const resetTokenExpiry = /* @__PURE__ */ new Date();
+    resetTokenExpiry.setHours(resetTokenExpiry.getHours() + 1);
+    await updateUser(user.id, {
+      resetToken,
+      resetTokenExpiry
+    });
+    await sendPasswordResetEmail(userEmail, resetToken, user.name || void 0);
+    res.json({
+      success: true,
+      message: "If that email exists, a reset link has been sent"
+    });
+  } catch (error) {
+    console.error("[Auth] Request reset error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+router.post("/reset-password", async (req, res) => {
+  try {
+    const { token, password } = req.body;
+    if (!token || !password) {
+      return res.status(400).json({ error: "Token and password are required" });
+    }
+    if (password.length < 8) {
+      return res.status(400).json({ error: "Password must be at least 8 characters" });
+    }
+    const users2 = await getAllUsers();
+    const user = users2.find((u) => u.resetToken === token);
+    if (!user) {
+      return res.status(400).json({ error: "Invalid or expired reset token" });
+    }
+    if (!user.resetTokenExpiry || user.resetTokenExpiry < /* @__PURE__ */ new Date()) {
+      return res.status(400).json({ error: "Reset token has expired" });
+    }
+    const passwordHash = await bcrypt2.hash(password, 10);
+    await updateUser(user.id, {
+      passwordHash,
+      resetToken: null,
+      resetTokenExpiry: null
+    });
+    res.json({
+      success: true,
+      message: "Password reset successful. You can now login with your new password."
+    });
+  } catch (error) {
+    console.error("[Auth] Reset password error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+router.post("/logout", (req, res) => {
+  res.clearCookie(COOKIE_NAME, {
+    httpOnly: true,
+    secure: ENV.cookieSecure,
+    sameSite: "lax",
+    domain: ENV.cookieDomain
+  });
+  res.json({ success: true });
+});
+var authRouter_default = router;
+
 // server/_core/systemRouter.ts
 import { z } from "zod";
 
@@ -1856,7 +2267,7 @@ import superjson from "superjson";
 var t = initTRPC.context().create({
   transformer: superjson
 });
-var router = t.router;
+var router2 = t.router;
 var publicProcedure = t.procedure;
 var requireUser = t.middleware(async (opts) => {
   const { ctx, next } = opts;
@@ -1896,7 +2307,7 @@ var adminUnlockedProcedure = protectedProcedure.use(
 
 // server/_core/systemRouter.ts
 init_env();
-var systemRouter = router({
+var systemRouter = router2({
   health: publicProcedure.input(
     z.object({
       timestamp: z.number().min(0, "timestamp cannot be negative")
@@ -2145,7 +2556,7 @@ async function storagePut(relKey, data, contentType = "application/octet-stream"
 }
 
 // server/routers.ts
-import { nanoid as nanoid2 } from "nanoid";
+import { nanoid as nanoid3 } from "nanoid";
 
 // server/stripe.ts
 init_env();
@@ -2264,9 +2675,9 @@ var subscribedProcedure = protectedProcedure.use(async ({ ctx, next }) => {
   }
   return next({ ctx });
 });
-var appRouter = router({
+var appRouter = router2({
   system: systemRouter,
-  auth: router({
+  auth: router2({
     me: publicProcedure.query((opts) => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
@@ -2275,7 +2686,7 @@ var appRouter = router({
     })
   }),
   // Admin unlock system
-  adminUnlock: router({
+  adminUnlock: router2({
     // Check if admin mode is unlocked
     getStatus: protectedProcedure.query(async ({ ctx }) => {
       const session = await getAdminSession(ctx.user.id);
@@ -2339,7 +2750,7 @@ var appRouter = router({
     })
   }),
   // AI chat
-  ai: router({
+  ai: router2({
     chat: protectedProcedure.input(z2.object({
       messages: z2.array(z2.object({
         role: z2.enum(["system", "user", "assistant"]),
@@ -2380,7 +2791,7 @@ var appRouter = router({
     })
   }),
   // Billing and subscription management
-  billing: router({
+  billing: router2({
     getPricing: publicProcedure.query(() => {
       if (!ENV.enableStripe) {
         return {
@@ -2486,7 +2897,7 @@ var appRouter = router({
     })
   }),
   // User profile and subscription
-  user: router({
+  user: router2({
     getProfile: protectedProcedure.query(async ({ ctx }) => {
       const user = await getUserById(ctx.user.id);
       return user;
@@ -2532,7 +2943,7 @@ var appRouter = router({
     })
   }),
   // Horse management
-  horses: router({
+  horses: router2({
     list: subscribedProcedure.query(async ({ ctx }) => {
       return getHorsesByUserId(ctx.user.id);
     }),
@@ -2615,7 +3026,7 @@ var appRouter = router({
     })
   }),
   // Health records
-  healthRecords: router({
+  healthRecords: router2({
     listAll: subscribedProcedure.query(async ({ ctx }) => {
       return getHealthRecordsByUserId(ctx.user.id);
     }),
@@ -2688,7 +3099,7 @@ var appRouter = router({
     })
   }),
   // Training sessions
-  training: router({
+  training: router2({
     listByHorse: subscribedProcedure.input(z2.object({ horseId: z2.number() })).query(async ({ ctx, input }) => {
       return getTrainingSessionsByHorseId(input.horseId, ctx.user.id);
     }),
@@ -2768,7 +3179,7 @@ var appRouter = router({
     })
   }),
   // Feeding plans
-  feeding: router({
+  feeding: router2({
     listAll: subscribedProcedure.query(async ({ ctx }) => {
       return getFeedingPlansByUserId(ctx.user.id);
     }),
@@ -2812,7 +3223,7 @@ var appRouter = router({
     })
   }),
   // Documents
-  documents: router({
+  documents: router2({
     list: subscribedProcedure.query(async ({ ctx }) => {
       return getDocumentsByUserId(ctx.user.id);
     }),
@@ -2837,7 +3248,7 @@ var appRouter = router({
         });
       }
       const buffer = Buffer.from(input.fileData, "base64");
-      const fileKey = `${ctx.user.id}/documents/${nanoid2()}-${input.fileName}`;
+      const fileKey = `${ctx.user.id}/documents/${nanoid3()}-${input.fileName}`;
       const { url } = await storagePut(fileKey, buffer, input.fileType);
       const id = await createDocument({
         userId: ctx.user.id,
@@ -2866,7 +3277,7 @@ var appRouter = router({
     })
   }),
   // Weather and AI analysis
-  weather: router({
+  weather: router2({
     analyze: subscribedProcedure.input(z2.object({
       location: z2.string(),
       temperature: z2.number(),
@@ -2947,7 +3358,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
     })
   }),
   // Admin routes
-  admin: router({
+  admin: router2({
     // User management
     getUsers: adminUnlockedProcedure.query(async () => {
       return getAllUsers();
@@ -3047,7 +3458,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
       return getRecentBackups(input.limit);
     }),
     // API Key Management
-    apiKeys: router({
+    apiKeys: router2({
       list: adminUnlockedProcedure.query(async ({ ctx }) => {
         return listApiKeys(ctx.user.id);
       }),
@@ -3149,7 +3560,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
     })
   }),
   // Stable management
-  stables: router({
+  stables: router2({
     create: subscribedProcedure.input(z2.object({
       name: z2.string().min(1).max(200),
       description: z2.string().optional(),
@@ -3231,7 +3642,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
       if (member.length === 0 || !["owner", "admin"].includes(member[0].role)) {
         throw new TRPCError4({ code: "FORBIDDEN" });
       }
-      const token = nanoid2(32);
+      const token = nanoid3(32);
       const expiresAt = /* @__PURE__ */ new Date();
       expiresAt.setDate(expiresAt.getDate() + 7);
       await db.insert(stableInvites).values({
@@ -3261,7 +3672,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
     })
   }),
   // Messages
-  messages: router({
+  messages: router2({
     getThreads: protectedProcedure.input(z2.object({ stableId: z2.number() })).query(async ({ ctx, input }) => {
       const db = await getDb();
       if (!db) return [];
@@ -3307,7 +3718,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
     })
   }),
   // Analytics
-  analytics: router({
+  analytics: router2({
     getTrainingStats: protectedProcedure.input(z2.object({
       horseId: z2.number().optional(),
       startDate: z2.string().optional(),
@@ -3365,7 +3776,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
     })
   }),
   // Reports
-  reports: router({
+  reports: router2({
     generate: subscribedProcedure.input(z2.object({
       reportType: z2.enum(["monthly_summary", "health_report", "training_progress", "cost_analysis", "competition_summary"]),
       horseId: z2.number().optional(),
@@ -3413,7 +3824,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
     })
   }),
   // Calendar and Events
-  calendar: router({
+  calendar: router2({
     getEvents: protectedProcedure.input(z2.object({
       startDate: z2.string(),
       endDate: z2.string(),
@@ -3482,7 +3893,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
     })
   }),
   // Competition Management
-  competitions: router({
+  competitions: router2({
     create: subscribedProcedure.input(z2.object({
       horseId: z2.number(),
       competitionName: z2.string().min(1).max(200),
@@ -3518,7 +3929,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
     })
   }),
   // Training Program Templates
-  trainingPrograms: router({
+  trainingPrograms: router2({
     listTemplates: protectedProcedure.query(async ({ ctx }) => {
       const db = await getDb();
       if (!db) return [];
@@ -3568,7 +3979,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
     })
   }),
   // Breeding Management
-  breeding: router({
+  breeding: router2({
     createRecord: subscribedProcedure.input(z2.object({
       mareId: z2.number(),
       stallionId: z2.number().optional(),
@@ -3633,9 +4044,9 @@ async function createContext(opts) {
 }
 
 // server/_core/vite.ts
-import express from "express";
+import express2 from "express";
 import fs from "fs";
-import { nanoid as nanoid3 } from "nanoid";
+import { nanoid as nanoid4 } from "nanoid";
 import path2 from "path";
 import { createServer as createViteServer } from "vite";
 
@@ -3707,7 +4118,7 @@ async function setupVite(app, server) {
       let template = await fs.promises.readFile(clientTemplate, "utf-8");
       template = template.replace(
         `src="/src/main.tsx"`,
-        `src="/src/main.tsx?v=${nanoid3()}"`
+        `src="/src/main.tsx?v=${nanoid4()}"`
       );
       const page = await vite.transformIndexHtml(url, template);
       res.status(200).set({ "Content-Type": "text/html" }).end(page);
@@ -3724,7 +4135,7 @@ function serveStatic(app) {
       `Could not find the build directory: ${distPath}, make sure to build the client first`
     );
   }
-  app.use(express.static(distPath));
+  app.use(express2.static(distPath));
   app.use("*", (_req, res) => {
     res.sendFile(path2.resolve(distPath, "index.html"));
   });
@@ -3732,7 +4143,7 @@ function serveStatic(app) {
 
 // server/_core/index.ts
 init_db();
-import { nanoid as nanoid4 } from "nanoid";
+import { nanoid as nanoid5 } from "nanoid";
 function isPortAvailable(port) {
   return new Promise((resolve) => {
     const server = net.createServer();
@@ -3751,14 +4162,14 @@ async function findAvailablePort(startPort = 3e3) {
   throw new Error(`No available port found starting from ${startPort}`);
 }
 async function startServer() {
-  const app = express2();
+  const app = express3();
   const server = createServer(app);
   app.use(helmet({
     contentSecurityPolicy: process.env.NODE_ENV === "production" ? void 0 : false,
     crossOriginEmbedderPolicy: false
   }));
   app.use((req, res, next) => {
-    req.headers["x-request-id"] = req.headers["x-request-id"] || nanoid4();
+    req.headers["x-request-id"] = req.headers["x-request-id"] || nanoid5();
     res.setHeader("X-Request-ID", req.headers["x-request-id"]);
     next();
   });
@@ -3779,7 +4190,7 @@ async function startServer() {
     legacyHeaders: false
   });
   app.use("/api", limiter);
-  app.post("/api/webhooks/stripe", express2.raw({ type: "application/json" }), async (req, res) => {
+  app.post("/api/webhooks/stripe", express3.raw({ type: "application/json" }), async (req, res) => {
     const stripe = getStripe();
     if (!stripe) {
       return res.status(500).json({ error: "Stripe not configured" });
@@ -3808,12 +4219,21 @@ async function startServer() {
           const session = event.data.object;
           const userId = parseInt(session.metadata?.userId || "0");
           if (userId && session.customer && session.subscription) {
+            const subscription = await stripe.subscriptions.retrieve(session.subscription);
+            const plan = subscription.items.data[0]?.price.recurring?.interval === "year" ? "yearly" : "monthly";
             await updateUser(userId, {
               stripeCustomerId: session.customer,
               stripeSubscriptionId: session.subscription,
               subscriptionStatus: "active",
+              subscriptionPlan: plan,
               lastPaymentAt: /* @__PURE__ */ new Date()
             });
+            const user = await getUserById(userId);
+            if (user) {
+              sendPaymentSuccessEmail(user, plan).catch(
+                (err) => console.error("[Stripe Webhook] Failed to send payment email:", err)
+              );
+            }
             console.log(`[Stripe Webhook] User ${userId} subscription activated`);
           }
           break;
@@ -3891,8 +4311,8 @@ async function startServer() {
     const user = users2.find((u) => u.stripeSubscriptionId === subscriptionId);
     return user?.id || null;
   }
-  app.use(express2.json({ limit: "50mb" }));
-  app.use(express2.urlencoded({ limit: "50mb", extended: true }));
+  app.use(express3.json({ limit: "50mb" }));
+  app.use(express3.urlencoded({ limit: "50mb", extended: true }));
   app.get("/api/health", async (req, res) => {
     const dbConnected = !!await getDb();
     const stripeConfigured = !!getStripe();
@@ -3907,6 +4327,20 @@ async function startServer() {
     });
   });
   registerOAuthRoutes(app);
+  app.use("/api/auth", authRouter_default);
+  app.post("/api/admin/send-test-email", async (req, res) => {
+    try {
+      const { to } = req.body;
+      if (!to) {
+        return res.status(400).json({ error: "Email address required" });
+      }
+      const success = await sendTestEmail(to);
+      res.json({ success, message: success ? "Test email sent" : "Failed to send email (check SMTP config)" });
+    } catch (error) {
+      console.error("[Admin] Test email error:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
   app.use(
     "/api/trpc",
     createExpressMiddleware({

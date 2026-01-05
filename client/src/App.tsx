@@ -13,10 +13,14 @@ import Features from "./pages/Features";
 import Pricing from "./pages/Pricing";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import TermsPage from "./pages/TermsPage";
+import PrivacyPage from "./pages/PrivacyPage";
 
 // Auth Pages
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 
 // App Pages (Protected)
 import Dashboard from "./pages/Dashboard";
@@ -51,10 +55,14 @@ function Router() {
           <Route path="/pricing" component={Pricing} />
           <Route path="/about" component={About} />
           <Route path="/contact" component={Contact} />
+          <Route path="/terms" component={TermsPage} />
+          <Route path="/privacy" component={PrivacyPage} />
           
           {/* Auth Pages */}
           <Route path="/login" component={Login} />
           <Route path="/register" component={Register} />
+          <Route path="/forgot-password" component={ForgotPassword} />
+          <Route path="/reset-password" component={ResetPassword} />
           
           {/* App Pages (Protected - require auth) */}
           <Route path="/dashboard" component={Dashboard} />
