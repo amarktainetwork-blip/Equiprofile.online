@@ -27,8 +27,7 @@ router.post("/signup", async (req, res) => {
     }
 
     // Check if user already exists
-    const existingUsers = await db.getAllUsers();
-    const existingUser = existingUsers.find(u => u.email === userEmail);
+    const existingUser = await db.getUserByEmail(userEmail);
     
     if (existingUser) {
       return res.status(400).json({ error: "Email already registered" });
@@ -110,8 +109,7 @@ router.post("/login", async (req, res) => {
     }
 
     // Find user by email
-    const users = await db.getAllUsers();
-    const user = users.find(u => u.email === userEmail);
+    const user = await db.getUserByEmail(userEmail);
 
     if (!user || !user.passwordHash) {
       return res.status(401).json({ error: "Invalid email or password" });
@@ -177,8 +175,7 @@ router.post("/request-reset", async (req, res) => {
     }
 
     // Find user by email
-    const users = await db.getAllUsers();
-    const user = users.find(u => u.email === userEmail);
+    const user = await db.getUserByEmail(userEmail);
 
     // Always return success to prevent email enumeration
     if (!user) {

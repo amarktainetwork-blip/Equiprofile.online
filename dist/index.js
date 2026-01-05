@@ -747,6 +747,7 @@ __export(db_exports, {
   getUpcomingReminders: () => getUpcomingReminders,
   getUpcomingTrainingSessions: () => getUpcomingTrainingSessions,
   getUserActivityLogs: () => getUserActivityLogs,
+  getUserByEmail: () => getUserByEmail,
   getUserById: () => getUserById,
   getUserByOpenId: () => getUserByOpenId,
   getVaccinationsByHorseId: () => getVaccinationsByHorseId,
@@ -853,6 +854,12 @@ async function getUserById(id) {
   const db = await getDb();
   if (!db) return void 0;
   const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
+  return result.length > 0 ? result[0] : void 0;
+}
+async function getUserByEmail(email) {
+  const db = await getDb();
+  if (!db) return void 0;
+  const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
   return result.length > 0 ? result[0] : void 0;
 }
 async function getAllUsers() {
@@ -2025,8 +2032,7 @@ router.post("/signup", async (req, res) => {
     if (password.length < 8) {
       return res.status(400).json({ error: "Password must be at least 8 characters" });
     }
-    const existingUsers = await getAllUsers();
-    const existingUser = existingUsers.find((u) => u.email === userEmail);
+    const existingUser = await getUserByEmail(userEmail);
     if (existingUser) {
       return res.status(400).json({ error: "Email already registered" });
     }
@@ -2081,8 +2087,7 @@ router.post("/login", async (req, res) => {
     if (!userEmail || !password) {
       return res.status(400).json({ error: "Email and password are required" });
     }
-    const users2 = await getAllUsers();
-    const user = users2.find((u) => u.email === userEmail);
+    const user = await getUserByEmail(userEmail);
     if (!user || !user.passwordHash) {
       return res.status(401).json({ error: "Invalid email or password" });
     }
@@ -2126,8 +2131,7 @@ router.post("/request-reset", async (req, res) => {
     if (!userEmail) {
       return res.status(400).json({ error: "Email is required" });
     }
-    const users2 = await getAllUsers();
-    const user = users2.find((u) => u.email === userEmail);
+    const user = await getUserByEmail(userEmail);
     if (!user) {
       console.log("[Auth] Password reset requested for non-existent email:", userEmail);
       return res.json({ success: true, message: "If that email exists, a reset link has been sent" });
