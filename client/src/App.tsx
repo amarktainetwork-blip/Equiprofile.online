@@ -7,8 +7,18 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import { SkipToContent, useKeyboardNavigation } from "./components/AccessibilityHelpers";
 import "./i18n/config";
 
-// Pages
+// Marketing Pages (Public)
 import Home from "./pages/Home";
+import Features from "./pages/Features";
+import Pricing from "./pages/Pricing";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+
+// Auth Pages
+import Login from "./pages/auth/Login";
+import Register from "./pages/auth/Register";
+
+// App Pages (Protected)
 import Dashboard from "./pages/Dashboard";
 import Horses from "./pages/Horses";
 import HorseForm from "./pages/HorseForm";
@@ -25,6 +35,7 @@ import Analytics from "./pages/Analytics";
 import Reports from "./pages/Reports";
 import Calendar from "./pages/Calendar";
 import AIChat from "./pages/AIChat";
+import Settings from "./pages/Settings";
 
 function Router() {
   useKeyboardNavigation();
@@ -34,10 +45,18 @@ function Router() {
       <SkipToContent />
       <main id="main-content">
         <Switch>
-          {/* Public landing page */}
+          {/* Marketing Pages (Public) */}
           <Route path="/" component={Home} />
+          <Route path="/features" component={Features} />
+          <Route path="/pricing" component={Pricing} />
+          <Route path="/about" component={About} />
+          <Route path="/contact" component={Contact} />
           
-          {/* Dashboard - requires auth */}
+          {/* Auth Pages */}
+          <Route path="/login" component={Login} />
+          <Route path="/register" component={Register} />
+          
+          {/* App Pages (Protected - require auth) */}
           <Route path="/dashboard" component={Dashboard} />
           
           {/* Horse management */}
@@ -75,6 +94,9 @@ function Router() {
           
           {/* Calendar */}
           <Route path="/calendar" component={Calendar} />
+          
+          {/* Settings */}
+          <Route path="/settings" component={Settings} />
           
           {/* AI Chat */}
           <Route path="/ai-chat" component={AIChat} />
