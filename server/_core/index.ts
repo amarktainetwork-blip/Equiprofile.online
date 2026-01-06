@@ -6,6 +6,8 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
+import authRouter from "./authRouter";
+import billingRouter from "./billingRouter";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
@@ -13,6 +15,7 @@ import { nanoid } from "nanoid";
 import Stripe from "stripe";
 import * as db from "../db";
 import { getStripe } from "../stripe";
+import * as email from "./email";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -111,12 +114,25 @@ async function startServer() {
           const userId = parseInt(session.metadata?.userId || "0");
           
           if (userId && session.customer && session.subscription) {
+            const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
+            const plan = subscription.items.data[0]?.price.recurring?.interval === "year" ? "yearly" : "monthly";
+            
             await db.updateUser(userId, {
               stripeCustomerId: session.customer as string,
               stripeSubscriptionId: session.subscription as string,
               subscriptionStatus: "active",
+              subscriptionPlan: plan,
               lastPaymentAt: new Date(),
             });
+            
+            // Send payment success email
+            const user = await db.getUserById(userId);
+            if (user) {
+              email.sendPaymentSuccessEmail(user, plan).catch(err => 
+                console.error("[Stripe Webhook] Failed to send payment email:", err)
+              );
+            }
+            
             console.log(`[Stripe Webhook] User ${userId} subscription activated`);
           }
           break;
@@ -228,6 +244,28 @@ async function startServer() {
 
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
+
+  // Local auth routes
+  app.use("/api/auth", authRouter);
+
+  // Billing routes (Stripe)
+  app.use("/api/billing", billingRouter);
+
+  // Test email endpoint (admin only)
+  app.post("/api/admin/send-test-email", async (req, res) => {
+    try {
+      const { to } = req.body;
+      if (!to) {
+        return res.status(400).json({ error: "Email address required" });
+      }
+      
+      const success = await email.sendTestEmail(to);
+      res.json({ success, message: success ? "Test email sent" : "Failed to send email (check SMTP config)" });
+    } catch (error) {
+      console.error("[Admin] Test email error:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
 
   // tRPC API
   app.use(

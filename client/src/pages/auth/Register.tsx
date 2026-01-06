@@ -3,24 +3,32 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { getLoginUrl } from "@/const";
+import { getLoginUrl, isOAuthAvailable } from "@/const";
 import { Link, useLocation } from "wouter";
-import { useState } from "react";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { useState, FormEvent } from "react";
+import { Loader2, ArrowLeft, AlertCircle } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { PageTransition } from "@/components/PageTransition";
 import { MarketingNav } from "@/components/MarketingNav";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 /**
  * Register page
  * 
- * Currently redirects to external OAuth portal for registration.
- * If you need a custom registration form, implement it here with proper backend support.
+ * Supports both OAuth (if configured) and email/password registration.
  */
 export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [error, setError] = useState("");
   const { isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
+
+  const oauthEnabled = isOAuthAvailable();
 
   // Redirect if already authenticated
   if (isAuthenticated) {
@@ -28,10 +36,60 @@ export default function Register() {
     return null;
   }
 
-  const handleRegister = () => {
+  const handleOAuthRegister = () => {
+    const loginUrl = getLoginUrl();
+    if (!loginUrl) {
+      setError("OAuth is not configured");
+      return;
+    }
     setIsLoading(true);
-    // The login URL also handles registration in most OAuth flows
-    window.location.href = getLoginUrl();
+    window.location.href = loginUrl;
+  };
+
+  const handleEmailRegister = async (e: FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    // Validation
+    if (!acceptTerms) {
+      setError("Please accept the Terms of Service and Privacy Policy");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, name }),
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Registration failed");
+        setIsLoading(false);
+        return;
+      }
+
+      // Redirect to dashboard on success
+      window.location.href = "/dashboard";
+    } catch (err) {
+      setError("An error occurred. Please try again.");
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -58,84 +116,142 @@ export default function Register() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Name field */}
-                <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
-                  <Input
-                    id="name"
-                    type="text"
-                    placeholder="John Doe"
-                    disabled={isLoading}
-                  />
-                </div>
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
 
-                {/* Email field */}
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="you@example.com"
-                    disabled={isLoading}
-                  />
-                </div>
+                <form onSubmit={handleEmailRegister} className="space-y-4">
+                  {/* Name field */}
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Full Name</Label>
+                    <Input
+                      id="name"
+                      type="text"
+                      placeholder="John Doe"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      disabled={isLoading}
+                    />
+                  </div>
 
-                {/* Password field */}
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="••••••••"
-                    disabled={isLoading}
-                  />
-                </div>
+                  {/* Email field */}
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      disabled={isLoading}
+                      required
+                    />
+                  </div>
 
-                {/* Confirm Password field */}
-                <div className="space-y-2">
-                  <Label htmlFor="confirm-password">Confirm Password</Label>
-                  <Input
-                    id="confirm-password"
-                    type="password"
-                    placeholder="••••••••"
-                    disabled={isLoading}
-                  />
-                </div>
+                  {/* Password field */}
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={isLoading}
+                      required
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      At least 8 characters
+                    </p>
+                  </div>
 
-                {/* Terms acceptance */}
-                <div className="flex items-start gap-2">
-                  <Checkbox id="terms" className="mt-1" />
-                  <Label
-                    htmlFor="terms"
-                    className="text-sm font-normal cursor-pointer leading-relaxed"
+                  {/* Confirm Password field */}
+                  <div className="space-y-2">
+                    <Label htmlFor="confirm-password">Confirm Password</Label>
+                    <Input
+                      id="confirm-password"
+                      type="password"
+                      placeholder="••••••••"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      disabled={isLoading}
+                      required
+                    />
+                  </div>
+
+                  {/* Terms acceptance */}
+                  <div className="flex items-start gap-2">
+                    <Checkbox 
+                      id="terms" 
+                      className="mt-1"
+                      checked={acceptTerms}
+                      onCheckedChange={(checked) => setAcceptTerms(checked as boolean)}
+                    />
+                    <Label
+                      htmlFor="terms"
+                      className="text-sm font-normal cursor-pointer leading-relaxed"
+                    >
+                      I agree to the{" "}
+                      <Link href="/terms">
+                        <a className="text-primary hover:underline">
+                          Terms of Service
+                        </a>
+                      </Link>{" "}
+                      and{" "}
+                      <Link href="/privacy">
+                        <a className="text-primary hover:underline">
+                          Privacy Policy
+                        </a>
+                      </Link>
+                    </Label>
+                  </div>
+
+                  {/* Create account button */}
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    size="lg"
+                    disabled={isLoading}
                   >
-                    I agree to the{" "}
-                    <a href="#" className="text-primary hover:underline">
-                      Terms of Service
-                    </a>{" "}
-                    and{" "}
-                    <a href="#" className="text-primary hover:underline">
-                      Privacy Policy
-                    </a>
-                  </Label>
-                </div>
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Creating account...
+                      </>
+                    ) : (
+                      "Create account"
+                    )}
+                  </Button>
+                </form>
 
-                {/* Create account button */}
-                <Button
-                  className="w-full"
-                  size="lg"
-                  onClick={handleRegister}
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Creating account...
-                    </>
-                  ) : (
-                    "Create account"
-                  )}
-                </Button>
+                {/* OAuth option if available */}
+                {oauthEnabled && (
+                  <>
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t" />
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-card px-2 text-muted-foreground">
+                          Or continue with
+                        </span>
+                      </div>
+                    </div>
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full"
+                      onClick={handleOAuthRegister}
+                      disabled={isLoading}
+                    >
+                      OAuth Sign Up
+                    </Button>
+                  </>
+                )}
 
                 {/* Divider */}
                 <div className="relative">
@@ -163,9 +279,14 @@ export default function Register() {
               </CardContent>
             </Card>
 
-            {/* Note about OAuth */}
+            {/* Note */}
             <p className="text-xs text-center text-muted-foreground mt-4">
-              This application uses secure OAuth authentication.
+              {oauthEnabled 
+                ? "Secure authentication with OAuth or email/password" 
+                : "Secure email/password authentication"}
+            </p>
+            <p className="text-xs text-center text-muted-foreground mt-2">
+              Start your <strong>7-day free trial</strong> - no credit card required
             </p>
           </div>
         </div>
