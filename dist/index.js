@@ -629,39 +629,86 @@ var init_schema = __esm({
 });
 
 // server/_core/env.ts
+function validateEnvironment() {
+  const isProduction = process.env.NODE_ENV === "production";
+  const coreRequiredVars = [
+    { name: "DATABASE_URL", description: "Database connection string" },
+    { name: "JWT_SECRET", description: "JWT secret for token signing" },
+    { name: "ADMIN_UNLOCK_PASSWORD", description: "Admin unlock password" }
+  ];
+  const missing = [];
+  coreRequiredVars.forEach((v) => {
+    if (!process.env[v.name]) {
+      missing.push(v);
+    }
+  });
+  if (enableStripe) {
+    const stripeVars = [
+      { name: "STRIPE_SECRET_KEY", description: "Stripe secret key" },
+      { name: "STRIPE_WEBHOOK_SECRET", description: "Stripe webhook secret" }
+    ];
+    stripeVars.forEach((v) => {
+      if (!process.env[v.name]) {
+        missing.push(v);
+      }
+    });
+  }
+  if (enableUploads) {
+    const uploadVars = [
+      { name: "BUILT_IN_FORGE_API_URL", description: "Forge API URL" },
+      { name: "BUILT_IN_FORGE_API_KEY", description: "Forge API key" }
+    ];
+    uploadVars.forEach((v) => {
+      if (!process.env[v.name]) {
+        missing.push(v);
+      }
+    });
+  }
+  if (missing.length > 0) {
+    console.error("\u274C STARTUP ERROR: Missing required environment variables\n");
+    console.error("The following required environment variables are not set:\n");
+    missing.forEach((v) => {
+      console.error(`  \u2022 ${v.name} - ${v.description}`);
+    });
+    console.error("\nFeature flags:");
+    console.error(`  \u2022 ENABLE_STRIPE=${enableStripe}`);
+    console.error(`  \u2022 ENABLE_UPLOADS=${enableUploads}`);
+    console.error("\nPlease configure all required environment variables in your .env file.");
+    console.error("See .env.example for a complete list of available options.\n");
+    process.exit(1);
+  }
+  if (isProduction && process.env.ADMIN_UNLOCK_PASSWORD === "ashmor12@") {
+    console.error("\u274C PRODUCTION ERROR: ADMIN_UNLOCK_PASSWORD is still set to default value!");
+    console.error("You MUST change this to a secure password before running in production.");
+    console.error("Generate a secure password and update your .env file.\n");
+    process.exit(1);
+  }
+  if (process.env.OAUTH_SERVER_URL) {
+    if (!process.env.VITE_APP_ID) {
+      console.warn("\u26A0\uFE0F  WARNING: OAUTH_SERVER_URL is set but VITE_APP_ID is missing.");
+      console.warn("   OAuth login will not work correctly without an app ID.\n");
+    } else {
+      console.log("\u2705 OAuth configured:", process.env.OAUTH_SERVER_URL);
+    }
+  } else {
+    console.log("\u2139\uFE0F  OAuth not configured - using email/password authentication only");
+  }
+  console.log("\u2139\uFE0F  Feature flags:");
+  console.log(`   \u2022 Stripe billing: ${enableStripe ? "\u2705 enabled" : "\u274C disabled"}`);
+  console.log(`   \u2022 Document uploads: ${enableUploads ? "\u2705 enabled" : "\u274C disabled"}`);
+  if (isProduction && process.env.JWT_SECRET && process.env.JWT_SECRET.length < 32) {
+    console.error("\u274C PRODUCTION ERROR: JWT_SECRET must be at least 32 characters long!");
+    console.error("Generate a secure secret with: openssl rand -base64 32\n");
+    process.exit(1);
+  }
+}
 var enableStripe, enableUploads, ENV;
 var init_env = __esm({
   "server/_core/env.ts"() {
     "use strict";
     enableStripe = process.env.ENABLE_STRIPE === "true";
     enableUploads = process.env.ENABLE_UPLOADS === "true";
-    if (process.env.NODE_ENV === "production") {
-      const coreRequiredVars = [
-        "DATABASE_URL",
-        "JWT_SECRET",
-        "ADMIN_UNLOCK_PASSWORD"
-      ];
-      const missing = coreRequiredVars.filter((v) => !process.env[v]);
-      if (enableStripe) {
-        const stripeVars = ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET"];
-        missing.push(...stripeVars.filter((v) => !process.env[v]));
-      }
-      if (enableUploads) {
-        const uploadVars = ["BUILT_IN_FORGE_API_URL", "BUILT_IN_FORGE_API_KEY"];
-        missing.push(...uploadVars.filter((v) => !process.env[v]));
-      }
-      if (missing.length > 0) {
-        console.error(`\u274C PRODUCTION ERROR: Missing required environment variables: ${missing.join(", ")}`);
-        console.error("Application cannot start. Please configure all required environment variables.");
-        console.error(`Feature flags: ENABLE_STRIPE=${enableStripe}, ENABLE_UPLOADS=${enableUploads}`);
-        process.exit(1);
-      }
-      if (process.env.ADMIN_UNLOCK_PASSWORD === "ashmor12@") {
-        console.error("\u274C PRODUCTION ERROR: ADMIN_UNLOCK_PASSWORD is still set to default value!");
-        console.error("You MUST change this to a secure password before running in production.");
-        process.exit(1);
-      }
-    }
+    validateEnvironment();
     ENV = {
       // Feature flags
       enableStripe,
@@ -1764,15 +1811,46 @@ function registerOAuthRoutes(app) {
   app.get("/api/oauth/callback", async (req, res) => {
     const code = getQueryParam(req, "code");
     const state = getQueryParam(req, "state");
-    if (!code || !state) {
-      res.status(400).json({ error: "code and state are required" });
+    if (!code) {
+      console.error("[OAuth] Missing authorization code");
+      res.status(400).send(`
+        <html>
+          <body>
+            <h1>OAuth Error</h1>
+            <p>Missing authorization code. The OAuth callback requires a 'code' parameter.</p>
+            <p><a href="/">Return to home</a></p>
+          </body>
+        </html>
+      `);
+      return;
+    }
+    if (!state) {
+      console.error("[OAuth] Missing state parameter");
+      res.status(400).send(`
+        <html>
+          <body>
+            <h1>OAuth Error</h1>
+            <p>Missing state parameter. The OAuth callback requires a 'state' parameter for security.</p>
+            <p><a href="/">Return to home</a></p>
+          </body>
+        </html>
+      `);
       return;
     }
     try {
       const tokenResponse = await sdk.exchangeCodeForToken(code, state);
       const userInfo = await sdk.getUserInfo(tokenResponse.accessToken);
       if (!userInfo.openId) {
-        res.status(400).json({ error: "openId missing from user info" });
+        console.error("[OAuth] Missing openId in user info");
+        res.status(400).send(`
+          <html>
+            <body>
+              <h1>OAuth Error</h1>
+              <p>Unable to retrieve user identification from OAuth provider.</p>
+              <p><a href="/">Return to home</a></p>
+            </body>
+          </html>
+        `);
         return;
       }
       await upsertUser({
@@ -1791,7 +1869,20 @@ function registerOAuthRoutes(app) {
       res.redirect(302, "/");
     } catch (error) {
       console.error("[OAuth] Callback failed", error);
-      res.status(500).json({ error: "OAuth callback failed" });
+      const escapeHtml = (str) => {
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+      };
+      const errorMessage = error instanceof Error ? escapeHtml(error.message) : "Unknown error";
+      res.status(500).send(`
+        <html>
+          <body>
+            <h1>OAuth Authentication Failed</h1>
+            <p>Failed to complete OAuth authentication: ${errorMessage}</p>
+            <p>Please try logging in again or contact support if the problem persists.</p>
+            <p><a href="/">Return to home</a></p>
+          </body>
+        </html>
+      `);
     }
   });
 }
@@ -4238,6 +4329,7 @@ function serveStatic(app) {
 // server/_core/index.ts
 init_db();
 import { nanoid as nanoid5 } from "nanoid";
+init_env();
 function isPortAvailable(port) {
   return new Promise((resolve) => {
     const server = net.createServer();
@@ -4258,6 +4350,8 @@ async function findAvailablePort(startPort = 3e3) {
 async function startServer() {
   const app = express4();
   const server = createServer(app);
+  app.set("trust proxy", 1);
+  console.log("\u2705 Trust proxy enabled for reverse proxy support");
   app.use(helmet({
     contentSecurityPolicy: process.env.NODE_ENV === "production" ? void 0 : false,
     crossOriginEmbedderPolicy: false
@@ -4410,14 +4504,25 @@ async function startServer() {
   app.get("/api/health", async (req, res) => {
     const dbConnected = !!await getDb();
     const stripeConfigured = !!getStripe();
+    const oauthConfigured = !!(ENV.oAuthServerUrl && ENV.appId);
+    const version = process.env.npm_package_version || "1.0.0";
     res.json({
       status: "healthy",
       timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-      version: "1.0.0",
+      version,
       services: {
         database: dbConnected,
-        stripe: stripeConfigured
+        stripe: stripeConfigured,
+        oauth: oauthConfigured
       }
+    });
+  });
+  app.get("/api/oauth/status", (req, res) => {
+    const configured = !!(ENV.oAuthServerUrl && ENV.appId);
+    res.json({
+      configured,
+      baseUrl: ENV.baseUrl,
+      oauthServerUrl: configured ? ENV.oAuthServerUrl : null
     });
   });
   registerOAuthRoutes(app);

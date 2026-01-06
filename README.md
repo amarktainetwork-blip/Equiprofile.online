@@ -6,6 +6,457 @@ EquiProfile is a comprehensive, cloud-based platform designed to centralize and 
 
 ---
 
+## 🚀 Quickstart
+
+Get EquiProfile running on a fresh Ubuntu VPS in under 10 minutes:
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/amarktainetwork-blip/Equiprofile.online.git
+cd Equiprofile.online
+
+# 2. Run the installation script
+sudo ./deployment/install.sh
+
+# 3. Configure your environment
+sudo nano /var/equiprofile/app/.env
+# Edit DATABASE_URL, JWT_SECRET, ADMIN_UNLOCK_PASSWORD
+
+# 4. Restart the service
+sudo systemctl restart equiprofile
+
+# 5. Check health status
+cd /var/equiprofile/app/deployment && sudo bash doctor.sh
+```
+
+Your application will be running at `http://localhost:3000` and proxied through nginx (once configured).
+
+**For SSL/HTTPS:** Run `sudo certbot --nginx -d yourdomain.com` after configuring your domain.
+
+---
+
+## 📋 Environment Variables
+
+EquiProfile requires specific environment variables to be configured. Copy `.env.example` to `.env` and update the values:
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| **Core Configuration** | | | |
+| `DATABASE_URL` | ✅ Yes | - | MySQL connection string: `mysql://user:pass@host:3306/dbname` |
+| `JWT_SECRET` | ✅ Yes | - | JWT signing secret (min 32 chars). Generate: `openssl rand -base64 32` |
+| `ADMIN_UNLOCK_PASSWORD` | ✅ Yes | `ashmor12@` | Admin unlock password. **MUST change in production!** |
+| `NODE_ENV` | ✅ Yes | `production` | Node environment: `development` or `production` |
+| `PORT` | No | `3000` | Server port |
+| `BASE_URL` | ✅ Yes (prod) | - | Application base URL (e.g., `https://equiprofile.online`) |
+| **OAuth (Optional)** | | | |
+| `OAUTH_SERVER_URL` | No | - | OAuth provider URL. Leave empty to use email/password auth only |
+| `VITE_APP_ID` | No | - | OAuth application ID (required if OAUTH_SERVER_URL is set) |
+| `OWNER_OPEN_ID` | No | - | Owner's OpenID for automatic admin access |
+| **Feature Flags** | | | |
+| `ENABLE_STRIPE` | No | `false` | Enable Stripe billing: `true` or `false` |
+| `ENABLE_UPLOADS` | No | `false` | Enable document uploads: `true` or `false` |
+| **Stripe (Required if ENABLE_STRIPE=true)** | | | |
+| `STRIPE_SECRET_KEY` | Conditional | - | Stripe secret key (`sk_live_` or `sk_test_`) |
+| `STRIPE_WEBHOOK_SECRET` | Conditional | - | Stripe webhook secret (`whsec_`) |
+| `STRIPE_PUBLISHABLE_KEY` | No | - | Stripe publishable key |
+| `STRIPE_MONTHLY_PRICE_ID` | No | - | Monthly subscription price ID |
+| `STRIPE_YEARLY_PRICE_ID` | No | - | Yearly subscription price ID |
+| **Uploads (Required if ENABLE_UPLOADS=true)** | | | |
+| `BUILT_IN_FORGE_API_URL` | Conditional | - | Forge API endpoint URL |
+| `BUILT_IN_FORGE_API_KEY` | Conditional | - | Forge API authentication key |
+| **Security & Proxy** | | | |
+| `RATE_LIMIT_WINDOW_MS` | No | `900000` | Rate limit window (15 min) |
+| `RATE_LIMIT_MAX_REQUESTS` | No | `100` | Max requests per window per IP |
+| `COOKIE_DOMAIN` | No | - | Cookie domain (e.g., `equiprofile.online`) |
+| `COOKIE_SECURE` | No | `false` | Enable secure cookies (set `true` for HTTPS) |
+| **Optional Features** | | | |
+| `OPENAI_API_KEY` | No | - | OpenAI API key for AI features |
+| `SMTP_HOST` | No | - | SMTP server for email notifications |
+| `SMTP_PORT` | No | `587` | SMTP port |
+| `SMTP_USER` | No | - | SMTP username |
+| `SMTP_PASSWORD` | No | - | SMTP password |
+
+**Important Notes:**
+- Application will **fail to start** if required variables are missing
+- In production, app will **refuse to start** if `ADMIN_UNLOCK_PASSWORD` is set to default value
+- `JWT_SECRET` must be at least 32 characters in production
+- Stripe and Upload features are **optional** - app works without them
+
+---
+
+## 🚢 Deployment
+
+### Prerequisites
+
+- Ubuntu 20.04 or 24.04 LTS
+- Root or sudo access
+- 2GB+ RAM recommended
+- MySQL/MariaDB database
+
+### Fresh Installation
+
+The installation script handles all dependencies, builds, and configuration:
+
+```bash
+sudo ./deployment/install.sh
+```
+
+**What it does:**
+1. Installs Node.js 20.x, nginx, MySQL, certbot
+2. Installs pnpm package manager
+3. Creates `/var/equiprofile/app` directory
+4. Clones repository and installs dependencies
+5. Builds frontend and backend
+6. Sets up systemd service
+7. Configures nginx reverse proxy
+8. Runs health checks
+
+### Updating to Latest Version
+
+To safely update an existing installation:
+
+```bash
+cd /var/equiprofile/app/deployment
+sudo ./update.sh
+```
+
+**What it does:**
+1. Creates automatic backup
+2. Pulls latest code from repository
+3. Installs/updates dependencies
+4. Rebuilds application
+5. Restarts services safely
+6. Runs health checks
+7. Rolls back on failure
+
+### Health Monitoring
+
+Run comprehensive health checks anytime:
+
+```bash
+cd /var/equiprofile/app/deployment
+sudo bash doctor.sh
+```
+
+**Checks performed:**
+- ✅ Port 3000 availability
+- ✅ Nginx configuration validity
+- ✅ Systemd service status
+- ✅ Environment variable validation
+- ✅ Health endpoint response
+- ✅ Static assets existence
+- ✅ Database connectivity
+- ✅ Trust proxy configuration
+
+### Environment Validation
+
+Check your environment configuration (with secrets redacted):
+
+```bash
+cd /var/equiprofile/app/deployment
+sudo bash env-check.sh
+```
+
+### Managing the Service
+
+```bash
+# Start service
+sudo systemctl start equiprofile
+
+# Stop service
+sudo systemctl stop equiprofile
+
+# Restart service
+sudo systemctl restart equiprofile
+
+# Check status
+sudo systemctl status equiprofile
+
+# View logs (follow mode)
+sudo journalctl -u equiprofile -f
+
+# View last 100 lines
+sudo journalctl -u equiprofile -n 100
+```
+
+### Nginx Configuration
+
+The nginx configuration template is located at `deployment/nginx-webdock.conf`. Key features:
+
+- **Reverse proxy** to Node.js on port 3000
+- **Critical cache headers** to prevent service worker issues:
+  - `index.html` and `service-worker.js`: **NO CACHE**
+  - `/assets/*` (hashed): **1 year immutable cache**
+- **Trust proxy headers** for correct IP detection
+- **SSL/TLS ready** (commented out, enable after certbot)
+- **Security headers** included
+
+To update nginx config:
+
+```bash
+# Edit your config
+sudo nano /etc/nginx/sites-available/equiprofile
+
+# Test configuration
+sudo nginx -t
+
+# Reload if valid
+sudo systemctl reload nginx
+```
+
+### SSL Certificate Setup
+
+After configuring your domain in nginx:
+
+```bash
+# Install SSL certificate with Let's Encrypt
+sudo certbot --nginx -d yourdomain.com
+
+# Certificate auto-renewal is configured automatically
+# Test renewal:
+sudo certbot renew --dry-run
+```
+
+---
+
+## 🔧 Troubleshooting
+
+### Service Won't Start
+
+**Check logs:**
+```bash
+sudo journalctl -u equiprofile -n 50
+```
+
+**Common issues:**
+- Missing environment variables → Check `/var/equiprofile/app/.env`
+- Database connection failed → Verify `DATABASE_URL` and MySQL is running
+- Port 3000 already in use → Check with `sudo lsof -i :3000`
+- Build artifacts missing → Run `cd /var/equiprofile/app && pnpm run build`
+
+**Validation:**
+```bash
+cd /var/equiprofile/app/deployment
+sudo bash env-check.sh
+```
+
+### Nginx Reverse Proxy Issues
+
+**Symptoms:**
+- 502 Bad Gateway
+- Connection refused errors
+- Rate limiting not working
+
+**Solutions:**
+
+1. **Verify backend is running:**
+   ```bash
+   curl http://localhost:3000/api/health
+   ```
+
+2. **Check nginx error log:**
+   ```bash
+   sudo tail -f /var/log/nginx/equiprofile-error.log
+   ```
+
+3. **Verify trust proxy headers:**
+   - Trust proxy MUST be set in Express app
+   - Check deployment/nginx-webdock.conf has X-Forwarded-* headers
+
+4. **Test nginx config:**
+   ```bash
+   sudo nginx -t
+   sudo systemctl reload nginx
+   ```
+
+### Service Worker Stuck on Old Version
+
+**Symptoms:**
+- Users see old UI after deployment
+- Changes don't appear without hard refresh
+- Console shows old version
+
+**Solutions:**
+
+1. **Force clear service worker:**
+   - Open DevTools → Application → Service Workers
+   - Click "Unregister"
+   - Hard refresh (Ctrl+Shift+R or Cmd+Shift+R)
+
+2. **Update service worker version:**
+   - Edit `client/public/service-worker.js`
+   - Update `CACHE_VERSION` constant
+   - Rebuild and deploy
+
+3. **Check cache headers:**
+   ```bash
+   curl -I https://yourdomain.com/index.html
+   # Should show: Cache-Control: no-cache, no-store
+   
+   curl -I https://yourdomain.com/service-worker.js
+   # Should show: Cache-Control: no-cache, no-store
+   ```
+
+4. **Verify nginx cache headers:**
+   - Check `/etc/nginx/sites-available/equiprofile`
+   - Ensure `index.html` and `service-worker.js` have `no-cache` headers
+
+### OAuth Callback Errors
+
+**Symptoms:**
+- "Missing code parameter" error
+- "OAuth callback failed" message
+- Redirect loop
+
+**Solutions:**
+
+1. **Check OAuth configuration:**
+   ```bash
+   curl http://localhost:3000/api/oauth/status
+   ```
+
+2. **Verify environment variables:**
+   - `OAUTH_SERVER_URL` must be valid URL
+   - `VITE_APP_ID` must match OAuth provider
+   - `BASE_URL` must match callback URL registered with provider
+
+3. **Check callback URL:**
+   - Must be: `https://yourdomain.com/api/oauth/callback`
+   - Must match exactly in OAuth provider settings
+
+4. **Review logs:**
+   ```bash
+   sudo journalctl -u equiprofile | grep OAuth
+   ```
+
+### Cookie Domain/Secure Flag Issues
+
+**Symptoms:**
+- Login works but session not persisted
+- Logged out immediately after login
+- Cookies not set in browser
+
+**Solutions:**
+
+1. **For HTTPS (production):**
+   ```bash
+   # In .env:
+   COOKIE_SECURE=true
+   COOKIE_DOMAIN=yourdomain.com
+   BASE_URL=https://yourdomain.com
+   ```
+
+2. **For HTTP (development):**
+   ```bash
+   # In .env:
+   COOKIE_SECURE=false
+   # COOKIE_DOMAIN= (leave empty or comment out)
+   BASE_URL=http://localhost:3000
+   ```
+
+3. **After changes:**
+   ```bash
+   sudo systemctl restart equiprofile
+   ```
+
+### Trust Proxy / Rate Limiting Errors
+
+**Symptoms:**
+- Rate limit triggers for all users
+- IP address shows as 127.0.0.1 in logs
+- Rate limiting too aggressive
+
+**Solutions:**
+
+1. **Verify trust proxy is enabled:**
+   ```bash
+   # Check server logs on startup
+   sudo journalctl -u equiprofile -n 100 | grep "trust proxy"
+   # Should show: "✅ Trust proxy enabled"
+   ```
+
+2. **Check nginx headers:**
+   ```bash
+   # Should include:
+   proxy_set_header X-Real-IP $remote_addr;
+   proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+   ```
+
+3. **Verify IP detection:**
+   ```bash
+   # Add temporary logging to check req.ip
+   # Check logs to see real client IP vs 127.0.0.1
+   ```
+
+4. **Adjust rate limits if needed:**
+   ```bash
+   # In .env:
+   RATE_LIMIT_WINDOW_MS=900000  # 15 minutes
+   RATE_LIMIT_MAX_REQUESTS=100   # per IP
+   ```
+
+### Database Connection Issues
+
+**Symptoms:**
+- "Database connection failed" error
+- Timeouts on startup
+- Health check shows database: false
+
+**Solutions:**
+
+1. **Verify MySQL is running:**
+   ```bash
+   sudo systemctl status mysql
+   # or
+   sudo systemctl status mariadb
+   ```
+
+2. **Test connection manually:**
+   ```bash
+   # Extract details from DATABASE_URL
+   mysql -h hostname -P 3306 -u username -p
+   ```
+
+3. **Check DATABASE_URL format:**
+   ```
+   mysql://username:password@hostname:3306/database_name
+   ```
+
+4. **Grant permissions:**
+   ```sql
+   GRANT ALL PRIVILEGES ON equiprofile.* TO 'equiprofile'@'localhost';
+   FLUSH PRIVILEGES;
+   ```
+
+### Build Failures
+
+**Symptoms:**
+- Build script fails
+- Missing dependencies
+- TypeScript errors
+
+**Solutions:**
+
+1. **Clean install:**
+   ```bash
+   cd /var/equiprofile/app
+   rm -rf node_modules pnpm-lock.yaml
+   pnpm install
+   pnpm run build
+   ```
+
+2. **Check Node version:**
+   ```bash
+   node --version  # Should be 20.x or higher
+   ```
+
+3. **Check disk space:**
+   ```bash
+   df -h /var/equiprofile
+   ```
+
+---
+
 ## Project Overview
 
 ### What is EquiProfile?
