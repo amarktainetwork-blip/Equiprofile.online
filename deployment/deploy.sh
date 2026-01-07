@@ -43,6 +43,14 @@ fi
 cd "$DEPLOY_DIR"
 echo "Working directory: $(pwd)"
 
+# Verify ownership
+CURRENT_OWNER=$(stat -c '%U' .)
+if [ "$CURRENT_OWNER" != "www-data" ]; then
+    echo "WARNING: Directory owned by $CURRENT_OWNER, not www-data"
+    echo "Fixing ownership..."
+    chown -R www-data:www-data .
+fi
+
 # Step 3: Pull latest code (if git repo)
 echo ""
 echo "[3/9] Updating code..."
@@ -105,19 +113,26 @@ echo "[7/9] Checking nginx configuration..."
 if [ ! -f /etc/nginx/sites-available/equiprofile ]; then
     echo "WARNING: Nginx config not installed at /etc/nginx/sites-available/equiprofile"
     echo "Please:"
-    echo "  1. Edit deployment/nginx-equiprofile.conf and replace YOUR_DOMAIN_HERE"
-    echo "  2. Copy to /etc/nginx/sites-available/equiprofile"
-    echo "  3. Create symlink: ln -s /etc/nginx/sites-available/equiprofile /etc/nginx/sites-enabled/"
-    echo "  4. Run certbot: certbot --nginx -d yourdomain.com"
+    echo "  1. Edit deployment/nginx-equiprofile.conf"
+    echo "  2. Replace ALL instances of YOUR_DOMAIN_HERE with your actual domain"
+    echo "  3. Copy to /etc/nginx/sites-available/equiprofile"
+    echo "  4. Create symlink: ln -s /etc/nginx/sites-available/equiprofile /etc/nginx/sites-enabled/"
+    echo "  5. Run certbot: certbot --nginx -d yourdomain.com"
 else
-    # Test nginx config
-    if nginx -t 2>/dev/null; then
-        echo "Nginx configuration is valid"
-        systemctl reload nginx
-        echo "Nginx reloaded"
+    # Check if placeholder still exists
+    if grep -q "YOUR_DOMAIN_HERE" /etc/nginx/sites-available/equiprofile 2>/dev/null; then
+        echo "ERROR: Nginx config still contains YOUR_DOMAIN_HERE placeholder"
+        echo "Please edit /etc/nginx/sites-available/equiprofile and replace with your actual domain"
     else
-        echo "WARNING: Nginx configuration test failed"
-        echo "Please check nginx configuration manually"
+        # Test nginx config
+        if nginx -t 2>/dev/null; then
+            echo "Nginx configuration is valid"
+            systemctl reload nginx
+            echo "Nginx reloaded"
+        else
+            echo "WARNING: Nginx configuration test failed"
+            echo "Please check nginx configuration manually"
+        fi
     fi
 fi
 

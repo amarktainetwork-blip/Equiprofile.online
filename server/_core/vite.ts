@@ -58,6 +58,13 @@ export function serveStatic(app: Express) {
     );
   }
 
+  // File extensions that should NOT fall through to SPA
+  const STATIC_FILE_EXTENSIONS = [
+    '.js', '.css', '.json', '.map',
+    '.woff', '.woff2', '.svg', '.png', 
+    '.jpg', '.jpeg', '.gif', '.ico'
+  ];
+
   // Serve static files with explicit MIME types
   app.use(express.static(distPath, {
     setHeaders: (res, filePath) => {
@@ -68,7 +75,9 @@ export function serveStatic(app: Express) {
         res.setHeader('Content-Type', 'text/css');
       } else if (filePath.endsWith('.json')) {
         res.setHeader('Content-Type', 'application/json');
-      } else if (filePath.endsWith('.woff') || filePath.endsWith('.woff2')) {
+      } else if (filePath.endsWith('.woff')) {
+        res.setHeader('Content-Type', 'font/woff');
+      } else if (filePath.endsWith('.woff2')) {
         res.setHeader('Content-Type', 'font/woff2');
       } else if (filePath.endsWith('.svg')) {
         res.setHeader('Content-Type', 'image/svg+xml');
@@ -86,19 +95,10 @@ export function serveStatic(app: Express) {
   // NOT for asset requests (prevents CSS/JS returning HTML)
   app.use("*", (req, res) => {
     // Don't fallback to index.html for asset paths
-    if (req.originalUrl.startsWith('/assets/') || 
-        req.originalUrl.endsWith('.js') || 
-        req.originalUrl.endsWith('.css') || 
-        req.originalUrl.endsWith('.json') ||
-        req.originalUrl.endsWith('.map') ||
-        req.originalUrl.endsWith('.woff') ||
-        req.originalUrl.endsWith('.woff2') ||
-        req.originalUrl.endsWith('.svg') ||
-        req.originalUrl.endsWith('.png') ||
-        req.originalUrl.endsWith('.jpg') ||
-        req.originalUrl.endsWith('.jpeg') ||
-        req.originalUrl.endsWith('.gif') ||
-        req.originalUrl.endsWith('.ico')) {
+    const isStaticFile = req.originalUrl.startsWith('/assets/') || 
+      STATIC_FILE_EXTENSIONS.some(ext => req.originalUrl.endsWith(ext));
+    
+    if (isStaticFile) {
       return res.status(404).send('Not Found');
     }
     
