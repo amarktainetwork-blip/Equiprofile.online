@@ -235,6 +235,39 @@ async function startServer() {
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
+  // Cache build info at startup to avoid blocking on every request
+  let cachedBuildInfo: any = null;
+  try {
+    const packageJsonPath = resolve(process.cwd(), 'package.json');
+    const packageJson = JSON.parse(require('fs').readFileSync(packageJsonPath, 'utf-8'));
+    
+    // Try to get git commit (only once at startup)
+    let commit = 'unknown';
+    try {
+      const { execSync } = require('child_process');
+      commit = execSync('git rev-parse HEAD', { encoding: 'utf-8', timeout: 1000 }).trim().slice(0, 7);
+    } catch {
+      // Git not available, that's okay
+    }
+
+    cachedBuildInfo = {
+      version: packageJson.version || '1.0.0',
+      buildId: process.env.BUILD_ID || 'dev',
+      commit,
+      buildTime: process.env.BUILD_TIME || new Date().toISOString(),
+      nodeVersion: process.version
+    };
+  } catch (err) {
+    console.warn('⚠️  Could not generate build info:', err);
+    cachedBuildInfo = {
+      version: '1.0.0',
+      buildId: 'unknown',
+      commit: 'unknown',
+      buildTime: new Date().toISOString(),
+      nodeVersion: process.version
+    };
+  }
+
   // Simple health check endpoint (production-friendly)
   app.get("/healthz", (req, res) => {
     res.json({
@@ -243,28 +276,9 @@ async function startServer() {
     });
   });
 
-  // Build info endpoint
+  // Build info endpoint (cached)
   app.get("/build", (req, res) => {
-    const packageJson = JSON.parse(
-      require('fs').readFileSync(resolve(process.cwd(), 'package.json'), 'utf-8')
-    );
-    
-    // Try to get git commit if available
-    let commit = 'unknown';
-    try {
-      const { execSync } = require('child_process');
-      commit = execSync('git rev-parse HEAD', { encoding: 'utf-8' }).trim().slice(0, 7);
-    } catch (err) {
-      // Git not available or not a repo, that's okay
-    }
-
-    res.json({
-      version: packageJson.version || '1.0.0',
-      buildId: process.env.BUILD_ID || 'dev',
-      commit,
-      buildTime: process.env.BUILD_TIME || new Date().toISOString(),
-      nodeVersion: process.version
-    });
+    res.json(cachedBuildInfo);
   });
 
   // Health check endpoint (detailed)

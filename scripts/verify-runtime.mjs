@@ -92,6 +92,7 @@ async function main() {
     log.success(`Port ${port} is available`);
   } else {
     log.error(`Port ${port} is already in use`);
+    log.info('Note: Port may become available before server starts');
   }
 
   // 6. Check dist directory structure
