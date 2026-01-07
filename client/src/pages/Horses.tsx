@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { trpc } from "@/lib/trpc";
 import { Link } from "wouter";
-import { Plus, Heart, ChevronRight, Edit, Trash2 } from "lucide-react";
+import { Plus, Heart, ChevronRight, Edit, Trash2, Download } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,9 +18,14 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import { downloadCSV } from "@/lib/csvDownload";
 
 function HorsesContent() {
   const { data: horses, isLoading, refetch } = trpc.horses.list.useQuery();
+  const exportMutation = trpc.horses.exportCSV.useQuery(undefined, {
+    enabled: false,
+  });
+  
   const deleteMutation = trpc.horses.delete.useMutation({
     onSuccess: () => {
       toast.success("Horse removed successfully");
@@ -33,6 +38,18 @@ function HorsesContent() {
 
   const handleDelete = (id: number) => {
     deleteMutation.mutate({ id });
+  };
+  
+  const handleExport = async () => {
+    try {
+      const result = await exportMutation.refetch();
+      if (result.data) {
+        downloadCSV(result.data.csv, result.data.filename);
+        toast.success("Horses exported successfully");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to export horses");
+    }
   };
 
   if (isLoading) {
@@ -60,12 +77,20 @@ function HorsesContent() {
             Manage profiles for all your equine companions
           </p>
         </div>
-        <Link href="/horses/new">
-          <Button>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Horse
-          </Button>
-        </Link>
+        <div className="flex gap-2">
+          {horses && horses.length > 0 && (
+            <Button variant="outline" onClick={handleExport}>
+              <Download className="w-4 h-4 mr-2" />
+              Export CSV
+            </Button>
+          )}
+          <Link href="/horses/new">
+            <Button>
+              <Plus className="w-4 h-4 mr-2" />
+              Add Horse
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {!horses || horses.length === 0 ? (

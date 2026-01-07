@@ -9,6 +9,7 @@ import { registerOAuthRoutes } from "./oauth";
 import authRouter from "./authRouter";
 import billingRouter from "./billingRouter";
 import { appRouter } from "../routers";
+import { apiRouter } from "../api";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { nanoid } from "nanoid";
@@ -295,6 +296,9 @@ async function startServer() {
       createContext,
     })
   );
+
+  // REST API v1 (for third-party integrations)
+  app.use("/api/v1", apiRouter);
 
   // development mode uses Vite, production mode uses static files
   if (process.env.NODE_ENV === "development") {

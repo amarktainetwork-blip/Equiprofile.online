@@ -24,6 +24,7 @@ import ResetPassword from "./pages/auth/ResetPassword";
 
 // App Pages (Protected)
 import Dashboard from "./pages/Dashboard";
+import Pricing from "./pages/Pricing";
 import Horses from "./pages/Horses";
 import HorseForm from "./pages/HorseForm";
 import HorseDetail from "./pages/HorseDetail";
@@ -39,6 +40,10 @@ import Analytics from "./pages/Analytics";
 import Reports from "./pages/Reports";
 import Calendar from "./pages/Calendar";
 import AIChat from "./pages/AIChat";
+import TrainingTemplates from "./pages/TrainingTemplates";
+import BreedingManagement from "./pages/BreedingManagement";
+import LessonScheduling from "./pages/LessonScheduling";
+import ClientPortal from "./pages/ClientPortal";
 import Settings from "./pages/Settings";
 import BillingPage from "./pages/BillingPage";
 
@@ -65,6 +70,10 @@ function Router() {
           <Route path="/forgot-password" component={ForgotPassword} />
           <Route path="/reset-password" component={ResetPassword} />
           
+          {/* Pricing page */}
+          <Route path="/pricing" component={Pricing} />
+          
+          {/* Dashboard - requires auth */}
           {/* App Pages (Protected - require auth) */}
           <Route path="/dashboard" component={Dashboard} />
           
@@ -79,6 +88,15 @@ function Router() {
           
           {/* Training */}
           <Route path="/training" component={Training} />
+          
+          {/* Training Templates */}
+          <Route path="/training-templates" component={TrainingTemplates} />
+          
+          {/* Breeding Management */}
+          <Route path="/breeding" component={BreedingManagement} />
+          
+          {/* Lesson Scheduling */}
+          <Route path="/lessons" component={LessonScheduling} />
           
           {/* Feeding plans */}
           <Route path="/feeding" component={Feeding} />
@@ -112,6 +130,9 @@ function Router() {
           
           {/* AI Chat */}
           <Route path="/ai-chat" component={AIChat} />
+          
+          {/* Client Portal */}
+          <Route path="/client/:clientId" component={ClientPortal} />
           
           {/* Admin panel - requires admin role */}
           <Route path="/admin" component={Admin} />

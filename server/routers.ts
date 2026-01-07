@@ -9,7 +9,16 @@ import { invokeLLM } from "./_core/llm";
 import { storagePut } from "./storage";
 import { nanoid } from "nanoid";
 import { createCheckoutSession, createPortalSession, STRIPE_PRICING } from "./stripe";
-import { eq, and, desc, sql, gte, lte, or } from "drizzle-orm";
+import {
+  exportHorsesCSV,
+  exportHealthRecordsCSV,
+  exportTrainingSessionsCSV,
+  exportCompetitionsCSV,
+  exportFeedCostsCSV,
+  exportDocumentsCSV,
+  generateCSVFilename,
+} from "./csvExport";
+import { eq, and, desc, sql, gte, lte, or, inArray } from "drizzle-orm";
 import { getDb } from "./db";
 import { ENV } from "./_core/env";
 import {
@@ -29,6 +38,8 @@ import {
   trainingSessions,
   healthRecords,
   feedCosts,
+  lessonBookings,
+  trainerAvailability,
 } from "../drizzle/schema";
 
 // Subscription check middleware
@@ -482,6 +493,18 @@ export const appRouter = router({
         });
         return { success: true };
       }),
+    
+    exportCSV: subscribedProcedure.query(async ({ ctx }) => {
+      const horses = await db.getHorsesByUserId(ctx.user.id);
+      const csv = exportHorsesCSV(horses);
+      const filename = generateCSVFilename('horses');
+      
+      return {
+        csv,
+        filename,
+        mimeType: 'text/csv',
+      };
+    }),
   }),
 
   // Health records
@@ -574,6 +597,18 @@ export const appRouter = router({
       .query(async ({ ctx, input }) => {
         return db.getUpcomingReminders(ctx.user.id, input.days);
       }),
+    
+    exportCSV: subscribedProcedure.query(async ({ ctx }) => {
+      const records = await db.getHealthRecordsByUserId(ctx.user.id);
+      const csv = exportHealthRecordsCSV(records);
+      const filename = generateCSVFilename('health_records');
+      
+      return {
+        csv,
+        filename,
+        mimeType: 'text/csv',
+      };
+    }),
   }),
 
   // Training sessions
@@ -671,6 +706,18 @@ export const appRouter = router({
         });
         return { success: true };
       }),
+    
+    exportCSV: subscribedProcedure.query(async ({ ctx }) => {
+      const sessions = await db.getTrainingSessionsByUserId(ctx.user.id);
+      const csv = exportTrainingSessionsCSV(sessions);
+      const filename = generateCSVFilename('training_sessions');
+      
+      return {
+        csv,
+        filename,
+        mimeType: 'text/csv',
+      };
+    }),
   }),
 
   // Feeding plans
@@ -728,6 +775,18 @@ export const appRouter = router({
         await db.deleteFeedingPlan(input.id, ctx.user.id);
         return { success: true };
       }),
+    
+    exportCSV: subscribedProcedure.query(async ({ ctx }) => {
+      const feedPlans = await db.getFeedingPlansByUserId(ctx.user.id);
+      const csv = exportFeedCostsCSV(feedPlans);
+      const filename = generateCSVFilename('feeding_plans');
+      
+      return {
+        csv,
+        filename,
+        mimeType: 'text/csv',
+      };
+    }),
   }),
 
   // Documents
@@ -797,6 +856,18 @@ export const appRouter = router({
         await db.deleteDocument(input.id, ctx.user.id);
         return { success: true };
       }),
+    
+    exportCSV: subscribedProcedure.query(async ({ ctx }) => {
+      const documents = await db.getDocumentsByUserId(ctx.user.id);
+      const csv = exportDocumentsCSV(documents);
+      const filename = generateCSVFilename('documents');
+      
+      return {
+        csv,
+        filename,
+        mimeType: 'text/csv',
+      };
+    }),
   }),
 
   // Weather and AI analysis
@@ -1684,6 +1755,23 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         }
         return db.getCompetitionsByUserId(ctx.user.id);
       }),
+    
+    exportCSV: subscribedProcedure.query(async ({ ctx }) => {
+      const dbInstance = await getDb();
+      if (!dbInstance) {
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+      }
+      
+      const competitionData = await dbInstance.getCompetitionsByUserId(ctx.user.id);
+      const csv = exportCompetitionsCSV(competitionData);
+      const filename = generateCSVFilename('competitions');
+      
+      return {
+        csv,
+        filename,
+        mimeType: 'text/csv',
+      };
+    }),
   }),
 
   // Training Program Templates
@@ -1719,6 +1807,124 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         const result = await db.insert(trainingProgramTemplates).values({
           ...input,
           userId: ctx.user!.id,
+        });
+        
+        return { id: result[0].insertId };
+      }),
+
+    getTemplate: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) return null;
+        
+        const templates = await db.select()
+          .from(trainingProgramTemplates)
+          .where(eq(trainingProgramTemplates.id, input.id))
+          .limit(1);
+        
+        if (templates.length === 0) return null;
+        
+        // Check permissions
+        const template = templates[0];
+        if (template.userId !== ctx.user.id && !template.isPublic) {
+          return null;
+        }
+        
+        return template;
+      }),
+
+    updateTemplate: subscribedProcedure
+      .input(z.object({
+        id: z.number(),
+        name: z.string().min(1).max(200).optional(),
+        description: z.string().optional(),
+        duration: z.number().optional(),
+        discipline: z.string().optional(),
+        level: z.string().optional(),
+        goals: z.string().optional(),
+        programData: z.string().optional(),
+        isPublic: z.boolean().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        
+        const { id, ...updateData } = input;
+        
+        // Verify ownership
+        const existing = await db.select()
+          .from(trainingProgramTemplates)
+          .where(eq(trainingProgramTemplates.id, id))
+          .limit(1);
+        
+        if (existing.length === 0 || existing[0].userId !== ctx.user.id) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+        
+        await db.update(trainingProgramTemplates)
+          .set(updateData)
+          .where(eq(trainingProgramTemplates.id, id));
+        
+        return { success: true };
+      }),
+
+    deleteTemplate: subscribedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        
+        // Verify ownership
+        const existing = await db.select()
+          .from(trainingProgramTemplates)
+          .where(eq(trainingProgramTemplates.id, input.id))
+          .limit(1);
+        
+        if (existing.length === 0 || existing[0].userId !== ctx.user.id) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+        
+        await db.delete(trainingProgramTemplates)
+          .where(eq(trainingProgramTemplates.id, input.id));
+        
+        return { success: true };
+      }),
+
+    duplicateTemplate: subscribedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        
+        // Get existing template
+        const existing = await db.select()
+          .from(trainingProgramTemplates)
+          .where(eq(trainingProgramTemplates.id, input.id))
+          .limit(1);
+        
+        if (existing.length === 0) {
+          throw new TRPCError({ code: 'NOT_FOUND' });
+        }
+        
+        const template = existing[0];
+        
+        // Check if user can access this template
+        if (template.userId !== ctx.user.id && !template.isPublic) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+        
+        // Create duplicate
+        const result = await db.insert(trainingProgramTemplates).values({
+          name: `${template.name} (Copy)`,
+          description: template.description,
+          duration: template.duration,
+          discipline: template.discipline,
+          level: template.level,
+          goals: template.goals,
+          programData: template.programData,
+          isPublic: false,
+          userId: ctx.user.id,
         });
         
         return { id: result[0].insertId };
@@ -1791,13 +1997,176 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         const db = await getDb();
         if (!db) return [];
         
-        let query = db.select().from(breeding);
+        // Join with horses table to filter by user ownership
+        const userHorses = await db.select({ id: horses.id })
+          .from(horses)
+          .where(eq(horses.userId, ctx.user.id));
+        
+        const horseIds = userHorses.map(h => h.id);
+        if (horseIds.length === 0) return [];
+        
+        let query = db.select().from(breeding)
+          .where(inArray(breeding.mareId, horseIds));
         
         if (input.mareId) {
-          query = query.where(eq(breeding.mareId, input.mareId));
+          query = db.select().from(breeding)
+            .where(and(
+              inArray(breeding.mareId, horseIds),
+              eq(breeding.mareId, input.mareId)
+            ));
         }
         
         return query.orderBy(desc(breeding.breedingDate));
+      }),
+
+    get: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) return null;
+        
+        // Verify ownership through horses table
+        const userHorses = await db.select({ id: horses.id })
+          .from(horses)
+          .where(eq(horses.userId, ctx.user.id));
+        
+        const horseIds = userHorses.map(h => h.id);
+        
+        const records = await db.select()
+          .from(breeding)
+          .where(and(
+            eq(breeding.id, input.id),
+            inArray(breeding.mareId, horseIds)
+          ))
+          .limit(1);
+        
+        return records.length > 0 ? records[0] : null;
+      }),
+
+    update: subscribedProcedure
+      .input(z.object({
+        id: z.number(),
+        stallionName: z.string().optional(),
+        breedingDate: z.string().optional(),
+        method: z.enum(['natural', 'artificial', 'embryo_transfer']).optional(),
+        veterinarianName: z.string().optional(),
+        cost: z.number().optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        
+        const { id, ...updateData } = input;
+        
+        // Verify ownership through horses table
+        const userHorses = await db.select({ id: horses.id })
+          .from(horses)
+          .where(eq(horses.userId, ctx.user.id));
+        
+        const horseIds = userHorses.map(h => h.id);
+        
+        const existing = await db.select()
+          .from(breeding)
+          .where(and(
+            eq(breeding.id, id),
+            inArray(breeding.mareId, horseIds)
+          ))
+          .limit(1);
+        
+        if (existing.length === 0) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+        
+        const dataToUpdate: any = { ...updateData };
+        if (updateData.breedingDate) {
+          dataToUpdate.breedingDate = new Date(updateData.breedingDate);
+        }
+        
+        await db.update(breeding)
+          .set(dataToUpdate)
+          .where(eq(breeding.id, id));
+        
+        return { success: true };
+      }),
+
+    delete: subscribedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        
+        // Verify ownership through horses table
+        const userHorses = await db.select({ id: horses.id })
+          .from(horses)
+          .where(eq(horses.userId, ctx.user.id));
+        
+        const horseIds = userHorses.map(h => h.id);
+        
+        const existing = await db.select()
+          .from(breeding)
+          .where(and(
+            eq(breeding.id, input.id),
+            inArray(breeding.mareId, horseIds)
+          ))
+          .limit(1);
+        
+        if (existing.length === 0) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+        
+        await db.delete(breeding)
+          .where(eq(breeding.id, input.id));
+        
+        return { success: true };
+      }),
+
+    confirmPregnancy: subscribedProcedure
+      .input(z.object({
+        id: z.number(),
+        confirmed: z.boolean(),
+        confirmationDate: z.string().optional(),
+        dueDate: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        
+        // Verify ownership through horses table
+        const userHorses = await db.select({ id: horses.id })
+          .from(horses)
+          .where(eq(horses.userId, ctx.user.id));
+        
+        const horseIds = userHorses.map(h => h.id);
+        
+        const existing = await db.select()
+          .from(breeding)
+          .where(and(
+            eq(breeding.id, input.id),
+            inArray(breeding.mareId, horseIds)
+          ))
+          .limit(1);
+        
+        if (existing.length === 0) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+        
+        const updateData: any = {
+          pregnancyConfirmed: input.confirmed,
+        };
+        
+        if (input.confirmationDate) {
+          updateData.confirmationDate = new Date(input.confirmationDate);
+        }
+        if (input.dueDate) {
+          updateData.dueDate = new Date(input.dueDate);
+        }
+        
+        await db.update(breeding)
+          .set(updateData)
+          .where(eq(breeding.id, input.id));
+        
+        return { success: true };
       }),
 
     addFoal: subscribedProcedure
@@ -1819,6 +2188,376 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         });
         
         return { id: result[0].insertId };
+      }),
+
+    listFoals: protectedProcedure
+      .input(z.object({
+        breedingId: z.number().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) return [];
+        
+        if (input.breedingId) {
+          return db.select().from(foals)
+            .where(eq(foals.breedingId, input.breedingId))
+            .orderBy(desc(foals.birthDate));
+        }
+        
+        return db.select().from(foals)
+          .orderBy(desc(foals.birthDate));
+      }),
+    
+    exportCSV: subscribedProcedure.query(async ({ ctx }) => {
+      const dbInstance = await getDb();
+      if (!dbInstance) {
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+      }
+      
+      const breedingRecords = await dbInstance.select()
+        .from(breeding)
+        .where(eq(breeding.userId, ctx.user.id))
+        .orderBy(desc(breeding.createdAt));
+      
+      // Create CSV with breeding data
+      const headers = ['id', 'mareId', 'stallionName', 'breedingDate', 'method', 'cost', 'pregnancyConfirmed', 'dueDate', 'notes'];
+      const data = breedingRecords.map(record => ({
+        id: record.id,
+        mareId: record.mareId,
+        stallionName: record.stallionName || 'N/A',
+        breedingDate: record.breedingDate ? new Date(record.breedingDate).toISOString().split('T')[0] : '',
+        method: record.method,
+        cost: record.cost || 0,
+        pregnancyConfirmed: record.pregnancyConfirmed ? 'Yes' : 'No',
+        dueDate: record.dueDate ? new Date(record.dueDate).toISOString().split('T')[0] : '',
+        notes: record.notes || '',
+      }));
+      
+      const csv = data.length > 0 ? 
+        [headers.join(','), ...data.map(row => headers.map(h => row[h]).join(','))].join('\n') :
+        headers.join(',');
+      
+      const filename = generateCSVFilename('breeding_records');
+      
+      return {
+        csv,
+        filename,
+        mimeType: 'text/csv',
+      };
+    }),
+  }),
+
+  // Trainer availability management
+  trainerAvailability: router({
+    create: protectedProcedure
+      .input(z.object({
+        dayOfWeek: z.number().min(0).max(6),
+        startTime: z.string().regex(/^\d{2}:\d{2}$/),
+        endTime: z.string().regex(/^\d{2}:\d{2}$/),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        }
+        
+        const result = await db.insert(trainerAvailability).values({
+          trainerId: ctx.user.id,
+          dayOfWeek: input.dayOfWeek,
+          startTime: input.startTime,
+          endTime: input.endTime,
+          isActive: true,
+        });
+        
+        return { id: result[0].insertId };
+      }),
+
+    list: protectedProcedure.query(async ({ ctx }) => {
+      const db = await getDb();
+      if (!db) return [];
+      
+      return db.select()
+        .from(trainerAvailability)
+        .where(and(
+          eq(trainerAvailability.trainerId, ctx.user.id),
+          eq(trainerAvailability.isActive, true)
+        ))
+        .orderBy(trainerAvailability.dayOfWeek, trainerAvailability.startTime);
+    }),
+
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        dayOfWeek: z.number().min(0).max(6).optional(),
+        startTime: z.string().regex(/^\d{2}:\d{2}$/).optional(),
+        endTime: z.string().regex(/^\d{2}:\d{2}$/).optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        }
+
+        const existing = await db.select().from(trainerAvailability)
+          .where(eq(trainerAvailability.id, input.id))
+          .limit(1);
+        
+        if (!existing.length || existing[0].trainerId !== ctx.user.id) {
+          throw new TRPCError({ code: 'NOT_FOUND' });
+        }
+
+        const updateData: any = {};
+        if (input.dayOfWeek !== undefined) updateData.dayOfWeek = input.dayOfWeek;
+        if (input.startTime) updateData.startTime = input.startTime;
+        if (input.endTime) updateData.endTime = input.endTime;
+
+        await db.update(trainerAvailability)
+          .set(updateData)
+          .where(eq(trainerAvailability.id, input.id));
+
+        return { success: true };
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        }
+
+        const existing = await db.select().from(trainerAvailability)
+          .where(eq(trainerAvailability.id, input.id))
+          .limit(1);
+        
+        if (!existing.length || existing[0].trainerId !== ctx.user.id) {
+          throw new TRPCError({ code: 'NOT_FOUND' });
+        }
+
+        await db.update(trainerAvailability)
+          .set({ isActive: false })
+          .where(eq(trainerAvailability.id, input.id));
+
+        return { success: true };
+      }),
+  }),
+
+  // Lesson bookings management
+  lessonBookings: router({
+    create: protectedProcedure
+      .input(z.object({
+        trainerId: z.number(),
+        horseId: z.number().optional(),
+        lessonDate: z.string(),
+        duration: z.number(),
+        lessonType: z.string().optional(),
+        location: z.string().optional(),
+        fee: z.number().optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        }
+        
+        const result = await db.insert(lessonBookings).values({
+          trainerId: input.trainerId,
+          clientId: ctx.user.id,
+          horseId: input.horseId,
+          lessonDate: new Date(input.lessonDate),
+          duration: input.duration,
+          lessonType: input.lessonType,
+          location: input.location,
+          status: 'scheduled',
+          fee: input.fee,
+          paid: false,
+          notes: input.notes,
+        });
+        
+        return { id: result[0].insertId };
+      }),
+
+    list: protectedProcedure
+      .input(z.object({
+        asTrainer: z.boolean().optional(),
+        status: z.enum(['scheduled', 'completed', 'cancelled', 'no_show']).optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) return [];
+        
+        let conditions: any[] = [];
+        
+        if (input.asTrainer) {
+          conditions.push(eq(lessonBookings.trainerId, ctx.user.id));
+        } else {
+          conditions.push(eq(lessonBookings.clientId, ctx.user.id));
+        }
+        
+        if (input.status) {
+          conditions.push(eq(lessonBookings.status, input.status));
+        }
+        
+        return db.select()
+          .from(lessonBookings)
+          .where(and(...conditions))
+          .orderBy(desc(lessonBookings.lessonDate));
+      }),
+
+    get: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({ code: 'NOT_FOUND' });
+        }
+
+        const lessons = await db.select()
+          .from(lessonBookings)
+          .where(eq(lessonBookings.id, input.id))
+          .limit(1);
+
+        if (!lessons.length) {
+          throw new TRPCError({ code: 'NOT_FOUND' });
+        }
+
+        const lesson = lessons[0];
+        if (lesson.trainerId !== ctx.user.id && lesson.clientId !== ctx.user.id) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+
+        return lesson;
+      }),
+
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        lessonDate: z.string().optional(),
+        duration: z.number().optional(),
+        lessonType: z.string().optional(),
+        location: z.string().optional(),
+        status: z.enum(['scheduled', 'completed', 'cancelled', 'no_show']).optional(),
+        fee: z.number().optional(),
+        paid: z.boolean().optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        }
+
+        const existing = await db.select().from(lessonBookings)
+          .where(eq(lessonBookings.id, input.id))
+          .limit(1);
+        
+        if (!existing.length) {
+          throw new TRPCError({ code: 'NOT_FOUND' });
+        }
+
+        const lesson = existing[0];
+        if (lesson.trainerId !== ctx.user.id && lesson.clientId !== ctx.user.id) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+
+        const updateData: any = {};
+        if (input.lessonDate) updateData.lessonDate = new Date(input.lessonDate);
+        if (input.duration) updateData.duration = input.duration;
+        if (input.lessonType) updateData.lessonType = input.lessonType;
+        if (input.location) updateData.location = input.location;
+        if (input.status) updateData.status = input.status;
+        if (input.fee !== undefined) updateData.fee = input.fee;
+        if (input.paid !== undefined) updateData.paid = input.paid;
+        if (input.notes) updateData.notes = input.notes;
+
+        await db.update(lessonBookings)
+          .set(updateData)
+          .where(eq(lessonBookings.id, input.id));
+
+        return { success: true };
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        }
+
+        const existing = await db.select().from(lessonBookings)
+          .where(eq(lessonBookings.id, input.id))
+          .limit(1);
+        
+        if (!existing.length) {
+          throw new TRPCError({ code: 'NOT_FOUND' });
+        }
+
+        const lesson = existing[0];
+        if (lesson.trainerId !== ctx.user.id && lesson.clientId !== ctx.user.id) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+
+        await db.delete(lessonBookings)
+          .where(eq(lessonBookings.id, input.id));
+
+        return { success: true };
+      }),
+
+    markCompleted: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        }
+
+        const existing = await db.select().from(lessonBookings)
+          .where(eq(lessonBookings.id, input.id))
+          .limit(1);
+        
+        if (!existing.length) {
+          throw new TRPCError({ code: 'NOT_FOUND' });
+        }
+
+        if (existing[0].trainerId !== ctx.user.id) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+
+        await db.update(lessonBookings)
+          .set({ status: 'completed' })
+          .where(eq(lessonBookings.id, input.id));
+
+        return { success: true };
+      }),
+
+    markCancelled: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+        }
+
+        const existing = await db.select().from(lessonBookings)
+          .where(eq(lessonBookings.id, input.id))
+          .limit(1);
+        
+        if (!existing.length) {
+          throw new TRPCError({ code: 'NOT_FOUND' });
+        }
+
+        const lesson = existing[0];
+        if (lesson.trainerId !== ctx.user.id && lesson.clientId !== ctx.user.id) {
+          throw new TRPCError({ code: 'FORBIDDEN' });
+        }
+
+        await db.update(lessonBookings)
+          .set({ status: 'cancelled' })
+          .where(eq(lessonBookings.id, input.id));
+
+        return { success: true };
       }),
   }),
 });
