@@ -33,6 +33,7 @@ services:
       db:
         condition: service_healthy
     env_file:
+      - .env.default
       - .env
     environment:
       # Override DATABASE_URL to use Docker service name
