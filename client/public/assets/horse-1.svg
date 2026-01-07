@@ -1,0 +1,48 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#87CEEB;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#E0F6FF;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="groundGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B7355;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6B5745;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Sky -->
+  <rect width="800" height="300" fill="url(#skyGrad)"/>
+  
+  <!-- Ground -->
+  <rect y="300" width="800" height="300" fill="url(#groundGrad)"/>
+  
+  <!-- Grass -->
+  <rect y="290" width="800" height="10" fill="#7BA428"/>
+  
+  <!-- Horse silhouette -->
+  <g transform="translate(200, 200)">
+    <ellipse cx="100" cy="150" rx="90" ry="70" fill="#654321"/>
+    <ellipse cx="60" cy="100" rx="50" ry="45" fill="#654321"/>
+    <rect x="50" y="220" width="15" height="80" fill="#654321"/>
+    <rect x="85" y="220" width="15" height="80" fill="#654321"/>
+    <rect x="120" y="220" width="15" height="80" fill="#654321"/>
+    <rect x="155" y="220" width="15" height="80" fill="#654321"/>
+    <path d="M 40 70 Q 20 60 25 85 L 35 85 Z" fill="#654321"/>
+    <circle cx="50" cy="90" r="5" fill="#FFF"/>
+    <path d="M 30 95 L 40 80 L 45 95 Z" fill="#654321"/>
+    <path d="M 25 95 L 35 80 L 40 95 Z" fill="#654321"/>
+  </g>
+  
+  <!-- Fence -->
+  <g>
+    <rect x="50" y="260" width="10" height="100" fill="#8B4513"/>
+    <rect x="200" y="260" width="10" height="100" fill="#8B4513"/>
+    <rect x="350" y="260" width="10" height="100" fill="#8B4513"/>
+    <rect x="500" y="260" width="10" height="100" fill="#8B4513"/>
+    <rect x="650" y="260" width="10" height="100" fill="#8B4513"/>
+    <rect x="0" y="280" width="800" height="8" fill="#8B4513"/>
+    <rect x="0" y="320" width="800" height="8" fill="#8B4513"/>
+  </g>
+  
+  <text x="400" y="560" font-family="Arial, sans-serif" font-size="24" fill="#333" text-anchor="middle">Professional Horse Care</text>
+</svg>
