@@ -82,10 +82,12 @@ const checkPort = (port) => {
   });
 };
 
-console.log('\n🔌 Checking port availability...');
-const port = parseInt(process.env.PORT || '3000');
+// Main async function
+async function main() {
+  console.log('\n🔌 Checking port availability...');
+  const port = parseInt(process.env.PORT || '3000');
 
-checkPort(port).then(available => {
+  const available = await checkPort(port);
   if (available) {
     log.success(`Port ${port} is available`);
   } else {
@@ -115,8 +117,8 @@ checkPort(port).then(available => {
       const distIndexPath = resolve(process.cwd(), 'dist/index.js');
       if (existsSync(distIndexPath)) {
         // Just check if file is readable
-        const fs = await import('fs/promises');
-        await fs.access(distIndexPath, fs.constants.R_OK);
+        const { access, constants } = await import('fs/promises');
+        await access(distIndexPath, constants.R_OK);
         log.success('Build files are readable');
       }
     } catch (err) {
@@ -135,7 +137,10 @@ checkPort(port).then(available => {
   }
 
   process.exit(exitCode);
-}).catch(err => {
-  log.error(`Port check failed: ${err.message}`);
+}
+
+// Run main function
+main().catch(err => {
+  log.error(`Unexpected error: ${err.message}`);
   process.exit(1);
 });
