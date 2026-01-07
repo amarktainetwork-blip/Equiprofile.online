@@ -82,6 +82,15 @@ async function startServer() {
   });
   app.use("/api", limiter);
 
+  // Health/build endpoints rate limiter (more permissive for monitoring)
+  const healthLimiter = rateLimit({
+    windowMs: 60000, // 1 minute
+    max: 60, // 60 requests per minute (1 per second average)
+    message: "Too many health check requests",
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
   // Stripe webhook - must be before body parser
   app.post("/api/webhooks/stripe", express.raw({ type: "application/json" }), async (req, res) => {
     const stripe = getStripe();
@@ -268,16 +277,16 @@ async function startServer() {
     };
   }
 
-  // Simple health check endpoint (production-friendly)
-  app.get("/healthz", (req, res) => {
+  // Simple health check endpoint (production-friendly) with rate limiting
+  app.get("/healthz", healthLimiter, (req, res) => {
     res.json({
       ok: true,
       timestamp: new Date().toISOString()
     });
   });
 
-  // Build info endpoint (cached)
-  app.get("/build", (req, res) => {
+  // Build info endpoint (cached) with rate limiting
+  app.get("/build", healthLimiter, (req, res) => {
     res.json(cachedBuildInfo);
   });
 
