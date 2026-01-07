@@ -18,6 +18,7 @@ import * as db from "../db";
 import { getStripe } from "../stripe";
 import * as email from "./email";
 import { ENV } from "./env";
+import { resolve } from "path";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -234,7 +235,39 @@ async function startServer() {
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
-  // Health check endpoint
+  // Simple health check endpoint (production-friendly)
+  app.get("/healthz", (req, res) => {
+    res.json({
+      ok: true,
+      timestamp: new Date().toISOString()
+    });
+  });
+
+  // Build info endpoint
+  app.get("/build", (req, res) => {
+    const packageJson = JSON.parse(
+      require('fs').readFileSync(resolve(process.cwd(), 'package.json'), 'utf-8')
+    );
+    
+    // Try to get git commit if available
+    let commit = 'unknown';
+    try {
+      const { execSync } = require('child_process');
+      commit = execSync('git rev-parse HEAD', { encoding: 'utf-8' }).trim().slice(0, 7);
+    } catch (err) {
+      // Git not available or not a repo, that's okay
+    }
+
+    res.json({
+      version: packageJson.version || '1.0.0',
+      buildId: process.env.BUILD_ID || 'dev',
+      commit,
+      buildTime: process.env.BUILD_TIME || new Date().toISOString(),
+      nodeVersion: process.version
+    });
+  });
+
+  // Health check endpoint (detailed)
   app.get("/api/health", async (req, res) => {
     const dbConnected = !!(await db.getDb());
     const stripeConfigured = !!getStripe();
