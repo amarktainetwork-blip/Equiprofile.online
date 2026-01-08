@@ -48,9 +48,18 @@ async function startServer() {
   app.set("trust proxy", 1);
   console.log("✅ Trust proxy enabled for reverse proxy support");
 
-  // Security middleware
+  // Security middleware with strict CSP (no unsafe-inline for scripts)
   app.use(helmet({
-    contentSecurityPolicy: process.env.NODE_ENV === "production" ? undefined : false,
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"], // NO 'unsafe-inline' - all scripts must be external
+        styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles (Tailwind)
+        imgSrc: ["'self'", "data:", "https:"],
+        connectSrc: ["'self'"],
+        fontSrc: ["'self'"],
+      },
+    },
     crossOriginEmbedderPolicy: false,
   }));
 

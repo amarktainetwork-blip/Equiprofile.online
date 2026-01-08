@@ -8,9 +8,17 @@ import App from "./App";
 import { getLoginUrl } from "./const";
 import "./index.css";
 
+// Initialize bootstrap modules (service worker, analytics) - MUST be imported before App
+import { registerServiceWorker } from "./bootstrap";
+import { initializeAnalytics } from "./analytics";
+
 // Initialize admin toggle system - sets up console commands
 // This must be imported to register showAdmin() and hideAdmin() functions
 import "@/lib/adminToggle";
+
+// Initialize service worker and analytics
+registerServiceWorker();
+initializeAnalytics();
 
 // Load visual configuration for post-deployment customization
 fetch('/visual-config.json')

@@ -58,10 +58,51 @@ export function serveStatic(app: Express) {
     );
   }
 
-  app.use(express.static(distPath));
+  // File extensions that should NOT fall through to SPA
+  const STATIC_FILE_EXTENSIONS = [
+    '.js', '.css', '.json', '.map',
+    '.woff', '.woff2', '.svg', '.png', 
+    '.jpg', '.jpeg', '.gif', '.ico'
+  ];
 
-  // fall through to index.html if the file doesn't exist
-  app.use("*", (_req, res) => {
+  // Serve static files with explicit MIME types
+  app.use(express.static(distPath, {
+    setHeaders: (res, filePath) => {
+      // Ensure correct MIME types for assets
+      if (filePath.endsWith('.js')) {
+        res.setHeader('Content-Type', 'application/javascript');
+      } else if (filePath.endsWith('.css')) {
+        res.setHeader('Content-Type', 'text/css');
+      } else if (filePath.endsWith('.json')) {
+        res.setHeader('Content-Type', 'application/json');
+      } else if (filePath.endsWith('.woff')) {
+        res.setHeader('Content-Type', 'font/woff');
+      } else if (filePath.endsWith('.woff2')) {
+        res.setHeader('Content-Type', 'font/woff2');
+      } else if (filePath.endsWith('.svg')) {
+        res.setHeader('Content-Type', 'image/svg+xml');
+      }
+      
+      // Ensure service worker has correct MIME type
+      if (filePath.endsWith('service-worker.js')) {
+        res.setHeader('Content-Type', 'application/javascript');
+        res.setHeader('Service-Worker-Allowed', '/');
+      }
+    }
+  }));
+
+  // SPA fallback - serve index.html ONLY for navigation requests
+  // NOT for asset requests (prevents CSS/JS returning HTML)
+  app.use("*", (req, res) => {
+    // Don't fallback to index.html for asset paths
+    const isStaticFile = req.originalUrl.startsWith('/assets/') || 
+      STATIC_FILE_EXTENSIONS.some(ext => req.originalUrl.endsWith(ext));
+    
+    if (isStaticFile) {
+      return res.status(404).send('Not Found');
+    }
+    
+    // Serve index.html for all other routes (SPA navigation)
     res.sendFile(path.resolve(distPath, "index.html"));
   });
 }

@@ -154,7 +154,7 @@ export default function Home() {
                 >
                   <div className="relative aspect-square rounded-2xl overflow-hidden shadow-2xl">
                     <img 
-                      src="/images/hero-horse.jpg" 
+                      src="/assets/horse-1.svg" 
                       alt="Professional horse care" 
                       className="w-full h-full object-cover"
                     />
