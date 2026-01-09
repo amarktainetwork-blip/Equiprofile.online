@@ -71,9 +71,6 @@ function Router() {
           <Route path="/forgot-password" component={ForgotPassword} />
           <Route path="/reset-password" component={ResetPassword} />
           
-          {/* Pricing page */}
-          <Route path="/pricing" component={Pricing} />
-          
           {/* Dashboard - requires auth */}
           {/* App Pages (Protected - require auth) */}
           <Route path="/dashboard" component={Dashboard} />
