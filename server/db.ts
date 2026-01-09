@@ -1175,3 +1175,221 @@ export async function deleteContact(id: number, userId: number) {
     and(eq(contacts.id, id), eq(contacts.userId, userId))
   );
 }
+
+// ============ VACCINATION QUERIES ============
+
+export async function createVaccination(data: {
+  horseId: number;
+  userId: number;
+  vaccineName: string;
+  vaccineType?: string;
+  dateAdministered: Date;
+  nextDueDate?: Date;
+  batchNumber?: string;
+  vetName?: string;
+  vetClinic?: string;
+  cost?: number;
+  notes?: string;
+  documentUrl?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  const { vaccinations } = await import('../drizzle/schema');
+  const result = await db.insert(vaccinations).values(data);
+  return result.insertId;
+}
+
+export async function getVaccinationsByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { vaccinations } = await import('../drizzle/schema');
+  return db.select().from(vaccinations).where(eq(vaccinations.userId, userId)).orderBy(desc(vaccinations.dateAdministered));
+}
+
+export async function getVaccinationsByHorseId(horseId: number, userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { vaccinations } = await import('../drizzle/schema');
+  return db.select().from(vaccinations).where(
+    and(eq(vaccinations.horseId, horseId), eq(vaccinations.userId, userId))
+  ).orderBy(desc(vaccinations.dateAdministered));
+}
+
+export async function getVaccinationById(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const { vaccinations } = await import('../drizzle/schema');
+  const results = await db.select().from(vaccinations).where(
+    and(eq(vaccinations.id, id), eq(vaccinations.userId, userId))
+  );
+  return results[0] || null;
+}
+
+export async function updateVaccination(id: number, userId: number, data: {
+  vaccineName?: string;
+  vaccineType?: string;
+  dateAdministered?: Date;
+  nextDueDate?: Date;
+  batchNumber?: string;
+  vetName?: string;
+  vetClinic?: string;
+  cost?: number;
+  notes?: string;
+  documentUrl?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  const { vaccinations } = await import('../drizzle/schema');
+  await db.update(vaccinations).set(data).where(
+    and(eq(vaccinations.id, id), eq(vaccinations.userId, userId))
+  );
+}
+
+export async function deleteVaccination(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  const { vaccinations } = await import('../drizzle/schema');
+  await db.delete(vaccinations).where(
+    and(eq(vaccinations.id, id), eq(vaccinations.userId, userId))
+  );
+}
+
+// ============ DEWORMING QUERIES ============
+
+export async function createDeworming(data: {
+  horseId: number;
+  userId: number;
+  productName: string;
+  activeIngredient?: string;
+  dateAdministered: Date;
+  nextDueDate?: Date;
+  dosage?: string;
+  weight?: number;
+  cost?: number;
+  notes?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  const { dewormings } = await import('../drizzle/schema');
+  const result = await db.insert(dewormings).values(data);
+  return result.insertId;
+}
+
+export async function getDewormingsByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { dewormings } = await import('../drizzle/schema');
+  return db.select().from(dewormings).where(eq(dewormings.userId, userId)).orderBy(desc(dewormings.dateAdministered));
+}
+
+export async function getDewormingsByHorseId(horseId: number, userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { dewormings } = await import('../drizzle/schema');
+  return db.select().from(dewormings).where(
+    and(eq(dewormings.horseId, horseId), eq(dewormings.userId, userId))
+  ).orderBy(desc(dewormings.dateAdministered));
+}
+
+export async function getDewormingById(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const { dewormings } = await import('../drizzle/schema');
+  const results = await db.select().from(dewormings).where(
+    and(eq(dewormings.id, id), eq(dewormings.userId, userId))
+  );
+  return results[0] || null;
+}
+
+export async function updateDeworming(id: number, userId: number, data: {
+  productName?: string;
+  activeIngredient?: string;
+  dateAdministered?: Date;
+  nextDueDate?: Date;
+  dosage?: string;
+  weight?: number;
+  cost?: number;
+  notes?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  const { dewormings } = await import('../drizzle/schema');
+  await db.update(dewormings).set(data).where(
+    and(eq(dewormings.id, id), eq(dewormings.userId, userId))
+  );
+}
+
+export async function deleteDeworming(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  const { dewormings } = await import('../drizzle/schema');
+  await db.delete(dewormings).where(
+    and(eq(dewormings.id, id), eq(dewormings.userId, userId))
+  );
+}
+
+// ============ PEDIGREE QUERIES ============
+
+export async function createOrUpdatePedigree(data: {
+  horseId: number;
+  sireId?: number;
+  sireName?: string;
+  damId?: number;
+  damName?: string;
+  sireOfSireId?: number;
+  sireOfSireName?: string;
+  damOfSireId?: number;
+  damOfSireName?: string;
+  sireOfDamId?: number;
+  sireOfDamName?: string;
+  damOfDamId?: number;
+  damOfDamName?: string;
+  geneticInfo?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  const { pedigree } = await import('../drizzle/schema');
+  
+  // Check if pedigree exists for this horse
+  const existing = await db.select().from(pedigree).where(eq(pedigree.horseId, data.horseId));
+  
+  if (existing.length > 0) {
+    // Update existing
+    await db.update(pedigree).set(data).where(eq(pedigree.horseId, data.horseId));
+    return existing[0].id;
+  } else {
+    // Create new
+    const result = await db.insert(pedigree).values(data);
+    return result.insertId;
+  }
+}
+
+export async function getPedigreeByHorseId(horseId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const { pedigree } = await import('../drizzle/schema');
+  const results = await db.select().from(pedigree).where(eq(pedigree.horseId, horseId));
+  return results[0] || null;
+}
+
+export async function deletePedigree(horseId: number) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  const { pedigree } = await import('../drizzle/schema');
+  await db.delete(pedigree).where(eq(pedigree.horseId, horseId));
+}
