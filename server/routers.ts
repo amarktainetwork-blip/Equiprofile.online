@@ -445,6 +445,12 @@ export const appRouter = router({
           entityId: id,
           details: JSON.stringify({ name: input.name }),
         });
+        
+        // Publish real-time event
+        const { publishModuleEvent } = await import('./_core/realtime');
+        const horse = await db.getHorseById(id, ctx.user!.id);
+        publishModuleEvent('horses', 'created', horse, ctx.user!.id);
+        
         return { id };
       }),
     
@@ -478,6 +484,12 @@ export const appRouter = router({
           entityType: 'horse',
           entityId: id,
         });
+        
+        // Publish real-time event
+        const { publishModuleEvent } = await import('./_core/realtime');
+        const horse = await db.getHorseById(id, ctx.user.id);
+        publishModuleEvent('horses', 'updated', horse, ctx.user.id);
+        
         return { success: true };
       }),
     
@@ -491,6 +503,11 @@ export const appRouter = router({
           entityType: 'horse',
           entityId: input.id,
         });
+        
+        // Publish real-time event
+        const { publishModuleEvent } = await import('./_core/realtime');
+        publishModuleEvent('horses', 'deleted', { id: input.id }, ctx.user.id);
+        
         return { success: true };
       }),
     
