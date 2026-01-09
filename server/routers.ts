@@ -3191,11 +3191,12 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         notes: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
+        const { startDate, endDate, ...rest } = input;
         const id = await db.createTreatment({
-          ...input,
+          ...rest,
           userId: ctx.user.id,
-          startDate: new Date(input.startDate),
-          endDate: input.endDate ? new Date(input.endDate) : undefined,
+          startDate: new Date(startDate),
+          endDate: endDate ? new Date(endDate) : undefined,
         });
 
         // Publish real-time event
@@ -3319,10 +3320,11 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         notes: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
+        const { appointmentDate, ...rest } = input;
         const id = await db.createAppointment({
-          ...input,
+          ...rest,
           userId: ctx.user.id,
-          appointmentDate: new Date(input.appointmentDate),
+          appointmentDate: new Date(appointmentDate),
           reminderSent: false,
         });
 
@@ -3444,11 +3446,12 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         notes: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
+        const { examDate, nextDueDate, ...rest } = input;
         const id = await db.createDentalCare({
-          ...input,
+          ...rest,
           userId: ctx.user.id,
-          examDate: new Date(input.examDate),
-          nextDueDate: input.nextDueDate ? new Date(input.nextDueDate) : undefined,
+          examDate: new Date(examDate),
+          nextDueDate: nextDueDate ? new Date(nextDueDate) : undefined,
         });
 
         // Publish real-time event
@@ -3570,10 +3573,11 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         notes: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
+        const { xrayDate, ...rest } = input;
         const id = await db.createXray({
-          ...input,
+          ...rest,
           userId: ctx.user.id,
-          xrayDate: new Date(input.xrayDate),
+          xrayDate: new Date(xrayDate),
         });
 
         // Publish real-time event
@@ -3791,11 +3795,12 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         notes: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
+        const { careDate, nextDueDate, ...rest } = input;
         const id = await db.createHoofcare({
-          ...input,
+          ...rest,
           userId: ctx.user.id,
-          careDate: new Date(input.careDate),
-          nextDueDate: input.nextDueDate ? new Date(input.nextDueDate) : undefined,
+          careDate: new Date(careDate),
+          nextDueDate: nextDueDate ? new Date(nextDueDate) : undefined,
         });
 
         // Publish real-time event
@@ -3915,10 +3920,11 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         notes: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
+        const { logDate, ...rest } = input;
         const id = await db.createNutritionLog({
-          ...input,
+          ...rest,
           userId: ctx.user.id,
-          logDate: new Date(input.logDate),
+          logDate: new Date(logDate),
         });
 
         // Publish real-time event
@@ -4040,11 +4046,12 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         notes: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
+        const { startDate, endDate, ...rest } = input;
         const id = await db.createNutritionPlan({
-          ...input,
+          ...rest,
           userId: ctx.user.id,
-          startDate: new Date(input.startDate),
-          endDate: input.endDate ? new Date(input.endDate) : undefined,
+          startDate: new Date(startDate),
+          endDate: endDate ? new Date(endDate) : undefined,
         });
 
         // Publish real-time event
