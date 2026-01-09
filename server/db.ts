@@ -662,40 +662,6 @@ export async function isStripeEventProcessed(eventId: string) {
   return result.length > 0;
 }
 
-// ============ VACCINATION QUERIES ============
-
-export async function createVaccination(data: InsertVaccination) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  const result = await db.insert(vaccinations).values(data);
-  return result[0].insertId;
-}
-
-export async function getVaccinationsByHorseId(horseId: number, userId: number) {
-  const db = await getDb();
-  if (!db) return [];
-  return db.select().from(vaccinations).where(
-    and(eq(vaccinations.horseId, horseId), eq(vaccinations.userId, userId))
-  ).orderBy(desc(vaccinations.dateAdministered));
-}
-
-// ============ DEWORMING QUERIES ============
-
-export async function createDeworming(data: InsertDeworming) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  const result = await db.insert(dewormings).values(data);
-  return result[0].insertId;
-}
-
-export async function getDewormingsByHorseId(horseId: number, userId: number) {
-  const db = await getDb();
-  if (!db) return [];
-  return db.select().from(dewormings).where(
-    and(eq(dewormings.horseId, horseId), eq(dewormings.userId, userId))
-  ).orderBy(desc(dewormings.dateAdministered));
-}
-
 // ============ COMPETITION QUERIES ============
 
 export async function createCompetition(data: InsertCompetition) {
