@@ -191,10 +191,18 @@ function AdminContent() {
       return;
     }
     
+    // Calculate expiration date
+    let expiresAt: string | undefined;
+    if (newKeyForm.expiresInDays > 0) {
+      const expiryDate = new Date();
+      expiryDate.setDate(expiryDate.getDate() + newKeyForm.expiresInDays);
+      expiresAt = expiryDate.toISOString();
+    }
+    
     createApiKeyMutation.mutate({
       name: newKeyForm.name,
       rateLimit: 100,
-      expiresInDays: newKeyForm.expiresInDays,
+      expiresAt,
       permissions: newKeyForm.permissions,
     });
     
