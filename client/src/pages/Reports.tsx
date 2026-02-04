@@ -13,7 +13,6 @@ import { toast } from "sonner";
 import { trpc } from "../lib/trpc";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
 
 const REPORT_TYPES = [
   { value: 'monthly_summary', label: 'Monthly Summary' },
@@ -169,16 +168,19 @@ export default function Reports() {
       yPos += 10;
       checkPageBreak(30);
 
-      // Summary Section
-      doc.setFontSize(16);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(37, 99, 235);
-      doc.text('Summary', margin, yPos);
-      yPos += 10;
+      // Summary Section (only if summary data exists and has content)
+      const hasSummaryData = reportData.summary && Object.keys(reportData.summary).length > 0;
+      
+      if (hasSummaryData) {
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(37, 99, 235);
+        doc.text('Summary', margin, yPos);
+        yPos += 10;
 
-      doc.setFontSize(11);
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(31, 41, 55);
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(31, 41, 55);
 
       const summary = reportData.summary;
       
@@ -265,7 +267,8 @@ export default function Reports() {
         });
       }
 
-      yPos += 10;
+        yPos += 10;
+      }
 
       // Detailed Data Section
       if (reportData.detailedData && reportData.detailedData.length > 0) {
@@ -311,8 +314,9 @@ export default function Reports() {
             let value = row[header];
             if (value === null || value === undefined) value = '-';
             if (typeof value === 'object') value = JSON.stringify(value);
-            const text = String(value).substring(0, 20);
-            doc.text(text, margin + i * colWidth + 2, yPos);
+            const text = String(value);
+            const truncated = text.length > 20 ? text.substring(0, 17) + '...' : text;
+            doc.text(truncated, margin + i * colWidth + 2, yPos);
           });
           
           yPos += 8;
@@ -403,7 +407,9 @@ export default function Reports() {
         endDate: generateForm.endDate ? format(new Date(generateForm.endDate), 'PP') : undefined,
         generatedDate: format(new Date(), 'PPp'),
         userName: user?.username || user?.email || 'User',
-        summary: await fetchReportSummary(generateForm.reportType, generateForm.horseId),
+        summary: generateForm.includeSummary 
+          ? await fetchReportSummary(generateForm.reportType, generateForm.horseId)
+          : {},
         detailedData: generateForm.includeDetails 
           ? await fetchDetailedData(generateForm.reportType, generateForm.horseId)
           : undefined,
@@ -426,9 +432,10 @@ export default function Reports() {
   };
 
   // Fetch summary data based on report type
+  // TODO: Replace with actual backend API calls
   const fetchReportSummary = async (reportType: string, horseId?: string): Promise<ReportDataSummary> => {
-    // This would typically fetch from your backend
-    // For now, return mock data with realistic values
+    // This uses mock data for demonstration. Connect to actual backend endpoints:
+    // - trpc.reports.getSummary.useQuery({ reportType, horseId })
     const summary: ReportDataSummary = {};
 
     switch (reportType) {
@@ -465,9 +472,10 @@ export default function Reports() {
   };
 
   // Fetch detailed data based on report type
+  // TODO: Replace with actual backend API calls
   const fetchDetailedData = async (reportType: string, horseId?: string): Promise<any[]> => {
-    // This would typically fetch from your backend
-    // For now, return mock data
+    // This uses mock data for demonstration. Connect to actual backend endpoints:
+    // - trpc.reports.getDetailedData.useQuery({ reportType, horseId })
     const mockData: any[] = [];
 
     switch (reportType) {
@@ -708,29 +716,31 @@ export default function Reports() {
                     </Label>
                   </div>
                   
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 opacity-50">
                     <Checkbox 
                       id="includeCharts" 
                       checked={generateForm.includeCharts}
+                      disabled
                       onCheckedChange={(checked) => 
                         setGenerateForm({ ...generateForm, includeCharts: checked as boolean })
                       }
                     />
-                    <Label htmlFor="includeCharts" className="font-normal cursor-pointer">
-                      Charts & Graphs
+                    <Label htmlFor="includeCharts" className="font-normal cursor-not-allowed">
+                      Charts & Graphs <span className="text-xs text-muted-foreground">(Coming soon)</span>
                     </Label>
                   </div>
                   
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 opacity-50">
                     <Checkbox 
                       id="includeNotes" 
                       checked={generateForm.includeNotes}
+                      disabled
                       onCheckedChange={(checked) => 
                         setGenerateForm({ ...generateForm, includeNotes: checked as boolean })
                       }
                     />
-                    <Label htmlFor="includeNotes" className="font-normal cursor-pointer">
-                      Notes & Comments
+                    <Label htmlFor="includeNotes" className="font-normal cursor-not-allowed">
+                      Notes & Comments <span className="text-xs text-muted-foreground">(Coming soon)</span>
                     </Label>
                   </div>
                 </div>
