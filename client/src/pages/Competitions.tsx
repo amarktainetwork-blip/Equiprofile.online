@@ -122,25 +122,6 @@ function CompetitionsContent() {
     enabled: false,
   });
 
-  // Note: Update and delete endpoints don't exist in backend yet
-  // These mutations will fail until backend is updated
-  const updateMutation = trpc.competitions.update?.useMutation({
-    onSuccess: () => {
-      setIsCreateOpen(false);
-      resetForm();
-      toast.success("Competition record updated successfully");
-    },
-    onError: (error) => {
-      toast.error(error.message || "Failed to update competition record. Update endpoint may not be implemented yet.");
-    },
-  });
-
-  const deleteMutation = trpc.competitions.delete?.useMutation({
-    onError: (error) => {
-      toast.error(error.message || "Failed to delete competition record. Delete endpoint may not be implemented yet.");
-    },
-  });
-
   const handleExportCSV = async () => {
     try {
       const result = await exportQuery.refetch();
@@ -185,6 +166,11 @@ function CompetitionsContent() {
       return;
     }
 
+    if (editingRecord) {
+      toast.error("Edit functionality not yet available. Backend update endpoint needs to be implemented.");
+      return;
+    }
+
     const costInPence = formData.cost ? Math.round(parseFloat(formData.cost) * 100) : undefined;
     const winningsInPence = formData.winnings ? Math.round(parseFloat(formData.winnings) * 100) : undefined;
 
@@ -203,39 +189,32 @@ function CompetitionsContent() {
       notes: formData.notes || undefined,
     };
 
-    if (editingRecord && updateMutation) {
-      updateMutation.mutate({ id: editingRecord.id, ...data });
-    } else {
-      createMutation.mutate(data);
-    }
+    createMutation.mutate(data);
   };
 
   const handleEdit = (record: CompetitionRecord) => {
-    setEditingRecord(record);
-    setFormData({
-      horseId: record.horseId.toString(),
-      competitionName: record.competitionName,
-      date: record.date?.split('T')[0] || "",
-      venue: record.venue || "",
-      discipline: record.discipline || "",
-      level: record.level || "",
-      class: record.class || "",
-      placement: record.placement || "",
-      score: record.score || "",
-      cost: record.cost ? (record.cost / 100).toFixed(2) : "",
-      winnings: record.winnings ? (record.winnings / 100).toFixed(2) : "",
-      notes: record.notes || "",
-    });
-    setIsCreateOpen(true);
+    toast.info("Edit functionality coming soon. Backend update endpoint needs to be implemented.");
+    // When backend is ready, uncomment below:
+    // setEditingRecord(record);
+    // setFormData({
+    //   horseId: record.horseId.toString(),
+    //   competitionName: record.competitionName,
+    //   date: record.date?.split('T')[0] || "",
+    //   venue: record.venue || "",
+    //   discipline: record.discipline || "",
+    //   level: record.level || "",
+    //   class: record.class || "",
+    //   placement: record.placement || "",
+    //   score: record.score || "",
+    //   cost: record.cost ? (record.cost / 100).toFixed(2) : "",
+    //   winnings: record.winnings ? (record.winnings / 100).toFixed(2) : "",
+    //   notes: record.notes || "",
+    // });
+    // setIsCreateOpen(true);
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this competition record?")) return;
-    if (deleteMutation) {
-      deleteMutation.mutate({ id });
-    } else {
-      toast.error("Delete functionality not yet implemented in backend");
-    }
+    toast.info("Delete functionality coming soon. Backend delete endpoint needs to be implemented.");
   };
 
   const getHorseName = (horseId: number) => {
@@ -336,9 +315,9 @@ function CompetitionsContent() {
             </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>{editingRecord ? "Edit Competition Record" : "Add Competition Record"}</DialogTitle>
+                <DialogTitle>Add Competition Record</DialogTitle>
                 <DialogDescription>
-                  {editingRecord ? "Update competition record details" : "Record a new competition result"}
+                  Record a new competition result
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
@@ -490,9 +469,9 @@ function CompetitionsContent() {
                 </Button>
                 <Button 
                   onClick={handleSubmit} 
-                  disabled={createMutation.isPending || (updateMutation && updateMutation.isPending)}
+                  disabled={createMutation.isPending}
                 >
-                  {(createMutation.isPending || (updateMutation && updateMutation.isPending)) ? "Saving..." : editingRecord ? "Update" : "Create"}
+                  {createMutation.isPending ? "Saving..." : "Create"}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -660,7 +639,8 @@ function CompetitionsContent() {
                             size="sm"
                             variant="ghost"
                             onClick={() => handleEdit(record)}
-                            title="Edit (Note: Backend update endpoint not yet implemented)"
+                            className="opacity-50"
+                            title="Coming soon - Backend update endpoint needed"
                           >
                             <Edit className="w-4 h-4" />
                           </Button>
@@ -668,7 +648,8 @@ function CompetitionsContent() {
                             size="sm"
                             variant="ghost"
                             onClick={() => handleDelete(record.id)}
-                            title="Delete (Note: Backend delete endpoint not yet implemented)"
+                            className="opacity-50"
+                            title="Coming soon - Backend delete endpoint needed"
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
