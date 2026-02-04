@@ -315,9 +315,9 @@ function CompetitionsContent() {
             </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Add Competition Record</DialogTitle>
+                <DialogTitle>{editingRecord ? "Edit Competition Record" : "Add Competition Record"}</DialogTitle>
                 <DialogDescription>
-                  Record a new competition result
+                  {editingRecord ? "Update competition record details" : "Record a new competition result"}
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
