@@ -98,12 +98,12 @@ export default function AIChat() {
               messages={messages}
               onSendMessage={handleSend}
               isLoading={chatMutation.isPending}
-              placeholder="Type your message... (Try 'show admin')"
+              placeholder="Type your message..."
               height="600px"
               suggestedPrompts={[
                 "What can you help me with?",
                 "Show me horse care tips",
-                "show admin",
+                "How do I track vaccinations?",
               ]}
             />
 

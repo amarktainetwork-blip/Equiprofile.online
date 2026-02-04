@@ -7,12 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 import { Pill, Plus, Pencil, Trash2 } from 'lucide-react';
 import DashboardLayout from '../components/DashboardLayout';
 
 function TreatmentsContent() {
-  const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [editingTreatment, setEditingTreatment] = useState<any>(null);
 
@@ -308,7 +307,7 @@ function TreatmentsContent() {
 
               <div className="flex justify-end gap-2">
                 <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-                <Button type="submit" disabled={createMutation.isLoading || updateMutation.isLoading}>
+                <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
                   {editingTreatment ? 'Update' : 'Create'}
                 </Button>
               </div>

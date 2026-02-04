@@ -6,10 +6,10 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
-import { toast } from "../components/ui/use-toast";
+import { toast } from "sonner";
 import { Plus, Edit, Trash2, Calendar, Stethoscope, AlertCircle } from "lucide-react";
 import { DashboardLayout } from "../components/DashboardLayout";
-import { useRealtime } from "../hooks/useRealtime";
+import { useRealtimeModule } from "../hooks/useRealtime";
 
 function DentalCareContent() {
   const { data: dentalRecords, refetch } = trpc.dentalCare.list.useQuery();
@@ -23,11 +23,10 @@ function DentalCareContent() {
   const [localRecords, setLocalRecords] = useState(dentalRecords || []);
 
   // Real-time updates
-  useRealtime((module, action, data) => {
-    if (module === 'dentalCare') {
-      if (action === 'created') {
-        setLocalRecords(prev => [data, ...prev]);
-        toast({ title: "Dental record added", description: "New dental care record created" });
+  useRealtimeModule('dentalCare', (action, data) => {
+    if (action === 'created') {
+      setLocalRecords(prev => [data, ...prev]);
+      toast.success("New dental care record created");
       } else if (action === 'updated') {
         setLocalRecords(prev => prev.map(r => r.id === data.id ? { ...r, ...data } : r));
       } else if (action === 'deleted') {
@@ -60,7 +59,7 @@ function DentalCareContent() {
     e.preventDefault();
 
     if (formData.horseId === 0) {
-      toast({ title: "Error", description: "Please select a horse", variant: "destructive" });
+      toast.error("Please select a horse");
       return;
     }
 
@@ -74,21 +73,21 @@ function DentalCareContent() {
           cost: costInPence,
           teethCondition: formData.teethCondition || undefined,
         });
-        toast({ title: "Success", description: "Dental record updated successfully" });
+        toast.success("Dental record updated successfully");
       } else {
         await createMutation.mutateAsync({
           ...formData,
           cost: costInPence,
           teethCondition: formData.teethCondition as any,
         });
-        toast({ title: "Success", description: "Dental record created successfully" });
+        toast.success("Dental record created successfully");
       }
       
       setOpen(false);
       resetForm();
       refetch();
     } catch (error: any) {
-      toast({ title: "Error", description: error.message || "Failed to save dental record", variant: "destructive" });
+      toast.error(error.message || "Failed to save dental record");
     }
   };
 
@@ -116,10 +115,10 @@ function DentalCareContent() {
     
     try {
       await deleteMutation.mutateAsync({ id });
-      toast({ title: "Success", description: "Dental record deleted" });
+      toast.success("Dental record deleted");
       refetch();
     } catch (error: any) {
-      toast({ title: "Error", description: error.message || "Failed to delete", variant: "destructive" });
+      toast.error(error.message || "Failed to delete");
     }
   };
 
@@ -323,7 +322,7 @@ function DentalCareContent() {
                 <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                   Cancel
                 </Button>
-                <Button type="submit" disabled={createMutation.isLoading || updateMutation.isLoading}>
+                <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
                   {editingId ? "Update" : "Create"} Record
                 </Button>
               </div>

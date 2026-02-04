@@ -7,12 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/components/ui/use-toast';
 import { Calendar, Plus, Pencil, Trash2, Clock } from 'lucide-react';
 import DashboardLayout from '../components/DashboardLayout';
+import { toast } from 'sonner';
 
 function AppointmentsContent() {
-  const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState<any>(null);
 
@@ -307,7 +306,7 @@ function AppointmentsContent() {
 
               <div className="flex justify-end gap-2">
                 <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-                <Button type="submit" disabled={createMutation.isLoading || updateMutation.isLoading}>
+                <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
                   {editingAppointment ? 'Update' : 'Schedule'}
                 </Button>
               </div>
