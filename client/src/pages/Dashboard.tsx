@@ -369,9 +369,9 @@ function DashboardContent() {
                     <p className="text-2xl font-bold text-primary">{upcomingSessions.length}</p>
                     <p className="text-xs text-muted-foreground">Scheduled</p>
                   </div>
-                  <div className="p-3 rounded-lg bg-green-50 border border-green-200">
-                    <p className="text-2xl font-bold text-green-700">0</p>
-                    <p className="text-xs text-muted-foreground">Completed</p>
+                  <div className="p-3 rounded-lg bg-muted/30 border border-muted">
+                    <p className="text-xs text-muted-foreground mb-1">Completed</p>
+                    <p className="text-xs text-muted-foreground italic">Coming soon</p>
                   </div>
                 </div>
 
