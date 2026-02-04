@@ -545,12 +545,12 @@ export const appRouter = router({
           photoUrl: url,
         });
         
-        await db.logActivity({
+        await db.createActivityLog({
           userId: ctx.user!.id,
           action: 'horse_photo_uploaded',
           entityType: 'horse',
           entityId: input.horseId,
-          details: JSON.stringify({ fileName: input.fileName }),
+          details: `Uploaded photo: ${input.fileName}`,
         });
         
         // Publish real-time event

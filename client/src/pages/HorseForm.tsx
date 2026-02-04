@@ -196,18 +196,29 @@ function HorseFormContent() {
             setUploadingPhoto(false);
           } else {
             // For new horses, we need to create the horse first, then upload photo
-            const createResult = await createMutation.mutateAsync(data);
-            if (createResult.id) {
-              await uploadPhotoMutation.mutateAsync({
-                horseId: createResult.id,
-                fileName: photoFile.name,
-                fileData: base64,
-                fileType: photoFile.type,
-                fileSize: photoFile.size,
-              });
+            try {
+              const createResult = await createMutation.mutateAsync(data);
+              if (createResult.id) {
+                try {
+                  await uploadPhotoMutation.mutateAsync({
+                    horseId: createResult.id,
+                    fileName: photoFile.name,
+                    fileData: base64,
+                    fileType: photoFile.type,
+                    fileSize: photoFile.size,
+                  });
+                  toast.success("Horse created and photo uploaded!");
+                } catch (uploadError) {
+                  toast.warning("Horse created, but photo upload failed. You can add a photo by editing the horse.");
+                  navigate(`/horses/${createResult.id}`);
+                }
+              }
+              setUploadingPhoto(false);
+              return;
+            } catch (createError) {
+              setUploadingPhoto(false);
+              throw createError;
             }
-            setUploadingPhoto(false);
-            return;
           }
           
           // Update horse with photo URL
