@@ -8,6 +8,14 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
   Table,
   TableBody,
   TableCell,
@@ -59,7 +67,7 @@ import {
   Server
 } from "lucide-react";
 import { toast } from "sonner";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, format } from "date-fns";
 
 function AdminContent() {
   const [, navigate] = useLocation();
@@ -67,6 +75,12 @@ function AdminContent() {
   const [suspendReason, setSuspendReason] = useState("");
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [newApiKeyData, setNewApiKeyData] = useState<{ id: number; key: string } | null>(null);
+  const [isCreateKeyOpen, setIsCreateKeyOpen] = useState(false);
+  const [newKeyForm, setNewKeyForm] = useState({
+    name: "",
+    expiresInDays: 90,
+    permissions: [] as string[],
+  });
 
   // Check admin session status
   const statusQuery = trpc.adminUnlock.getStatus.useQuery();
@@ -166,6 +180,27 @@ function AdminContent() {
     },
     onError: (error) => toast.error(error.message),
   });
+
+  const handleCreateKey = () => {
+    if (!newKeyForm.name.trim()) {
+      toast.error("Please enter a key name");
+      return;
+    }
+    if (newKeyForm.permissions.length === 0) {
+      toast.error("Please select at least one permission");
+      return;
+    }
+    
+    createApiKeyMutation.mutate({
+      name: newKeyForm.name,
+      rateLimit: 100,
+      expiresInDays: newKeyForm.expiresInDays,
+      permissions: newKeyForm.permissions,
+    });
+    
+    setIsCreateKeyOpen(false);
+    setNewKeyForm({ name: "", expiresInDays: 90, permissions: [] });
+  };
 
   const filteredUsers = users?.filter(user => 
     user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -599,44 +634,113 @@ function AdminContent() {
         {/* System Secrets Tab */}
         <TabsContent value="api-keys" className="space-y-4">
           <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>System Integration Keys</CardTitle>
-                  <CardDescription>Configure global API keys for platform integrations (OpenAI, SMTP, weather providers). These are system-wide settings, not user-specific.</CardDescription>
-                </div>
-                <Button onClick={() => {
-                  const name = prompt('Enter integration name (e.g., "OpenAI API", "Weather API"):');
-                  if (name) {
-                    createApiKeyMutation.mutate({ name, rateLimit: 100 });
-                  }
-                }}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Integration
-                </Button>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+              <div>
+                <CardTitle>API Keys Management</CardTitle>
+                <CardDescription>
+                  Manage API keys for integrations and external services
+                </CardDescription>
               </div>
+              <Dialog open={isCreateKeyOpen} onOpenChange={setIsCreateKeyOpen}>
+                <DialogTrigger asChild>
+                  <Button>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create API Key
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Create New API Key</DialogTitle>
+                    <DialogDescription>
+                      Generate a new API key for external integrations
+                    </DialogDescription>
+                  </DialogHeader>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <Label>Key Name</Label>
+                      <Input 
+                        value={newKeyForm.name}
+                        onChange={(e) => setNewKeyForm({...newKeyForm, name: e.target.value})}
+                        placeholder="e.g., Mobile App Integration"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label>Expires In (Days)</Label>
+                      <Select 
+                        value={newKeyForm.expiresInDays.toString()}
+                        onValueChange={(val) => setNewKeyForm({...newKeyForm, expiresInDays: parseInt(val)})}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="30">30 days</SelectItem>
+                          <SelectItem value="90">90 days</SelectItem>
+                          <SelectItem value="180">180 days</SelectItem>
+                          <SelectItem value="365">1 year</SelectItem>
+                          <SelectItem value="0">Never</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label>Permissions</Label>
+                      <div className="space-y-2 mt-2">
+                        {['read:horses', 'write:horses', 'read:health', 'write:health'].map(perm => (
+                          <div key={perm} className="flex items-center space-x-2">
+                            <Checkbox 
+                              checked={newKeyForm.permissions.includes(perm)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setNewKeyForm({...newKeyForm, permissions: [...newKeyForm.permissions, perm]});
+                                } else {
+                                  setNewKeyForm({...newKeyForm, permissions: newKeyForm.permissions.filter(p => p !== perm)});
+                                }
+                              }}
+                            />
+                            <Label className="cursor-pointer">{perm}</Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <DialogFooter>
+                    <Button onClick={handleCreateKey}>Create Key</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </CardHeader>
             <CardContent>
               {newApiKeyData && (
-                <Alert className="mb-4 border-yellow-500 bg-yellow-50">
+                <Alert className="mb-4">
                   <Key className="h-4 w-4" />
-                  <AlertTitle>Save This Key Now!</AlertTitle>
-                  <AlertDescription className="mt-2 space-y-2">
-                    <p className="text-sm">This is the only time you'll see this key:</p>
-                    <div className="flex items-center gap-2 bg-white p-2 rounded border font-mono text-sm">
-                      <code className="flex-1">{newApiKeyData.key}</code>
-                      <Button
-                        size="sm"
+                  <AlertTitle>API Key Created Successfully</AlertTitle>
+                  <AlertDescription>
+                    <p className="mb-2">Save this key now - it won't be shown again:</p>
+                    <div className="flex items-center gap-2">
+                      <code className="bg-muted px-2 py-1 rounded text-sm flex-1 overflow-x-auto">
+                        {newApiKeyData.key}
+                      </code>
+                      <Button 
+                        size="sm" 
                         variant="ghost"
                         onClick={() => {
                           navigator.clipboard.writeText(newApiKeyData.key);
-                          toast.success('Copied to clipboard');
+                          toast.success("Copied to clipboard");
                         }}
                       >
-                        <Copy className="h-4 w-4" />
+                        <Copy className="w-4 h-4" />
                       </Button>
                     </div>
-                    <Button size="sm" variant="outline" onClick={() => setNewApiKeyData(null)}>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={() => setNewApiKeyData(null)}
+                      className="mt-2"
+                    >
                       I've saved it
                     </Button>
                   </AlertDescription>
@@ -648,55 +752,53 @@ function AdminContent() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Name</TableHead>
-                      <TableHead>Key Prefix</TableHead>
-                      <TableHead>Rate Limit</TableHead>
+                      <TableHead>Created</TableHead>
+                      <TableHead>Expires</TableHead>
                       <TableHead>Last Used</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {apiKeysQuery.data.map((key) => (
+                    {apiKeysQuery.data.map(key => (
                       <TableRow key={key.id}>
-                        <TableCell className="font-medium">{key.name}</TableCell>
+                        <TableCell>{key.name}</TableCell>
+                        <TableCell>{format(new Date(key.createdAt || Date.now()), 'PP')}</TableCell>
+                        <TableCell>{key.expiresAt ? format(new Date(key.expiresAt), 'PP') : 'Never'}</TableCell>
+                        <TableCell>{key.lastUsedAt ? formatDistanceToNow(new Date(key.lastUsedAt)) + ' ago' : 'Never'}</TableCell>
                         <TableCell>
-                          <code className="text-xs">{key.keyPrefix}_...</code>
-                        </TableCell>
-                        <TableCell>{key.rateLimit}/hr</TableCell>
-                        <TableCell>
-                          {key.lastUsedAt ? formatDistanceToNow(new Date(key.lastUsedAt), { addSuffix: true }) : 'Never'}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={key.isActive ? 'default' : 'secondary'}>
+                          <Badge variant={key.isActive ? 'default' : 'destructive'}>
                             {key.isActive ? 'Active' : 'Revoked'}
                           </Badge>
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => {
-                                if (confirm('Rotate this API key? The old key will stop working immediately.')) {
-                                  rotateApiKeyMutation.mutate({ id: key.id });
-                                }
-                              }}
-                              disabled={!key.isActive}
-                            >
-                              <RotateCw className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => {
-                                if (confirm('Revoke this API key? This cannot be undone.')) {
-                                  revokeApiKeyMutation.mutate({ id: key.id });
-                                }
-                              }}
-                              disabled={!key.isActive}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                            {key.isActive && (
+                              <>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => {
+                                    if (confirm('Rotate this API key? The old key will stop working immediately.')) {
+                                      rotateApiKeyMutation.mutate({ id: key.id });
+                                    }
+                                  }}
+                                >
+                                  <RotateCw className="h-4 w-4" />
+                                </Button>
+                                <Button 
+                                  variant="destructive" 
+                                  size="sm"
+                                  onClick={() => {
+                                    if (confirm('Revoke this API key? This cannot be undone.')) {
+                                      revokeApiKeyMutation.mutate({ id: key.id });
+                                    }
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </>
+                            )}
                           </div>
                         </TableCell>
                       </TableRow>
@@ -760,6 +862,97 @@ function AdminContent() {
                   </Table>
                 </div>
               )}
+            </CardContent>
+          </Card>
+
+          {/* Database Backup Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Server className="w-5 h-5" />
+                Database Backups
+              </CardTitle>
+              <CardDescription>
+                Automated backup system and manual backup options
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Alert>
+                <AlertTitle>Automated Daily Backups</AlertTitle>
+                <AlertDescription>
+                  Database backups are automatically created daily at 2:00 AM UTC.
+                  Backups are retained for 30 days.
+                </AlertDescription>
+              </Alert>
+              
+              <div className="space-y-2">
+                <h3 className="font-semibold">Backup Configuration</h3>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-muted-foreground">Frequency:</span>
+                    <span className="ml-2 font-medium">Daily (2:00 AM UTC)</span>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Retention:</span>
+                    <span className="ml-2 font-medium">30 days</span>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Location:</span>
+                    <span className="ml-2 font-medium">S3 Bucket (Encrypted)</span>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Compression:</span>
+                    <span className="ml-2 font-medium">Gzip</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <h3 className="font-semibold">Manual Backup</h3>
+                <p className="text-sm text-muted-foreground">
+                  Trigger a manual backup if needed. This will not affect the automated schedule.
+                </p>
+                <Button 
+                  onClick={() => toast.info("Manual backup functionality requires backend implementation")}
+                  disabled
+                >
+                  <RotateCw className="w-4 h-4 mr-2" />
+                  Trigger Manual Backup (Coming Soon)
+                </Button>
+              </div>
+              
+              <div className="space-y-2">
+                <h3 className="font-semibold">Backup Script Documentation</h3>
+                <p className="text-sm text-muted-foreground mb-2">
+                  Automated backups use the following script deployed via cron:
+                </p>
+                <pre className="bg-muted p-4 rounded-lg text-xs overflow-x-auto">
+{`#!/bin/bash
+# Daily backup script at /scripts/backup.sh
+
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR="/var/backups/equiprofile"
+DB_NAME="equiprofile"
+
+# Create backup
+mysqldump -u $DB_USER -p$DB_PASS $DB_NAME > "$BACKUP_DIR/db_$DATE.sql"
+
+# Compress
+gzip "$BACKUP_DIR/db_$DATE.sql"
+
+# Upload to S3
+aws s3 cp "$BACKUP_DIR/db_$DATE.sql.gz" s3://equiprofile-backups/
+
+# Clean old backups (keep 30 days)
+find $BACKUP_DIR -name "db_*.sql.gz" -mtime +30 -delete
+
+echo "Backup completed: db_$DATE.sql.gz"`}
+                </pre>
+                
+                <p className="text-sm text-muted-foreground mt-2">
+                  <strong>Cron Schedule:</strong> <code>0 2 * * * /scripts/backup.sh</code>
+                </p>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
