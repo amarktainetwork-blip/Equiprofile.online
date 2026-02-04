@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { trpc } from "@/lib/trpc";
 import { useParams, Link } from "wouter";
 import { 
@@ -17,14 +18,17 @@ import {
   Calendar,
   Syringe,
   Stethoscope,
-  FileHeart
+  FileHeart,
+  Camera
 } from "lucide-react";
 import { toast } from "sonner";
 import { MedicalPassport } from "@/components/MedicalPassport";
+import { useState } from "react";
 
 function HorseDetailContent() {
   const params = useParams<{ id: string }>();
   const horseId = parseInt(params.id);
+  const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
 
   const { data: horse, isLoading } = trpc.horses.get.useQuery({ id: horseId });
   const { data: healthRecords } = trpc.healthRecords.listByHorse.useQuery({ horseId });
@@ -91,12 +95,28 @@ function HorseDetailContent() {
       {/* Horse Profile Card */}
       <Card>
         <div className="grid md:grid-cols-3 gap-6">
-          <div className="aspect-square bg-muted rounded-l-lg overflow-hidden">
+          <div className="aspect-square bg-muted rounded-l-lg overflow-hidden relative group">
             {horse.photoUrl ? (
-              <img src={horse.photoUrl} alt={horse.name} className="w-full h-full object-cover" />
+              <>
+                <img 
+                  src={horse.photoUrl} 
+                  alt={horse.name} 
+                  className="w-full h-full object-cover cursor-pointer transition-transform hover:scale-105" 
+                  onClick={() => setIsPhotoModalOpen(true)}
+                />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <p className="text-white text-sm">Click to view full size</p>
+                </div>
+              </>
             ) : (
-              <div className="w-full h-full flex items-center justify-center">
+              <div className="w-full h-full flex flex-col items-center justify-center gap-3">
                 <Heart className="w-24 h-24 text-muted-foreground/30" />
+                <Link href={`/horses/${horse.id}/edit`}>
+                  <Button variant="outline" size="sm">
+                    <Camera className="w-4 h-4 mr-2" />
+                    Add Photo
+                  </Button>
+                </Link>
               </div>
             )}
           </div>
@@ -155,6 +175,19 @@ function HorseDetailContent() {
           </div>
         </div>
       </Card>
+
+      {/* Photo Modal */}
+      <Dialog open={isPhotoModalOpen} onOpenChange={setIsPhotoModalOpen}>
+        <DialogContent className="max-w-4xl">
+          {horse.photoUrl && (
+            <img 
+              src={horse.photoUrl} 
+              alt={horse.name} 
+              className="w-full h-auto rounded-lg"
+            />
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Tabs for Health, Training, Feeding, Medical Passport */}
       <Tabs defaultValue="health" className="space-y-4">

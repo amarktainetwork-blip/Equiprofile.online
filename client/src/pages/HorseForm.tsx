@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 import { useLocation, useParams } from "wouter";
-import { ArrowLeft, Save, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Camera, X, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "wouter";
 
@@ -57,6 +57,11 @@ function HorseFormContent() {
     photoUrl: "",
   });
 
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string>("");
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const { data: horse, isLoading: horseLoading } = trpc.horses.get.useQuery(
     { id: horseId! },
     { enabled: !!horseId }
@@ -82,6 +87,19 @@ function HorseFormContent() {
     },
   });
 
+  const uploadPhotoMutation = trpc.horses.uploadPhoto.useMutation({
+    onSuccess: (data) => {
+      toast.success("Photo uploaded successfully!");
+      setFormData({ ...formData, photoUrl: data.url });
+      setPhotoPreview(data.url);
+      setPhotoFile(null);
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to upload photo");
+      setUploadingPhoto(false);
+    },
+  });
+
   useEffect(() => {
     if (horse) {
       setFormData({
@@ -100,10 +118,38 @@ function HorseFormContent() {
         notes: horse.notes || "",
         photoUrl: horse.photoUrl || "",
       });
+      if (horse.photoUrl) {
+        setPhotoPreview(horse.photoUrl);
+      }
     }
   }, [horse]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error("Please select an image file (JPG, PNG, WebP)");
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Photo must be less than 5MB");
+        return;
+      }
+      setPhotoFile(file);
+      setPhotoPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleRemovePhoto = () => {
+    setPhotoFile(null);
+    setPhotoPreview("");
+    setFormData({ ...formData, photoUrl: "" });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.name.trim()) {
@@ -128,14 +174,63 @@ function HorseFormContent() {
       photoUrl: formData.photoUrl || undefined,
     };
 
-    if (isEditing && horseId) {
-      updateMutation.mutate({ id: horseId, ...data });
+    // If there's a photo file to upload
+    if (photoFile) {
+      setUploadingPhoto(true);
+      try {
+        const reader = new FileReader();
+        reader.onload = async () => {
+          const base64 = (reader.result as string).split(',')[1];
+          
+          // Upload photo first
+          let photoUrl = formData.photoUrl;
+          if (isEditing && horseId) {
+            const uploadResult = await uploadPhotoMutation.mutateAsync({
+              horseId,
+              fileName: photoFile.name,
+              fileData: base64,
+              fileType: photoFile.type,
+              fileSize: photoFile.size,
+            });
+            photoUrl = uploadResult.url;
+            setUploadingPhoto(false);
+          } else {
+            // For new horses, we need to create the horse first, then upload photo
+            const createResult = await createMutation.mutateAsync(data);
+            if (createResult.id) {
+              await uploadPhotoMutation.mutateAsync({
+                horseId: createResult.id,
+                fileName: photoFile.name,
+                fileData: base64,
+                fileType: photoFile.type,
+                fileSize: photoFile.size,
+              });
+            }
+            setUploadingPhoto(false);
+            return;
+          }
+          
+          // Update horse with photo URL
+          if (isEditing && horseId) {
+            updateMutation.mutate({ id: horseId, ...data, photoUrl });
+          }
+        };
+        reader.readAsDataURL(photoFile);
+      } catch (error) {
+        toast.error("Failed to upload photo");
+        setUploadingPhoto(false);
+      }
     } else {
-      createMutation.mutate(data);
+      // No photo to upload, just save the horse
+      if (isEditing && horseId) {
+        updateMutation.mutate({ id: horseId, ...data });
+      } else {
+        createMutation.mutate(data);
+      }
     }
   };
 
-  const isSubmitting = createMutation.isPending || updateMutation.isPending;
+  const isSubmitting = createMutation.isPending || updateMutation.isPending || uploadingPhoto;
 
   if (horseLoading) {
     return (
@@ -349,17 +444,52 @@ function HorseFormContent() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="photoUrl">Photo URL</Label>
-              <Input
-                id="photoUrl"
-                type="url"
-                value={formData.photoUrl}
-                onChange={(e) => setFormData({ ...formData, photoUrl: e.target.value })}
-                placeholder="https://example.com/photo.jpg"
-              />
-              <p className="text-xs text-muted-foreground">
-                Enter a URL to your horse's photo. File upload coming soon.
-              </p>
+              <Label>Horse Photo</Label>
+              <div className="flex flex-col gap-3">
+                {photoPreview ? (
+                  <div className="relative w-full max-w-sm">
+                    <img 
+                      src={photoPreview} 
+                      alt="Horse preview" 
+                      className="w-full h-48 object-cover rounded-lg border"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-2 right-2"
+                      onClick={handleRemovePhoto}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div 
+                    className="w-full max-w-sm h-48 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-primary/50 transition-colors"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Camera className="w-12 h-12 text-muted-foreground mb-2" />
+                    <p className="text-sm text-muted-foreground">Click to upload a photo</p>
+                    <p className="text-xs text-muted-foreground mt-1">JPG, PNG, WebP (max 5MB)</p>
+                  </div>
+                )}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  className="hidden"
+                  accept="image/jpeg,image/png,image/webp,image/jpg"
+                  onChange={handlePhotoSelect}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full max-w-sm"
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  {photoPreview ? "Change Photo" : "Upload Photo"}
+                </Button>
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="notes">Notes</Label>

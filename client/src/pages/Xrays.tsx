@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { trpc } from '../_core/trpc';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { Button } from '../components/ui/button';
@@ -10,7 +10,7 @@ import { Textarea } from '../components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { useToast } from '../hooks/use-toast';
 import { useRealtimeModule } from '../hooks/useRealtime';
-import { PlusCircle, Edit2, Trash2, FileImage } from 'lucide-react';
+import { PlusCircle, Edit2, Trash2, FileImage, Upload, Download, Image } from 'lucide-react';
 
 export default function Xrays() {
   return (
@@ -24,6 +24,9 @@ function XraysContent() {
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingXray, setEditingXray] = useState<any>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState({
     horseId: '',
@@ -97,6 +100,20 @@ function XraysContent() {
     }
   });
 
+  const uploadMutation = trpc.xrays.upload.useMutation({
+    onSuccess: () => {
+      toast({ title: 'X-ray uploaded successfully' });
+      setIsDialogOpen(false);
+      resetForm();
+      setSelectedFile(null);
+      refetch();
+    },
+    onError: (error) => {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      setUploading(false);
+    }
+  });
+
   const resetForm = () => {
     setFormData({
       horseId: '',
@@ -113,35 +130,110 @@ function XraysContent() {
       cost: 0,
       notes: ''
     });
+    setSelectedFile(null);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast({ title: 'Error', description: 'Please select an image file', variant: 'destructive' });
+        return;
+      }
+      if (file.size > 20 * 1024 * 1024) {
+        toast({ title: 'Error', description: 'File size must be less than 20MB', variant: 'destructive' });
+        return;
+      }
+      setSelectedFile(file);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
-    const costInPence = Math.round(parseFloat(formData.cost.toString()) * 100);
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast({ title: 'Error', description: 'Please select an image file', variant: 'destructive' });
+        return;
+      }
+      if (file.size > 20 * 1024 * 1024) {
+        toast({ title: 'Error', description: 'File size must be less than 20MB', variant: 'destructive' });
+        return;
+      }
+      setSelectedFile(file);
+    }
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     
-    const payload = {
-      horseId: parseInt(formData.horseId),
-      xrayDate: formData.xrayDate,
-      bodyPart: formData.bodyPart,
-      vetName: formData.vetName || undefined,
-      vetClinic: formData.vetClinic || undefined,
-      findings: formData.findings || undefined,
-      diagnosis: formData.diagnosis || undefined,
-      fileUrl: formData.fileUrl || undefined,
-      fileName: formData.fileName || undefined,
-      fileSize: formData.fileSize || undefined,
-      mimeType: formData.fileMimeType || undefined,
-      cost: costInPence,
-      notes: formData.notes || undefined,
-    };
+    if (!formData.horseId || !formData.bodyPart) {
+      toast({ title: 'Error', description: 'Please fill in required fields', variant: 'destructive' });
+      return;
+    }
 
     if (editingXray) {
+      // Update existing xray (without file upload for now in update)
+      const costInPence = Math.round(parseFloat(formData.cost.toString()) * 100);
       updateMutation.mutate({
         id: editingXray.id,
-        ...payload
+        horseId: parseInt(formData.horseId),
+        xrayDate: formData.xrayDate,
+        bodyPart: formData.bodyPart,
+        vetName: formData.vetName || undefined,
+        vetClinic: formData.vetClinic || undefined,
+        findings: formData.findings || undefined,
+        diagnosis: formData.diagnosis || undefined,
+        cost: costInPence,
+        notes: formData.notes || undefined,
       });
     } else {
-      createMutation.mutate(payload);
+      // Create new xray with file upload
+      if (!selectedFile) {
+        toast({ title: 'Error', description: 'Please select an X-ray image', variant: 'destructive' });
+        return;
+      }
+
+      setUploading(true);
+      try {
+        const reader = new FileReader();
+        reader.onload = async () => {
+          const base64 = (reader.result as string).split(',')[1];
+          const costInPence = Math.round(parseFloat(formData.cost.toString()) * 100);
+          
+          uploadMutation.mutate({
+            horseId: parseInt(formData.horseId),
+            xrayDate: formData.xrayDate,
+            bodyPart: formData.bodyPart,
+            fileName: selectedFile.name,
+            fileData: base64,
+            fileType: selectedFile.type,
+            fileSize: selectedFile.size,
+            vetName: formData.vetName || undefined,
+            vetClinic: formData.vetClinic || undefined,
+            findings: formData.findings || undefined,
+            diagnosis: formData.diagnosis || undefined,
+            cost: costInPence,
+            notes: formData.notes || undefined,
+          });
+        };
+        reader.readAsDataURL(selectedFile);
+      } catch (error) {
+        toast({ title: 'Error', description: 'Failed to upload file', variant: 'destructive' });
+        setUploading(false);
+      }
     }
   };
 
@@ -199,6 +291,47 @@ function XraysContent() {
             </DialogHeader>
             <form onSubmit={handleSubmit}>
               <div className="grid gap-4 py-4">
+                {!editingXray && (
+                  <div className="grid gap-2">
+                    <Label>X-ray Image *</Label>
+                    <div 
+                      className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:border-primary/50 transition-colors"
+                      onClick={() => fileInputRef.current?.click()}
+                      onDragOver={handleDragOver}
+                      onDrop={handleDrop}
+                    >
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        className="hidden"
+                        accept="image/jpeg,image/png,image/jpg,image/dicom"
+                        onChange={handleFileSelect}
+                      />
+                      {selectedFile ? (
+                        <div className="flex items-center justify-center gap-3">
+                          <Image className="w-8 h-8 text-primary" />
+                          <div className="text-left">
+                            <p className="font-medium">{selectedFile.name}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {formatFileSize(selectedFile.size)}
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <Upload className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
+                          <p className="text-sm text-muted-foreground">
+                            Drop X-ray image here or click to browse
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            JPG, PNG, DICOM (max 20MB)
+                          </p>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
+                
                 <div className="grid gap-2">
                   <Label htmlFor="horseId">Horse *</Label>
                   <Select value={formData.horseId} onValueChange={(value) => setFormData({...formData, horseId: value})} required>
@@ -281,17 +414,6 @@ function XraysContent() {
                   />
                 </div>
 
-                <div className="grid gap-2">
-                  <Label htmlFor="fileUrl">File URL (placeholder)</Label>
-                  <Input
-                    id="fileUrl"
-                    placeholder="File will be uploaded to secure storage"
-                    value={formData.fileUrl}
-                    onChange={(e) => setFormData({...formData, fileUrl: e.target.value})}
-                  />
-                  <p className="text-sm text-muted-foreground">File upload integration pending</p>
-                </div>
-
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
                     <Label htmlFor="cost">Cost (£)</Label>
@@ -321,8 +443,8 @@ function XraysContent() {
                 <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                   Cancel
                 </Button>
-                <Button type="submit">
-                  {editingXray ? 'Update' : 'Create'} Record
+                <Button type="submit" disabled={uploading || uploadMutation.isPending || updateMutation.isPending}>
+                  {uploading || uploadMutation.isPending ? 'Uploading...' : editingXray ? 'Update Record' : 'Upload X-ray'}
                 </Button>
               </DialogFooter>
             </form>
@@ -356,32 +478,54 @@ function XraysContent() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-2 text-sm">
-                  {xray.vetClinic && (
-                    <div>
-                      <span className="font-medium">Clinic:</span> {xray.vetClinic}
+                <div className="grid md:grid-cols-[200px_1fr] gap-4">
+                  {xray.fileUrl && (
+                    <div className="w-full h-48 rounded-lg overflow-hidden bg-muted">
+                      <img 
+                        src={xray.fileUrl} 
+                        alt={`X-ray of ${xray.bodyPart}`} 
+                        className="w-full h-full object-contain cursor-pointer hover:scale-105 transition-transform"
+                        onClick={() => window.open(xray.fileUrl, '_blank')}
+                      />
                     </div>
                   )}
-                  {xray.findings && (
-                    <div>
-                      <span className="font-medium">Findings:</span> {xray.findings}
-                    </div>
-                  )}
-                  {xray.diagnosis && (
-                    <div>
-                      <span className="font-medium">Diagnosis:</span> {xray.diagnosis}
-                    </div>
-                  )}
-                  {xray.cost > 0 && (
-                    <div>
-                      <span className="font-medium">Cost:</span> £{(xray.cost / 100).toFixed(2)}
-                    </div>
-                  )}
-                  {xray.notes && (
-                    <div>
-                      <span className="font-medium">Notes:</span> {xray.notes}
-                    </div>
-                  )}
+                  <div className="grid gap-2 text-sm">
+                    {xray.vetClinic && (
+                      <div>
+                        <span className="font-medium">Clinic:</span> {xray.vetClinic}
+                      </div>
+                    )}
+                    {xray.findings && (
+                      <div>
+                        <span className="font-medium">Findings:</span> {xray.findings}
+                      </div>
+                    )}
+                    {xray.diagnosis && (
+                      <div>
+                        <span className="font-medium">Diagnosis:</span> {xray.diagnosis}
+                      </div>
+                    )}
+                    {xray.cost > 0 && (
+                      <div>
+                        <span className="font-medium">Cost:</span> £{(xray.cost / 100).toFixed(2)}
+                      </div>
+                    )}
+                    {xray.notes && (
+                      <div>
+                        <span className="font-medium">Notes:</span> {xray.notes}
+                      </div>
+                    )}
+                    {xray.fileUrl && (
+                      <div className="mt-2">
+                        <Button variant="outline" size="sm" asChild>
+                          <a href={xray.fileUrl} target="_blank" rel="noopener noreferrer">
+                            <Download className="h-4 w-4 mr-2" />
+                            Download X-ray
+                          </a>
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </CardContent>
             </Card>

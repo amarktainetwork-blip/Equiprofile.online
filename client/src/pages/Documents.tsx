@@ -88,6 +88,27 @@ function DocumentsContent() {
     }
   };
 
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error("File size must be less than 10MB");
+        return;
+      }
+      setSelectedFile(file);
+      if (!formData.title) {
+        setFormData({ ...formData, title: file.name.replace(/\.[^/.]+$/, "") });
+      }
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedFile || !formData.title) {
@@ -172,6 +193,8 @@ function DocumentsContent() {
                 <div 
                   className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:border-primary/50 transition-colors"
                   onClick={() => fileInputRef.current?.click()}
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop}
                 >
                   <input
                     ref={fileInputRef}
@@ -194,7 +217,7 @@ function DocumentsContent() {
                     <>
                       <Upload className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
                       <p className="text-sm text-muted-foreground">
-                        Click to select a file or drag and drop
+                        Drop files here or click to browse
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
                         PDF, DOC, DOCX, JPG, PNG (max 10MB)
@@ -285,11 +308,22 @@ function DocumentsContent() {
               {documents.map((doc) => {
                 const horse = horses?.find(h => h.id === doc.horseId);
                 const docType = documentTypes.find(t => t.value === doc.category);
+                const isImage = doc.fileType?.startsWith('image/');
                 return (
                   <div key={doc.id} className="flex items-center gap-4 p-4 rounded-lg border hover:bg-muted/30 transition-colors">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                      {getFileIcon(doc.fileType || 'application/pdf')}
-                    </div>
+                    {isImage && doc.fileUrl ? (
+                      <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                        <img 
+                          src={doc.fileUrl} 
+                          alt={doc.description || doc.fileName} 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+                        {getFileIcon(doc.fileType || 'application/pdf')}
+                      </div>
+                    )}
                     <div className="flex-1 min-w-0">
                       <p className="font-medium truncate">{doc.description || doc.fileName}</p>
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">

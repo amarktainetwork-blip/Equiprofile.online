@@ -525,6 +525,41 @@ export const appRouter = router({
         mimeType: 'text/csv',
       };
     }),
+    
+    uploadPhoto: subscribedProcedure
+      .input(z.object({
+        horseId: z.number(),
+        fileName: z.string(),
+        fileData: z.string(), // base64
+        fileType: z.string(),
+        fileSize: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Decode base64 and upload to storage
+        const buffer = Buffer.from(input.fileData, 'base64');
+        const fileKey = `${ctx.user.id}/horses/${input.horseId}/${nanoid()}-${input.fileName}`;
+        const { url } = await storagePut(fileKey, buffer, input.fileType);
+        
+        // Update horse with photo URL
+        await db.updateHorse(input.horseId, ctx.user.id, {
+          photoUrl: url,
+        });
+        
+        await db.logActivity({
+          userId: ctx.user!.id,
+          action: 'horse_photo_uploaded',
+          entityType: 'horse',
+          entityId: input.horseId,
+          details: JSON.stringify({ fileName: input.fileName }),
+        });
+        
+        // Publish real-time event
+        const { publishModuleEvent } = await import('./_core/realtime');
+        const horse = await db.getHorseById(input.horseId, ctx.user.id);
+        publishModuleEvent('horses', 'updated', horse, ctx.user.id);
+        
+        return { url };
+      }),
   }),
 
   // Health records
@@ -3662,6 +3697,64 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         });
 
         return { success: true };
+      }),
+    
+    upload: protectedProcedure
+      .input(z.object({
+        horseId: z.number(),
+        xrayDate: z.string(),
+        bodyPart: z.string().min(1).max(100),
+        fileName: z.string(),
+        fileData: z.string(), // base64
+        fileType: z.string(),
+        fileSize: z.number(),
+        vetName: z.string().optional(),
+        vetClinic: z.string().optional(),
+        findings: z.string().optional(),
+        diagnosis: z.string().optional(),
+        cost: z.number().optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Decode base64 and upload to storage
+        const buffer = Buffer.from(input.fileData, 'base64');
+        const fileKey = `${ctx.user.id}/xrays/${nanoid()}-${input.fileName}`;
+        const { url } = await storagePut(fileKey, buffer, input.fileType);
+        
+        const id = await db.createXray({
+          userId: ctx.user.id,
+          horseId: input.horseId,
+          xrayDate: new Date(input.xrayDate),
+          bodyPart: input.bodyPart,
+          vetName: input.vetName,
+          vetClinic: input.vetClinic,
+          findings: input.findings,
+          diagnosis: input.diagnosis,
+          fileUrl: url,
+          fileName: input.fileName,
+          fileSize: input.fileSize,
+          mimeType: input.fileType,
+          cost: input.cost,
+          notes: input.notes,
+        });
+
+        // Publish real-time event
+        const { publishModuleEvent } = await import('./_core/realtime');
+        const xray = await db.getXrayById(id, ctx.user.id);
+        if (xray) {
+          publishModuleEvent('xrays', 'created', xray, ctx.user.id);
+        }
+
+        // Audit log
+        await db.createActivityLog({
+          userId: ctx.user.id,
+          action: 'xray_uploaded',
+          entityType: 'xray',
+          entityId: id,
+          details: `Uploaded x-ray for ${input.bodyPart}`,
+        });
+
+        return { id, url };
       }),
   }),
 
