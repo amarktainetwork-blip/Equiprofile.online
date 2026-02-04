@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -58,7 +58,7 @@ function WeatherContent() {
   });
 
   // Geolocation function
-  const requestLocation = async () => {
+  const requestLocation = useCallback(async () => {
     setLocationStatus('loading');
     
     if (!navigator.geolocation) {
@@ -113,7 +113,7 @@ function WeatherContent() {
         maximumAge: 0 
       }
     );
-  };
+  }, []);
 
   // Auto-request location on mount
   useEffect(() => {
