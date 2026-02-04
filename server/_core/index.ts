@@ -383,7 +383,19 @@ async function startServer() {
   app.get("/api/realtime/events", async (req, res) => {
     try {
       // Get user from session (reuse tRPC context logic)
-      const context = await createContext({ req, res, info: { isBatchCall: false, calls: [] } });
+      const context = await createContext({ 
+        req, 
+        res, 
+        info: {
+          isBatchCall: false,
+          calls: [],
+          accept: 'application/json',
+          type: 'query',
+          connectionParams: null,
+          signal: null,
+          url: new URL(req.url, `http://${req.headers.host}`),
+        } as any
+      });
       
       if (!context.user) {
         return res.status(401).json({ error: "Unauthorized" });
@@ -405,7 +417,19 @@ async function startServer() {
   // SSE stats endpoint (admin only)
   app.get("/api/realtime/stats", async (req, res) => {
     try {
-      const context = await createContext({ req, res, info: { isBatchCall: false, calls: [] } });
+      const context = await createContext({ 
+        req, 
+        res,
+        info: {
+          isBatchCall: false,
+          calls: [],
+          accept: 'application/json',
+          type: 'query',
+          connectionParams: null,
+          signal: null,
+          url: new URL(req.url, `http://${req.headers.host}`),
+        } as any
+      });
       if (!context.user || context.user.role !== 'admin') {
         return res.status(403).json({ error: "Admin access required" });
       }
