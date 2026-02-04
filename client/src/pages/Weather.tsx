@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -25,8 +25,23 @@ import {
 import { toast } from "sonner";
 import { Streamdown } from "streamdown";
 
+const UK_CITIES = [
+  "London", "Birmingham", "Manchester", "Liverpool", "Leeds",
+  "Sheffield", "Bristol", "Newcastle upon Tyne", "Nottingham", "Leicester",
+  "Coventry", "Bradford", "Cardiff", "Belfast", "Edinburgh",
+  "Glasgow", "Cambridge", "Oxford", "Brighton", "Portsmouth",
+  "Southampton", "Reading", "Derby", "Plymouth", "Wolverhampton",
+  "Stoke-on-Trent", "Preston", "York", "Chester", "Bath"
+];
+
 function WeatherContent() {
   const [location, setLocation] = useState("");
+  const [locationSuggestions, setLocationSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState("");
+  const suggestionsRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  
   const [weatherData, setWeatherData] = useState({
     temperature: 15,
     humidity: 60,
@@ -36,6 +51,40 @@ function WeatherContent() {
     uvIndex: 4,
     visibility: 10,
   });
+
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (suggestionsRef.current && !suggestionsRef.current.contains(event.target as Node) &&
+          inputRef.current && !inputRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleLocationChange = (value: string) => {
+    setLocation(value);
+    setSelectedLocation("");
+    
+    if (value.length > 1) {
+      const filtered = UK_CITIES.filter(city => 
+        city.toLowerCase().includes(value.toLowerCase())
+      ).slice(0, 6);
+      setLocationSuggestions(filtered);
+      setShowSuggestions(filtered.length > 0);
+    } else {
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleSelectLocation = (city: string) => {
+    setLocation(city);
+    setSelectedLocation(city);
+    setShowSuggestions(false);
+  };
 
   const { data: latestWeather, isLoading: weatherLoading } = trpc.weather.getLatest.useQuery();
   const { data: weatherHistory } = trpc.weather.getHistory.useQuery({ limit: 5 });
@@ -93,6 +142,47 @@ function WeatherContent() {
     }
   };
 
+  const getRidingCondition = () => {
+    const { temperature, windSpeed, precipitation, visibility } = weatherData;
+    
+    if (precipitation > 5 || windSpeed > 40 || visibility < 2) {
+      return { status: 'Poor', color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200' };
+    } else if (precipitation > 2 || windSpeed > 25 || temperature < 0 || temperature > 30) {
+      return { status: 'Fair', color: 'text-yellow-600', bg: 'bg-yellow-50', border: 'border-yellow-200' };
+    } else {
+      return { status: 'Good', color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-200' };
+    }
+  };
+
+  const getSafetyRecommendations = () => {
+    const { temperature, windSpeed, precipitation, uvIndex } = weatherData;
+    const recommendations: string[] = [];
+
+    if (temperature < 5) {
+      recommendations.push("🧥 Cold weather - dress warmly and warm up gradually");
+    }
+    if (temperature > 25) {
+      recommendations.push("☀️ Hot weather - ensure adequate hydration for horse and rider");
+    }
+    if (windSpeed > 30) {
+      recommendations.push("💨 Strong winds - be cautious, horses may be more reactive");
+    }
+    if (precipitation > 0) {
+      recommendations.push("☔ Wet conditions - surfaces may be slippery");
+    }
+    if (uvIndex > 6) {
+      recommendations.push("🕶️ High UV - use sun protection");
+    }
+    if (recommendations.length === 0) {
+      recommendations.push("✅ Excellent conditions for riding");
+    }
+
+    return recommendations;
+  };
+
+  const ridingCondition = getRidingCondition();
+  const safetyRecommendations = getSafetyRecommendations();
+
   return (
     <div className="space-y-6">
       <div>
@@ -113,19 +203,54 @@ function WeatherContent() {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="location">Location</Label>
+              <Label htmlFor="location">Location (UK)</Label>
               <div className="flex gap-2">
                 <div className="relative flex-1">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <MapPin className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${
+                    selectedLocation ? 'text-primary' : 'text-muted-foreground'
+                  }`} />
                   <Input
+                    ref={inputRef}
                     id="location"
                     value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    placeholder="Enter your location (e.g., London, UK)"
-                    className="pl-10"
+                    onChange={(e) => handleLocationChange(e.target.value)}
+                    onFocus={() => {
+                      if (locationSuggestions.length > 0) {
+                        setShowSuggestions(true);
+                      }
+                    }}
+                    placeholder="Enter UK city (e.g., London, Manchester)"
+                    className={`pl-10 ${selectedLocation ? 'border-primary' : ''}`}
+                    autoComplete="off"
                   />
+                  
+                  {/* Autocomplete dropdown */}
+                  {showSuggestions && locationSuggestions.length > 0 && (
+                    <div 
+                      ref={suggestionsRef}
+                      className="absolute top-full left-0 right-0 mt-1 bg-card border rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto"
+                    >
+                      {locationSuggestions.map((city, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => handleSelectLocation(city)}
+                          className="w-full px-4 py-2.5 text-left hover:bg-muted transition-colors flex items-center gap-2 border-b last:border-b-0"
+                        >
+                          <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                          <span className="text-sm">{city}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
+              {selectedLocation && (
+                <p className="text-xs text-muted-foreground flex items-center gap-1">
+                  <CheckCircle className="w-3 h-3 text-primary" />
+                  Selected: {selectedLocation}
+                </p>
+              )}
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -253,9 +378,70 @@ function WeatherContent() {
 
         {/* Latest Result */}
         <div className="space-y-6">
+          {/* Riding Condition Indicator */}
           <Card>
             <CardHeader>
-              <CardTitle>Current Recommendation</CardTitle>
+              <CardTitle>Riding Conditions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className={`p-4 rounded-lg border ${ridingCondition.bg} ${ridingCondition.border}`}>
+                <div className="flex items-center gap-2 mb-3">
+                  {ridingCondition.status === 'Good' ? (
+                    <CheckCircle className={`w-6 h-6 ${ridingCondition.color}`} />
+                  ) : ridingCondition.status === 'Fair' ? (
+                    <AlertTriangle className={`w-6 h-6 ${ridingCondition.color}`} />
+                  ) : (
+                    <XCircle className={`w-6 h-6 ${ridingCondition.color}`} />
+                  )}
+                  <span className={`font-bold text-lg ${ridingCondition.color}`}>
+                    {ridingCondition.status}
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  {safetyRecommendations.map((rec, idx) => (
+                    <p key={idx} className="text-sm text-muted-foreground">{rec}</p>
+                  ))}
+                </div>
+              </div>
+
+              {/* Weather Stats Grid */}
+              <div className="grid grid-cols-2 gap-2 mt-4">
+                <div className="p-2 rounded-lg bg-muted/30">
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
+                    <Thermometer className="w-3 h-3" />
+                    <span>Temp</span>
+                  </div>
+                  <p className="font-semibold">{weatherData.temperature}°C</p>
+                </div>
+                <div className="p-2 rounded-lg bg-muted/30">
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
+                    <Wind className="w-3 h-3" />
+                    <span>Wind</span>
+                  </div>
+                  <p className="font-semibold">{weatherData.windSpeed} km/h</p>
+                </div>
+                <div className="p-2 rounded-lg bg-muted/30">
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
+                    <Droplets className="w-3 h-3" />
+                    <span>Humidity</span>
+                  </div>
+                  <p className="font-semibold">{weatherData.humidity}%</p>
+                </div>
+                <div className="p-2 rounded-lg bg-muted/30">
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
+                    <CloudRain className="w-3 h-3" />
+                    <span>Rain</span>
+                  </div>
+                  <p className="font-semibold">{weatherData.precipitation} mm</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* AI Analysis Result */}
+          <Card>
+            <CardHeader>
+              <CardTitle>AI Analysis</CardTitle>
             </CardHeader>
             <CardContent>
               {analyzeMutation.data ? (

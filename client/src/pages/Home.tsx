@@ -91,10 +91,18 @@ export default function Home() {
         <div className="min-h-screen">
           {/* Hero Section */}
           <section className="relative pt-24 lg:pt-32 pb-16 lg:pb-24 overflow-hidden">
-            {/* Background gradient */}
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
+            {/* Background with image overlay */}
+            <div className="absolute inset-0">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background/95 to-accent/20 z-10" />
+              <img 
+                src="/images/hero-horse.jpg" 
+                alt="Professional horse management" 
+                className="w-full h-full object-cover opacity-10"
+                loading="eager"
+              />
+            </div>
             
-            <div className="container relative z-10">
+            <div className="container relative z-20">
               <div className="grid lg:grid-cols-2 gap-12 items-center">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}

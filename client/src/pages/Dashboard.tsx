@@ -224,6 +224,168 @@ function DashboardContent() {
           </Card>
         </div>
       </div>
+
+      {/* New 3-Column Widget Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Widget 1: Upcoming Appointments */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Calendar className="w-5 h-5" />
+              Upcoming Appointments
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {!upcomingSessions || upcomingSessions.length === 0 ? (
+              <div className="text-center py-6">
+                <Calendar className="w-10 h-10 text-muted-foreground/30 mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">No upcoming appointments</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {upcomingSessions.slice(0, 5).map((session) => (
+                  <div key={session.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
+                    <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium capitalize truncate">{session.sessionType}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(session.sessionDate).toLocaleDateString('en-US', { 
+                          month: 'short', 
+                          day: 'numeric',
+                          hour: 'numeric',
+                          minute: '2-digit'
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+                {upcomingSessions.length > 5 && (
+                  <Link href="/training">
+                    <Button variant="ghost" size="sm" className="w-full mt-2">
+                      View All
+                      <ChevronRight className="w-4 h-4 ml-1" />
+                    </Button>
+                  </Link>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Widget 2: Recent Health Alerts */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <AlertCircle className="w-5 h-5" />
+              Health Alerts
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {!reminders || reminders.length === 0 ? (
+              <div className="text-center py-6">
+                <Heart className="w-10 h-10 text-muted-foreground/30 mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">No health alerts</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {reminders.slice(0, 5).map((reminder) => {
+                  const daysUntil = reminder.nextDueDate 
+                    ? Math.ceil((new Date(reminder.nextDueDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+                    : null;
+                  const isOverdue = daysUntil !== null && daysUntil < 0;
+                  const isUrgent = daysUntil !== null && daysUntil <= 7 && daysUntil >= 0;
+                  
+                  return (
+                    <div 
+                      key={reminder.id} 
+                      className={`flex items-center gap-3 p-2 rounded-lg border ${
+                        isOverdue ? 'bg-red-50 border-red-200' : 
+                        isUrgent ? 'bg-yellow-50 border-yellow-200' : 
+                        'bg-muted/30 border-transparent'
+                      }`}
+                    >
+                      <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                        isOverdue ? 'bg-red-500' : isUrgent ? 'bg-yellow-500' : 'bg-green-500'
+                      }`} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{reminder.title}</p>
+                        <p className={`text-xs ${
+                          isOverdue ? 'text-red-600 font-medium' : 
+                          isUrgent ? 'text-yellow-700' : 
+                          'text-muted-foreground'
+                        }`}>
+                          {isOverdue ? `Overdue by ${Math.abs(daysUntil)} days` :
+                           isUrgent ? `Due in ${daysUntil} days` :
+                           reminder.nextDueDate ? new Date(reminder.nextDueDate).toLocaleDateString() : 'No date'}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+                {reminders.length > 5 && (
+                  <Link href="/health">
+                    <Button variant="ghost" size="sm" className="w-full mt-2">
+                      View All
+                      <ChevronRight className="w-4 h-4 ml-1" />
+                    </Button>
+                  </Link>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Widget 3: Training Progress Summary */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Activity className="w-5 h-5" />
+              Training Progress
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {!upcomingSessions || upcomingSessions.length === 0 ? (
+              <div className="text-center py-6">
+                <Activity className="w-10 h-10 text-muted-foreground/30 mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">No training data</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Sessions This Month</span>
+                    <span className="font-semibold">{upcomingSessions.length}</span>
+                  </div>
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-primary rounded-full transition-all" 
+                      style={{ width: `${Math.min((upcomingSessions.length / 20) * 100, 100)}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3 rounded-lg bg-primary/5 border border-primary/10">
+                    <p className="text-2xl font-bold text-primary">{upcomingSessions.length}</p>
+                    <p className="text-xs text-muted-foreground">Scheduled</p>
+                  </div>
+                  <div className="p-3 rounded-lg bg-green-50 border border-green-200">
+                    <p className="text-2xl font-bold text-green-700">0</p>
+                    <p className="text-xs text-muted-foreground">Completed</p>
+                  </div>
+                </div>
+
+                <Link href="/training">
+                  <Button variant="outline" size="sm" className="w-full">
+                    View Details
+                    <ChevronRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </Link>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
