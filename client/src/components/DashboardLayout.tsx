@@ -41,7 +41,8 @@ import {
   Calendar,
   Users,
   TrendingUp,
-  TrendingDown
+  TrendingDown,
+  Trophy
 } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
@@ -56,6 +57,7 @@ const menuItems = [
   { icon: Heart, label: "Health Records", path: "/health" },
   { icon: Activity, label: "Training", path: "/training" },
   { icon: ListChecks, label: "Training Templates", path: "/training-templates" },
+  { icon: Trophy, label: "Competitions", path: "/competitions" },
   { icon: ListChecks, label: "Tasks", path: "/tasks" },
   { icon: Users, label: "Contacts", path: "/contacts" },
   { icon: Baby, label: "Breeding", path: "/breeding" },

@@ -49,6 +49,7 @@ import Settings from "./pages/Settings";
 import BillingPage from "./pages/BillingPage";
 import Income from "./pages/Income";
 import Expenses from "./pages/Expenses";
+import Competitions from "./pages/Competitions";
 
 function Router() {
   useKeyboardNavigation();
@@ -131,6 +132,9 @@ function Router() {
           {/* Financial Tracking */}
           <Route path="/income" component={Income} />
           <Route path="/expenses" component={Expenses} />
+          
+          {/* Competitions */}
+          <Route path="/competitions" component={Competitions} />
           
           {/* Settings */}
           <Route path="/settings" component={Settings} />
