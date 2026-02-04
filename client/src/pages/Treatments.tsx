@@ -35,7 +35,7 @@ function TreatmentsContent() {
     switch (action) {
       case 'created':
         setLocalTreatments(prev => [data, ...prev]);
-        toast({ title: 'New treatment added', description: data.name });
+        toast.success(`New treatment added: ${data.name}`);
         break;
       case 'updated':
         setLocalTreatments(prev => prev.map(t => t.id === data.id ? { ...t, ...data } : t));
@@ -84,24 +84,33 @@ function TreatmentsContent() {
 
     try {
       const payload = {
-        ...formData,
         horseId: parseInt(formData.horseId),
-        costInPence: formData.cost ? Math.round(parseFloat(formData.cost) * 100) : null,
+        treatmentType: formData.type,
+        treatmentName: formData.name,
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+        frequency: formData.frequency,
+        dosage: formData.dosage,
+        vetName: formData.vet,
+        vetClinic: formData.vetClinic,
+        cost: formData.cost ? Math.round(parseFloat(formData.cost) * 100) : undefined,
+        status: formData.status as "active" | "completed" | "discontinued",
+        notes: formData.notes,
       };
 
       if (editingTreatment) {
         await updateMutation.mutateAsync({ id: editingTreatment.id, ...payload });
-        toast({ title: 'Treatment updated successfully' });
+        toast.success('Treatment updated successfully');
       } else {
         await createMutation.mutateAsync(payload);
-        toast({ title: 'Treatment created successfully' });
+        toast.success('Treatment created successfully');
       }
 
       setOpen(false);
       resetForm();
       refetch();
     } catch (error: any) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      toast.error(error.message);
     }
   };
 
@@ -128,10 +137,10 @@ function TreatmentsContent() {
     if (confirm('Are you sure you want to delete this treatment?')) {
       try {
         await deleteMutation.mutateAsync({ id });
-        toast({ title: 'Treatment deleted successfully' });
+        toast.success('Treatment deleted successfully');
         refetch();
       } catch (error: any) {
-        toast({ title: 'Error', description: error.message, variant: 'destructive' });
+        toast.error(error.message);
       }
     }
   };

@@ -110,7 +110,6 @@ export default function Pricing() {
     if (!subscriptionStatus) return false;
     if (plan === 'trial') return subscriptionStatus.status === 'trial';
     if (plan === 'pro') return subscriptionStatus.plan === 'monthly' || subscriptionStatus.plan === 'yearly';
-    if (plan === 'stable') return subscriptionStatus.plan === 'stable_monthly' || subscriptionStatus.plan === 'stable_yearly';
     return false;
   };
 
@@ -189,12 +188,12 @@ export default function Pricing() {
               <CardDescription>For individual horse owners</CardDescription>
               <div className="mt-4">
                 <span className="text-4xl font-bold">
-                  £{pricing?.monthly.amount ? (pricing.monthly.amount / 100).toFixed(2) : '7.99'}
+                  £{pricing?.monthly && pricing.monthly.amount ? (pricing.monthly.amount / 100).toFixed(2) : '7.99'}
                 </span>
                 <span className="text-muted-foreground">/month</span>
               </div>
               <p className="text-sm text-muted-foreground">
-                or £{pricing?.yearly.amount ? (pricing.yearly.amount / 100).toFixed(2) : '79.90'}/year 
+                or £{pricing?.yearly && pricing.yearly.amount ? (pricing.yearly.amount / 100).toFixed(2) : '79.90'}/year 
                 <span className="text-green-600 font-semibold"> (Save 17%)</span>
               </p>
             </CardHeader>

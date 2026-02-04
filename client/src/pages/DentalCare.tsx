@@ -27,11 +27,10 @@ function DentalCareContent() {
     if (action === 'created') {
       setLocalRecords(prev => [data, ...prev]);
       toast.success("New dental care record created");
-      } else if (action === 'updated') {
-        setLocalRecords(prev => prev.map(r => r.id === data.id ? { ...r, ...data } : r));
-      } else if (action === 'deleted') {
-        setLocalRecords(prev => prev.filter(r => r.id !== data.id));
-      }
+    } else if (action === 'updated') {
+      setLocalRecords(prev => prev.map(r => r.id === data.id ? { ...r, ...data } : r));
+    } else if (action === 'deleted') {
+      setLocalRecords(prev => prev.filter(r => r.id !== data.id));
     }
   });
 

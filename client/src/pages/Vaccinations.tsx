@@ -42,7 +42,7 @@ function VaccinationsContent() {
     switch (action) {
       case 'created':
         setLocalVaccinations(prev => [data, ...prev]);
-        toast({ title: "Vaccination added", description: "New vaccination record created" });
+        toast.success("New vaccination record created");
         break;
       case 'updated':
         setLocalVaccinations(prev => prev.map(v => v.id === data.id ? { ...v, ...data } : v));
@@ -86,7 +86,7 @@ function VaccinationsContent() {
     e.preventDefault();
 
     if (!formData.horseId || !formData.vaccineName || !formData.dateAdministered) {
-      toast({ title: "Error", description: "Please fill in all required fields", variant: "destructive" });
+      toast.error("Please fill in all required fields");
       return;
     }
 
@@ -106,16 +106,16 @@ function VaccinationsContent() {
 
       if (editingVaccination) {
         await updateMutation.mutateAsync({ id: editingVaccination.id, ...data });
-        toast({ title: "Success", description: "Vaccination record updated" });
+        toast.success("Vaccination record updated");
       } else {
         await createMutation.mutateAsync(data);
-        toast({ title: "Success", description: "Vaccination record created" });
+        toast.success("Vaccination record created");
       }
 
       setIsCreateDialogOpen(false);
       resetForm();
     } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast.error(error.message);
     }
   };
 
@@ -141,9 +141,9 @@ function VaccinationsContent() {
 
     try {
       await deleteMutation.mutateAsync({ id });
-      toast({ title: "Success", description: "Vaccination record deleted" });
+      toast.success("Vaccination record deleted");
     } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast.error(error.message);
     }
   };
 

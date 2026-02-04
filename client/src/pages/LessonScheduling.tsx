@@ -52,78 +52,78 @@ function LessonSchedulingContent() {
   // Mutations
   const createBooking = trpc.lessonBookings.create.useMutation({
     onSuccess: () => {
-      toast({ title: "Lesson booked successfully" });
+      toast.success("Lesson booked successfully");
       setIsCreateBookingOpen(false);
       resetBookingForm();
       refetchBookings();
     },
     onError: (error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast.error(error.message);
     },
   });
 
   const updateBooking = trpc.lessonBookings.update.useMutation({
     onSuccess: () => {
-      toast({ title: "Lesson updated successfully" });
+      toast.success("Lesson updated successfully");
       refetchBookings();
       refetchMyTraining();
     },
     onError: (error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast.error(error.message);
     },
   });
 
   const deleteBooking = trpc.lessonBookings.delete.useMutation({
     onSuccess: () => {
-      toast({ title: "Lesson deleted successfully" });
+      toast.success("Lesson deleted successfully");
       refetchBookings();
       refetchMyTraining();
     },
     onError: (error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast.error(error.message);
     },
   });
 
   const markCompleted = trpc.lessonBookings.markCompleted.useMutation({
     onSuccess: () => {
-      toast({ title: "Lesson marked as completed" });
+      toast.success("Lesson marked as completed");
       refetchMyTraining();
     },
     onError: (error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast.error(error.message);
     },
   });
 
   const markCancelled = trpc.lessonBookings.markCancelled.useMutation({
     onSuccess: () => {
-      toast({ title: "Lesson cancelled" });
+      toast.success("Lesson cancelled");
       refetchBookings();
       refetchMyTraining();
     },
     onError: (error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast.error(error.message);
     },
   });
 
   const createAvailability = trpc.trainerAvailability.create.useMutation({
     onSuccess: () => {
-      toast({ title: "Availability added successfully" });
+      toast.success("Availability added successfully");
       setIsCreateAvailabilityOpen(false);
       resetAvailabilityForm();
       refetchAvailability();
     },
     onError: (error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast.error(error.message);
     },
   });
 
   const deleteAvailability = trpc.trainerAvailability.delete.useMutation({
     onSuccess: () => {
-      toast({ title: "Availability removed" });
+      toast.success("Availability removed");
       refetchAvailability();
     },
     onError: (error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast.error(error.message);
     },
   });
 
@@ -150,7 +150,7 @@ function LessonSchedulingContent() {
 
   const handleCreateBooking = () => {
     if (!bookingForm.trainerId || !bookingForm.lessonDate) {
-      toast({ title: "Error", description: "Please fill in required fields", variant: "destructive" });
+      toast.error("Please fill in required fields");
       return;
     }
 
@@ -168,7 +168,7 @@ function LessonSchedulingContent() {
 
   const handleCreateAvailability = () => {
     if (!availabilityForm.dayOfWeek || !availabilityForm.startTime || !availabilityForm.endTime) {
-      toast({ title: "Error", description: "Please fill in all fields", variant: "destructive" });
+      toast.error("Please fill in all fields");
       return;
     }
 

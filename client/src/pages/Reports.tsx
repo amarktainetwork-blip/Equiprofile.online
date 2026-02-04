@@ -54,23 +54,23 @@ export default function Reports() {
   // Mutations
   const generateReport = trpc.reports.generate.useMutation({
     onSuccess: () => {
-      toast({ title: "Report generated successfully" });
+      toast.success("Report generated successfully");
       refetchReports();
       resetGenerateForm();
     },
     onError: (error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast.error(error.message);
     },
   });
 
   const scheduleReport = trpc.reports.scheduleReport.useMutation({
     onSuccess: () => {
-      toast({ title: "Report scheduled successfully" });
+      toast.success("Report scheduled successfully");
       setIsScheduleDialogOpen(false);
       resetScheduleForm();
     },
     onError: (error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast.error(error.message);
     },
   });
 
@@ -93,7 +93,7 @@ export default function Reports() {
 
   const handleGenerateReport = () => {
     if (!generateForm.reportType) {
-      toast({ title: "Error", description: "Please select a report type", variant: "destructive" });
+      toast.error("Please select a report type");
       return;
     }
 
@@ -107,13 +107,13 @@ export default function Reports() {
 
   const handleScheduleReport = () => {
     if (!scheduleForm.reportType || !scheduleForm.frequency || !scheduleForm.recipients) {
-      toast({ title: "Error", description: "Please fill in all required fields", variant: "destructive" });
+      toast.error("Please fill in all required fields");
       return;
     }
 
     const recipients = scheduleForm.recipients.split(',').map(email => email.trim()).filter(Boolean);
     if (recipients.length === 0) {
-      toast({ title: "Error", description: "Please enter at least one recipient email", variant: "destructive" });
+      toast.error("Please enter at least one recipient email");
       return;
     }
 

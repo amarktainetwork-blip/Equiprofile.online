@@ -17,18 +17,10 @@ export default function Pedigree() {
   const [formData, setFormData] = useState({
     sireName: '',
     damName: '',
-    paternalGrandsireName: '',
-    paternalGrandamName: '',
-    maternalGrandsireName: '',
-    maternalGrandamName: '',
-    paternalGreatGrandsire1: '',
-    paternalGreatGranddam1: '',
-    paternalGreatGrandsire2: '',
-    paternalGreatGranddam2: '',
-    maternalGreatGrandsire1: '',
-    maternalGreatGranddam1: '',
-    maternalGreatGrandsire2: '',
-    maternalGreatGranddam2: '',
+    sireOfSireName: '',
+    damOfSireName: '',
+    sireOfDamName: '',
+    damOfDamName: '',
   });
 
   const { data: horses = [] } = trpc.horses.list.useQuery();
@@ -71,18 +63,10 @@ export default function Pedigree() {
       setFormData({
         sireName: pedigreeData.sireName || '',
         damName: pedigreeData.damName || '',
-        paternalGrandsireName: pedigreeData.paternalGrandsireName || '',
-        paternalGrandamName: pedigreeData.paternalGrandamName || '',
-        maternalGrandsireName: pedigreeData.maternalGrandsireName || '',
-        maternalGrandamName: pedigreeData.maternalGrandamName || '',
-        paternalGreatGrandsire1: pedigreeData.paternalGreatGrandsire1 || '',
-        paternalGreatGranddam1: pedigreeData.paternalGreatGranddam1 || '',
-        paternalGreatGrandsire2: pedigreeData.paternalGreatGrandsire2 || '',
-        paternalGreatGranddam2: pedigreeData.paternalGreatGranddam2 || '',
-        maternalGreatGrandsire1: pedigreeData.maternalGreatGrandsire1 || '',
-        maternalGreatGranddam1: pedigreeData.maternalGreatGranddam1 || '',
-        maternalGreatGrandsire2: pedigreeData.maternalGreatGrandsire2 || '',
-        maternalGreatGranddam2: pedigreeData.maternalGreatGranddam2 || '',
+        sireOfSireName: pedigreeData.sireOfSireName || '',
+        damOfSireName: pedigreeData.damOfSireName || '',
+        sireOfDamName: pedigreeData.sireOfDamName || '',
+        damOfDamName: pedigreeData.damOfDamName || '',
       });
       setIsDialogOpen(true);
     }
@@ -92,18 +76,10 @@ export default function Pedigree() {
     setFormData({
       sireName: '',
       damName: '',
-      paternalGrandsireName: '',
-      paternalGrandamName: '',
-      maternalGrandsireName: '',
-      maternalGrandamName: '',
-      paternalGreatGrandsire1: '',
-      paternalGreatGranddam1: '',
-      paternalGreatGrandsire2: '',
-      paternalGreatGranddam2: '',
-      maternalGreatGrandsire1: '',
-      maternalGreatGranddam1: '',
-      maternalGreatGrandsire2: '',
-      maternalGreatGranddam2: '',
+      sireOfSireName: '',
+      damOfSireName: '',
+      sireOfDamName: '',
+      damOfDamName: '',
     });
   };
 
@@ -185,19 +161,19 @@ export default function Pedigree() {
                         <p className="text-sm text-gray-600">Paternal (Father's side)</p>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <Label htmlFor="paternalGrandsireName">Paternal Grandsire</Label>
+                            <Label htmlFor="sireOfSireName">Paternal Grandsire</Label>
                             <Input
-                              id="paternalGrandsireName"
-                              value={formData.paternalGrandsireName}
-                              onChange={(e) => setFormData({ ...formData, paternalGrandsireName: e.target.value })}
+                              id="sireOfSireName"
+                              value={formData.sireOfSireName}
+                              onChange={(e) => setFormData({ ...formData, sireOfSireName: e.target.value })}
                             />
                           </div>
                           <div>
-                            <Label htmlFor="paternalGrandamName">Paternal Granddam</Label>
+                            <Label htmlFor="damOfSireName">Paternal Granddam</Label>
                             <Input
-                              id="paternalGrandamName"
-                              value={formData.paternalGrandamName}
-                              onChange={(e) => setFormData({ ...formData, paternalGrandamName: e.target.value })}
+                              id="damOfSireName"
+                              value={formData.damOfSireName}
+                              onChange={(e) => setFormData({ ...formData, damOfSireName: e.target.value })}
                             />
                           </div>
                         </div>
@@ -206,110 +182,20 @@ export default function Pedigree() {
                         <p className="text-sm text-gray-600">Maternal (Mother's side)</p>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <Label htmlFor="maternalGrandsireName">Maternal Grandsire</Label>
+                            <Label htmlFor="sireOfDamName">Maternal Grandsire</Label>
                             <Input
-                              id="maternalGrandsireName"
-                              value={formData.maternalGrandsireName}
-                              onChange={(e) => setFormData({ ...formData, maternalGrandsireName: e.target.value })}
+                              id="sireOfDamName"
+                              value={formData.sireOfDamName}
+                              onChange={(e) => setFormData({ ...formData, sireOfDamName: e.target.value })}
                             />
                           </div>
                           <div>
-                            <Label htmlFor="maternalGrandamName">Maternal Granddam</Label>
+                            <Label htmlFor="damOfDamName">Maternal Granddam</Label>
                             <Input
-                              id="maternalGrandamName"
-                              value={formData.maternalGrandamName}
-                              onChange={(e) => setFormData({ ...formData, maternalGrandamName: e.target.value })}
+                              id="damOfDamName"
+                              value={formData.damOfDamName}
+                              onChange={(e) => setFormData({ ...formData, damOfDamName: e.target.value })}
                             />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-4">
-                      <h3 className="font-semibold text-lg">Great-Grandparents</h3>
-                      <div className="space-y-4">
-                        <div>
-                          <p className="text-sm text-gray-600 mb-2">Paternal Grandsire's parents</p>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <Label htmlFor="paternalGreatGrandsire1">Great-Grandsire</Label>
-                              <Input
-                                id="paternalGreatGrandsire1"
-                                value={formData.paternalGreatGrandsire1}
-                                onChange={(e) => setFormData({ ...formData, paternalGreatGrandsire1: e.target.value })}
-                              />
-                            </div>
-                            <div>
-                              <Label htmlFor="paternalGreatGranddam1">Great-Granddam</Label>
-                              <Input
-                                id="paternalGreatGranddam1"
-                                value={formData.paternalGreatGranddam1}
-                                onChange={(e) => setFormData({ ...formData, paternalGreatGranddam1: e.target.value })}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-600 mb-2">Paternal Granddam's parents</p>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <Label htmlFor="paternalGreatGrandsire2">Great-Grandsire</Label>
-                              <Input
-                                id="paternalGreatGrandsire2"
-                                value={formData.paternalGreatGrandsire2}
-                                onChange={(e) => setFormData({ ...formData, paternalGreatGrandsire2: e.target.value })}
-                              />
-                            </div>
-                            <div>
-                              <Label htmlFor="paternalGreatGranddam2">Great-Granddam</Label>
-                              <Input
-                                id="paternalGreatGranddam2"
-                                value={formData.paternalGreatGranddam2}
-                                onChange={(e) => setFormData({ ...formData, paternalGreatGranddam2: e.target.value })}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-600 mb-2">Maternal Grandsire's parents</p>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <Label htmlFor="maternalGreatGrandsire1">Great-Grandsire</Label>
-                              <Input
-                                id="maternalGreatGrandsire1"
-                                value={formData.maternalGreatGrandsire1}
-                                onChange={(e) => setFormData({ ...formData, maternalGreatGrandsire1: e.target.value })}
-                              />
-                            </div>
-                            <div>
-                              <Label htmlFor="maternalGreatGranddam1">Great-Granddam</Label>
-                              <Input
-                                id="maternalGreatGranddam1"
-                                value={formData.maternalGreatGranddam1}
-                                onChange={(e) => setFormData({ ...formData, maternalGreatGranddam1: e.target.value })}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-600 mb-2">Maternal Granddam's parents</p>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <Label htmlFor="maternalGreatGrandsire2">Great-Grandsire</Label>
-                              <Input
-                                id="maternalGreatGrandsire2"
-                                value={formData.maternalGreatGrandsire2}
-                                onChange={(e) => setFormData({ ...formData, maternalGreatGrandsire2: e.target.value })}
-                              />
-                            </div>
-                            <div>
-                              <Label htmlFor="maternalGreatGranddam2">Great-Granddam</Label>
-                              <Input
-                                id="maternalGreatGranddam2"
-                                value={formData.maternalGreatGranddam2}
-                                onChange={(e) => setFormData({ ...formData, maternalGreatGranddam2: e.target.value })}
-                              />
-                            </div>
                           </div>
                         </div>
                       </div>
@@ -361,72 +247,25 @@ export default function Pedigree() {
                         <Card className="bg-blue-50">
                           <CardContent className="pt-3">
                             <p className="text-xs text-gray-600">Paternal Grandsire</p>
-                            <p className="text-sm font-medium">{pedigreeData.paternalGrandsireName || '-'}</p>
+                            <p className="text-sm font-medium">{pedigreeData.sireOfSireName || '-'}</p>
                           </CardContent>
                         </Card>
                         <Card className="bg-pink-50">
                           <CardContent className="pt-3">
                             <p className="text-xs text-gray-600">Paternal Granddam</p>
-                            <p className="text-sm font-medium">{pedigreeData.paternalGrandamName || '-'}</p>
+                            <p className="text-sm font-medium">{pedigreeData.damOfSireName || '-'}</p>
                           </CardContent>
                         </Card>
                         <Card className="bg-blue-50">
                           <CardContent className="pt-3">
                             <p className="text-xs text-gray-600">Maternal Grandsire</p>
-                            <p className="text-sm font-medium">{pedigreeData.maternalGrandsireName || '-'}</p>
+                            <p className="text-sm font-medium">{pedigreeData.sireOfDamName || '-'}</p>
                           </CardContent>
                         </Card>
                         <Card className="bg-pink-50">
                           <CardContent className="pt-3">
                             <p className="text-xs text-gray-600">Maternal Granddam</p>
-                            <p className="text-sm font-medium">{pedigreeData.maternalGrandamName || '-'}</p>
-                          </CardContent>
-                        </Card>
-                      </div>
-                    </div>
-
-                    {/* Generation 3: Great-Grandparents */}
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-700 mb-2">Great-Grandparents</h4>
-                      <div className="grid grid-cols-8 gap-1">
-                        <Card className="bg-blue-100">
-                          <CardContent className="pt-2 px-2">
-                            <p className="text-xs">{pedigreeData.paternalGreatGrandsire1 || '-'}</p>
-                          </CardContent>
-                        </Card>
-                        <Card className="bg-pink-100">
-                          <CardContent className="pt-2 px-2">
-                            <p className="text-xs">{pedigreeData.paternalGreatGranddam1 || '-'}</p>
-                          </CardContent>
-                        </Card>
-                        <Card className="bg-blue-100">
-                          <CardContent className="pt-2 px-2">
-                            <p className="text-xs">{pedigreeData.paternalGreatGrandsire2 || '-'}</p>
-                          </CardContent>
-                        </Card>
-                        <Card className="bg-pink-100">
-                          <CardContent className="pt-2 px-2">
-                            <p className="text-xs">{pedigreeData.paternalGreatGranddam2 || '-'}</p>
-                          </CardContent>
-                        </Card>
-                        <Card className="bg-blue-100">
-                          <CardContent className="pt-2 px-2">
-                            <p className="text-xs">{pedigreeData.maternalGreatGrandsire1 || '-'}</p>
-                          </CardContent>
-                        </Card>
-                        <Card className="bg-pink-100">
-                          <CardContent className="pt-2 px-2">
-                            <p className="text-xs">{pedigreeData.maternalGreatGranddam1 || '-'}</p>
-                          </CardContent>
-                        </Card>
-                        <Card className="bg-blue-100">
-                          <CardContent className="pt-2 px-2">
-                            <p className="text-xs">{pedigreeData.maternalGreatGrandsire2 || '-'}</p>
-                          </CardContent>
-                        </Card>
-                        <Card className="bg-pink-100">
-                          <CardContent className="pt-2 px-2">
-                            <p className="text-xs">{pedigreeData.maternalGreatGranddam2 || '-'}</p>
+                            <p className="text-sm font-medium">{pedigreeData.damOfDamName || '-'}</p>
                           </CardContent>
                         </Card>
                       </div>

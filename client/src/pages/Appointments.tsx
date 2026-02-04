@@ -35,7 +35,7 @@ function AppointmentsContent() {
     switch (action) {
       case 'created':
         setLocalAppointments(prev => [data, ...prev]);
-        toast({ title: 'New appointment scheduled', description: data.type });
+        toast.success('New appointment scheduled');
         break;
       case 'updated':
         setLocalAppointments(prev => prev.map(a => a.id === data.id ? { ...a, ...data } : a));
@@ -80,24 +80,30 @@ function AppointmentsContent() {
 
     try {
       const payload = {
-        ...formData,
         horseId: parseInt(formData.horseId),
-        costInPence: formData.cost ? Math.round(parseFloat(formData.cost) * 100) : null,
+        appointmentType: formData.type,
+        title: formData.provider || 'Appointment',
+        appointmentDate: formData.appointmentDate,
+        appointmentTime: formData.appointmentTime,
+        location: formData.location,
+        cost: formData.cost ? Math.round(parseFloat(formData.cost) * 100) : undefined,
+        status: formData.status as "scheduled" | "confirmed" | "completed" | "cancelled",
+        notes: formData.notes,
       };
 
       if (editingAppointment) {
         await updateMutation.mutateAsync({ id: editingAppointment.id, ...payload });
-        toast({ title: 'Appointment updated successfully' });
+        toast.success('Appointment updated successfully');
       } else {
         await createMutation.mutateAsync(payload);
-        toast({ title: 'Appointment scheduled successfully' });
+        toast.success('Appointment scheduled successfully');
       }
 
       setOpen(false);
       resetForm();
       refetch();
     } catch (error: any) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      toast.error(error.message || 'An error occurred');
     }
   };
 
@@ -122,10 +128,10 @@ function AppointmentsContent() {
     if (confirm('Are you sure you want to delete this appointment?')) {
       try {
         await deleteMutation.mutateAsync({ id });
-        toast({ title: 'Appointment deleted successfully' });
+        toast.success('Appointment deleted successfully');
         refetch();
       } catch (error: any) {
-        toast({ title: 'Error', description: error.message, variant: 'destructive' });
+        toast.error(error.message || 'An error occurred');
       }
     }
   };

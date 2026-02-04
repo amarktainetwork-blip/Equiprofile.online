@@ -17,7 +17,7 @@ export default function ClientPortal() {
   const { data: healthRecords = [] } = trpc.healthRecords.listAll.useQuery();
   const { data: trainingSessions = [] } = trpc.training.listAll.useQuery();
   const { data: competitions = [] } = trpc.competitions.list.useQuery({ horseId: undefined });
-  const { data: documents = [] } = trpc.documents.list.useQuery({ folderId: undefined });
+  const { data: documents = [] } = trpc.documents.list.useQuery();
 
   if (!clientId) {
     return (
@@ -190,7 +190,7 @@ export default function ClientPortal() {
                             <div className="text-sm font-medium">{horseCompetitions.length} Events</div>
                             {horseCompetitions.slice(0, 3).map((comp) => (
                               <div key={comp.id} className="text-xs p-2 bg-muted rounded">
-                                <div className="font-medium">{comp.eventName}</div>
+                                <div className="font-medium">{comp.competitionName}</div>
                                 <div className="text-muted-foreground">
                                   {comp.placement && `${comp.placement} place`}
                                 </div>

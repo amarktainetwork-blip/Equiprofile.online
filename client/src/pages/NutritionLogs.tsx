@@ -59,8 +59,8 @@ function NutritionLogsContent() {
     try {
       const payload = {
         horseId: parseInt(formData.horseId),
-        date: formData.date,
-        feedType: formData.feedType || undefined,
+        logDate: formData.date,
+        feedType: formData.feedType,
         feedAmount: formData.feedAmount ? parseFloat(formData.feedAmount) : undefined,
         breakfast: formData.breakfast || undefined,
         lunch: formData.lunch || undefined,

@@ -28,15 +28,15 @@ function HoofcareContent() {
 
   const [formData, setFormData] = useState({
     horseId: '',
-    date: new Date().toISOString().split('T')[0],
-    careType: 'shoeing',
+    careDate: new Date().toISOString().split('T')[0],
+    careType: 'shoeing' as "shoeing" | "trimming" | "remedial" | "inspection" | "other",
     farrierName: '',
     farrierContact: '',
-    hoofCondition: 'good',
+    hoofCondition: 'good' as "excellent" | "good" | "fair" | "poor",
     workPerformed: '',
     findings: '',
     nextDueDate: '',
-    costPence: 0,
+    cost: 0,
     notes: ''
   });
 
@@ -99,50 +99,59 @@ function HoofcareContent() {
   const resetForm = () => {
     setFormData({
       horseId: '',
-      date: new Date().toISOString().split('T')[0],
-      careType: 'shoeing',
+      careDate: new Date().toISOString().split('T')[0],
+      careType: 'shoeing' as "shoeing" | "trimming" | "remedial" | "inspection" | "other",
       farrierName: '',
       farrierContact: '',
-      hoofCondition: 'good',
+      hoofCondition: 'good' as "excellent" | "good" | "fair" | "poor",
       workPerformed: '',
       findings: '',
       nextDueDate: '',
-      costPence: 0,
+      cost: 0,
       notes: ''
     });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const costInPence = Math.round(parseFloat(formData.costPence.toString()) * 100);
+    const costInPence = Math.round(parseFloat(formData.cost.toString()) * 100);
+    const payload = {
+      horseId: parseInt(formData.horseId),
+      careDate: formData.careDate,
+      careType: formData.careType,
+      farrierName: formData.farrierName,
+      farrierPhone: formData.farrierContact,
+      hoofCondition: formData.hoofCondition,
+      workPerformed: formData.workPerformed,
+      findings: formData.findings,
+      nextDueDate: formData.nextDueDate || undefined,
+      cost: costInPence,
+      notes: formData.notes,
+    };
 
     if (editingRecord) {
       updateMutation.mutate({
         id: editingRecord.id,
-        ...formData,
-        costPence: costInPence
+        ...payload
       });
     } else {
-      createMutation.mutate({
-        ...formData,
-        costPence: costInPence
-      });
+      createMutation.mutate(payload);
     }
   };
 
   const handleEdit = (record: any) => {
     setEditingRecord(record);
     setFormData({
-      horseId: record.horseId || '',
-      date: record.date?.split('T')[0] || new Date().toISOString().split('T')[0],
+      horseId: record.horseId ? record.horseId.toString() : '',
+      careDate: record.careDate?.split('T')[0] || new Date().toISOString().split('T')[0],
       careType: record.careType || 'shoeing',
       farrierName: record.farrierName || '',
-      farrierContact: record.farrierContact || '',
+      farrierContact: record.farrierPhone || '',
       hoofCondition: record.hoofCondition || 'good',
       workPerformed: record.workPerformed || '',
       findings: record.findings || '',
       nextDueDate: record.nextDueDate?.split('T')[0] || '',
-      costPence: (record.costPence || 0) / 100,
+      cost: (record.cost || 0) / 100,
       notes: record.notes || ''
     });
     setIsDialogOpen(true);
@@ -155,7 +164,7 @@ function HoofcareContent() {
   };
 
   const getHorseName = (horseId: string) => {
-    const horse = horses?.find(h => h.id === horseId);
+    const horse = horses?.find(h => h.id === parseInt(horseId));
     return horse ? horse.name : 'Unknown Horse';
   };
 
@@ -208,7 +217,7 @@ function HoofcareContent() {
                     </SelectTrigger>
                     <SelectContent>
                       {horses?.map((horse) => (
-                        <SelectItem key={horse.id} value={horse.id}>
+                        <SelectItem key={horse.id} value={horse.id.toString()}>
                           {horse.name}
                         </SelectItem>
                       ))}
@@ -218,18 +227,18 @@ function HoofcareContent() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="date">Date *</Label>
+                    <Label htmlFor="careDate">Date *</Label>
                     <Input
-                      id="date"
+                      id="careDate"
                       type="date"
-                      value={formData.date}
-                      onChange={(e) => setFormData({...formData, date: e.target.value})}
+                      value={formData.careDate}
+                      onChange={(e) => setFormData({...formData, careDate: e.target.value})}
                       required
                     />
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="careType">Care Type *</Label>
-                    <Select value={formData.careType} onValueChange={(value) => setFormData({...formData, careType: value})} required>
+                    <Select value={formData.careType} onValueChange={(value) => setFormData({...formData, careType: value as "shoeing" | "trimming" | "remedial" | "inspection" | "other"})} required>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -266,7 +275,7 @@ function HoofcareContent() {
 
                 <div className="grid gap-2">
                   <Label htmlFor="hoofCondition">Hoof Condition</Label>
-                  <Select value={formData.hoofCondition} onValueChange={(value) => setFormData({...formData, hoofCondition: value})}>
+                  <Select value={formData.hoofCondition} onValueChange={(value) => setFormData({...formData, hoofCondition: value as "excellent" | "good" | "fair" | "poor"})}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -318,8 +327,8 @@ function HoofcareContent() {
                       type="number"
                       step="0.01"
                       placeholder="0.00"
-                      value={formData.costPence}
-                      onChange={(e) => setFormData({...formData, costPence: parseFloat(e.target.value) || 0})}
+                      value={formData.cost}
+                      onChange={(e) => setFormData({...formData, cost: parseFloat(e.target.value) || 0})}
                     />
                   </div>
                 </div>
@@ -405,9 +414,9 @@ function HoofcareContent() {
                       <span className="font-medium">Next Due:</span> {new Date(record.nextDueDate).toLocaleDateString()}
                     </div>
                   )}
-                  {record.costPence > 0 && (
+                  {record.cost > 0 && (
                     <div>
-                      <span className="font-medium">Cost:</span> £{(record.costPence / 100).toFixed(2)}
+                      <span className="font-medium">Cost:</span> £{(record.cost / 100).toFixed(2)}
                     </div>
                   )}
                   {record.notes && (
