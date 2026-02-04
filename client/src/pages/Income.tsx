@@ -36,18 +36,33 @@ import { Plus, TrendingUp, Edit, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRealtimeModule } from "@/hooks/useRealtime";
 
+type IncomeSource = "lesson" | "training" | "sale" | "stud" | "prize" | "boarding" | "sponsorship" | "other";
+type PaymentMethod = "cash" | "bank_transfer" | "card" | "check" | "other";
+
 type IncomeRecord = {
   id: number;
   incomeDate: string;
-  source: string;
+  source: IncomeSource;
   description: string | null;
   amount: number;
   horseId: number | null;
-  paymentMethod: string | null;
+  paymentMethod: PaymentMethod | null;
   reference: string | null;
   taxable: boolean;
   category: string | null;
   notes: string | null;
+};
+
+type IncomeBreakdown = {
+  source: IncomeSource;
+  amount: number;
+  count: number;
+};
+
+type IncomeStats = {
+  total: number;
+  count: number;
+  bySource: IncomeBreakdown[];
 };
 
 function IncomeContent() {
@@ -156,10 +171,10 @@ function IncomeContent() {
     const data = {
       horseId: formData.horseId ? parseInt(formData.horseId) : undefined,
       incomeDate: formData.incomeDate,
-      source: formData.source as any,
+      source: formData.source as IncomeSource,
       description: formData.description || undefined,
       amount: amountInPence,
-      paymentMethod: formData.paymentMethod ? formData.paymentMethod as any : undefined,
+      paymentMethod: formData.paymentMethod ? formData.paymentMethod as PaymentMethod : undefined,
       reference: formData.reference || undefined,
       taxable: formData.taxable,
       category: formData.category || undefined,
@@ -436,7 +451,7 @@ function IncomeContent() {
           <CardContent>
             <div className="flex flex-wrap gap-2">
               {stats?.bySource && stats.bySource.length > 0 ? (
-                stats.bySource.map((item: any) => (
+                stats.bySource.map((item: IncomeBreakdown) => (
                   <div key={item.source} className="flex items-center gap-2 text-sm">
                     {getSourceBadge(item.source)}
                     <span className="font-semibold">{formatCurrency(item.amount)}</span>

@@ -36,20 +36,35 @@ import { Plus, TrendingDown, Edit, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRealtimeModule } from "@/hooks/useRealtime";
 
+type ExpenseCategory = "feed" | "vet" | "farrier" | "equipment" | "transport" | "insurance" | "training" | "competition" | "boarding" | "supplies" | "maintenance" | "other";
+type PaymentMethod = "cash" | "bank_transfer" | "card" | "check" | "other";
+
 type ExpenseRecord = {
   id: number;
   expenseDate: string;
-  category: string;
+  category: ExpenseCategory;
   description: string | null;
   amount: number;
   horseId: number | null;
   vendor: string | null;
-  paymentMethod: string | null;
+  paymentMethod: PaymentMethod | null;
   reference: string | null;
   taxDeductible: boolean;
   receiptUrl: string | null;
   subcategory: string | null;
   notes: string | null;
+};
+
+type ExpenseBreakdown = {
+  category: ExpenseCategory;
+  amount: number;
+  count: number;
+};
+
+type ExpenseStats = {
+  total: number;
+  count: number;
+  byCategory: ExpenseBreakdown[];
 };
 
 function ExpensesContent() {
@@ -162,11 +177,11 @@ function ExpensesContent() {
     const data = {
       horseId: formData.horseId ? parseInt(formData.horseId) : undefined,
       expenseDate: formData.expenseDate,
-      category: formData.category as any,
+      category: formData.category as ExpenseCategory,
       description: formData.description || undefined,
       amount: amountInPence,
       vendor: formData.vendor || undefined,
-      paymentMethod: formData.paymentMethod ? formData.paymentMethod as any : undefined,
+      paymentMethod: formData.paymentMethod ? formData.paymentMethod as PaymentMethod : undefined,
       reference: formData.reference || undefined,
       taxDeductible: formData.taxDeductible,
       receiptUrl: formData.receiptUrl || undefined,
@@ -476,7 +491,7 @@ function ExpensesContent() {
           <CardContent>
             <div className="flex flex-wrap gap-2">
               {stats?.byCategory && stats.byCategory.length > 0 ? (
-                stats.byCategory.map((item: any) => (
+                stats.byCategory.map((item: ExpenseBreakdown) => (
                   <div key={item.category} className="flex items-center gap-2 text-sm">
                     {getCategoryBadge(item.category)}
                     <span className="font-semibold">{formatCurrency(item.amount)}</span>
