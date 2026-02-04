@@ -47,6 +47,8 @@ import LessonScheduling from "./pages/LessonScheduling";
 import ClientPortal from "./pages/ClientPortal";
 import Settings from "./pages/Settings";
 import BillingPage from "./pages/BillingPage";
+import Income from "./pages/Income";
+import Expenses from "./pages/Expenses";
 
 function Router() {
   useKeyboardNavigation();
@@ -125,6 +127,10 @@ function Router() {
           
           {/* Calendar */}
           <Route path="/calendar" component={Calendar} />
+          
+          {/* Financial Tracking */}
+          <Route path="/income" component={Income} />
+          <Route path="/expenses" component={Expenses} />
           
           {/* Settings */}
           <Route path="/settings" component={Settings} />
