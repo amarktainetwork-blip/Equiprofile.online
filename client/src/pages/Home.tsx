@@ -26,33 +26,39 @@ export default function Home() {
   const features = [
     {
       icon: Heart,
-      title: "Health Records",
-      description: "Track vaccinations, vet visits, medications, and medical history with automated reminders."
+      title: "Comprehensive Health Records",
+      description: "Meticulous tracking of vaccinations, veterinary visits, medications, and complete medical histories with intelligent reminders.",
+      gradient: "from-red-500 to-pink-500"
     },
     {
       icon: Activity,
-      title: "Training Management",
-      description: "Plan sessions, log progress, and track performance with detailed analytics."
+      title: "Advanced Training Analytics",
+      description: "Sophisticated session planning, progress logging, and performance analysis with data-driven insights.",
+      gradient: "from-blue-500 to-cyan-500"
     },
     {
       icon: Utensils,
-      title: "Feeding Schedules",
-      description: "Create custom feeding plans with nutrition tracking and meal reminders."
+      title: "Premium Nutrition Management",
+      description: "Create custom feeding plans with nutrition tracking, meal reminders, and dietary optimization.",
+      gradient: "from-green-500 to-emerald-500"
     },
     {
       icon: Calendar,
-      title: "Calendar & Events",
-      description: "Never miss appointments with integrated scheduling and notifications."
+      title: "Intelligent Scheduling",
+      description: "Never miss appointments with integrated scheduling, automated notifications, and smart calendar management.",
+      gradient: "from-purple-500 to-violet-500"
     },
     {
       icon: CloudSun,
       title: "AI Weather Analysis",
-      description: "Get intelligent riding recommendations based on real-time weather conditions."
+      description: "Get intelligent riding recommendations based on real-time weather conditions with geolocation support.",
+      gradient: "from-orange-500 to-amber-500"
     },
     {
       icon: FileText,
-      title: "Document Storage",
-      description: "Securely store all important papers, records, and certificates in one place."
+      title: "Secure Document Vault",
+      description: "Securely store all important papers, records, and certificates in one encrypted, accessible place.",
+      gradient: "from-slate-500 to-gray-500"
     }
   ];
 
@@ -89,105 +95,136 @@ export default function Home() {
       <MarketingNav />
       <PageTransition>
         <div className="min-h-screen">
-          {/* Hero Section */}
-          <section className="relative pt-24 lg:pt-32 pb-16 lg:pb-24 overflow-hidden">
-            {/* Background with image overlay */}
+          {/* Hero Section with Premium Design */}
+          <section className="relative pt-24 lg:pt-32 pb-20 lg:pb-32 overflow-hidden min-h-[90vh] flex items-center">
+            {/* Animated gradient background */}
             <div className="absolute inset-0">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background/95 to-accent/20 z-10" />
+              {/* Primary gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900/95 to-slate-800" />
+              
+              {/* Animated shapes */}
+              <div className="absolute top-0 left-0 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" 
+                   style={{ animationDuration: '8s' }} />
+              <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse" 
+                   style={{ animationDuration: '10s', animationDelay: '2s' }} />
+              
+              {/* Subtle pattern overlay */}
+              <div className="absolute inset-0 opacity-10"
+                   style={{
+                     backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)',
+                     backgroundSize: '40px 40px'
+                   }} />
+              
+              {/* Image overlay for texture */}
               <img 
                 src="/images/hero-horse.jpg" 
-                alt="Professional horse management" 
-                className="w-full h-full object-cover opacity-10"
+                alt="Professional equestrian management" 
+                className="w-full h-full object-cover opacity-5 mix-blend-overlay"
                 loading="eager"
               />
             </div>
             
             <div className="container relative z-20">
-              <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div className="max-w-4xl mx-auto text-center">
+                {/* Premium badge */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6 }}
                 >
-                  <Badge className="mb-6 inline-flex items-center gap-1">
-                    <Sparkles className="w-3 h-3" />
-                    14-Day Free Trial
+                  <Badge className="mb-8 inline-flex items-center gap-2 px-4 py-2 bg-white/10 border-white/20 text-white backdrop-blur-sm">
+                    <Sparkles className="w-4 h-4 text-yellow-300" />
+                    <span className="text-sm font-medium">Premium Equestrian Management Platform</span>
                   </Badge>
-                  
-                  <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-6">
-                    Professional Horse Management Made{" "}
-                    <span className="text-gradient">Simple</span>
-                  </h1>
-                  
-                  <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed">
-                    The complete digital platform for horse owners, trainers, and equestrian professionals. 
-                    Track health records, manage training, and provide exceptional care—all in one place.
-                  </p>
-                  
-                  <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                    <Link href={isAuthenticated ? "/dashboard" : "/register"}>
-                      <Button size="lg" className="text-lg w-full sm:w-auto">
-                        {isAuthenticated ? "Go to Dashboard" : "Start Free Trial"}
-                        <ChevronRight className="w-5 h-5 ml-2" />
-                      </Button>
-                    </Link>
-                    <Link href="/features">
-                      <Button size="lg" variant="outline" className="text-lg w-full sm:w-auto">
-                        Explore Features
-                      </Button>
-                    </Link>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-primary" />
-                      <span>No credit card required</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-primary" />
-                      <span>Cancel anytime</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-primary" />
-                      <span>Free support</span>
-                    </div>
-                  </div>
+                </motion.div>
+                
+                {/* Main heading */}
+                <motion.h1
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                  className="font-serif text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6 text-white"
+                >
+                  Elevate Your
+                  <br />
+                  <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    Equestrian Excellence
+                  </span>
+                </motion.h1>
+                
+                {/* Subheading */}
+                <motion.p
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.4 }}
+                  className="text-xl md:text-2xl text-gray-200 mb-10 leading-relaxed max-w-3xl mx-auto"
+                >
+                  The sophisticated digital companion for discerning horse owners. 
+                  Comprehensive health tracking, training management, and premium care coordination.
+                </motion.p>
+                
+                {/* CTA Buttons */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.6 }}
+                  className="flex flex-col sm:flex-row gap-4 justify-center mb-12"
+                >
+                  <Link href={isAuthenticated ? "/dashboard" : "/register"}>
+                    <Button size="lg" className="text-lg px-8 py-6 bg-white text-gray-900 hover:bg-gray-100">
+                      {isAuthenticated ? "Enter Dashboard" : "Begin Your 14-Day Trial"}
+                      <ChevronRight className="w-5 h-5 ml-2" />
+                    </Button>
+                  </Link>
+                  <Link href="/features">
+                    <Button 
+                      size="lg" 
+                      variant="outline" 
+                      className="text-lg px-8 py-6 border-white/30 text-white hover:bg-white/10 backdrop-blur-sm"
+                    >
+                      Discover Features
+                    </Button>
+                  </Link>
                 </motion.div>
 
+                {/* Trust indicators */}
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                  className="relative"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.6, delay: 0.8 }}
+                  className="flex flex-wrap justify-center items-center gap-8 text-sm text-gray-300"
                 >
-                  <div className="relative aspect-square rounded-2xl overflow-hidden shadow-2xl">
-                    <img 
-                      src="/assets/horse-1.svg" 
-                      alt="Professional horse care" 
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+                  <div className="flex items-center gap-2">
+                    <Check className="w-5 h-5 text-green-400" />
+                    <span>No Credit Card Required</span>
                   </div>
-                  {/* Floating card */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
-                    className="absolute -bottom-6 -left-6 bg-card p-4 rounded-xl shadow-xl border"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                        <Heart className="w-6 h-6 text-primary" />
-                      </div>
-                      <div>
-                        <div className="font-semibold">Health Tracking</div>
-                        <div className="text-sm text-muted-foreground">Never miss a checkup</div>
-                      </div>
-                    </div>
-                  </motion.div>
+                  <div className="flex items-center gap-2">
+                    <Check className="w-5 h-5 text-green-400" />
+                    <span>Full Access Trial</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check className="w-5 h-5 text-green-400" />
+                    <span>Cancel Anytime</span>
+                  </div>
                 </motion.div>
               </div>
             </div>
+            
+            {/* Scroll indicator */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 1 }}
+              className="absolute bottom-8 left-1/2 -translate-x-1/2"
+            >
+              <div className="w-6 h-10 border-2 border-white/30 rounded-full flex items-start justify-center p-2">
+                <motion.div
+                  animate={{ y: [0, 12, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                  className="w-1 h-2 bg-white/50 rounded-full"
+                />
+              </div>
+            </motion.div>
           </section>
 
           {/* Stats Section */}
@@ -230,15 +267,15 @@ export default function Home() {
               <Stagger className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {features.map((feature, index) => (
                   <StaggerItem key={index}>
-                    <Card className="h-full card-hover">
+                    <Card className="group hover:shadow-2xl transition-all duration-300 border-0 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 h-full">
                       <CardHeader>
-                        <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                          <feature.icon className="w-7 h-7 text-primary" />
+                        <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-4`}>
+                          <feature.icon className="w-7 h-7 text-white" />
                         </div>
-                        <CardTitle className="text-xl">{feature.title}</CardTitle>
+                        <CardTitle className="text-xl font-serif">{feature.title}</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <CardDescription className="text-base">
+                        <CardDescription className="text-base leading-relaxed">
                           {feature.description}
                         </CardDescription>
                       </CardContent>

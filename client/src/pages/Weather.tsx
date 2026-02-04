@@ -42,6 +42,11 @@ function WeatherContent() {
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   
+  // Geolocation state
+  const [locationStatus, setLocationStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [coordinates, setCoordinates] = useState<{ lat: number; lon: number } | null>(null);
+  const [locationName, setLocationName] = useState("");
+  
   const [weatherData, setWeatherData] = useState({
     temperature: 15,
     humidity: 60,
@@ -51,6 +56,69 @@ function WeatherContent() {
     uvIndex: 4,
     visibility: 10,
   });
+
+  // Geolocation function
+  const requestLocation = async () => {
+    setLocationStatus('loading');
+    
+    if (!navigator.geolocation) {
+      toast.error("Geolocation not supported by your browser");
+      setLocationStatus('error');
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        setCoordinates({ lat: latitude, lon: longitude });
+        
+        // Reverse geocode to get city name
+        try {
+          const response = await fetch(
+            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+          );
+          const data = await response.json();
+          const cityName = data.city || data.locality || data.principalSubdivision || "Unknown";
+          setLocationName(cityName);
+          setLocation(cityName);
+          setSelectedLocation(cityName);
+          setLocationStatus('success');
+          toast.success(`Location detected: ${cityName}`);
+        } catch (error) {
+          setLocationStatus('error');
+          toast.error("Failed to get location name");
+        }
+      },
+      (error) => {
+        setLocationStatus('error');
+        let errorMessage = "Unable to get your location";
+        
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = "Location permission denied. Please enable location access.";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = "Location information unavailable.";
+            break;
+          case error.TIMEOUT:
+            errorMessage = "Location request timed out.";
+            break;
+        }
+        
+        toast.error(errorMessage);
+      },
+      { 
+        enableHighAccuracy: true, 
+        timeout: 10000, 
+        maximumAge: 0 
+      }
+    );
+  };
+
+  // Auto-request location on mount
+  useEffect(() => {
+    requestLocation();
+  }, []);
 
   // Close suggestions when clicking outside
   useEffect(() => {
@@ -204,6 +272,38 @@ function WeatherContent() {
           <CardContent className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="location">Location (UK)</Label>
+              <div className="flex items-center gap-2 mb-4">
+                <Button 
+                  onClick={requestLocation}
+                  disabled={locationStatus === 'loading'}
+                  variant={locationStatus === 'success' ? 'default' : 'outline'}
+                  type="button"
+                  className="flex-shrink-0"
+                >
+                  {locationStatus === 'loading' ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Detecting...
+                    </>
+                  ) : locationStatus === 'success' ? (
+                    <>
+                      <MapPin className="w-4 h-4 mr-2 text-green-600" />
+                      Location: {locationName}
+                    </>
+                  ) : (
+                    <>
+                      <MapPin className="w-4 h-4 mr-2" />
+                      Use My Location
+                    </>
+                  )}
+                </Button>
+                
+                {locationStatus === 'success' && (
+                  <Badge variant="secondary" className="bg-green-100 text-green-700">
+                    Auto-detected
+                  </Badge>
+                )}
+              </div>
               <div className="flex gap-2">
                 <div className="relative flex-1">
                   <MapPin className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${
