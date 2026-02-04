@@ -41,6 +41,8 @@ import {
   lessonBookings,
   trainerAvailability,
   horses,
+  income,
+  expenses,
 } from "../drizzle/schema";
 
 // Subscription check middleware
@@ -4136,6 +4138,274 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         });
 
         return { success: true };
+      }),
+  }),
+
+  // Income tracking
+  income: router({
+    list: protectedProcedure
+      .input(z.object({
+        horseId: z.number().optional(),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+        source: z.enum(["lesson", "training", "sale", "stud", "prize", "boarding", "sponsorship", "other"]).optional(),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        return await db.listIncome(ctx.user.id, input);
+      }),
+
+    get: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getIncomeById(input.id, ctx.user.id);
+      }),
+
+    create: protectedProcedure
+      .input(z.object({
+        horseId: z.number().optional(),
+        incomeDate: z.string(),
+        source: z.enum(["lesson", "training", "sale", "stud", "prize", "boarding", "sponsorship", "other"]),
+        description: z.string().optional(),
+        amount: z.number(),
+        currency: z.string().default("GBP"),
+        paymentMethod: z.enum(["cash", "bank_transfer", "card", "check", "other"]).optional(),
+        reference: z.string().optional(),
+        taxable: z.boolean().default(true),
+        category: z.string().optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const id = await db.createIncome({
+          ...input,
+          userId: ctx.user.id,
+          incomeDate: new Date(input.incomeDate),
+        });
+
+        // Publish real-time event
+        const { publishModuleEvent } = await import('./_core/realtime');
+        const incomeRecord = await db.getIncomeById(id, ctx.user.id);
+        if (incomeRecord) {
+          publishModuleEvent('income', 'created', incomeRecord, ctx.user.id);
+        }
+
+        // Audit log
+        await db.createActivityLog({
+          userId: ctx.user.id,
+          action: 'income_created',
+          entityType: 'income',
+          entityId: id,
+          details: `Created income record: ${input.source}`,
+        });
+
+        return { id };
+      }),
+
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        horseId: z.number().optional(),
+        incomeDate: z.string().optional(),
+        source: z.enum(["lesson", "training", "sale", "stud", "prize", "boarding", "sponsorship", "other"]).optional(),
+        description: z.string().optional(),
+        amount: z.number().optional(),
+        currency: z.string().optional(),
+        paymentMethod: z.enum(["cash", "bank_transfer", "card", "check", "other"]).optional(),
+        reference: z.string().optional(),
+        taxable: z.boolean().optional(),
+        category: z.string().optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { id, incomeDate, ...data } = input;
+        await db.updateIncome(id, ctx.user.id, {
+          ...data,
+          incomeDate: incomeDate ? new Date(incomeDate) : undefined,
+        });
+
+        // Publish real-time event
+        const { publishModuleEvent } = await import('./_core/realtime');
+        const incomeRecord = await db.getIncomeById(id, ctx.user.id);
+        if (incomeRecord) {
+          publishModuleEvent('income', 'updated', incomeRecord, ctx.user.id);
+        }
+
+        // Audit log
+        await db.createActivityLog({
+          userId: ctx.user.id,
+          action: 'income_updated',
+          entityType: 'income',
+          entityId: id,
+          details: `Updated income record`,
+        });
+
+        return { success: true };
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        await db.deleteIncome(input.id, ctx.user.id);
+
+        // Publish real-time event
+        const { publishModuleEvent } = await import('./_core/realtime');
+        publishModuleEvent('income', 'deleted', { id: input.id }, ctx.user.id);
+
+        // Audit log
+        await db.createActivityLog({
+          userId: ctx.user.id,
+          action: 'income_deleted',
+          entityType: 'income',
+          entityId: input.id,
+          details: `Deleted income record`,
+        });
+
+        return { success: true };
+      }),
+
+    getStats: protectedProcedure
+      .input(z.object({
+        horseId: z.number().optional(),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        return await db.getIncomeStats(ctx.user.id, input);
+      }),
+  }),
+
+  // Expenses tracking
+  expenses: router({
+    list: protectedProcedure
+      .input(z.object({
+        horseId: z.number().optional(),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+        category: z.enum(["feed", "vet", "farrier", "equipment", "transport", "insurance", "training", "competition", "boarding", "supplies", "maintenance", "other"]).optional(),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        return await db.listExpenses(ctx.user.id, input);
+      }),
+
+    get: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getExpenseById(input.id, ctx.user.id);
+      }),
+
+    create: protectedProcedure
+      .input(z.object({
+        horseId: z.number().optional(),
+        expenseDate: z.string(),
+        category: z.enum(["feed", "vet", "farrier", "equipment", "transport", "insurance", "training", "competition", "boarding", "supplies", "maintenance", "other"]),
+        description: z.string().optional(),
+        amount: z.number(),
+        currency: z.string().default("GBP"),
+        paymentMethod: z.enum(["cash", "bank_transfer", "card", "check", "other"]).optional(),
+        vendor: z.string().optional(),
+        reference: z.string().optional(),
+        taxDeductible: z.boolean().default(false),
+        receiptUrl: z.string().optional(),
+        subcategory: z.string().optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const id = await db.createExpense({
+          ...input,
+          userId: ctx.user.id,
+          expenseDate: new Date(input.expenseDate),
+        });
+
+        // Publish real-time event
+        const { publishModuleEvent } = await import('./_core/realtime');
+        const expense = await db.getExpenseById(id, ctx.user.id);
+        if (expense) {
+          publishModuleEvent('expenses', 'created', expense, ctx.user.id);
+        }
+
+        // Audit log
+        await db.createActivityLog({
+          userId: ctx.user.id,
+          action: 'expense_created',
+          entityType: 'expense',
+          entityId: id,
+          details: `Created expense record: ${input.category}`,
+        });
+
+        return { id };
+      }),
+
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        horseId: z.number().optional(),
+        expenseDate: z.string().optional(),
+        category: z.enum(["feed", "vet", "farrier", "equipment", "transport", "insurance", "training", "competition", "boarding", "supplies", "maintenance", "other"]).optional(),
+        description: z.string().optional(),
+        amount: z.number().optional(),
+        currency: z.string().optional(),
+        paymentMethod: z.enum(["cash", "bank_transfer", "card", "check", "other"]).optional(),
+        vendor: z.string().optional(),
+        reference: z.string().optional(),
+        taxDeductible: z.boolean().optional(),
+        receiptUrl: z.string().optional(),
+        subcategory: z.string().optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { id, expenseDate, ...data } = input;
+        await db.updateExpense(id, ctx.user.id, {
+          ...data,
+          expenseDate: expenseDate ? new Date(expenseDate) : undefined,
+        });
+
+        // Publish real-time event
+        const { publishModuleEvent } = await import('./_core/realtime');
+        const expense = await db.getExpenseById(id, ctx.user.id);
+        if (expense) {
+          publishModuleEvent('expenses', 'updated', expense, ctx.user.id);
+        }
+
+        // Audit log
+        await db.createActivityLog({
+          userId: ctx.user.id,
+          action: 'expense_updated',
+          entityType: 'expense',
+          entityId: id,
+          details: `Updated expense record`,
+        });
+
+        return { success: true };
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        await db.deleteExpense(input.id, ctx.user.id);
+
+        // Publish real-time event
+        const { publishModuleEvent } = await import('./_core/realtime');
+        publishModuleEvent('expenses', 'deleted', { id: input.id }, ctx.user.id);
+
+        // Audit log
+        await db.createActivityLog({
+          userId: ctx.user.id,
+          action: 'expense_deleted',
+          entityType: 'expense',
+          entityId: input.id,
+          details: `Deleted expense record`,
+        });
+
+        return { success: true };
+      }),
+
+    getStats: protectedProcedure
+      .input(z.object({
+        horseId: z.number().optional(),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        return await db.getExpenseStats(ctx.user.id, input);
       }),
   }),
 });

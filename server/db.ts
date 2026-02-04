@@ -49,7 +49,9 @@ import {
   tags, InsertTag,
   hoofcare, InsertHoofcare,
   nutritionLogs, InsertNutritionLog,
-  nutritionPlans, InsertNutritionPlan
+  nutritionPlans, InsertNutritionPlan,
+  income, InsertIncome,
+  expenses, InsertExpense
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -1785,4 +1787,190 @@ export async function deleteNutritionPlan(id: number, userId: number) {
   
   await db.delete(nutritionPlans)
     .where(and(eq(nutritionPlans.id, id), eq(nutritionPlans.userId, userId)));
+}
+
+// ============ INCOME ============
+export async function createIncome(data: InsertIncome) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  const result = await db.insert(income).values(data);
+  return (result[0] as ResultSetHeader).insertId as number;
+}
+
+export async function listIncome(userId: number, filters?: { horseId?: number; startDate?: string; endDate?: string; source?: string }) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  let conditions = [eq(income.userId, userId)];
+  
+  if (filters?.horseId) {
+    conditions.push(eq(income.horseId, filters.horseId));
+  }
+  if (filters?.startDate) {
+    conditions.push(gte(income.incomeDate, new Date(filters.startDate)));
+  }
+  if (filters?.endDate) {
+    conditions.push(lte(income.incomeDate, new Date(filters.endDate)));
+  }
+  if (filters?.source) {
+    conditions.push(eq(income.source, filters.source as any));
+  }
+  
+  return await db.select().from(income)
+    .where(and(...conditions))
+    .orderBy(desc(income.incomeDate));
+}
+
+export async function getIncomeById(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const results = await db.select().from(income)
+    .where(and(eq(income.id, id), eq(income.userId, userId)));
+  return results[0] || null;
+}
+
+export async function updateIncome(id: number, userId: number, data: Partial<InsertIncome>) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  await db.update(income)
+    .set(data)
+    .where(and(eq(income.id, id), eq(income.userId, userId)));
+}
+
+export async function deleteIncome(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  await db.delete(income)
+    .where(and(eq(income.id, id), eq(income.userId, userId)));
+}
+
+export async function getIncomeStats(userId: number, filters?: { horseId?: number; startDate?: string; endDate?: string }) {
+  const db = await getDb();
+  if (!db) return { total: 0, count: 0, bySource: [] };
+  
+  let conditions = [eq(income.userId, userId)];
+  
+  if (filters?.horseId) {
+    conditions.push(eq(income.horseId, filters.horseId));
+  }
+  if (filters?.startDate) {
+    conditions.push(gte(income.incomeDate, new Date(filters.startDate)));
+  }
+  if (filters?.endDate) {
+    conditions.push(lte(income.incomeDate, new Date(filters.endDate)));
+  }
+  
+  const records = await db.select().from(income)
+    .where(and(...conditions));
+  
+  const total = records.reduce((sum, record) => sum + record.amount, 0);
+  const bySource = records.reduce((acc: any[], record) => {
+    const existing = acc.find(item => item.source === record.source);
+    if (existing) {
+      existing.amount += record.amount;
+      existing.count += 1;
+    } else {
+      acc.push({ source: record.source, amount: record.amount, count: 1 });
+    }
+    return acc;
+  }, []);
+  
+  return { total, count: records.length, bySource };
+}
+
+// ============ EXPENSES ============
+export async function createExpense(data: InsertExpense) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  const result = await db.insert(expenses).values(data);
+  return (result[0] as ResultSetHeader).insertId as number;
+}
+
+export async function listExpenses(userId: number, filters?: { horseId?: number; startDate?: string; endDate?: string; category?: string }) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  let conditions = [eq(expenses.userId, userId)];
+  
+  if (filters?.horseId) {
+    conditions.push(eq(expenses.horseId, filters.horseId));
+  }
+  if (filters?.startDate) {
+    conditions.push(gte(expenses.expenseDate, new Date(filters.startDate)));
+  }
+  if (filters?.endDate) {
+    conditions.push(lte(expenses.expenseDate, new Date(filters.endDate)));
+  }
+  if (filters?.category) {
+    conditions.push(eq(expenses.category, filters.category as any));
+  }
+  
+  return await db.select().from(expenses)
+    .where(and(...conditions))
+    .orderBy(desc(expenses.expenseDate));
+}
+
+export async function getExpenseById(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const results = await db.select().from(expenses)
+    .where(and(eq(expenses.id, id), eq(expenses.userId, userId)));
+  return results[0] || null;
+}
+
+export async function updateExpense(id: number, userId: number, data: Partial<InsertExpense>) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  await db.update(expenses)
+    .set(data)
+    .where(and(eq(expenses.id, id), eq(expenses.userId, userId)));
+}
+
+export async function deleteExpense(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+  
+  await db.delete(expenses)
+    .where(and(eq(expenses.id, id), eq(expenses.userId, userId)));
+}
+
+export async function getExpenseStats(userId: number, filters?: { horseId?: number; startDate?: string; endDate?: string }) {
+  const db = await getDb();
+  if (!db) return { total: 0, count: 0, byCategory: [] };
+  
+  let conditions = [eq(expenses.userId, userId)];
+  
+  if (filters?.horseId) {
+    conditions.push(eq(expenses.horseId, filters.horseId));
+  }
+  if (filters?.startDate) {
+    conditions.push(gte(expenses.expenseDate, new Date(filters.startDate)));
+  }
+  if (filters?.endDate) {
+    conditions.push(lte(expenses.expenseDate, new Date(filters.endDate)));
+  }
+  
+  const records = await db.select().from(expenses)
+    .where(and(...conditions));
+  
+  const total = records.reduce((sum, record) => sum + record.amount, 0);
+  const byCategory = records.reduce((acc: any[], record) => {
+    const existing = acc.find(item => item.category === record.category);
+    if (existing) {
+      existing.amount += record.amount;
+      existing.count += 1;
+    } else {
+      acc.push({ category: record.category, amount: record.amount, count: 1 });
+    }
+    return acc;
+  }, []);
+  
+  return { total, count: records.length, byCategory };
 }

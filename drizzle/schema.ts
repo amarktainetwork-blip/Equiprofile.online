@@ -952,3 +952,49 @@ export const nutritionPlans = mysqlTable("nutritionPlans", {
 
 export type NutritionPlan = typeof nutritionPlans.$inferSelect;
 export type InsertNutritionPlan = typeof nutritionPlans.$inferInsert;
+
+// Income tracking module
+export const income = mysqlTable("income", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  horseId: int("horseId"), // Optional - income may not be horse-specific
+  incomeDate: date("incomeDate").notNull(),
+  source: mysqlEnum("source", ["lesson", "training", "sale", "stud", "prize", "boarding", "sponsorship", "other"]).notNull(),
+  description: text("description"),
+  amount: int("amount").notNull(), // in pence
+  currency: varchar("currency", { length: 3 }).default("GBP").notNull(),
+  paymentMethod: mysqlEnum("paymentMethod", ["cash", "bank_transfer", "card", "check", "other"]),
+  reference: varchar("reference", { length: 255 }), // invoice number, transaction ID, etc.
+  taxable: boolean("taxable").default(true).notNull(),
+  category: varchar("category", { length: 100 }), // Custom categorization
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Income = typeof income.$inferSelect;
+export type InsertIncome = typeof income.$inferInsert;
+
+// Expenses tracking module
+export const expenses = mysqlTable("expenses", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  horseId: int("horseId"), // Optional - expense may not be horse-specific
+  expenseDate: date("expenseDate").notNull(),
+  category: mysqlEnum("category", ["feed", "vet", "farrier", "equipment", "transport", "insurance", "training", "competition", "boarding", "supplies", "maintenance", "other"]).notNull(),
+  description: text("description"),
+  amount: int("amount").notNull(), // in pence
+  currency: varchar("currency", { length: 3 }).default("GBP").notNull(),
+  paymentMethod: mysqlEnum("paymentMethod", ["cash", "bank_transfer", "card", "check", "other"]),
+  vendor: varchar("vendor", { length: 255 }),
+  reference: varchar("reference", { length: 255 }), // invoice number
+  taxDeductible: boolean("taxDeductible").default(false).notNull(),
+  receiptUrl: text("receiptUrl"), // Path to stored receipt/invoice
+  subcategory: varchar("subcategory", { length: 100 }), // Custom sub-categorization
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Expense = typeof expenses.$inferSelect;
+export type InsertExpense = typeof expenses.$inferInsert;
