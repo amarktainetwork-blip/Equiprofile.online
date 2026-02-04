@@ -82,7 +82,7 @@ function AppointmentsContent() {
       const payload = {
         horseId: parseInt(formData.horseId),
         appointmentType: formData.type,
-        title: formData.provider || 'Appointment',
+        title: `${formData.type} - ${formData.provider || 'Provider'}`,
         appointmentDate: formData.appointmentDate,
         appointmentTime: formData.appointmentTime,
         location: formData.location,

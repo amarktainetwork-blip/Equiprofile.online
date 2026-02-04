@@ -383,6 +383,8 @@ async function startServer() {
   app.get("/api/realtime/events", async (req, res) => {
     try {
       // Get user from session (reuse tRPC context logic)
+      // Note: Using 'as any' here because we're constructing a minimal TRPCRequestInfo
+      // for non-tRPC endpoints (SSE). The context only needs req/res for auth.
       const context = await createContext({ 
         req, 
         res, 
@@ -417,6 +419,7 @@ async function startServer() {
   // SSE stats endpoint (admin only)
   app.get("/api/realtime/stats", async (req, res) => {
     try {
+      // Note: Using 'as any' for TRPCRequestInfo in non-tRPC endpoint (SSE stats)
       const context = await createContext({ 
         req, 
         res,
