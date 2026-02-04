@@ -1,6 +1,6 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { useTranslation } from "react-i18next";
-import { BarChart3, TrendingUp, Activity, DollarSign, Download } from "lucide-react";
+import { BarChart3, TrendingUp, TrendingDown, Activity, DollarSign, Download } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { Button } from "../components/ui/button";
@@ -32,6 +32,10 @@ export default function AnalyticsPage() {
   const { data: healthRecords } = trpc.healthRecords.listAll.useQuery();
   const { data: competitions } = trpc.competitions.list.useQuery({});
   const { data: horses } = trpc.horses.list.useQuery();
+  const { data: incomeRecords } = trpc.income.list.useQuery({});
+  const { data: expenseRecords } = trpc.expenses.list.useQuery({});
+  const { data: incomeStats } = trpc.income.getStats.useQuery({});
+  const { data: expenseStats } = trpc.expenses.getStats.useQuery({});
   
   // Training data aggregation
   const trainingByMonth = trainingSessions?.reduce((acc: any, session: any) => {
@@ -96,6 +100,35 @@ export default function AnalyticsPage() {
   
   const healthCostData = Object.values(healthByMonth).slice(-6);
   
+  // Financial data aggregation
+  const incomeByMonth = incomeRecords?.reduce((acc: any, record: any) => {
+    const month = new Date(record.incomeDate).toLocaleString('default', { month: 'short', year: 'numeric' });
+    if (!acc[month]) acc[month] = { month, amount: 0, count: 0 };
+    acc[month].amount += record.amount / 100; // Convert to £
+    acc[month].count += 1;
+    return acc;
+  }, {}) || {};
+  
+  const incomeChartData = Object.values(incomeByMonth).slice(-6);
+  
+  const expenseByMonth = expenseRecords?.reduce((acc: any, record: any) => {
+    const month = new Date(record.expenseDate).toLocaleString('default', { month: 'short', year: 'numeric' });
+    if (!acc[month]) acc[month] = { month, amount: 0, count: 0 };
+    acc[month].amount += record.amount / 100; // Convert to £
+    acc[month].count += 1;
+    return acc;
+  }, {}) || {};
+  
+  const expenseChartData = Object.values(expenseByMonth).slice(-6);
+  
+  // Profit/Loss data
+  const profitLossData = Object.keys({...incomeByMonth, ...expenseByMonth}).map(month => ({
+    month,
+    income: incomeByMonth[month]?.amount || 0,
+    expenses: expenseByMonth[month]?.amount || 0,
+    profit: (incomeByMonth[month]?.amount || 0) - (expenseByMonth[month]?.amount || 0),
+  })).slice(-6);
+  
   const totalSessions = trainingSessions?.length || 0;
   const totalHours = trainingSessions?.reduce((sum: number, s: any) => sum + (s.duration || 0), 0) || 0;
   const completedSessions = trainingSessions?.filter((s: any) => s.isCompleted).length || 0;
@@ -114,8 +147,13 @@ export default function AnalyticsPage() {
         </div>
 
         <Tabs defaultValue="training" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="training">Training</TabsTrigger>
+            <TabsTrigger value="performance">Performance</TabsTrigger>
+            <TabsTrigger value="financial">Financial</TabsTrigger>
+            <TabsTrigger value="health">Health</TabsTrigger>
+            <TabsTrigger value="comparison">Comparison</TabsTrigger>
+          </TabsList>
             <TabsTrigger value="performance">Performance</TabsTrigger>
             <TabsTrigger value="health">Health</TabsTrigger>
             <TabsTrigger value="comparison">Comparison</TabsTrigger>
@@ -307,6 +345,175 @@ export default function AnalyticsPage() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="financial" className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-4">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total Income</CardTitle>
+                  <TrendingUp className="h-4 w-4 text-green-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-green-600">
+                    £{((incomeStats?.total || 0) / 100).toFixed(2)}
+                  </div>
+                  <p className="text-xs text-muted-foreground">{incomeStats?.count || 0} records</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
+                  <TrendingDown className="h-4 w-4 text-red-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-red-600">
+                    £{((expenseStats?.total || 0) / 100).toFixed(2)}
+                  </div>
+                  <p className="text-xs text-muted-foreground">{expenseStats?.count || 0} records</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Net Profit/Loss</CardTitle>
+                  <DollarSign className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className={`text-2xl font-bold ${((incomeStats?.total || 0) - (expenseStats?.total || 0)) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    £{(((incomeStats?.total || 0) - (expenseStats?.total || 0)) / 100).toFixed(2)}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {((incomeStats?.total || 0) - (expenseStats?.total || 0)) >= 0 ? 'Profit' : 'Loss'}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Profit Margin</CardTitle>
+                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {incomeStats?.total && incomeStats.total > 0
+                      ? Math.round(((incomeStats.total - (expenseStats?.total || 0)) / incomeStats.total) * 100)
+                      : 0}%
+                  </div>
+                  <p className="text-xs text-muted-foreground">Profit margin</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Income vs Expenses Over Time</CardTitle>
+                <CardDescription>Monthly financial overview (last 6 months)</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {profitLossData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={profitLossData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <Tooltip formatter={(value) => `£${Number(value).toFixed(2)}`} />
+                      <Legend />
+                      <Line type="monotone" dataKey="income" stroke="#10b981" strokeWidth={2} name="Income" />
+                      <Line type="monotone" dataKey="expenses" stroke="#ef4444" strokeWidth={2} name="Expenses" />
+                      <Line type="monotone" dataKey="profit" stroke="#3b82f6" strokeWidth={2} name="Profit/Loss" />
+                    </LineChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <DollarSign className="h-16 w-16 text-muted-foreground mb-4" />
+                    <p className="text-muted-foreground">No financial data available</p>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Add income and expense records to track finances
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Income by Source</CardTitle>
+                  <CardDescription>Breakdown of income sources</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {incomeStats?.bySource && incomeStats.bySource.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={300}>
+                      <PieChart>
+                        <Pie
+                          data={incomeStats.bySource.map((item: any) => ({
+                            name: item.source,
+                            value: item.amount / 100
+                          }))}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={(entry) => `${entry.name}: £${entry.value.toFixed(0)}`}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                        >
+                          {incomeStats.bySource.map((_: any, index: number) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip formatter={(value) => `£${Number(value).toFixed(2)}`} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                      <TrendingUp className="h-16 w-16 text-muted-foreground mb-4" />
+                      <p className="text-muted-foreground">No income records yet</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Expenses by Category</CardTitle>
+                  <CardDescription>Breakdown of expense categories</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {expenseStats?.byCategory && expenseStats.byCategory.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={300}>
+                      <PieChart>
+                        <Pie
+                          data={expenseStats.byCategory.map((item: any) => ({
+                            name: item.category,
+                            value: item.amount / 100
+                          }))}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={(entry) => `${entry.name}: £${entry.value.toFixed(0)}`}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                        >
+                          {expenseStats.byCategory.map((_: any, index: number) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip formatter={(value) => `£${Number(value).toFixed(2)}`} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                      <TrendingDown className="h-16 w-16 text-muted-foreground mb-4" />
+                      <p className="text-muted-foreground">No expense records yet</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="health" className="space-y-4">
