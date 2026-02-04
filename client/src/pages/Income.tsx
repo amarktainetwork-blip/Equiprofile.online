@@ -36,6 +36,20 @@ import { Plus, TrendingUp, Edit, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRealtimeModule } from "@/hooks/useRealtime";
 
+type IncomeRecord = {
+  id: number;
+  incomeDate: string;
+  source: string;
+  description: string | null;
+  amount: number;
+  horseId: number | null;
+  paymentMethod: string | null;
+  reference: string | null;
+  taxable: boolean;
+  category: string | null;
+  notes: string | null;
+};
+
 function IncomeContent() {
   const [filters, setFilters] = useState({
     horseId: undefined as number | undefined,
@@ -50,7 +64,7 @@ function IncomeContent() {
   
   const [localIncome, setLocalIncome] = useState(incomeRecords || []);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [editingRecord, setEditingRecord] = useState<any>(null);
+  const [editingRecord, setEditingRecord] = useState<IncomeRecord | null>(null);
   
   const [formData, setFormData] = useState({
     horseId: "",
@@ -159,7 +173,7 @@ function IncomeContent() {
     }
   };
 
-  const handleEdit = (record: any) => {
+  const handleEdit = (record: IncomeRecord) => {
     setEditingRecord(record);
     setFormData({
       horseId: record.horseId?.toString() || "",

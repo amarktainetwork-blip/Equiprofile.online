@@ -36,6 +36,22 @@ import { Plus, TrendingDown, Edit, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRealtimeModule } from "@/hooks/useRealtime";
 
+type ExpenseRecord = {
+  id: number;
+  expenseDate: string;
+  category: string;
+  description: string | null;
+  amount: number;
+  horseId: number | null;
+  vendor: string | null;
+  paymentMethod: string | null;
+  reference: string | null;
+  taxDeductible: boolean;
+  receiptUrl: string | null;
+  subcategory: string | null;
+  notes: string | null;
+};
+
 function ExpensesContent() {
   const [filters, setFilters] = useState({
     horseId: undefined as number | undefined,
@@ -50,7 +66,7 @@ function ExpensesContent() {
   
   const [localExpenses, setLocalExpenses] = useState(expenseRecords || []);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [editingRecord, setEditingRecord] = useState<any>(null);
+  const [editingRecord, setEditingRecord] = useState<ExpenseRecord | null>(null);
   
   const [formData, setFormData] = useState({
     horseId: "",
@@ -165,7 +181,7 @@ function ExpensesContent() {
     }
   };
 
-  const handleEdit = (record: any) => {
+  const handleEdit = (record: ExpenseRecord) => {
     setEditingRecord(record);
     setFormData({
       horseId: record.horseId?.toString() || "",
