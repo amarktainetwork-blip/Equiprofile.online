@@ -18,8 +18,8 @@
     "db:push": "drizzle-kit generate && drizzle-kit migrate"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.693.0",
-    "@aws-sdk/s3-request-presigner": "^3.693.0",
+    "@aws-sdk/client-s3": "^3.984.0",
+    "@aws-sdk/s3-request-presigner": "^3.984.0",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -75,7 +75,7 @@
     "i18next": "^25.7.3",
     "input-otp": "^1.4.2",
     "jose": "6.1.0",
-    "jspdf": "^3.0.4",
+    "jspdf": "^4.1.0",
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.453.0",
     "mysql2": "^3.15.0",
