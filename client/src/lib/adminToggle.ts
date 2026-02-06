@@ -1,7 +1,7 @@
 /**
  * Admin Toggle System
  * Provides a hidden console-based admin section toggle
- * 
+ *
  * Usage:
  * - Type "show admin" in browser console to reveal admin section
  * - Type "hide admin" to hide it again
@@ -26,26 +26,27 @@ class AdminToggleSystem {
     // Make commands globally available
     (window as any).showAdmin = () => this.showAdmin();
     (window as any).hideAdmin = () => this.hideAdmin();
-    
+
     console.log(
       "%c🐴 EquiProfile Admin Commands",
-      "color: #10b981; font-size: 16px; font-weight: bold;"
+      "color: #10b981; font-size: 16px; font-weight: bold;",
     );
     console.log(
       "%cType 'showAdmin()' to reveal admin section",
-      "color: #6b7280; font-size: 12px;"
+      "color: #6b7280; font-size: 12px;",
     );
     console.log(
       "%cType 'hideAdmin()' to hide admin section",
-      "color: #6b7280; font-size: 12px;"
+      "color: #6b7280; font-size: 12px;",
     );
   }
 
   private loadState() {
     // Check if admin was previously visible
     const visible = sessionStorage.getItem(ADMIN_VISIBLE_KEY) === "true";
-    const authenticated = sessionStorage.getItem(ADMIN_AUTHENTICATED_KEY) === "true";
-    
+    const authenticated =
+      sessionStorage.getItem(ADMIN_AUTHENTICATED_KEY) === "true";
+
     if (visible && authenticated) {
       this.notifyListeners();
     }
@@ -54,12 +55,13 @@ class AdminToggleSystem {
   private async showAdmin() {
     try {
       // Check if already authenticated in this session
-      const authenticated = sessionStorage.getItem(ADMIN_AUTHENTICATED_KEY) === "true";
-      
+      const authenticated =
+        sessionStorage.getItem(ADMIN_AUTHENTICATED_KEY) === "true";
+
       if (!authenticated) {
         // Prompt for password
         const password = prompt("Enter admin password:");
-        
+
         if (!password) {
           console.log("%c❌ Admin access cancelled", "color: #ef4444;");
           return;
@@ -78,14 +80,14 @@ class AdminToggleSystem {
       // Show admin section
       sessionStorage.setItem(ADMIN_VISIBLE_KEY, "true");
       this.notifyListeners();
-      
+
       console.log(
         "%c✅ Admin section is now visible",
-        "color: #10b981; font-weight: bold;"
+        "color: #10b981; font-weight: bold;",
       );
       console.log(
         "%cNavigate to /admin to access the admin panel",
-        "color: #6b7280;"
+        "color: #6b7280;",
       );
     } catch (error) {
       console.error("Error showing admin:", error);
@@ -95,16 +97,18 @@ class AdminToggleSystem {
   private hideAdmin() {
     sessionStorage.setItem(ADMIN_VISIBLE_KEY, "false");
     this.notifyListeners();
-    
+
     console.log(
       "%c✅ Admin section is now hidden",
-      "color: #10b981; font-weight: bold;"
+      "color: #10b981; font-weight: bold;",
     );
   }
 
   public isAdminVisible(): boolean {
-    return sessionStorage.getItem(ADMIN_VISIBLE_KEY) === "true" &&
-           sessionStorage.getItem(ADMIN_AUTHENTICATED_KEY) === "true";
+    return (
+      sessionStorage.getItem(ADMIN_VISIBLE_KEY) === "true" &&
+      sessionStorage.getItem(ADMIN_AUTHENTICATED_KEY) === "true"
+    );
   }
 
   public subscribe(callback: () => void) {
@@ -113,7 +117,7 @@ class AdminToggleSystem {
   }
 
   private notifyListeners() {
-    this.listeners.forEach(callback => callback());
+    this.listeners.forEach((callback) => callback());
   }
 
   public resetAuth() {

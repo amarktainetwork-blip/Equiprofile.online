@@ -1,5 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -42,7 +48,7 @@ export default function Contact() {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setFormData({
       ...formData,
@@ -76,10 +82,12 @@ export default function Contact() {
               <ScrollReveal className="lg:col-span-2">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-2xl">Send us a message</CardTitle>
+                    <CardTitle className="text-2xl">
+                      Send us a message
+                    </CardTitle>
                     <CardDescription>
-                      Fill out the form below and we'll get back to you within 24
-                      hours.
+                      Fill out the form below and we'll get back to you within
+                      24 hours.
                     </CardDescription>
                   </CardHeader>
                   <CardContent>

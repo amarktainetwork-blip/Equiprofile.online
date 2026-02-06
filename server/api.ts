@@ -1,7 +1,12 @@
 import { Router, Request, Response, NextFunction } from "express";
 import * as db from "./db";
 import { getDb } from "./db";
-import { horses, healthRecords, trainingSessions, competitions } from "../drizzle/schema";
+import {
+  horses,
+  healthRecords,
+  trainingSessions,
+  competitions,
+} from "../drizzle/schema";
 import { eq, desc } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
@@ -10,13 +15,15 @@ const apiRouter = Router();
 // Middleware to verify API key
 async function verifyApiKey(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
-  
+
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Missing or invalid authorization header" });
+    return res
+      .status(401)
+      .json({ error: "Missing or invalid authorization header" });
   }
 
   const apiKey = authHeader.substring(7); // Remove "Bearer " prefix
-  
+
   if (!apiKey) {
     return res.status(401).json({ error: "API key is required" });
   }
@@ -34,11 +41,11 @@ async function verifyApiKey(req: Request, res: Response, next: NextFunction) {
     // 3. Verify isActive and expiresAt
     // 4. Enforce rate limiting based on rateLimit field
     // 5. Check permissions field for endpoint access
-    
+
     // For MVP, we'll do a simplified check
     // Store the userId in req for downstream use
     (req as any).apiUserId = 1; // Replace with actual user lookup from API key
-    
+
     next();
   } catch (error) {
     console.error("API key verification error:", error);
@@ -54,12 +61,13 @@ apiRouter.get("/horses", async (req: Request, res: Response) => {
   try {
     const userId = (req as any).apiUserId;
     const dbInstance = await getDb();
-    
+
     if (!dbInstance) {
       return res.status(500).json({ error: "Database connection failed" });
     }
 
-    const userHorses = await dbInstance.select()
+    const userHorses = await dbInstance
+      .select()
       .from(horses)
       .where(eq(horses.userId, userId))
       .orderBy(desc(horses.createdAt));
@@ -80,7 +88,7 @@ apiRouter.get("/horses/:id", async (req: Request, res: Response) => {
   try {
     const userId = (req as any).apiUserId;
     const horseId = parseInt(req.params.id);
-    
+
     if (isNaN(horseId)) {
       return res.status(400).json({ error: "Invalid horse ID" });
     }
@@ -90,7 +98,8 @@ apiRouter.get("/horses/:id", async (req: Request, res: Response) => {
       return res.status(500).json({ error: "Database connection failed" });
     }
 
-    const horse = await dbInstance.select()
+    const horse = await dbInstance
+      .select()
       .from(horses)
       .where(eq(horses.id, horseId))
       .limit(1);
@@ -115,93 +124,103 @@ apiRouter.get("/horses/:id", async (req: Request, res: Response) => {
 });
 
 // GET /api/v1/health-records/:horseId - List health records for a horse
-apiRouter.get("/health-records/:horseId", async (req: Request, res: Response) => {
-  try {
-    const userId = (req as any).apiUserId;
-    const horseId = parseInt(req.params.horseId);
-    
-    if (isNaN(horseId)) {
-      return res.status(400).json({ error: "Invalid horse ID" });
+apiRouter.get(
+  "/health-records/:horseId",
+  async (req: Request, res: Response) => {
+    try {
+      const userId = (req as any).apiUserId;
+      const horseId = parseInt(req.params.horseId);
+
+      if (isNaN(horseId)) {
+        return res.status(400).json({ error: "Invalid horse ID" });
+      }
+
+      const dbInstance = await getDb();
+      if (!dbInstance) {
+        return res.status(500).json({ error: "Database connection failed" });
+      }
+
+      // Verify horse ownership
+      const horse = await dbInstance
+        .select()
+        .from(horses)
+        .where(eq(horses.id, horseId))
+        .limit(1);
+
+      if (!horse.length || horse[0].userId !== userId) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      const records = await dbInstance
+        .select()
+        .from(healthRecords)
+        .where(eq(healthRecords.horseId, horseId))
+        .orderBy(desc(healthRecords.recordDate));
+
+      res.json({
+        success: true,
+        data: records,
+        count: records.length,
+      });
+    } catch (error) {
+      console.error("Error fetching health records:", error);
+      res.status(500).json({ error: "Failed to fetch health records" });
     }
-
-    const dbInstance = await getDb();
-    if (!dbInstance) {
-      return res.status(500).json({ error: "Database connection failed" });
-    }
-
-    // Verify horse ownership
-    const horse = await dbInstance.select()
-      .from(horses)
-      .where(eq(horses.id, horseId))
-      .limit(1);
-
-    if (!horse.length || horse[0].userId !== userId) {
-      return res.status(403).json({ error: "Access denied" });
-    }
-
-    const records = await dbInstance.select()
-      .from(healthRecords)
-      .where(eq(healthRecords.horseId, horseId))
-      .orderBy(desc(healthRecords.recordDate));
-
-    res.json({
-      success: true,
-      data: records,
-      count: records.length,
-    });
-  } catch (error) {
-    console.error("Error fetching health records:", error);
-    res.status(500).json({ error: "Failed to fetch health records" });
-  }
-});
+  },
+);
 
 // GET /api/v1/training-sessions/:horseId - List training sessions for a horse
-apiRouter.get("/training-sessions/:horseId", async (req: Request, res: Response) => {
-  try {
-    const userId = (req as any).apiUserId;
-    const horseId = parseInt(req.params.horseId);
-    
-    if (isNaN(horseId)) {
-      return res.status(400).json({ error: "Invalid horse ID" });
+apiRouter.get(
+  "/training-sessions/:horseId",
+  async (req: Request, res: Response) => {
+    try {
+      const userId = (req as any).apiUserId;
+      const horseId = parseInt(req.params.horseId);
+
+      if (isNaN(horseId)) {
+        return res.status(400).json({ error: "Invalid horse ID" });
+      }
+
+      const dbInstance = await getDb();
+      if (!dbInstance) {
+        return res.status(500).json({ error: "Database connection failed" });
+      }
+
+      // Verify horse ownership
+      const horse = await dbInstance
+        .select()
+        .from(horses)
+        .where(eq(horses.id, horseId))
+        .limit(1);
+
+      if (!horse.length || horse[0].userId !== userId) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      const sessions = await dbInstance
+        .select()
+        .from(trainingSessions)
+        .where(eq(trainingSessions.horseId, horseId))
+        .orderBy(desc(trainingSessions.sessionDate));
+
+      res.json({
+        success: true,
+        data: sessions,
+        count: sessions.length,
+      });
+    } catch (error) {
+      console.error("Error fetching training sessions:", error);
+      res.status(500).json({ error: "Failed to fetch training sessions" });
     }
-
-    const dbInstance = await getDb();
-    if (!dbInstance) {
-      return res.status(500).json({ error: "Database connection failed" });
-    }
-
-    // Verify horse ownership
-    const horse = await dbInstance.select()
-      .from(horses)
-      .where(eq(horses.id, horseId))
-      .limit(1);
-
-    if (!horse.length || horse[0].userId !== userId) {
-      return res.status(403).json({ error: "Access denied" });
-    }
-
-    const sessions = await dbInstance.select()
-      .from(trainingSessions)
-      .where(eq(trainingSessions.horseId, horseId))
-      .orderBy(desc(trainingSessions.sessionDate));
-
-    res.json({
-      success: true,
-      data: sessions,
-      count: sessions.length,
-    });
-  } catch (error) {
-    console.error("Error fetching training sessions:", error);
-    res.status(500).json({ error: "Failed to fetch training sessions" });
-  }
-});
+  },
+);
 
 // GET /api/v1/competitions/:horseId - List competitions for a horse
 apiRouter.get("/competitions/:horseId", async (req: Request, res: Response) => {
   try {
     const userId = (req as any).apiUserId;
     const horseId = parseInt(req.params.horseId);
-    
+
     if (isNaN(horseId)) {
       return res.status(400).json({ error: "Invalid horse ID" });
     }
@@ -212,7 +231,8 @@ apiRouter.get("/competitions/:horseId", async (req: Request, res: Response) => {
     }
 
     // Verify horse ownership
-    const horse = await dbInstance.select()
+    const horse = await dbInstance
+      .select()
       .from(horses)
       .where(eq(horses.id, horseId))
       .limit(1);
@@ -221,7 +241,8 @@ apiRouter.get("/competitions/:horseId", async (req: Request, res: Response) => {
       return res.status(403).json({ error: "Access denied" });
     }
 
-    const comps = await dbInstance.select()
+    const comps = await dbInstance
+      .select()
       .from(competitions)
       .where(eq(competitions.horseId, horseId))
       .orderBy(desc(competitions.date));

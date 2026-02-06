@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 🚀 Added
 
 #### Deployment & Operations
+
 - **One-command Ubuntu 24 VPS deployment system** with automated setup
   - `deployment/ubuntu24/install.sh` - Complete installation script with prerequisites, user creation, and service configuration
   - `deployment/ubuntu24/uninstall.sh` - Clean uninstallation script preserving SSL certificates
@@ -31,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Cache names include build ID for proper cache invalidation
 
 #### Configuration & Safety
+
 - **Safe environment configuration** - Application gracefully handles missing optional features
   - OAuth credentials optional (falls back to email/password authentication)
   - Stripe keys optional (app runs without payment features)
@@ -49,11 +51,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 🎨 Changed
 
 #### Frontend
+
 - Placeholder for frontend redesign (to be implemented in subsequent commits)
 - Service worker registration now conditional based on `VITE_PWA_ENABLED`
 - Visual configuration system enhanced for post-deployment customization
 
 #### Configuration
+
 - **Completely restructured `.env.example`** with clear sections
   - Core configuration (required)
   - Feature flags (optional)
@@ -63,6 +67,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Examples of proper values for each setting
 
 ### 🔧 Fixed
+
 - Server no longer crashes when OAuth credentials are missing
 - Server no longer crashes when Stripe keys are missing
 - Native module build issues on fresh installations
@@ -70,6 +75,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Port binding errors in systemd service
 
 ### 📚 Documentation
+
 - Added comprehensive deployment guide in `deployment/ubuntu24/README.md`
   - Prerequisites checklist
   - Step-by-step installation instructions
@@ -83,18 +89,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced inline documentation in deployment scripts
 
 ### 🔒 Security
+
 - Enforced strong JWT_SECRET requirement in production
 - Enforced changing default admin password in production
 - Added production startup validation to prevent insecure deployments
 - Documented security best practices in deployment guide
 
 ### ⚙️ Build & Infrastructure
+
 - Build output includes metadata for `/build` endpoint
 - Externalized native dependencies properly in esbuild configuration
 - Added build verification in installation scripts
 - Health endpoints for load balancer integration
 
 ### 🐛 Known Issues
+
 None at this time.
 
 ---
@@ -102,6 +111,7 @@ None at this time.
 ## [1.0.0] - Previous Release
 
 ### Features
+
 - Complete horse profile management system
 - Health records tracking
 - Training session planning and logging
@@ -123,12 +133,15 @@ None at this time.
 ### Upgrading from 1.x to 2.0
 
 #### Breaking Changes
+
 None. Version 2.0 is fully backward compatible with 1.x configurations.
 
 #### New Required Steps
+
 1. **Review environment variables**: The `.env` file structure has been reorganized for clarity. Compare your existing `.env` with the new `.env.example`.
 
 2. **Add feature flags** (optional):
+
    ```bash
    ENABLE_STRIPE=false
    ENABLE_UPLOADS=false
@@ -136,6 +149,7 @@ None. Version 2.0 is fully backward compatible with 1.x configurations.
    ```
 
 3. **Add PWA control** (recommended):
+
    ```bash
    VITE_PWA_ENABLED=false  # Disable PWA by default
    ```
@@ -146,6 +160,7 @@ None. Version 2.0 is fully backward compatible with 1.x configurations.
    - Application will refuse to start in production with default values
 
 #### Optional Enhancements
+
 - Use new deployment scripts for fresh installations
 - Add `/healthz` endpoint to load balancer health checks
 - Configure monitoring to use `/build` endpoint for version tracking

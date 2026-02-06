@@ -4,7 +4,10 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import { SkipToContent, useKeyboardNavigation } from "./components/AccessibilityHelpers";
+import {
+  SkipToContent,
+  useKeyboardNavigation,
+} from "./components/AccessibilityHelpers";
 import "./i18n/config";
 
 // Marketing Pages (Public)
@@ -50,7 +53,7 @@ import BillingPage from "./pages/BillingPage";
 
 function Router() {
   useKeyboardNavigation();
-  
+
   return (
     <>
       <SkipToContent />
@@ -64,83 +67,83 @@ function Router() {
           <Route path="/contact" component={Contact} />
           <Route path="/terms" component={TermsPage} />
           <Route path="/privacy" component={PrivacyPage} />
-          
+
           {/* Auth Pages */}
           <Route path="/login" component={Login} />
           <Route path="/register" component={Register} />
           <Route path="/forgot-password" component={ForgotPassword} />
           <Route path="/reset-password" component={ResetPassword} />
-          
+
           {/* Dashboard - requires auth */}
           {/* App Pages (Protected - require auth) */}
           <Route path="/dashboard" component={Dashboard} />
-          
+
           {/* Horse management */}
           <Route path="/horses" component={Horses} />
           <Route path="/horses/new" component={HorseForm} />
           <Route path="/horses/:id/edit" component={HorseForm} />
           <Route path="/horses/:id" component={HorseDetail} />
-          
+
           {/* Health records */}
           <Route path="/health" component={Health} />
-          
+
           {/* Training */}
           <Route path="/training" component={Training} />
-          
+
           {/* Training Templates */}
           <Route path="/training-templates" component={TrainingTemplates} />
-          
+
           {/* Breeding Management */}
           <Route path="/breeding" component={BreedingManagement} />
-          
+
           {/* Lesson Scheduling */}
           <Route path="/lessons" component={LessonScheduling} />
-          
+
           {/* Feeding plans */}
           <Route path="/feeding" component={Feeding} />
-          
+
           {/* Weather */}
           <Route path="/weather" component={Weather} />
-          
+
           {/* Documents */}
           <Route path="/documents" component={Documents} />
-          
+
           {/* Tasks */}
           <Route path="/tasks" component={Tasks} />
-          
+
           {/* Contacts */}
           <Route path="/contacts" component={Contacts} />
-          
+
           {/* Stable Management */}
           <Route path="/stable" component={Stable} />
-          
+
           {/* Messaging */}
           <Route path="/messages" component={Messages} />
-          
+
           {/* Analytics */}
           <Route path="/analytics" component={Analytics} />
-          
+
           {/* Reports */}
           <Route path="/reports" component={Reports} />
-          
+
           {/* Calendar */}
           <Route path="/calendar" component={Calendar} />
-          
+
           {/* Settings */}
           <Route path="/settings" component={Settings} />
-          
+
           {/* Billing */}
           <Route path="/billing" component={BillingPage} />
-          
+
           {/* AI Chat */}
           <Route path="/ai-chat" component={AIChat} />
-          
+
           {/* Client Portal */}
           <Route path="/client/:clientId" component={ClientPortal} />
-          
+
           {/* Admin panel - requires admin role */}
           <Route path="/admin" component={Admin} />
-          
+
           {/* 404 */}
           <Route path="/404" component={NotFound} />
           <Route component={NotFound} />

@@ -149,6 +149,7 @@ ENABLE_UPLOADS=false
 ```
 
 > **Important**: Generate a secure JWT secret with:
+>
 > ```bash
 > openssl rand -base64 32
 > ```
@@ -161,6 +162,7 @@ sudo bash deployment/deploy.sh
 ```
 
 The deployment script will:
+
 - Install dependencies
 - Build the application
 - Install systemd service
@@ -280,6 +282,7 @@ sudo bash deployment/deploy.sh
 ```
 
 The deployment script handles:
+
 - Stopping the service
 - Installing new dependencies
 - Rebuilding the application

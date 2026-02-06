@@ -1,5 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -14,7 +20,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 
 /**
  * Register page
- * 
+ *
  * Supports both OAuth (if configured) and email/password registration.
  */
 export default function Register() {
@@ -184,11 +190,13 @@ export default function Register() {
 
                   {/* Terms acceptance */}
                   <div className="flex items-start gap-2">
-                    <Checkbox 
-                      id="terms" 
+                    <Checkbox
+                      id="terms"
                       className="mt-1"
                       checked={acceptTerms}
-                      onCheckedChange={(checked) => setAcceptTerms(checked as boolean)}
+                      onCheckedChange={(checked) =>
+                        setAcceptTerms(checked as boolean)
+                      }
                     />
                     <Label
                       htmlFor="terms"
@@ -281,12 +289,13 @@ export default function Register() {
 
             {/* Note */}
             <p className="text-xs text-center text-muted-foreground mt-4">
-              {oauthEnabled 
-                ? "Secure authentication with OAuth or email/password" 
+              {oauthEnabled
+                ? "Secure authentication with OAuth or email/password"
                 : "Secure email/password authentication"}
             </p>
             <p className="text-xs text-center text-muted-foreground mt-2">
-              Start your <strong>7-day free trial</strong> - no credit card required
+              Start your <strong>7-day free trial</strong> - no credit card
+              required
             </p>
           </div>
         </div>

@@ -1,5 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -14,7 +20,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 
 /**
  * Login page
- * 
+ *
  * Supports both OAuth (if configured) and email/password authentication.
  */
 export default function Login() {
@@ -136,10 +142,12 @@ export default function Login() {
                   {/* Remember me & Forgot password */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Checkbox 
+                      <Checkbox
                         id="remember"
                         checked={rememberMe}
-                        onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+                        onCheckedChange={(checked) =>
+                          setRememberMe(checked as boolean)
+                        }
                       />
                       <Label
                         htmlFor="remember"
@@ -227,8 +235,8 @@ export default function Login() {
 
             {/* Note */}
             <p className="text-xs text-center text-muted-foreground mt-4">
-              {oauthEnabled 
-                ? "Secure authentication with OAuth or email/password" 
+              {oauthEnabled
+                ? "Secure authentication with OAuth or email/password"
                 : "Secure email/password authentication"}
             </p>
           </div>

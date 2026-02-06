@@ -1,6 +1,12 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -154,7 +160,10 @@ export default function Settings() {
                           id="name"
                           value={profileData.name}
                           onChange={(e) =>
-                            setProfileData({ ...profileData, name: e.target.value })
+                            setProfileData({
+                              ...profileData,
+                              name: e.target.value,
+                            })
                           }
                           disabled={isLoading}
                         />
@@ -167,7 +176,10 @@ export default function Settings() {
                           type="email"
                           value={profileData.email}
                           onChange={(e) =>
-                            setProfileData({ ...profileData, email: e.target.value })
+                            setProfileData({
+                              ...profileData,
+                              email: e.target.value,
+                            })
                           }
                           disabled={isLoading}
                         />
@@ -229,7 +241,9 @@ export default function Settings() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="confirm-password">Confirm New Password</Label>
+                      <Label htmlFor="confirm-password">
+                        Confirm New Password
+                      </Label>
                       <Input
                         id="confirm-password"
                         type="password"
@@ -267,17 +281,20 @@ export default function Settings() {
                       {
                         key: "emailNotifications",
                         label: "Email Notifications",
-                        description: "Receive email notifications for important updates",
+                        description:
+                          "Receive email notifications for important updates",
                       },
                       {
                         key: "healthReminders",
                         label: "Health Reminders",
-                        description: "Get notified about upcoming vet visits and vaccinations",
+                        description:
+                          "Get notified about upcoming vet visits and vaccinations",
                       },
                       {
                         key: "trainingReminders",
                         label: "Training Reminders",
-                        description: "Reminders for scheduled training sessions",
+                        description:
+                          "Reminders for scheduled training sessions",
                       },
                       {
                         key: "feedingReminders",
@@ -295,7 +312,10 @@ export default function Settings() {
                         description: "Receive a weekly summary of activities",
                       },
                     ].map((item) => (
-                      <div key={item.key} className="flex items-center justify-between">
+                      <div
+                        key={item.key}
+                        className="flex items-center justify-between"
+                      >
                         <div className="space-y-0.5">
                           <Label htmlFor={item.key}>{item.label}</Label>
                           <p className="text-sm text-muted-foreground">
@@ -305,10 +325,15 @@ export default function Settings() {
                         <Switch
                           id={item.key}
                           checked={
-                            notifications[item.key as keyof typeof notifications]
+                            notifications[
+                              item.key as keyof typeof notifications
+                            ]
                           }
                           onCheckedChange={(checked) =>
-                            setNotifications({ ...notifications, [item.key]: checked })
+                            setNotifications({
+                              ...notifications,
+                              [item.key]: checked,
+                            })
                           }
                         />
                       </div>

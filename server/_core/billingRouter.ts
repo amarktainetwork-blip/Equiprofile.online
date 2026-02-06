@@ -1,6 +1,10 @@
 import express, { Router } from "express";
 import { sdk } from "./sdk";
-import { createCheckoutSession, createPortalSession, STRIPE_PRICING } from "../stripe";
+import {
+  createCheckoutSession,
+  createPortalSession,
+  STRIPE_PRICING,
+} from "../stripe";
 import { ENV } from "./env";
 
 const router: Router = express.Router();
@@ -19,12 +23,15 @@ router.get("/checkout", async (req, res) => {
 
     const plan = req.query.plan as "monthly" | "yearly";
     if (!plan || (plan !== "monthly" && plan !== "yearly")) {
-      return res.status(400).json({ error: "Invalid plan. Must be 'monthly' or 'yearly'" });
+      return res
+        .status(400)
+        .json({ error: "Invalid plan. Must be 'monthly' or 'yearly'" });
     }
 
-    const priceId = plan === "monthly" 
-      ? STRIPE_PRICING.monthly.priceId 
-      : STRIPE_PRICING.yearly.priceId;
+    const priceId =
+      plan === "monthly"
+        ? STRIPE_PRICING.monthly.priceId
+        : STRIPE_PRICING.yearly.priceId;
 
     if (!priceId) {
       return res.status(500).json({ error: "Stripe price ID not configured" });
@@ -37,11 +44,13 @@ router.get("/checkout", async (req, res) => {
       priceId,
       `${ENV.baseUrl}/billing?success=true`,
       `${ENV.baseUrl}/billing?canceled=true`,
-      user.stripeCustomerId || undefined
+      user.stripeCustomerId || undefined,
     );
 
     if (!session) {
-      return res.status(500).json({ error: "Failed to create checkout session" });
+      return res
+        .status(500)
+        .json({ error: "Failed to create checkout session" });
     }
 
     // Redirect to Stripe checkout
@@ -71,7 +80,7 @@ router.get("/portal", async (req, res) => {
     // Create portal session
     const portalUrl = await createPortalSession(
       user.stripeCustomerId,
-      `${ENV.baseUrl}/billing`
+      `${ENV.baseUrl}/billing`,
     );
 
     if (!portalUrl) {

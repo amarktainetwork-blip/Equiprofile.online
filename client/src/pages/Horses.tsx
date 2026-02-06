@@ -1,12 +1,25 @@
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { trpc } from "@/lib/trpc";
 import { Link } from "wouter";
-import { Plus, Heart, ChevronRight, Edit, Trash2, Download } from "lucide-react";
+import {
+  Plus,
+  Heart,
+  ChevronRight,
+  Edit,
+  Trash2,
+  Download,
+} from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,34 +38,34 @@ import { useRealtimeModule } from "@/hooks/useRealtime";
 function HorsesContent() {
   const { data: horses, isLoading, refetch } = trpc.horses.list.useQuery();
   const [localHorses, setLocalHorses] = useState(horses || []);
-  
+
   // Real-time updates
-  useRealtimeModule('horses', (action, data) => {
+  useRealtimeModule("horses", (action, data) => {
     switch (action) {
-      case 'created':
-        setLocalHorses(prev => [...prev, data]);
+      case "created":
+        setLocalHorses((prev) => [...prev, data]);
         toast.success(`${data.name} added`);
         break;
-      case 'updated':
-        setLocalHorses(prev => 
-          prev.map(h => h.id === data.id ? { ...h, ...data } : h)
+      case "updated":
+        setLocalHorses((prev) =>
+          prev.map((h) => (h.id === data.id ? { ...h, ...data } : h)),
         );
         break;
-      case 'deleted':
-        setLocalHorses(prev => prev.filter(h => h.id !== data.id));
+      case "deleted":
+        setLocalHorses((prev) => prev.filter((h) => h.id !== data.id));
         break;
     }
   });
-  
+
   // Update local state when query data changes
   useEffect(() => {
     if (horses) setLocalHorses(horses);
   }, [horses]);
-  
+
   const exportMutation = trpc.horses.exportCSV.useQuery(undefined, {
     enabled: false,
   });
-  
+
   const deleteMutation = trpc.horses.delete.useMutation({
     onSuccess: () => {
       toast.success("Horse removed successfully");
@@ -66,7 +79,7 @@ function HorsesContent() {
   const handleDelete = (id: number) => {
     deleteMutation.mutate({ id });
   };
-  
+
   const handleExport = async () => {
     try {
       const result = await exportMutation.refetch();
@@ -99,7 +112,9 @@ function HorsesContent() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="font-serif text-3xl font-bold text-foreground">Your Horses</h1>
+          <h1 className="font-serif text-3xl font-bold text-foreground">
+            Your Horses
+          </h1>
           <p className="text-muted-foreground mt-1">
             Manage profiles for all your equine companions
           </p>
@@ -124,9 +139,12 @@ function HorsesContent() {
         <Card className="text-center py-16">
           <CardContent>
             <Heart className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
-            <h3 className="font-serif text-xl font-semibold mb-2">No horses yet</h3>
+            <h3 className="font-serif text-xl font-semibold mb-2">
+              No horses yet
+            </h3>
             <p className="text-muted-foreground mb-6">
-              Add your first horse to start tracking their health, training, and care.
+              Add your first horse to start tracking their health, training, and
+              care.
             </p>
             <Link href="/horses/new">
               <Button>
@@ -142,9 +160,9 @@ function HorsesContent() {
             <Card key={horse.id} className="card-hover overflow-hidden">
               <div className="aspect-video bg-muted relative">
                 {horse.photoUrl ? (
-                  <img 
-                    src={horse.photoUrl} 
-                    alt={horse.name} 
+                  <img
+                    src={horse.photoUrl}
+                    alt={horse.name}
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -161,7 +179,7 @@ function HorsesContent() {
               <CardHeader>
                 <CardTitle className="font-serif">{horse.name}</CardTitle>
                 <CardDescription>
-                  {horse.breed || 'Unknown breed'}
+                  {horse.breed || "Unknown breed"}
                   {horse.age && ` • ${horse.age} years old`}
                 </CardDescription>
               </CardHeader>
@@ -188,21 +206,28 @@ function HorsesContent() {
                   </Link>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-destructive hover:text-destructive"
+                      >
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Remove {horse.name}?</AlertDialogTitle>
+                        <AlertDialogTitle>
+                          Remove {horse.name}?
+                        </AlertDialogTitle>
                         <AlertDialogDescription>
-                          This will remove the horse from your profile. All associated health records, 
-                          training sessions, and documents will also be removed.
+                          This will remove the horse from your profile. All
+                          associated health records, training sessions, and
+                          documents will also be removed.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction 
+                        <AlertDialogAction
                           onClick={() => handleDelete(horse.id)}
                           className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         >

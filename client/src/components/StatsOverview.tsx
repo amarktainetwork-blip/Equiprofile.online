@@ -55,7 +55,9 @@ export function StatsOverview({
         return (
           <Card key={stat.title}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                {stat.title}
+              </CardTitle>
               <div className={`p-2 rounded-lg ${stat.bgColor}`}>
                 <Icon className={`h-4 w-4 ${stat.color}`} />
               </div>
@@ -63,7 +65,7 @@ export function StatsOverview({
             <CardContent>
               <div className="text-2xl font-bold">{stat.value}</div>
               <p className="text-xs text-muted-foreground mt-1">
-                {stat.value === 0 ? 'No data yet' : 'This month'}
+                {stat.value === 0 ? "No data yet" : "This month"}
               </p>
             </CardContent>
           </Card>

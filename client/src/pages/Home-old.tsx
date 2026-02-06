@@ -1,17 +1,23 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MarketingNav } from "@/components/MarketingNav";
 import { PageTransition } from "@/components/PageTransition";
 import { ScrollReveal, Stagger, StaggerItem } from "@/components/ScrollReveal";
 import { Link } from "wouter";
-import { 
-  Heart, 
-  Calendar, 
-  CloudSun, 
-  FileText, 
-  Check, 
+import {
+  Heart,
+  Calendar,
+  CloudSun,
+  FileText,
+  Check,
   ChevronRight,
   Sparkles,
   Activity,
@@ -26,52 +32,61 @@ export default function Home() {
     {
       icon: Heart,
       title: "Health Records",
-      description: "Track vaccinations, vet visits, medications, and medical history with automated reminders."
+      description:
+        "Track vaccinations, vet visits, medications, and medical history with automated reminders.",
     },
     {
       icon: Activity,
       title: "Training Management",
-      description: "Plan sessions, log progress, and track performance with detailed analytics."
+      description:
+        "Plan sessions, log progress, and track performance with detailed analytics.",
     },
     {
       icon: Utensils,
       title: "Feeding Schedules",
-      description: "Create custom feeding plans with nutrition tracking and meal reminders."
+      description:
+        "Create custom feeding plans with nutrition tracking and meal reminders.",
     },
     {
       icon: Calendar,
       title: "Calendar & Events",
-      description: "Never miss appointments with integrated scheduling and notifications."
+      description:
+        "Never miss appointments with integrated scheduling and notifications.",
     },
     {
       icon: CloudSun,
       title: "AI Weather Analysis",
-      description: "Get intelligent riding recommendations based on real-time weather conditions."
+      description:
+        "Get intelligent riding recommendations based on real-time weather conditions.",
     },
     {
       icon: FileText,
       title: "Document Storage",
-      description: "Securely store all important papers, records, and certificates in one place."
-    }
+      description:
+        "Securely store all important papers, records, and certificates in one place.",
+    },
   ];
 
   const testimonials = [
     {
       name: "Sarah Thompson",
       role: "Dressage Rider",
-      content: "EquiProfile has completely transformed how I manage my horses. The health tracking and reminders have been invaluable!",
+      content:
+        "EquiProfile has completely transformed how I manage my horses. The health tracking and reminders have been invaluable!",
       rating: 5,
     },
     {
       name: "Michael Chen",
       role: "Stable Manager",
-      content: "Managing 20+ horses used to be overwhelming. EquiProfile makes it simple and organized. Highly recommend!",
+      content:
+        "Managing 20+ horses used to be overwhelming. EquiProfile makes it simple and organized. Highly recommend!",
       rating: 5,
     },
     {
       name: "Emma Rodriguez",
       role: "Eventing Trainer",
-      content: "The training logs and analytics are fantastic. I can see progress clearly and share updates with clients easily.",
+      content:
+        "The training logs and analytics are fantastic. I can see progress clearly and share updates with clients easily.",
       rating: 5,
     },
   ];
@@ -92,38 +107,45 @@ export default function Home() {
           <section className="relative pt-24 lg:pt-32 pb-16 lg:pb-24 overflow-hidden">
             {/* Background gradient */}
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
-            
+
             <div className="container relative z-10">
               <div className="grid lg:grid-cols-2 gap-12 items-center">
                 <div
                   style={{
-                    animation: 'fadeInUp 0.6s ease-out'
+                    animation: "fadeInUp 0.6s ease-out",
                   }}
                 >
                   <Badge className="mb-6 inline-flex items-center gap-1">
                     <Sparkles className="w-3 h-3" />
                     14-Day Free Trial
                   </Badge>
-                  
+
                   <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-6">
                     Professional Horse Management Made{" "}
                     <span className="text-gradient">Simple</span>
                   </h1>
-                  
+
                   <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed">
-                    The complete digital platform for horse owners, trainers, and equestrian professionals. 
-                    Track health records, manage training, and provide exceptional care—all in one place.
+                    The complete digital platform for horse owners, trainers,
+                    and equestrian professionals. Track health records, manage
+                    training, and provide exceptional care—all in one place.
                   </p>
-                  
+
                   <div className="flex flex-col sm:flex-row gap-4 mb-8">
                     <Link href={isAuthenticated ? "/dashboard" : "/register"}>
                       <Button size="lg" className="text-lg w-full sm:w-auto">
-                        {isAuthenticated ? "Go to Dashboard" : "Start Free Trial"}
+                        {isAuthenticated
+                          ? "Go to Dashboard"
+                          : "Start Free Trial"}
                         <ChevronRight className="w-5 h-5 ml-2" />
                       </Button>
                     </Link>
                     <Link href="/features">
-                      <Button size="lg" variant="outline" className="text-lg w-full sm:w-auto">
+                      <Button
+                        size="lg"
+                        variant="outline"
+                        className="text-lg w-full sm:w-auto"
+                      >
                         Explore Features
                       </Button>
                     </Link>
@@ -147,14 +169,14 @@ export default function Home() {
 
                 <div
                   style={{
-                    animation: 'fadeInScale 0.6s ease-out 0.2s both'
+                    animation: "fadeInScale 0.6s ease-out 0.2s both",
                   }}
                   className="relative"
                 >
                   <div className="relative aspect-square rounded-2xl overflow-hidden shadow-2xl">
-                    <img 
-                      src="/assets/horse-1.svg" 
-                      alt="Professional horse care" 
+                    <img
+                      src="/assets/horse-1.svg"
+                      alt="Professional horse care"
                       className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
@@ -162,7 +184,7 @@ export default function Home() {
                   {/* Floating card */}
                   <div
                     style={{
-                      animation: 'fadeInUp 0.6s ease-out 0.4s both'
+                      animation: "fadeInUp 0.6s ease-out 0.4s both",
                     }}
                     className="absolute -bottom-6 -left-6 bg-card p-4 rounded-xl shadow-xl border"
                   >
@@ -172,7 +194,9 @@ export default function Home() {
                       </div>
                       <div>
                         <div className="font-semibold">Health Tracking</div>
-                        <div className="text-sm text-muted-foreground">Never miss a checkup</div>
+                        <div className="text-sm text-muted-foreground">
+                          Never miss a checkup
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -206,14 +230,17 @@ export default function Home() {
             <div className="container">
               <ScrollReveal>
                 <div className="text-center max-w-3xl mx-auto mb-16">
-                  <Badge className="mb-4" variant="secondary">Features</Badge>
+                  <Badge className="mb-4" variant="secondary">
+                    Features
+                  </Badge>
                   <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
                     Everything You Need for{" "}
                     <span className="text-gradient">Complete Care</span>
                   </h2>
                   <p className="text-lg md:text-xl text-muted-foreground">
-                    From health tracking to AI-powered insights, EquiProfile provides all the tools 
-                    you need to keep your horses healthy, happy, and performing their best.
+                    From health tracking to AI-powered insights, EquiProfile
+                    provides all the tools you need to keep your horses healthy,
+                    happy, and performing their best.
                   </p>
                 </div>
               </ScrollReveal>
@@ -226,7 +253,9 @@ export default function Home() {
                         <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
                           <feature.icon className="w-7 h-7 text-primary" />
                         </div>
-                        <CardTitle className="text-xl">{feature.title}</CardTitle>
+                        <CardTitle className="text-xl">
+                          {feature.title}
+                        </CardTitle>
                       </CardHeader>
                       <CardContent>
                         <CardDescription className="text-base">
@@ -256,7 +285,9 @@ export default function Home() {
             <div className="container">
               <ScrollReveal>
                 <div className="text-center max-w-3xl mx-auto mb-16">
-                  <Badge className="mb-4" variant="secondary">Testimonials</Badge>
+                  <Badge className="mb-4" variant="secondary">
+                    Testimonials
+                  </Badge>
                   <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
                     Loved by Horse Owners Worldwide
                   </h2>
@@ -272,9 +303,14 @@ export default function Home() {
                     <Card className="h-full">
                       <CardHeader>
                         <div className="flex gap-1 mb-4">
-                          {Array.from({ length: testimonial.rating }).map((_, i) => (
-                            <Star key={i} className="w-5 h-5 fill-primary text-primary" />
-                          ))}
+                          {Array.from({ length: testimonial.rating }).map(
+                            (_, i) => (
+                              <Star
+                                key={i}
+                                className="w-5 h-5 fill-primary text-primary"
+                              />
+                            ),
+                          )}
                         </div>
                         <CardDescription className="text-base leading-relaxed">
                           "{testimonial.content}"
@@ -282,7 +318,9 @@ export default function Home() {
                       </CardHeader>
                       <CardContent>
                         <div className="font-semibold">{testimonial.name}</div>
-                        <div className="text-sm text-muted-foreground">{testimonial.role}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {testimonial.role}
+                        </div>
                       </CardContent>
                     </Card>
                   </StaggerItem>
@@ -301,8 +339,8 @@ export default function Home() {
                       Simple, Transparent Pricing
                     </h2>
                     <p className="text-lg md:text-xl text-muted-foreground mb-8">
-                      Start with a 14-day free trial. Plans start at just $9/month. 
-                      No credit card required to get started.
+                      Start with a 14-day free trial. Plans start at just
+                      $9/month. No credit card required to get started.
                     </p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                       <Link href="/pricing">
@@ -311,7 +349,11 @@ export default function Home() {
                         </Button>
                       </Link>
                       <Link href="/register">
-                        <Button size="lg" variant="outline" className="text-lg w-full sm:w-auto">
+                        <Button
+                          size="lg"
+                          variant="outline"
+                          className="text-lg w-full sm:w-auto"
+                        >
                           Start Free Trial
                         </Button>
                       </Link>
@@ -331,11 +373,15 @@ export default function Home() {
                     Ready to Transform Your Horse Care?
                   </h2>
                   <p className="text-lg md:text-xl text-primary-foreground/90 mb-8">
-                    Join thousands of horse owners who trust EquiProfile to manage their equine companions. 
-                    Start your free trial today—no credit card required.
+                    Join thousands of horse owners who trust EquiProfile to
+                    manage their equine companions. Start your free trial
+                    today—no credit card required.
                   </p>
                   <Link href="/register">
-                    <Button size="lg" className="bg-background text-foreground hover:bg-background/90 text-lg">
+                    <Button
+                      size="lg"
+                      className="bg-background text-foreground hover:bg-background/90 text-lg"
+                    >
                       Start Your Free Trial
                       <ChevronRight className="w-5 h-5 ml-2" />
                     </Button>
@@ -357,35 +403,82 @@ export default function Home() {
                     Professional horse management for the modern equestrian.
                   </p>
                 </div>
-                
+
                 <div>
                   <h4 className="font-semibold mb-4">Product</h4>
                   <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li><Link href="/features"><a className="hover:text-foreground transition-colors">Features</a></Link></li>
-                    <li><Link href="/pricing"><a className="hover:text-foreground transition-colors">Pricing</a></Link></li>
-                    <li><Link href="/dashboard"><a className="hover:text-foreground transition-colors">Dashboard</a></Link></li>
+                    <li>
+                      <Link href="/features">
+                        <a className="hover:text-foreground transition-colors">
+                          Features
+                        </a>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link href="/pricing">
+                        <a className="hover:text-foreground transition-colors">
+                          Pricing
+                        </a>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link href="/dashboard">
+                        <a className="hover:text-foreground transition-colors">
+                          Dashboard
+                        </a>
+                      </Link>
+                    </li>
                   </ul>
                 </div>
-                
+
                 <div>
                   <h4 className="font-semibold mb-4">Company</h4>
                   <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li><Link href="/about"><a className="hover:text-foreground transition-colors">About</a></Link></li>
-                    <li><Link href="/contact"><a className="hover:text-foreground transition-colors">Contact</a></Link></li>
+                    <li>
+                      <Link href="/about">
+                        <a className="hover:text-foreground transition-colors">
+                          About
+                        </a>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link href="/contact">
+                        <a className="hover:text-foreground transition-colors">
+                          Contact
+                        </a>
+                      </Link>
+                    </li>
                   </ul>
                 </div>
-                
+
                 <div>
                   <h4 className="font-semibold mb-4">Legal</h4>
                   <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li><a href="#" className="hover:text-foreground transition-colors">Privacy</a></li>
-                    <li><a href="#" className="hover:text-foreground transition-colors">Terms</a></li>
+                    <li>
+                      <a
+                        href="#"
+                        className="hover:text-foreground transition-colors"
+                      >
+                        Privacy
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href="#"
+                        className="hover:text-foreground transition-colors"
+                      >
+                        Terms
+                      </a>
+                    </li>
                   </ul>
                 </div>
               </div>
-              
+
               <div className="border-t pt-8 text-center text-sm text-muted-foreground">
-                <p>© {new Date().getFullYear()} EquiProfile. All rights reserved.</p>
+                <p>
+                  © {new Date().getFullYear()} EquiProfile. All rights
+                  reserved.
+                </p>
               </div>
             </div>
           </footer>

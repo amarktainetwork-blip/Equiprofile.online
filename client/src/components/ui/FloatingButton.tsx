@@ -1,6 +1,6 @@
-import { motion } from 'framer-motion';
-import { Plus } from 'lucide-react';
-import { ReactNode, useState } from 'react';
+import { motion } from "framer-motion";
+import { Plus } from "lucide-react";
+import { ReactNode, useState } from "react";
 
 interface FloatingButtonProps {
   actions: Array<{
@@ -12,7 +12,7 @@ interface FloatingButtonProps {
 
 /**
  * FloatingButton with speed dial action menu
- * 
+ *
  * Note: Using 'as any' type assertions for framer-motion props is a workaround
  * for React 19 type compatibility issues with framer-motion 12.x. This is a
  * known limitation and will be resolved when framer-motion releases full React 19 support.

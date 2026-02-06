@@ -14,7 +14,7 @@ const navLinks = [
 
 /**
  * Marketing navigation component for public pages
- * 
+ *
  * Features:
  * - Responsive design with mobile hamburger menu
  * - Sticky header with background change on scroll
@@ -131,11 +131,14 @@ export function MarketingNav() {
                   </a>
                 </Link>
               ))}
-              
+
               <div className="pt-4 border-t flex flex-col gap-2">
                 {isAuthenticated ? (
                   <Link href="/dashboard">
-                    <Button className="w-full" onClick={() => setMobileMenuOpen(false)}>
+                    <Button
+                      className="w-full"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
                       Go to Dashboard
                     </Button>
                   </Link>

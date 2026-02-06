@@ -6,8 +6,8 @@ import { TRPCError } from "@trpc/server";
 function checkStripeEnabled() {
   if (!ENV.enableStripe) {
     throw new TRPCError({
-      code: 'PRECONDITION_FAILED',
-      message: 'Billing is disabled'
+      code: "PRECONDITION_FAILED",
+      message: "Billing is disabled",
     });
   }
 }
@@ -18,7 +18,7 @@ export function getStripe(): Stripe | null {
     console.warn("[Stripe] Billing feature is disabled");
     return null;
   }
-  
+
   if (!process.env.STRIPE_SECRET_KEY) {
     console.warn("[Stripe] Secret key not configured");
     return null;
@@ -53,10 +53,10 @@ export async function createCheckoutSession(
   priceId: string,
   successUrl: string,
   cancelUrl: string,
-  customerId?: string
+  customerId?: string,
 ): Promise<{ sessionId: string; url: string } | null> {
   checkStripeEnabled();
-  
+
   const stripe = getStripe();
   if (!stripe) return null;
 
@@ -98,10 +98,10 @@ export async function createCheckoutSession(
 // Create customer portal session
 export async function createPortalSession(
   customerId: string,
-  returnUrl: string
+  returnUrl: string,
 ): Promise<string | null> {
   checkStripeEnabled();
-  
+
   const stripe = getStripe();
   if (!stripe) return null;
 
@@ -120,7 +120,7 @@ export async function createPortalSession(
 
 // Get subscription details
 export async function getSubscription(
-  subscriptionId: string
+  subscriptionId: string,
 ): Promise<Stripe.Subscription | null> {
   const stripe = getStripe();
   if (!stripe) return null;
@@ -135,7 +135,7 @@ export async function getSubscription(
 
 // Cancel subscription at period end
 export async function cancelSubscription(
-  subscriptionId: string
+  subscriptionId: string,
 ): Promise<boolean> {
   const stripe = getStripe();
   if (!stripe) return false;
@@ -153,7 +153,7 @@ export async function cancelSubscription(
 
 // Reactivate cancelled subscription
 export async function reactivateSubscription(
-  subscriptionId: string
+  subscriptionId: string,
 ): Promise<boolean> {
   const stripe = getStripe();
   if (!stripe) return false;

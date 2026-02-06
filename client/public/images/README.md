@@ -5,6 +5,7 @@ This directory contains all visual assets for the EquiProfile application.
 ## Current Assets
 
 ### Feature Icons (`features/`)
+
 - `icon-automation.svg` - Automation/workflow icon
 - `icon-analytics.svg` - Analytics/charts icon
 - `icon-security.svg` - Security/lock icon
@@ -13,6 +14,7 @@ This directory contains all visual assets for the EquiProfile application.
 - `icon-support.svg` - Support/help icon
 
 **Note**: These are placeholder SVG icons. For production, consider:
+
 - Using your brand's icon style
 - Ensuring consistent stroke width and sizing
 - Optimizing SVGs with SVGO
@@ -21,6 +23,7 @@ This directory contains all visual assets for the EquiProfile application.
 ### Hero Images (To Be Added)
 
 **hero.webp** (Required for new design)
+
 - **Recommended size**: 1920x1080px
 - **Format**: WebP (for optimal loading)
 - **Content suggestions**:
@@ -32,6 +35,7 @@ This directory contains all visual assets for the EquiProfile application.
 - **Fallback**: Can temporarily use `hero-horse.jpg` (exists in directory)
 
 ### Current Images (May be replaced)
+
 - `hero-horse.jpg` (245KB) - Current hero image
 - `horse-stable.jpg` (70KB) - Stable scene
 - `riding-lesson.jpg` (110KB) - Training scene
@@ -41,6 +45,7 @@ This directory contains all visual assets for the EquiProfile application.
 ## Image Guidelines
 
 ### Performance Requirements
+
 1. **Format**: Use WebP for photos, SVG for icons/graphics
 2. **Compression**: All images should be optimized
    - Photos: 60-80% quality WebP
@@ -49,11 +54,13 @@ This directory contains all visual assets for the EquiProfile application.
 4. **Responsive**: Provide multiple sizes for different viewports
 
 ### Naming Conventions
+
 - Use kebab-case: `hero-background.webp`
 - Be descriptive: `dashboard-empty-state.svg`
 - Include dimensions if specific: `logo-192x192.png`
 
 ### Directory Structure
+
 ```
 images/
 ├── features/          # Feature section icons
@@ -65,6 +72,7 @@ images/
 ## Adding New Images
 
 ### For WebP Conversion
+
 ```bash
 # Using sharp-cli (recommended)
 npx sharp-cli --input source.jpg --output optimized.webp --quality 75
@@ -74,12 +82,14 @@ cwebp -q 75 source.jpg -o optimized.webp
 ```
 
 ### For SVG Optimization
+
 ```bash
 # Using SVGO
 npx svgo input.svg -o output.svg
 ```
 
 ## Future Improvements
+
 - [ ] Replace hero-horse.jpg with modern hero.webp
 - [ ] Optimize all existing JPG images to WebP
 - [ ] Add dark mode variants if needed
@@ -88,7 +98,9 @@ npx svgo input.svg -o output.svg
 - [ ] Create app store screenshots
 
 ## Copyright Notice
+
 Ensure all images used are:
+
 - Owned by you/your organization
 - Licensed for commercial use
 - Properly attributed if required

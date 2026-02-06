@@ -11,7 +11,7 @@ interface ScrollRevealProps {
 
 /**
  * Scroll reveal animation component
- * 
+ *
  * Animates children when they enter the viewport
  * Uses IntersectionObserver via Framer Motion's useInView
  */
@@ -41,7 +41,7 @@ export function ScrollReveal({
       opacity: 1,
       x: 0,
       y: 0,
-    }
+    },
   };
 
   return (
@@ -117,7 +117,13 @@ const staggerItemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-export function StaggerItem({ children, className = "" }: { children: ReactNode; className?: string }) {
+export function StaggerItem({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return (
     <motion.div
       {...({

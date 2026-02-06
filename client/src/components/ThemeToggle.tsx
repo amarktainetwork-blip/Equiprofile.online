@@ -6,9 +6,9 @@ export function ThemeToggle() {
   const { isDarkMode, toggleTheme } = useTheme();
 
   return (
-    <Button 
-      variant="ghost" 
-      size="icon" 
+    <Button
+      variant="ghost"
+      size="icon"
       aria-label="Toggle theme"
       onClick={toggleTheme}
     >

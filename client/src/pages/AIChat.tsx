@@ -11,7 +11,11 @@ import { toast } from "sonner";
 
 export default function AIChat() {
   const [messages, setMessages] = useState<Message[]>([
-    { role: "system", content: "You are EquiProfile AI Assistant, an expert in horse care, training, and management." },
+    {
+      role: "system",
+      content:
+        "You are EquiProfile AI Assistant, an expert in horse care, training, and management.",
+    },
   ]);
   const [showPasswordInput, setShowPasswordInput] = useState(false);
   const [password, setPassword] = useState("");
@@ -22,8 +26,8 @@ export default function AIChat() {
 
   const chatMutation = trpc.ai.chat.useMutation({
     onSuccess: (response: any) => {
-      setMessages(prev => [...prev, response]);
-      
+      setMessages((prev) => [...prev, response]);
+
       // Check if this is an admin challenge
       if (response.metadata?.adminChallenge) {
         setShowPasswordInput(true);
@@ -39,17 +43,23 @@ export default function AIChat() {
       setShowPasswordInput(false);
       setPassword("");
       setAdminStatus({ isUnlocked: true, expiresAt: data.expiresAt });
-      setMessages(prev => [...prev, {
-        role: "assistant",
-        content: `✅ **Admin mode unlocked!**\n\nYou now have full admin access until ${new Date(data.expiresAt).toLocaleString()}.\n\nNavigate to the Admin panel to manage users, system settings, and more.`,
-      }]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: `✅ **Admin mode unlocked!**\n\nYou now have full admin access until ${new Date(data.expiresAt).toLocaleString()}.\n\nNavigate to the Admin panel to manage users, system settings, and more.`,
+        },
+      ]);
       toast.success("Admin mode unlocked successfully!");
     },
     onError: (error: any) => {
-      setMessages(prev => [...prev, {
-        role: "assistant",
-        content: `❌ ${error.message}`,
-      }]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: `❌ ${error.message}`,
+        },
+      ]);
       setPassword("");
       toast.error(error.message);
     },
@@ -67,7 +77,7 @@ export default function AIChat() {
 
   const handleSend = (content: string) => {
     const newMessage: Message = { role: "user", content };
-    setMessages(prev => [...prev, newMessage]);
+    setMessages((prev) => [...prev, newMessage]);
     chatMutation.mutate({ messages: [...messages, newMessage] });
   };
 
@@ -86,7 +96,9 @@ export default function AIChat() {
             <Alert className="w-auto">
               <ShieldCheck className="h-4 w-4" />
               <AlertDescription>
-                Admin unlocked until {adminStatus.expiresAt && new Date(adminStatus.expiresAt).toLocaleTimeString()}
+                Admin unlocked until{" "}
+                {adminStatus.expiresAt &&
+                  new Date(adminStatus.expiresAt).toLocaleTimeString()}
               </AlertDescription>
             </Alert>
           )}
@@ -119,10 +131,12 @@ export default function AIChat() {
                     placeholder="Enter admin password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handlePasswordSubmit()}
+                    onKeyDown={(e) =>
+                      e.key === "Enter" && handlePasswordSubmit()
+                    }
                     disabled={unlockMutation.isPending}
                   />
-                  <Button 
+                  <Button
                     onClick={handlePasswordSubmit}
                     disabled={unlockMutation.isPending || !password.trim()}
                   >

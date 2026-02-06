@@ -11,12 +11,15 @@ interface ProtectedRouteProps {
 
 /**
  * Protected route wrapper
- * 
+ *
  * Ensures user is authenticated before rendering children.
  * Redirects to login if not authenticated.
  * Optionally can require admin role.
  */
-export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRouteProps) {
+export function ProtectedRoute({
+  children,
+  requireAdmin = false,
+}: ProtectedRouteProps) {
   const { user, loading, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
 
@@ -25,15 +28,17 @@ export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRout
 
     if (!isAuthenticated) {
       // Redirect to login with return URL
-      const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+      const returnUrl = encodeURIComponent(
+        window.location.pathname + window.location.search,
+      );
       const loginUrl = getLoginUrl();
       window.location.href = `${loginUrl}&returnUrl=${returnUrl}`;
       return;
     }
 
-    if (requireAdmin && user?.role !== 'admin') {
+    if (requireAdmin && user?.role !== "admin") {
       // Redirect to dashboard if user is not admin
-      setLocation('/dashboard');
+      setLocation("/dashboard");
     }
   }, [loading, isAuthenticated, requireAdmin, user, setLocation]);
 
@@ -55,7 +60,7 @@ export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRout
   }
 
   // Don't render if admin required but user is not admin
-  if (requireAdmin && user?.role !== 'admin') {
+  if (requireAdmin && user?.role !== "admin") {
     return null;
   }
 

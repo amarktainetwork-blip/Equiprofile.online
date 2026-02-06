@@ -221,7 +221,10 @@ export default function Features() {
                     </p>
                     <ul className="space-y-2">
                       {feature.points.map((point, idx) => (
-                        <li key={idx} className="flex items-center gap-2 text-sm">
+                        <li
+                          key={idx}
+                          className="flex items-center gap-2 text-sm"
+                        >
                           <div className="w-1.5 h-1.5 rounded-full bg-primary" />
                           <span>{point}</span>
                         </li>
@@ -242,8 +245,8 @@ export default function Features() {
                     Ready to Transform Your Horse Management?
                   </h2>
                   <p className="text-lg text-muted-foreground mb-8">
-                    Join thousands of horse owners who trust EquiProfile for their
-                    equine management needs.
+                    Join thousands of horse owners who trust EquiProfile for
+                    their equine management needs.
                   </p>
                   <Link href="/register">
                     <Button size="lg" className="text-lg">

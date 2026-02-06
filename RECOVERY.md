@@ -225,6 +225,7 @@ grep " 4[0-9][0-9] " /var/log/nginx/equiprofile-access.log | tail -50
 ### Scenario 1: Application won't start after deployment
 
 **Symptoms:**
+
 - `systemctl status equiprofile` shows "failed" or "inactive"
 - `/api/health` endpoint not responding
 
@@ -252,6 +253,7 @@ sudo systemctl restart equiprofile
 ### Scenario 2: Nginx serving 502 Bad Gateway
 
 **Symptoms:**
+
 - Website shows "502 Bad Gateway"
 - Nginx is running but can't reach backend
 
@@ -282,6 +284,7 @@ sudo systemctl reload nginx
 ### Scenario 3: Deployment failed mid-way
 
 **Symptoms:**
+
 - Deployment log shows errors
 - Application in unknown state
 
@@ -312,6 +315,7 @@ sudo bash ops/deploy.sh --domain equiprofile.online --resume
 ### Scenario 4: Users seeing old version (cache issue)
 
 **Symptoms:**
+
 - Deployment succeeded but users see old UI
 - Build SHA doesn't match expected version
 
@@ -344,6 +348,7 @@ curl https://equiprofile.online/api/version
 ### Scenario 5: Database connection lost
 
 **Symptoms:**
+
 - Application logs show database errors
 - API returns 500 errors
 
@@ -446,21 +451,25 @@ sudo bash ops/verify.sh --domain equiprofile.online
 ## Prevention Tips
 
 1. **Always backup .env before major changes:**
+
    ```bash
    sudo cp /var/equiprofile/app/.env /backup/.env_$(date +%Y%m%d)
    ```
 
 2. **Use --unit mode for deployments to survive SSH disconnects:**
+
    ```bash
    sudo bash ops/deploy.sh --unit --domain equiprofile.online
    ```
 
 3. **Monitor deployment logs during deployment:**
+
    ```bash
    tail -f /var/equiprofile/_ops/deploy_*.log
    ```
 
 4. **Always run verify.sh after deployment:**
+
    ```bash
    sudo bash ops/verify.sh --domain equiprofile.online
    ```

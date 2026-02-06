@@ -9,16 +9,19 @@ interface PageTransitionProps {
 const pageVariants = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -20 }
+  exit: { opacity: 0, y: -20 },
 };
 
 /**
  * Page transition wrapper component
- * 
+ *
  * Provides smooth fade + slide up animations when pages load
  * Use this to wrap page components for consistent transitions
  */
-export function PageTransition({ children, className = "" }: PageTransitionProps) {
+export function PageTransition({
+  children,
+  className = "",
+}: PageTransitionProps) {
   return (
     <motion.div
       {...({
