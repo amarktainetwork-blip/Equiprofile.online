@@ -6,12 +6,13 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
-import { toast } from "../components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2, Calendar, Stethoscope, AlertCircle } from "lucide-react";
 import { DashboardLayout } from "../components/DashboardLayout";
-import { useRealtime } from "../hooks/useRealtime";
+import { useRealtimeModule } from "../hooks/useRealtime";
 
 function DentalCareContent() {
+  const { toast } = useToast();
   const { data: dentalRecords, refetch } = trpc.dentalCare.list.useQuery();
   const { data: horses } = trpc.horses.list.useQuery();
   const createMutation = trpc.dentalCare.create.useMutation();
@@ -23,16 +24,14 @@ function DentalCareContent() {
   const [localRecords, setLocalRecords] = useState(dentalRecords || []);
 
   // Real-time updates
-  useRealtime((module, action, data) => {
-    if (module === 'dentalCare') {
-      if (action === 'created') {
-        setLocalRecords(prev => [data, ...prev]);
-        toast({ title: "Dental record added", description: "New dental care record created" });
-      } else if (action === 'updated') {
-        setLocalRecords(prev => prev.map(r => r.id === data.id ? { ...r, ...data } : r));
-      } else if (action === 'deleted') {
-        setLocalRecords(prev => prev.filter(r => r.id !== data.id));
-      }
+  useRealtimeModule('dentalCare', (action, data) => {
+    if (action === 'created') {
+      setLocalRecords(prev => [data, ...prev]);
+      toast({ title: "Dental record added", description: "New dental care record created" });
+    } else if (action === 'updated') {
+      setLocalRecords(prev => prev.map(r => r.id === data.id ? { ...r, ...data} : r));
+    } else if (action === 'deleted') {
+      setLocalRecords(prev => prev.filter(r => r.id !== data.id));
     }
   });
 
@@ -323,7 +322,7 @@ function DentalCareContent() {
                 <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                   Cancel
                 </Button>
-                <Button type="submit" disabled={createMutation.isLoading || updateMutation.isLoading}>
+                <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
                   {editingId ? "Update" : "Create"} Record
                 </Button>
               </div>
