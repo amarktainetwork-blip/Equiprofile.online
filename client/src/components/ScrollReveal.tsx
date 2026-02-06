@@ -42,19 +42,21 @@ export function ScrollReveal({
       x: 0,
       y: 0,
     }
-  } as const;
+  };
 
   return (
     <motion.div
       ref={ref}
-      variants={variants}
-      initial="hidden"
-      animate={isInView ? "visible" : "hidden"}
-      transition={{
-        duration: 0.5,
-        delay,
-        ease: "easeOut",
-      }}
+      {...({
+        variants,
+        initial: "hidden",
+        animate: isInView ? "visible" : "hidden",
+        transition: {
+          duration: 0.5,
+          delay,
+          ease: "easeOut",
+        },
+      } as any)}
       className={className}
     >
       {children}
@@ -89,14 +91,16 @@ export function Stagger({
         staggerChildren: staggerDelay,
       },
     },
-  } as const;
+  };
 
   return (
     <motion.div
       ref={ref}
-      variants={customVariants}
-      initial="hidden"
-      animate={isInView ? "visible" : "hidden"}
+      {...({
+        variants: customVariants,
+        initial: "hidden",
+        animate: isInView ? "visible" : "hidden",
+      } as any)}
       className={className}
     >
       {children}
@@ -111,13 +115,15 @@ export function Stagger({
 const staggerItemVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0 },
-} as const;
+};
 
 export function StaggerItem({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <motion.div
-      variants={staggerItemVariants}
-      transition={{ duration: 0.4, ease: "easeOut" }}
+      {...({
+        variants: staggerItemVariants,
+        transition: { duration: 0.4, ease: "easeOut" },
+      } as any)}
       className={className}
     >
       {children}

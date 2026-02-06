@@ -16,7 +16,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 
 export default function Settings() {
   const { user } = useAuth();
-  const { theme, setTheme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
 
   const [profileData, setProfileData] = useState({
@@ -334,11 +334,11 @@ export default function Settings() {
                 <CardContent className="space-y-6">
                   <div className="space-y-4">
                     <Label>Theme</Label>
-                    <div className="grid grid-cols-3 gap-4">
-                      {["light", "dark", "system"].map((themeOption) => (
+                    <div className="grid grid-cols-2 gap-4">
+                      {["light", "dark"].map((themeOption) => (
                         <button
                           key={themeOption}
-                          onClick={() => setTheme(themeOption as any)}
+                          onClick={toggleTheme}
                           className={`p-4 border-2 rounded-lg transition-all ${
                             theme === themeOption
                               ? "border-primary bg-primary/5"
@@ -350,9 +350,7 @@ export default function Settings() {
                               {themeOption}
                             </div>
                             <div className="text-xs text-muted-foreground">
-                              {themeOption === "system"
-                                ? "Match system"
-                                : `Use ${themeOption} theme`}
+                              Use {themeOption} theme
                             </div>
                           </div>
                         </button>

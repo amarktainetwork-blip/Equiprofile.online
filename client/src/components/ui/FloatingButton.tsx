@@ -18,16 +18,20 @@ export function FloatingButton({ actions }: FloatingButtonProps) {
       {/* Speed dial menu */}
       {isOpen && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
+          {...({
+            initial: { opacity: 0, scale: 0.8 },
+            animate: { opacity: 1, scale: 1 },
+          } as any)}
           className="absolute bottom-20 right-0 flex flex-col gap-3"
         >
           {actions.map((action, index) => (
             <motion.button
               key={index}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.05 }}
+              {...({
+                initial: { opacity: 0, x: 20 },
+                animate: { opacity: 1, x: 0 },
+                transition: { delay: index * 0.05 },
+              } as any)}
               onClick={() => {
                 action.onClick();
                 setIsOpen(false);
@@ -47,14 +51,18 @@ export function FloatingButton({ actions }: FloatingButtonProps) {
 
       {/* Main FAB */}
       <motion.button
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
+        {...({
+          whileHover: { scale: 1.1 },
+          whileTap: { scale: 0.9 },
+        } as any)}
         onClick={() => setIsOpen(!isOpen)}
         className="w-16 h-16 bg-gradient-to-r from-blue-600 to-blue-700 rounded-full shadow-2xl flex items-center justify-center text-white hover:shadow-blue-500/50 transition-shadow"
       >
         <motion.div
-          animate={{ rotate: isOpen ? 45 : 0 }}
-          transition={{ duration: 0.2 }}
+          {...({
+            animate: { rotate: isOpen ? 45 : 0 },
+            transition: { duration: 0.2 },
+          } as any)}
         >
           <Plus size={28} />
         </motion.div>
