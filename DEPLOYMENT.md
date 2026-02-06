@@ -193,6 +193,7 @@ sudo bash ops/deploy.sh \
 ```
 
 The deployment script will:
+
 1. ✓ Run pre-flight checks
 2. ✓ Install Node.js and dependencies
 3. ✓ Setup deployment directory
@@ -214,6 +215,7 @@ sudo bash ops/verify.sh --domain equiprofile.online
 ```
 
 Verification checks:
+
 - ✓ Service status
 - ✓ Health endpoints
 - ✓ Frontend assets
@@ -394,14 +396,17 @@ curl -I https://equiprofile.online/ | grep Cache-Control
 ### Regular Tasks
 
 #### Daily
+
 - Monitor application logs: `journalctl -u equiprofile --since "1 hour ago"`
 - Check disk space: `df -h`
 
 #### Weekly
+
 - Review access logs: `tail -100 /var/log/nginx/equiprofile-access.log`
 - Check for updates: `cd /var/equiprofile/app && git fetch`
 
 #### Monthly
+
 - Update system packages: `sudo apt update && sudo apt upgrade`
 - Rotate old deployment logs: `find /var/equiprofile/_ops -name "deploy_*.log" -mtime +30 -delete`
 
@@ -490,6 +495,7 @@ sudo nano /etc/systemd/system/equiprofile.service
 ```
 
 Add under `[Service]`:
+
 ```ini
 LimitNOFILE=65536
 LimitNPROC=512
@@ -498,6 +504,7 @@ CPUQuota=200%
 ```
 
 Then reload:
+
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl restart equiprofile
@@ -527,6 +534,7 @@ sudo systemctl restart equiprofile
 ## Support
 
 For issues or questions:
+
 - GitHub Issues: https://github.com/amarktainetwork-blip/Equiprofile.online/issues
 - Documentation: See `docs/` directory
 - Deployment Recovery: See `RECOVERY.md`
@@ -538,12 +546,15 @@ For issues or questions:
 MIT License - See LICENSE file for details
 
 # Option 2: Use corepack (recommended)
+
 corepack enable
 corepack prepare pnpm@latest --activate
 
 # Verify installation
-pnpm --version  # Should be v10.x or higher
-```
+
+pnpm --version # Should be v10.x or higher
+
+````
 
 #### 1.4. Install Nginx
 
@@ -556,7 +567,7 @@ sudo systemctl enable nginx
 
 # Verify installation
 nginx -v
-```
+````
 
 #### 1.5. Install Certbot (for SSL)
 
@@ -648,6 +659,7 @@ openssl rand -base64 16
 #### 3.4. Optional Features
 
 **Stripe Billing** (if ENABLE_STRIPE=true):
+
 ```env
 STRIPE_SECRET_KEY=sk_live_xxxxx
 STRIPE_PUBLISHABLE_KEY=pk_live_xxxxx
@@ -657,6 +669,7 @@ STRIPE_YEARLY_PRICE_ID=price_xxxxx
 ```
 
 **File Uploads** (if ENABLE_UPLOADS=true):
+
 ```env
 BUILT_IN_FORGE_API_URL=https://your-forge-api.com
 BUILT_IN_FORGE_API_KEY=your_forge_api_key
@@ -668,6 +681,7 @@ BUILT_IN_FORGE_API_KEY=your_forge_api_key
 ```
 
 **Email Notifications** (optional):
+
 ```env
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
@@ -685,6 +699,7 @@ bash ops/preflight.sh
 ```
 
 This checks:
+
 - ✅ OS version (Ubuntu 24.04 or 22.04)
 - ✅ Node.js version (≥20.x)
 - ✅ pnpm version (≥10.x)
@@ -742,6 +757,7 @@ bash ops/verify.sh --domain your-domain.com
 ```
 
 This checks:
+
 - ✅ Only ONE service running (no duplicates)
 - ✅ Health endpoints return 200
 - ✅ Frontend serves hashed assets
@@ -861,33 +877,37 @@ sudo logrotate -f /etc/logrotate.d/equiprofile
 **Solutions**:
 
 1. **Node.js version too old**:
+
    ```bash
    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
    sudo apt-get install -y nodejs
    ```
 
 2. **pnpm not installed**:
+
    ```bash
    npm install -g pnpm@latest
    ```
 
 3. **Port already in use**:
+
    ```bash
    # Find process using port
    lsof -i :3000
-   
+
    # Kill process
    sudo kill -9 <PID>
-   
+
    # Or change port
    sudo bash ops/deploy.sh --domain your-domain.com --port 3001
    ```
 
 4. **Insufficient disk space**:
+
    ```bash
    # Check disk usage
    df -h
-   
+
    # Clean up if needed
    sudo apt-get autoremove
    sudo apt-get clean
@@ -900,6 +920,7 @@ sudo logrotate -f /etc/logrotate.d/equiprofile
 **Solutions**:
 
 1. **Out of memory**:
+
    ```bash
    # The deploy script already sets NODE_OPTIONS=--max_old_space_size=2048
    # If still failing, increase swap:
@@ -910,6 +931,7 @@ sudo logrotate -f /etc/logrotate.d/equiprofile
    ```
 
 2. **Dependency errors**:
+
    ```bash
    # Clean install
    rm -rf node_modules
@@ -929,11 +951,13 @@ sudo logrotate -f /etc/logrotate.d/equiprofile
 **Solutions**:
 
 1. **Check logs**:
+
    ```bash
    sudo journalctl -u equiprofile -n 50 --no-pager
    ```
 
 2. **Port conflict**:
+
    ```bash
    # Application now fails clearly if port is in use (no auto-switching)
    lsof -i :3000
@@ -942,20 +966,22 @@ sudo logrotate -f /etc/logrotate.d/equiprofile
    ```
 
 3. **Environment variables**:
+
    ```bash
    # Verify .env file exists
    ls -la /var/equiprofile/app/.env
-   
+
    # Check critical variables
    grep JWT_SECRET /var/equiprofile/app/.env
    grep DATABASE_URL /var/equiprofile/app/.env
    ```
 
 4. **Database connection**:
+
    ```bash
    # Test MySQL connection
    mysql -u equiprofile -p equiprofile
-   
+
    # Or check SQLite database
    ls -la /var/equiprofile/app/data/equiprofile.db
    ```
@@ -969,19 +995,22 @@ sudo logrotate -f /etc/logrotate.d/equiprofile
 **Solutions**:
 
 1. **Check if service is running**:
+
    ```bash
    sudo systemctl status equiprofile
-   
+
    # If not running
    sudo systemctl start equiprofile
    ```
 
 2. **Check backend health**:
+
    ```bash
    curl http://127.0.0.1:3000/api/health
    ```
 
 3. **Check nginx proxy configuration**:
+
    ```bash
    # Verify proxy_pass points to correct port
    grep proxy_pass /etc/nginx/sites-available/equiprofile
@@ -999,17 +1028,20 @@ sudo logrotate -f /etc/logrotate.d/equiprofile
 **Solutions**:
 
 1. **Check certificate status**:
+
    ```bash
    sudo certbot certificates
    ```
 
 2. **Renew certificate**:
+
    ```bash
    sudo certbot renew --dry-run  # Test
    sudo certbot renew             # Actually renew
    ```
 
 3. **Re-run certbot**:
+
    ```bash
    sudo certbot --nginx -d your-domain.com -d www.your-domain.com
    ```
@@ -1027,6 +1059,7 @@ sudo logrotate -f /etc/logrotate.d/equiprofile
 **Solutions**:
 
 1. **Clear service worker** (if PWA was previously enabled):
+
    ```bash
    # In browser DevTools (F12):
    # Application → Service Workers → Unregister
@@ -1035,6 +1068,7 @@ sudo logrotate -f /etc/logrotate.d/equiprofile
    ```
 
 2. **Verify cache headers**:
+
    ```bash
    curl -I https://your-domain.com/
    # Should show: Cache-Control: no-store, no-cache, must-revalidate
@@ -1055,6 +1089,7 @@ sudo logrotate -f /etc/logrotate.d/equiprofile
 If legitimate files are missing:
 
 1. **Verify build output**:
+
    ```bash
    ls -la /var/equiprofile/app/dist/public/
    ls -la /var/equiprofile/app/dist/public/assets/
@@ -1074,12 +1109,14 @@ If legitimate files are missing:
 By default, service worker is **disabled**. If you previously had PWA enabled:
 
 1. **Verify PWA is disabled**:
+
    ```bash
    grep ENABLE_PWA /var/equiprofile/app/.env
    # Should show: ENABLE_PWA=false or be commented out
    ```
 
 2. **Rebuild without service worker**:
+
    ```bash
    cd /var/equiprofile/app
    sudo -u www-data ENABLE_PWA=false pnpm build
@@ -1173,6 +1210,7 @@ sudo journalctl --vacuum-time=7d
 **For high-traffic deployments**:
 
 1. **Increase worker processes** in nginx:
+
    ```nginx
    # /etc/nginx/nginx.conf
    worker_processes auto;
@@ -1180,6 +1218,7 @@ sudo journalctl --vacuum-time=7d
    ```
 
 2. **Enable connection pooling** for MySQL:
+
    ```env
    # .env
    DATABASE_POOL_SIZE=10
@@ -1245,11 +1284,13 @@ sudo nethogs
 ### Getting Help
 
 1. **Check logs first**:
+
    ```bash
    sudo journalctl -u equiprofile -n 100
    ```
 
 2. **Run verification**:
+
    ```bash
    bash ops/verify.sh --domain your-domain.com
    ```

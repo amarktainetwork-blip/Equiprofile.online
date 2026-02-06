@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Send, Paperclip, MessageSquare } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { ScrollArea } from "../components/ui/scroll-area";
@@ -29,7 +34,9 @@ export default function MessagesPage() {
             <ScrollArea className="h-[calc(100vh-16rem)]">
               <div className="flex flex-col items-center justify-center py-8 text-center">
                 <MessageSquare className="h-12 w-12 text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">{t("messages.noMessages")}</p>
+                <p className="text-muted-foreground">
+                  {t("messages.noMessages")}
+                </p>
               </div>
             </ScrollArea>
           </CardContent>

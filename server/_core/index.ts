@@ -36,19 +36,21 @@ async function startServer() {
   // NOTE: scriptSrc does NOT include 'unsafe-inline' - all scripts must be external
   // client/index.html contains NO inline scripts, only <script type="module" src="/src/main.tsx">
   // This prevents XSS attacks via inline script injection
-  app.use(helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'"], // NO 'unsafe-inline' - all scripts must be external
-        styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles (Tailwind)
-        imgSrc: ["'self'", "data:", "https:"],
-        connectSrc: ["'self'"],
-        fontSrc: ["'self'"],
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: ["'self'"], // NO 'unsafe-inline' - all scripts must be external
+          styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles (Tailwind)
+          imgSrc: ["'self'", "data:", "https:"],
+          connectSrc: ["'self'"],
+          fontSrc: ["'self'"],
+        },
       },
-    },
-    crossOriginEmbedderPolicy: false,
-  }));
+      crossOriginEmbedderPolicy: false,
+    }),
+  );
 
   // Request ID middleware for logging
   app.use((req, res, next) => {
@@ -62,7 +64,9 @@ async function startServer() {
     const start = Date.now();
     res.on("finish", () => {
       const duration = Date.now() - start;
-      console.log(`[${req.headers["x-request-id"]}] ${req.method} ${req.path} ${res.statusCode} ${duration}ms`);
+      console.log(
+        `[${req.headers["x-request-id"]}] ${req.method} ${req.path} ${res.statusCode} ${duration}ms`,
+      );
     });
     next();
   });
@@ -88,151 +92,197 @@ async function startServer() {
   });
 
   // Stripe webhook - must be before body parser
-  app.post("/api/webhooks/stripe", express.raw({ type: "application/json" }), async (req, res) => {
-    const stripe = getStripe();
-    if (!stripe) {
-      return res.status(500).json({ error: "Stripe not configured" });
-    }
-
-    const sig = req.headers["stripe-signature"];
-    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
-    if (!sig || !webhookSecret) {
-      return res.status(400).json({ error: "Missing signature or secret" });
-    }
-
-    let event: Stripe.Event;
-
-    try {
-      event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
-    } catch (err: any) {
-      console.error(`[Stripe Webhook] Signature verification failed:`, err.message);
-      return res.status(400).json({ error: `Webhook signature verification failed: ${err.message}` });
-    }
-
-    // Check for duplicate events (idempotency)
-    const alreadyProcessed = await db.isStripeEventProcessed(event.id);
-    if (alreadyProcessed) {
-      console.log(`[Stripe Webhook] Event ${event.id} already processed`);
-      return res.json({ received: true, cached: true });
-    }
-
-    // Store event for idempotency
-    await db.createStripeEvent(event.id, event.type, JSON.stringify(event.data.object));
-
-    try {
-      // Handle different event types
-      switch (event.type) {
-        case "checkout.session.completed": {
-          const session = event.data.object as Stripe.Checkout.Session;
-          const userId = parseInt(session.metadata?.userId || "0");
-          
-          if (userId && session.customer && session.subscription) {
-            const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
-            const plan = subscription.items.data[0]?.price.recurring?.interval === "year" ? "yearly" : "monthly";
-            
-            await db.updateUser(userId, {
-              stripeCustomerId: session.customer as string,
-              stripeSubscriptionId: session.subscription as string,
-              subscriptionStatus: "active",
-              subscriptionPlan: plan,
-              lastPaymentAt: new Date(),
-            });
-            
-            // Send payment success email
-            const user = await db.getUserById(userId);
-            if (user) {
-              email.sendPaymentSuccessEmail(user, plan).catch(err => 
-                console.error("[Stripe Webhook] Failed to send payment email:", err)
-              );
-            }
-            
-            console.log(`[Stripe Webhook] User ${userId} subscription activated`);
-          }
-          break;
-        }
-
-        case "customer.subscription.updated": {
-          const subscription = event.data.object as Stripe.Subscription;
-          const userId = await getUserIdByStripeSubscription(subscription.id);
-          
-          if (userId) {
-            let status: "active" | "cancelled" | "overdue" | "expired" = "active";
-            if (subscription.status === "past_due") status = "overdue";
-            if (subscription.status === "canceled" || subscription.status === "unpaid") status = "cancelled";
-            if (subscription.status === "incomplete_expired") status = "expired";
-
-            await db.updateUser(userId, {
-              subscriptionStatus: status,
-              subscriptionEndsAt: subscription.cancel_at ? new Date(subscription.cancel_at * 1000) : null,
-            });
-            console.log(`[Stripe Webhook] User ${userId} subscription updated to ${status}`);
-          }
-          break;
-        }
-
-        case "customer.subscription.deleted": {
-          const subscription = event.data.object as Stripe.Subscription;
-          const userId = await getUserIdByStripeSubscription(subscription.id);
-          
-          if (userId) {
-            await db.updateUser(userId, {
-              subscriptionStatus: "cancelled",
-              subscriptionEndsAt: new Date(),
-            });
-            console.log(`[Stripe Webhook] User ${userId} subscription cancelled`);
-          }
-          break;
-        }
-
-        case "invoice.payment_succeeded": {
-          const invoice = event.data.object as any;
-          const subscriptionId = invoice.subscription as string | undefined;
-          if (subscriptionId) {
-            const userId = await getUserIdByStripeSubscription(subscriptionId);
-            if (userId) {
-              await db.updateUser(userId, {
-                subscriptionStatus: "active",
-                lastPaymentAt: new Date(),
-              });
-              console.log(`[Stripe Webhook] User ${userId} payment succeeded`);
-            }
-          }
-          break;
-        }
-
-        case "invoice.payment_failed": {
-          const invoice = event.data.object as any;
-          const subscriptionId = invoice.subscription as string | undefined;
-          if (subscriptionId) {
-            const userId = await getUserIdByStripeSubscription(subscriptionId);
-            if (userId) {
-              await db.updateUser(userId, {
-                subscriptionStatus: "overdue",
-              });
-              console.log(`[Stripe Webhook] User ${userId} payment failed`);
-            }
-          }
-          break;
-        }
-
-        default:
-          console.log(`[Stripe Webhook] Unhandled event type: ${event.type}`);
+  app.post(
+    "/api/webhooks/stripe",
+    express.raw({ type: "application/json" }),
+    async (req, res) => {
+      const stripe = getStripe();
+      if (!stripe) {
+        return res.status(500).json({ error: "Stripe not configured" });
       }
 
-      await db.markStripeEventProcessed(event.id);
-      res.json({ received: true });
-    } catch (error) {
-      console.error(`[Stripe Webhook] Error processing event ${event.id}:`, error);
-      await db.markStripeEventProcessed(event.id, (error as Error).message);
-      res.status(500).json({ error: "Webhook processing failed" });
-    }
-  });
+      const sig = req.headers["stripe-signature"];
+      const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+      if (!sig || !webhookSecret) {
+        return res.status(400).json({ error: "Missing signature or secret" });
+      }
+
+      let event: Stripe.Event;
+
+      try {
+        event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+      } catch (err: any) {
+        console.error(
+          `[Stripe Webhook] Signature verification failed:`,
+          err.message,
+        );
+        return res.status(400).json({
+          error: `Webhook signature verification failed: ${err.message}`,
+        });
+      }
+
+      // Check for duplicate events (idempotency)
+      const alreadyProcessed = await db.isStripeEventProcessed(event.id);
+      if (alreadyProcessed) {
+        console.log(`[Stripe Webhook] Event ${event.id} already processed`);
+        return res.json({ received: true, cached: true });
+      }
+
+      // Store event for idempotency
+      await db.createStripeEvent(
+        event.id,
+        event.type,
+        JSON.stringify(event.data.object),
+      );
+
+      try {
+        // Handle different event types
+        switch (event.type) {
+          case "checkout.session.completed": {
+            const session = event.data.object as Stripe.Checkout.Session;
+            const userId = parseInt(session.metadata?.userId || "0");
+
+            if (userId && session.customer && session.subscription) {
+              const subscription = await stripe.subscriptions.retrieve(
+                session.subscription as string,
+              );
+              const plan =
+                subscription.items.data[0]?.price.recurring?.interval === "year"
+                  ? "yearly"
+                  : "monthly";
+
+              await db.updateUser(userId, {
+                stripeCustomerId: session.customer as string,
+                stripeSubscriptionId: session.subscription as string,
+                subscriptionStatus: "active",
+                subscriptionPlan: plan,
+                lastPaymentAt: new Date(),
+              });
+
+              // Send payment success email
+              const user = await db.getUserById(userId);
+              if (user) {
+                email
+                  .sendPaymentSuccessEmail(user, plan)
+                  .catch((err) =>
+                    console.error(
+                      "[Stripe Webhook] Failed to send payment email:",
+                      err,
+                    ),
+                  );
+              }
+
+              console.log(
+                `[Stripe Webhook] User ${userId} subscription activated`,
+              );
+            }
+            break;
+          }
+
+          case "customer.subscription.updated": {
+            const subscription = event.data.object as Stripe.Subscription;
+            const userId = await getUserIdByStripeSubscription(subscription.id);
+
+            if (userId) {
+              let status: "active" | "cancelled" | "overdue" | "expired" =
+                "active";
+              if (subscription.status === "past_due") status = "overdue";
+              if (
+                subscription.status === "canceled" ||
+                subscription.status === "unpaid"
+              )
+                status = "cancelled";
+              if (subscription.status === "incomplete_expired")
+                status = "expired";
+
+              await db.updateUser(userId, {
+                subscriptionStatus: status,
+                subscriptionEndsAt: subscription.cancel_at
+                  ? new Date(subscription.cancel_at * 1000)
+                  : null,
+              });
+              console.log(
+                `[Stripe Webhook] User ${userId} subscription updated to ${status}`,
+              );
+            }
+            break;
+          }
+
+          case "customer.subscription.deleted": {
+            const subscription = event.data.object as Stripe.Subscription;
+            const userId = await getUserIdByStripeSubscription(subscription.id);
+
+            if (userId) {
+              await db.updateUser(userId, {
+                subscriptionStatus: "cancelled",
+                subscriptionEndsAt: new Date(),
+              });
+              console.log(
+                `[Stripe Webhook] User ${userId} subscription cancelled`,
+              );
+            }
+            break;
+          }
+
+          case "invoice.payment_succeeded": {
+            const invoice = event.data.object as any;
+            const subscriptionId = invoice.subscription as string | undefined;
+            if (subscriptionId) {
+              const userId =
+                await getUserIdByStripeSubscription(subscriptionId);
+              if (userId) {
+                await db.updateUser(userId, {
+                  subscriptionStatus: "active",
+                  lastPaymentAt: new Date(),
+                });
+                console.log(
+                  `[Stripe Webhook] User ${userId} payment succeeded`,
+                );
+              }
+            }
+            break;
+          }
+
+          case "invoice.payment_failed": {
+            const invoice = event.data.object as any;
+            const subscriptionId = invoice.subscription as string | undefined;
+            if (subscriptionId) {
+              const userId =
+                await getUserIdByStripeSubscription(subscriptionId);
+              if (userId) {
+                await db.updateUser(userId, {
+                  subscriptionStatus: "overdue",
+                });
+                console.log(`[Stripe Webhook] User ${userId} payment failed`);
+              }
+            }
+            break;
+          }
+
+          default:
+            console.log(`[Stripe Webhook] Unhandled event type: ${event.type}`);
+        }
+
+        await db.markStripeEventProcessed(event.id);
+        res.json({ received: true });
+      } catch (error) {
+        console.error(
+          `[Stripe Webhook] Error processing event ${event.id}:`,
+          error,
+        );
+        await db.markStripeEventProcessed(event.id, (error as Error).message);
+        res.status(500).json({ error: "Webhook processing failed" });
+      }
+    },
+  );
 
   // Helper function to find user by Stripe subscription ID
-  async function getUserIdByStripeSubscription(subscriptionId: string): Promise<number | null> {
+  async function getUserIdByStripeSubscription(
+    subscriptionId: string,
+  ): Promise<number | null> {
     const users = await db.getAllUsers();
-    const user = users.find(u => u.stripeSubscriptionId === subscriptionId);
+    const user = users.find((u) => u.stripeSubscriptionId === subscriptionId);
     return user?.id || null;
   }
 
@@ -243,33 +293,40 @@ async function startServer() {
   // Cache build info at startup to avoid blocking on every request
   let cachedBuildInfo: any = null;
   try {
-    const packageJsonPath = resolve(process.cwd(), 'package.json');
-    const packageJson = JSON.parse(require('fs').readFileSync(packageJsonPath, 'utf-8'));
-    
+    const packageJsonPath = resolve(process.cwd(), "package.json");
+    const packageJson = JSON.parse(
+      require("fs").readFileSync(packageJsonPath, "utf-8"),
+    );
+
     // Try to get git commit (only once at startup)
-    let commit = 'unknown';
+    let commit = "unknown";
     try {
-      const { execSync } = require('child_process');
-      commit = execSync('git rev-parse HEAD', { encoding: 'utf-8', timeout: 1000 }).trim().slice(0, 7);
+      const { execSync } = require("child_process");
+      commit = execSync("git rev-parse HEAD", {
+        encoding: "utf-8",
+        timeout: 1000,
+      })
+        .trim()
+        .slice(0, 7);
     } catch {
       // Git not available, that's okay
     }
 
     cachedBuildInfo = {
-      version: packageJson.version || '1.0.0',
-      buildId: process.env.BUILD_ID || 'dev',
+      version: packageJson.version || "1.0.0",
+      buildId: process.env.BUILD_ID || "dev",
       commit,
       buildTime: process.env.BUILD_TIME || new Date().toISOString(),
-      nodeVersion: process.version
+      nodeVersion: process.version,
     };
   } catch (err) {
-    console.warn('⚠️  Could not generate build info:', err);
+    console.warn("⚠️  Could not generate build info:", err);
     cachedBuildInfo = {
-      version: '1.0.0',
-      buildId: 'unknown',
-      commit: 'unknown',
+      version: "1.0.0",
+      buildId: "unknown",
+      commit: "unknown",
       buildTime: new Date().toISOString(),
-      nodeVersion: process.version
+      nodeVersion: process.version,
     };
   }
 
@@ -277,7 +334,7 @@ async function startServer() {
   app.get("/healthz", healthLimiter, (req, res) => {
     res.json({
       ok: true,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   });
 
@@ -292,7 +349,7 @@ async function startServer() {
     const stripeConfigured = !!getStripe();
     const oauthConfigured = !!(ENV.oAuthServerUrl && ENV.appId);
     const version = process.env.npm_package_version || "1.0.0";
-    
+
     res.json({
       status: "healthy",
       timestamp: new Date().toISOString(),
@@ -312,34 +369,34 @@ async function startServer() {
 
   // Version endpoint with build fingerprint
   app.get("/api/version", (req, res) => {
-    const fs = require('fs');
-    const path = require('path');
-    
+    const fs = require("fs");
+    const path = require("path");
+
     // Try to read build.txt for build fingerprint
     let buildInfo: any = {
       version: cachedBuildInfo.version,
       sha: cachedBuildInfo.commit,
-      buildTime: cachedBuildInfo.buildTime
+      buildTime: cachedBuildInfo.buildTime,
     };
-    
+
     try {
-      const buildTxtPath = path.resolve(process.cwd(), 'dist/public/build.txt');
+      const buildTxtPath = path.resolve(process.cwd(), "dist/public/build.txt");
       if (fs.existsSync(buildTxtPath)) {
-        const buildTxt = fs.readFileSync(buildTxtPath, 'utf-8');
-        const lines = buildTxt.split('\n');
+        const buildTxt = fs.readFileSync(buildTxtPath, "utf-8");
+        const lines = buildTxt.split("\n");
         lines.forEach((line: string) => {
-          const [key, value] = line.split('=');
+          const [key, value] = line.split("=");
           if (key && value) {
-            if (key === 'BUILD_SHA') buildInfo.sha = value.trim();
-            if (key === 'BUILD_TIME') buildInfo.buildTime = value.trim();
-            if (key === 'VERSION') buildInfo.version = value.trim();
+            if (key === "BUILD_SHA") buildInfo.sha = value.trim();
+            if (key === "BUILD_TIME") buildInfo.buildTime = value.trim();
+            if (key === "VERSION") buildInfo.version = value.trim();
           }
         });
       }
     } catch (err) {
       // If build.txt doesn't exist, use cached info
     }
-    
+
     res.json(buildInfo);
   });
 
@@ -369,9 +426,14 @@ async function startServer() {
       if (!to) {
         return res.status(400).json({ error: "Email address required" });
       }
-      
+
       const success = await email.sendTestEmail(to);
-      res.json({ success, message: success ? "Test email sent" : "Failed to send email (check SMTP config)" });
+      res.json({
+        success,
+        message: success
+          ? "Test email sent"
+          : "Failed to send email (check SMTP config)",
+      });
     } catch (error) {
       console.error("[Admin] Test email error:", error);
       res.status(500).json({ error: "Internal server error" });
@@ -385,18 +447,20 @@ async function startServer() {
       // Get user from session (reuse tRPC context logic)
       // @ts-expect-error - Express req/res is compatible with CreateExpressContextOptions
       const context = await createContext({ req, res });
-      
+
       if (!context.user) {
         return res.status(401).json({ error: "Unauthorized" });
       }
 
       // Register SSE client
       const clientId = realtimeManager.addClient(context.user.id, res);
-      
+
       // Subscribe to user-specific channel
       realtimeManager.subscribe(clientId, [`user:${context.user.id}`]);
-      
-      console.log(`[SSE] User ${context.user.id} connected with client ${clientId}`);
+
+      console.log(
+        `[SSE] User ${context.user.id} connected with client ${clientId}`,
+      );
     } catch (error) {
       console.error("[SSE] Connection error:", error);
       res.status(500).json({ error: "Internal server error" });
@@ -408,10 +472,10 @@ async function startServer() {
     try {
       // @ts-expect-error - Express req/res is compatible with CreateExpressContextOptions
       const context = await createContext({ req, res });
-      if (!context.user || context.user.role !== 'admin') {
+      if (!context.user || context.user.role !== "admin") {
         return res.status(403).json({ error: "Admin access required" });
       }
-      
+
       const stats = realtimeManager.getStats();
       res.json(stats);
     } catch (error) {
@@ -426,7 +490,7 @@ async function startServer() {
     createExpressMiddleware({
       router: appRouter,
       createContext,
-    })
+    }),
   );
 
   // REST API v1 (for third-party integrations)
@@ -442,7 +506,7 @@ async function startServer() {
   // Deterministic port binding - fail if port is in use (no auto-switching)
   const host = process.env.HOST || "127.0.0.1";
   const port = parseInt(process.env.PORT || "3000");
-  
+
   console.log(`Starting server on ${host}:${port}...`);
 
   server.listen(port, host, () => {

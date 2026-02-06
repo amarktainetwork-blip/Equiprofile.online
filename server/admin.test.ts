@@ -223,7 +223,9 @@ describe("admin router - unauthorized access", () => {
     const ctx = createUserContext();
     const caller = appRouter.createCaller(ctx);
 
-    await expect(caller.admin.getUsers()).rejects.toThrow("You do not have required permission");
+    await expect(caller.admin.getUsers()).rejects.toThrow(
+      "You do not have required permission",
+    );
   });
 
   it("throws error for unauthenticated user", async () => {

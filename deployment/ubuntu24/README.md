@@ -34,6 +34,7 @@ Before installing EquiProfile, ensure your VPS meets these requirements:
 ### Firewall Ports
 
 Ensure these ports are open:
+
 - **22**: SSH (for management)
 - **80**: HTTP (for web traffic)
 - **443**: HTTPS (for SSL/TLS)
@@ -74,6 +75,7 @@ sudo ./install.sh
 ```
 
 The script will:
+
 1. ✅ Install Node.js LTS, pnpm, and nginx
 2. ✅ Create system user 'equiprofile'
 3. ✅ Setup application directory
@@ -224,6 +226,7 @@ sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
 ```
 
 Follow the prompts:
+
 - Enter email address (for renewal notifications)
 - Agree to terms of service
 - Choose whether to redirect HTTP to HTTPS (recommended: yes)
@@ -252,6 +255,7 @@ SSL certificates will auto-renew before expiration.
 ### Installation Issues
 
 #### Script fails with "Permission denied"
+
 ```bash
 # Ensure script is executable
 chmod +x install.sh
@@ -259,6 +263,7 @@ sudo ./install.sh
 ```
 
 #### "Node.js not found" after installation
+
 ```bash
 # Verify Node.js installation
 node --version
@@ -270,6 +275,7 @@ sudo apt-get install -y nodejs
 ```
 
 #### Build fails with "pnpm command not found"
+
 ```bash
 # Install pnpm globally
 npm install -g pnpm
@@ -480,6 +486,7 @@ sudo ./uninstall.sh
 ```
 
 This will:
+
 - Stop and remove the service
 - Remove nginx configuration
 - Delete application directory

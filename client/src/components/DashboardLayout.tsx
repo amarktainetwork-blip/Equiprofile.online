@@ -23,10 +23,10 @@ import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
 import { useAdminToggle } from "@/hooks/useAdminToggle";
 import { TrialBanner } from "./TrialBanner";
-import { 
-  LayoutDashboard, 
-  LogOut, 
-  PanelLeft, 
+import {
+  LayoutDashboard,
+  LogOut,
+  PanelLeft,
   CircleDot,
   Heart,
   Activity,
@@ -39,11 +39,11 @@ import {
   ListChecks,
   Baby,
   Calendar,
-  Users
+  Users,
 } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
-import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
+import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
 import { Button } from "./ui/button";
 import { trpc } from "@/lib/trpc";
 import { ThemeToggle } from "./ThemeToggle";
@@ -53,7 +53,11 @@ const menuItems = [
   { icon: CircleDot, label: "My Horses", path: "/horses" },
   { icon: Heart, label: "Health Records", path: "/health" },
   { icon: Activity, label: "Training", path: "/training" },
-  { icon: ListChecks, label: "Training Templates", path: "/training-templates" },
+  {
+    icon: ListChecks,
+    label: "Training Templates",
+    path: "/training-templates",
+  },
   { icon: ListChecks, label: "Tasks", path: "/tasks" },
   { icon: Users, label: "Contacts", path: "/contacts" },
   { icon: Baby, label: "Breeding", path: "/breeding" },
@@ -64,9 +68,7 @@ const menuItems = [
   { icon: MessageSquare, label: "AI Chat", path: "/ai-chat" },
 ];
 
-const adminMenuItems = [
-  { icon: Shield, label: "Admin Panel", path: "/admin" },
-];
+const adminMenuItems = [{ icon: Shield, label: "Admin Panel", path: "/admin" }];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
 const DEFAULT_WIDTH = 280;
@@ -89,7 +91,7 @@ export default function DashboardLayout({
   }, [sidebarWidth]);
 
   if (loading) {
-    return <DashboardLayoutSkeleton />
+    return <DashboardLayoutSkeleton />;
   }
 
   if (!user) {
@@ -101,7 +103,8 @@ export default function DashboardLayout({
               Sign in to continue
             </h1>
             <p className="text-sm text-muted-foreground text-center max-w-sm">
-              Access to this dashboard requires authentication. Continue to launch the login flow.
+              Access to this dashboard requires authentication. Continue to
+              launch the login flow.
             </p>
           </div>
           <Button
@@ -148,19 +151,16 @@ function DashboardLayoutContent({
   const isCollapsed = state === "collapsed";
   const [isResizing, setIsResizing] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const activeMenuItem = menuItems.find(item => item.path === location);
+  const activeMenuItem = menuItems.find((item) => item.path === location);
   const isMobile = useIsMobile();
   const { isAdminVisible } = useAdminToggle();
 
   // Check admin unlock status
-  const { data: adminStatus } = trpc.adminUnlock.getStatus.useQuery(
-    undefined,
-    {
-      enabled: user?.role === 'admin', // Only fetch if admin
-      staleTime: 60 * 1000, // Cache for 1 minute
-      refetchInterval: 60 * 1000, // Refresh every minute
-    }
-  );
+  const { data: adminStatus } = trpc.adminUnlock.getStatus.useQuery(undefined, {
+    enabled: user?.role === "admin", // Only fetch if admin
+    staleTime: 60 * 1000, // Cache for 1 minute
+    refetchInterval: 60 * 1000, // Refresh every minute
+  });
 
   useEffect(() => {
     if (isCollapsed) {
@@ -227,7 +227,7 @@ function DashboardLayoutContent({
 
           <SidebarContent className="gap-0">
             <SidebarMenu className="px-2 py-1">
-              {menuItems.map(item => {
+              {menuItems.map((item) => {
                 const isActive = location === item.path;
                 return (
                   <SidebarMenuItem key={item.path}>
@@ -246,12 +246,12 @@ function DashboardLayoutContent({
                 );
               })}
               {/* Admin menu items - shown to admin users who have unlocked admin mode */}
-              {user?.role === 'admin' && adminStatus?.isUnlocked && (
+              {user?.role === "admin" && adminStatus?.isUnlocked && (
                 <>
                   <div className="my-2 px-2">
                     <div className="h-px bg-border" />
                   </div>
-                  {adminMenuItems.map(item => {
+                  {adminMenuItems.map((item) => {
                     const isActive = location === item.path;
                     return (
                       <SidebarMenuItem key={item.path}>

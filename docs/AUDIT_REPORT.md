@@ -25,10 +25,12 @@ This audit identifies and resolves critical production deployment issues that ca
 **File**: `client/index.html` (lines 26-59)
 
 The application had two inline `<script>` blocks:
+
 1. Service worker registration (lines 26-41)
 2. Analytics initialization (lines 43-59)
 
 These inline scripts were blocked by Content Security Policy in production, causing:
+
 - White screen on load
 - "Refused to execute inline script" errors in browser console
 - Service worker not registering
@@ -37,35 +39,41 @@ These inline scripts were blocked by Content Security Policy in production, caus
 ### Root Cause
 
 CSP configuration in `server/_core/index.ts` was either:
+
 - Disabled in production (`undefined`)
 - Not strict enough to catch this during development
 
 ### Solution
 
 **Created Files**:
+
 - `client/src/bootstrap.ts` - Service worker registration logic
 - `client/src/analytics.ts` - Analytics initialization logic
 
 **Modified Files**:
+
 - `client/src/main.tsx` - Import and execute bootstrap modules
 - `client/index.html` - Removed all inline scripts
 - `server/_core/index.ts` - Enabled strict CSP with no `unsafe-inline` for scripts
 
 **New CSP Configuration**:
+
 ```typescript
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"], // NO 'unsafe-inline'
-      styleSrc: ["'self'", "'unsafe-inline'"], // Needed for Tailwind
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'"],
-      fontSrc: ["'self'"],
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"], // NO 'unsafe-inline'
+        styleSrc: ["'self'", "'unsafe-inline'"], // Needed for Tailwind
+        imgSrc: ["'self'", "data:", "https:"],
+        connectSrc: ["'self'"],
+        fontSrc: ["'self'"],
+      },
     },
-  },
-  crossOriginEmbedderPolicy: false,
-}));
+    crossOriginEmbedderPolicy: false,
+  }),
+);
 ```
 
 ### Impact
@@ -73,7 +81,7 @@ app.use(helmet({
 ✅ No more CSP violations  
 ✅ No more white screen  
 ✅ Service worker registers correctly  
-✅ Analytics loads when configured  
+✅ Analytics loads when configured
 
 ---
 
@@ -84,6 +92,7 @@ app.use(helmet({
 **File**: `server/_core/vite.ts` (lines 50-67)
 
 Static assets were served with incorrect `Content-Type` headers:
+
 - JavaScript files (`.js`) served as `text/html`
 - CSS files (`.css`) served as `text/html`
 - Service worker returned HTML instead of JavaScript
@@ -93,6 +102,7 @@ This occurred because the SPA fallback (`app.use("*", ...)`) caught ALL requests
 ### Root Cause
 
 The fallback handler didn't distinguish between:
+
 - Navigation requests (should get `index.html`)
 - Asset requests (should get 404 if not found)
 
@@ -105,9 +115,9 @@ The fallback handler didn't distinguish between:
 
 ```typescript
 // Don't fallback to index.html for asset paths
-if (req.originalUrl.startsWith('/assets/') || 
-    req.originalUrl.endsWith('.js') || 
-    req.originalUrl.endsWith('.css') || 
+if (req.originalUrl.startsWith('/assets/') ||
+    req.originalUrl.endsWith('.js') ||
+    req.originalUrl.endsWith('.css') ||
     req.originalUrl.endsWith('.json') ||
     // ... other asset extensions
     ) {
@@ -118,9 +128,9 @@ if (req.originalUrl.startsWith('/assets/') ||
 3. Added specific handling for service worker:
 
 ```typescript
-if (filePath.endsWith('service-worker.js')) {
-  res.setHeader('Content-Type', 'application/javascript');
-  res.setHeader('Service-Worker-Allowed', '/');
+if (filePath.endsWith("service-worker.js")) {
+  res.setHeader("Content-Type", "application/javascript");
+  res.setHeader("Service-Worker-Allowed", "/");
 }
 ```
 
@@ -129,7 +139,7 @@ if (filePath.endsWith('service-worker.js')) {
 ✅ JavaScript files served with `Content-Type: application/javascript`  
 ✅ CSS files served with `Content-Type: text/css`  
 ✅ Service worker served with correct MIME type  
-✅ No more "MIME type mismatch" errors  
+✅ No more "MIME type mismatch" errors
 
 ---
 
@@ -140,12 +150,14 @@ if (filePath.endsWith('service-worker.js')) {
 **File**: `deployment/nginx-webdock.conf`
 
 The existing Nginx configuration had several issues:
+
 1. Served static files directly from `dist/public/` (line 35)
 2. Mixed proxy and static serving patterns
 3. Lacked production-ready SSL configuration
 4. No clear single source of truth for deployment
 
 This caused:
+
 - Old content served from Nginx cache
 - Assets served directly by Nginx instead of Node
 - Inconsistent behavior between environments
@@ -159,6 +171,7 @@ Multiple configuration patterns without clear documentation on which to use.
 **Created**: `deployment/nginx-equiprofile.conf`
 
 New production-ready configuration:
+
 - **Proxy ALL requests to Node** (no direct static serving)
 - Node server at port 3000 handles both API and static files
 - Proper SSL configuration placeholders for Certbot
@@ -188,7 +201,7 @@ location / {
 ✅ Consistent serving of static files and API  
 ✅ No old content from Nginx cache  
 ✅ Production-ready SSL configuration  
-✅ Clear upgrade path  
+✅ Clear upgrade path
 
 ---
 
@@ -199,6 +212,7 @@ location / {
 **Files**: `.gitignore`, Documentation
 
 Build output pattern was confusing:
+
 - `.gitignore` had conflicting rules for `dist/`
 - Not clearly documented where builds go
 - Mix of patterns (`!dist/index.js`, `!dist/public/`)
@@ -212,6 +226,7 @@ Iterative development without cleanup of conflicting patterns.
 **Modified**: `.gitignore`
 
 Clear documentation:
+
 ```gitignore
 # Build outputs (generated during deployment - see README)
 # dist/ contains:
@@ -222,6 +237,7 @@ dist/
 ```
 
 **Pattern**:
+
 - Client build → `dist/public/` (Vite output, configured in `vite.config.ts` line 54)
 - Server build → `dist/index.js` (esbuild, configured in `package.json` line 9)
 
@@ -229,7 +245,7 @@ dist/
 
 ✅ Clear build pattern  
 ✅ Documented in `.gitignore`  
-✅ Consistent with deployment script  
+✅ Consistent with deployment script
 
 ---
 
@@ -238,6 +254,7 @@ dist/
 ### Problem
 
 Deployment documentation was:
+
 - Scattered across multiple files
 - Some files outdated (DEPLOYMENT_OLD.md)
 - No single comprehensive guide
@@ -251,6 +268,7 @@ Documentation debt from rapid development.
 ### Solution
 
 **Created Files**:
+
 1. `deployment/nginx-equiprofile.conf` - Production Nginx config
 2. `deployment/systemd/equiprofile.service` - Systemd unit file
 3. `deployment/deploy.sh` - Idempotent deployment script
@@ -258,10 +276,12 @@ Documentation debt from rapid development.
 5. `docs/QA_CHECKLIST.md` - Acceptance testing checklist
 
 **Deleted Files**:
+
 - `DEPLOYMENT_OLD.md` - Obsolete
 - `vite.config.ts.bak` - Backup file
 
 **Reorganized Documentation**:
+
 - Moved all markdown files to `docs/` directory
 - Created `docs/implementation/` for implementation summaries
 - Updated main README.md with deployment overview
@@ -272,7 +292,7 @@ Documentation debt from rapid development.
 ✅ Complete step-by-step guide  
 ✅ Systemd service for production  
 ✅ Idempotent deployment (safe to run multiple times)  
-✅ QA checklist for validation  
+✅ QA checklist for validation
 
 ---
 
@@ -325,14 +345,16 @@ curl -I https://yourdomain.com/assets/index-*.css | grep content-type
 ### 1. Node Serves Everything
 
 **Decision**: Node server handles both API and static files.  
-**Rationale**: 
+**Rationale**:
+
 - Simplifies architecture
 - Consistent MIME types
 - Easier debugging
 - Same behavior in dev/prod
 
 **Alternative Considered**: Nginx serves static files directly  
-**Rejected Because**: 
+**Rejected Because**:
+
 - Adds complexity
 - Cache invalidation issues
 - Different behavior in dev/prod
@@ -341,6 +363,7 @@ curl -I https://yourdomain.com/assets/index-*.css | grep content-type
 
 **Decision**: No `unsafe-inline` in scriptSrc directive.  
 **Rationale**:
+
 - Security best practice
 - Prevents XSS attacks
 - Forces proper script organization
@@ -351,12 +374,14 @@ curl -I https://yourdomain.com/assets/index-*.css | grep content-type
 
 **Decision**: Move all inline scripts to TypeScript modules.  
 **Rationale**:
+
 - Complies with CSP
 - Better organization
 - Type safety
 - Easier testing
 
 **Files Created**:
+
 - `bootstrap.ts` - Service worker
 - `analytics.ts` - Analytics
 
@@ -364,6 +389,7 @@ curl -I https://yourdomain.com/assets/index-*.css | grep content-type
 
 **Decision**: Single `deploy.sh` script handles entire deployment.  
 **Rationale**:
+
 - Reduces human error
 - Consistent deployments
 - Idempotent (safe to rerun)
@@ -376,27 +402,31 @@ curl -I https://yourdomain.com/assets/index-*.css | grep content-type
 For existing deployments:
 
 1. **Backup current deployment**
+
    ```bash
    sudo systemctl stop equiprofile
    cp -r /var/www/equiprofile /var/backups/equiprofile-$(date +%Y%m%d)
    ```
 
 2. **Pull latest code**
+
    ```bash
    cd /var/www/equiprofile
    git pull origin main
    ```
 
 3. **Run deployment script**
+
    ```bash
    sudo bash deployment/deploy.sh
    ```
 
 4. **Update Nginx config** (if needed)
+
    ```bash
    # Edit domain name
    sudo nano /var/www/equiprofile/deployment/nginx-equiprofile.conf
-   
+
    # Install
    sudo cp /var/www/equiprofile/deployment/nginx-equiprofile.conf /etc/nginx/sites-available/equiprofile
    sudo ln -sf /etc/nginx/sites-available/equiprofile /etc/nginx/sites-enabled/
@@ -426,6 +456,7 @@ To prevent similar issues in the future:
 ## Summary of Changes
 
 ### Files Created (11)
+
 1. `client/src/bootstrap.ts`
 2. `client/src/analytics.ts`
 3. `deployment/nginx-equiprofile.conf`
@@ -440,6 +471,7 @@ To prevent similar issues in the future:
 12. `client/public/assets/horse-4.svg`
 
 ### Files Modified (6)
+
 1. `client/index.html` - Removed inline scripts
 2. `client/src/main.tsx` - Added bootstrap imports
 3. `server/_core/index.ts` - Strict CSP configuration
@@ -448,10 +480,12 @@ To prevent similar issues in the future:
 6. `client/src/pages/Home.tsx` - Use local assets
 
 ### Files Deleted (2)
+
 1. `DEPLOYMENT_OLD.md` - Obsolete
 2. `vite.config.ts.bak` - Backup file
 
 ### Files Moved (8)
+
 1. `CHANGELOG.md` → `docs/CHANGELOG.md`
 2. `CONTRIBUTING.md` → `docs/CONTRIBUTING.md`
 3. `FEATURE_FLAGS_ARCHITECTURE.md` → `docs/FEATURE_FLAGS.md`
@@ -480,6 +514,6 @@ All acceptance criteria from the problem statement are met:
 ---
 
 **Audit Completed By**: GitHub Copilot  
-**Reviewed By**: _______________  
-**Approved By**: _______________  
+**Reviewed By**: **\*\***\_\_\_**\*\***  
+**Approved By**: **\*\***\_\_\_**\*\***  
 **Date**: 2026-01-07

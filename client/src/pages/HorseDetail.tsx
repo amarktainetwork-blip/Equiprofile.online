@@ -1,23 +1,29 @@
 import DashboardLayout from "@/components/DashboardLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { trpc } from "@/lib/trpc";
 import { useParams, Link } from "wouter";
-import { 
-  ArrowLeft, 
-  Edit, 
-  Heart, 
-  Activity, 
-  Utensils, 
+import {
+  ArrowLeft,
+  Edit,
+  Heart,
+  Activity,
+  Utensils,
   FileText,
   Plus,
   Calendar,
   Syringe,
   Stethoscope,
-  FileHeart
+  FileHeart,
 } from "lucide-react";
 import { toast } from "sonner";
 import { MedicalPassport } from "@/components/MedicalPassport";
@@ -27,8 +33,12 @@ function HorseDetailContent() {
   const horseId = parseInt(params.id);
 
   const { data: horse, isLoading } = trpc.horses.get.useQuery({ id: horseId });
-  const { data: healthRecords } = trpc.healthRecords.listByHorse.useQuery({ horseId });
-  const { data: trainingSessions } = trpc.training.listByHorse.useQuery({ horseId });
+  const { data: healthRecords } = trpc.healthRecords.listByHorse.useQuery({
+    horseId,
+  });
+  const { data: trainingSessions } = trpc.training.listByHorse.useQuery({
+    horseId,
+  });
   const { data: feedingPlans } = trpc.feeding.listByHorse.useQuery({ horseId });
 
   if (isLoading) {
@@ -44,8 +54,12 @@ function HorseDetailContent() {
     return (
       <div className="text-center py-12">
         <Heart className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
-        <h2 className="font-serif text-xl font-semibold mb-2">Horse not found</h2>
-        <p className="text-muted-foreground mb-4">This horse may have been removed.</p>
+        <h2 className="font-serif text-xl font-semibold mb-2">
+          Horse not found
+        </h2>
+        <p className="text-muted-foreground mb-4">
+          This horse may have been removed.
+        </p>
         <Link href="/horses">
           <Button>Back to Horses</Button>
         </Link>
@@ -55,9 +69,9 @@ function HorseDetailContent() {
 
   const getRecordTypeIcon = (type: string) => {
     switch (type) {
-      case 'vaccination':
+      case "vaccination":
         return <Syringe className="w-4 h-4" />;
-      case 'veterinary':
+      case "veterinary":
         return <Stethoscope className="w-4 h-4" />;
       default:
         return <FileText className="w-4 h-4" />;
@@ -74,9 +88,11 @@ function HorseDetailContent() {
           </Button>
         </Link>
         <div className="flex-1">
-          <h1 className="font-serif text-3xl font-bold text-foreground">{horse.name}</h1>
+          <h1 className="font-serif text-3xl font-bold text-foreground">
+            {horse.name}
+          </h1>
           <p className="text-muted-foreground">
-            {horse.breed || 'Unknown breed'}
+            {horse.breed || "Unknown breed"}
             {horse.age && ` • ${horse.age} years old`}
           </p>
         </div>
@@ -93,7 +109,11 @@ function HorseDetailContent() {
         <div className="grid md:grid-cols-3 gap-6">
           <div className="aspect-square bg-muted rounded-l-lg overflow-hidden">
             {horse.photoUrl ? (
-              <img src={horse.photoUrl} alt={horse.name} className="w-full h-full object-cover" />
+              <img
+                src={horse.photoUrl}
+                alt={horse.name}
+                className="w-full h-full object-cover"
+              />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
                 <Heart className="w-24 h-24 text-muted-foreground/30" />
@@ -102,11 +122,15 @@ function HorseDetailContent() {
           </div>
           <div className="md:col-span-2 p-6">
             <div className="flex flex-wrap gap-2 mb-4">
-              {horse.gender && <Badge className="capitalize">{horse.gender}</Badge>}
-              {horse.discipline && <Badge variant="secondary">{horse.discipline}</Badge>}
+              {horse.gender && (
+                <Badge className="capitalize">{horse.gender}</Badge>
+              )}
+              {horse.discipline && (
+                <Badge variant="secondary">{horse.discipline}</Badge>
+              )}
               {horse.level && <Badge variant="outline">{horse.level}</Badge>}
             </div>
-            
+
             <div className="grid sm:grid-cols-2 gap-4">
               {horse.color && (
                 <div>
@@ -129,12 +153,16 @@ function HorseDetailContent() {
               {horse.dateOfBirth && (
                 <div>
                   <p className="text-sm text-muted-foreground">Date of Birth</p>
-                  <p className="font-medium">{new Date(horse.dateOfBirth).toLocaleDateString()}</p>
+                  <p className="font-medium">
+                    {new Date(horse.dateOfBirth).toLocaleDateString()}
+                  </p>
                 </div>
               )}
               {horse.registrationNumber && (
                 <div>
-                  <p className="text-sm text-muted-foreground">Registration #</p>
+                  <p className="text-sm text-muted-foreground">
+                    Registration #
+                  </p>
                   <p className="font-medium">{horse.registrationNumber}</p>
                 </div>
               )}
@@ -183,7 +211,9 @@ function HorseDetailContent() {
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Health Records</CardTitle>
-                <CardDescription>Vaccinations, vet visits, and medical history</CardDescription>
+                <CardDescription>
+                  Vaccinations, vet visits, and medical history
+                </CardDescription>
               </div>
               <Link href={`/health/new?horseId=${horse.id}`}>
                 <Button size="sm">
@@ -201,19 +231,24 @@ function HorseDetailContent() {
               ) : (
                 <div className="space-y-3">
                   {healthRecords.map((record) => (
-                    <div key={record.id} className="flex items-center gap-4 p-3 rounded-lg bg-muted/30">
+                    <div
+                      key={record.id}
+                      className="flex items-center gap-4 p-3 rounded-lg bg-muted/30"
+                    >
                       <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                         {getRecordTypeIcon(record.recordType)}
                       </div>
                       <div className="flex-1">
                         <p className="font-medium">{record.title}</p>
                         <p className="text-sm text-muted-foreground">
-                          {new Date(record.recordDate).toLocaleDateString()} • {record.recordType}
+                          {new Date(record.recordDate).toLocaleDateString()} •{" "}
+                          {record.recordType}
                         </p>
                       </div>
                       {record.nextDueDate && (
                         <Badge variant="outline">
-                          Due: {new Date(record.nextDueDate).toLocaleDateString()}
+                          Due:{" "}
+                          {new Date(record.nextDueDate).toLocaleDateString()}
                         </Badge>
                       )}
                     </div>
@@ -230,7 +265,9 @@ function HorseDetailContent() {
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Training Sessions</CardTitle>
-                <CardDescription>Scheduled and completed training activities</CardDescription>
+                <CardDescription>
+                  Scheduled and completed training activities
+                </CardDescription>
               </div>
               <Link href={`/training/new?horseId=${horse.id}`}>
                 <Button size="sm">
@@ -243,23 +280,32 @@ function HorseDetailContent() {
               {!trainingSessions || trainingSessions.length === 0 ? (
                 <div className="text-center py-8">
                   <Activity className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-                  <p className="text-muted-foreground">No training sessions yet</p>
+                  <p className="text-muted-foreground">
+                    No training sessions yet
+                  </p>
                 </div>
               ) : (
                 <div className="space-y-3">
                   {trainingSessions.map((session) => (
-                    <div key={session.id} className="flex items-center gap-4 p-3 rounded-lg bg-muted/30">
+                    <div
+                      key={session.id}
+                      className="flex items-center gap-4 p-3 rounded-lg bg-muted/30"
+                    >
                       <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                         <Calendar className="w-5 h-5 text-primary" />
                       </div>
                       <div className="flex-1">
-                        <p className="font-medium capitalize">{session.sessionType}</p>
+                        <p className="font-medium capitalize">
+                          {session.sessionType}
+                        </p>
                         <p className="text-sm text-muted-foreground">
                           {new Date(session.sessionDate).toLocaleDateString()}
                           {session.startTime && ` at ${session.startTime}`}
                         </p>
                       </div>
-                      <Badge variant={session.isCompleted ? "secondary" : "outline"}>
+                      <Badge
+                        variant={session.isCompleted ? "secondary" : "outline"}
+                      >
                         {session.isCompleted ? "Completed" : "Scheduled"}
                       </Badge>
                     </div>
@@ -276,7 +322,9 @@ function HorseDetailContent() {
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Feeding Plan</CardTitle>
-                <CardDescription>Daily feeding schedule and nutrition</CardDescription>
+                <CardDescription>
+                  Daily feeding schedule and nutrition
+                </CardDescription>
               </div>
               <Link href={`/feeding/new?horseId=${horse.id}`}>
                 <Button size="sm">
@@ -289,22 +337,29 @@ function HorseDetailContent() {
               {!feedingPlans || feedingPlans.length === 0 ? (
                 <div className="text-center py-8">
                   <Utensils className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-                  <p className="text-muted-foreground">No feeding plan set up yet</p>
+                  <p className="text-muted-foreground">
+                    No feeding plan set up yet
+                  </p>
                 </div>
               ) : (
                 <div className="space-y-3">
                   {feedingPlans.map((plan) => (
-                    <div key={plan.id} className="flex items-center gap-4 p-3 rounded-lg bg-muted/30">
+                    <div
+                      key={plan.id}
+                      className="flex items-center gap-4 p-3 rounded-lg bg-muted/30"
+                    >
                       <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                         <Utensils className="w-5 h-5 text-primary" />
                       </div>
                       <div className="flex-1">
                         <p className="font-medium">{plan.feedType}</p>
                         <p className="text-sm text-muted-foreground">
-                          {plan.quantity} {plan.unit || ''} • {plan.mealTime}
+                          {plan.quantity} {plan.unit || ""} • {plan.mealTime}
                         </p>
                       </div>
-                      <Badge variant="outline" className="capitalize">{plan.mealTime}</Badge>
+                      <Badge variant="outline" className="capitalize">
+                        {plan.mealTime}
+                      </Badge>
                     </div>
                   ))}
                 </div>
@@ -319,11 +374,12 @@ function HorseDetailContent() {
             <CardHeader>
               <CardTitle>Medical Passport</CardTitle>
               <CardDescription>
-                Comprehensive health record document with QR code for easy sharing
+                Comprehensive health record document with QR code for easy
+                sharing
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <MedicalPassport 
+              <MedicalPassport
                 horse={{
                   id: horse.id,
                   name: horse.name,
@@ -332,19 +388,40 @@ function HorseDetailContent() {
                   microchipNumber: horse.microchipNumber || undefined,
                   registrationNumber: horse.registrationNumber || undefined,
                 }}
-                vaccinations={healthRecords?.filter(r => r.recordType === 'vaccination').map(r => ({
-                  vaccineName: r.title || 'Vaccination',
-                  dateAdministered: r.recordDate instanceof Date ? r.recordDate.toISOString() : r.recordDate,
-                  nextDueDate: r.nextDueDate ? (r.nextDueDate instanceof Date ? r.nextDueDate.toISOString() : r.nextDueDate) : undefined,
-                }))}
-                dewormings={healthRecords?.filter(r => r.recordType === 'deworming').map(r => ({
-                  productName: r.title || 'Deworming',
-                  dateAdministered: r.recordDate instanceof Date ? r.recordDate.toISOString() : r.recordDate,
-                  nextDueDate: r.nextDueDate ? (r.nextDueDate instanceof Date ? r.nextDueDate.toISOString() : r.nextDueDate) : undefined,
-                }))}
-                healthRecords={healthRecords?.map(r => ({
+                vaccinations={healthRecords
+                  ?.filter((r) => r.recordType === "vaccination")
+                  .map((r) => ({
+                    vaccineName: r.title || "Vaccination",
+                    dateAdministered:
+                      r.recordDate instanceof Date
+                        ? r.recordDate.toISOString()
+                        : r.recordDate,
+                    nextDueDate: r.nextDueDate
+                      ? r.nextDueDate instanceof Date
+                        ? r.nextDueDate.toISOString()
+                        : r.nextDueDate
+                      : undefined,
+                  }))}
+                dewormings={healthRecords
+                  ?.filter((r) => r.recordType === "deworming")
+                  .map((r) => ({
+                    productName: r.title || "Deworming",
+                    dateAdministered:
+                      r.recordDate instanceof Date
+                        ? r.recordDate.toISOString()
+                        : r.recordDate,
+                    nextDueDate: r.nextDueDate
+                      ? r.nextDueDate instanceof Date
+                        ? r.nextDueDate.toISOString()
+                        : r.nextDueDate
+                      : undefined,
+                  }))}
+                healthRecords={healthRecords?.map((r) => ({
                   title: r.title,
-                  recordDate: r.recordDate instanceof Date ? r.recordDate.toISOString() : r.recordDate,
+                  recordDate:
+                    r.recordDate instanceof Date
+                      ? r.recordDate.toISOString()
+                      : r.recordDate,
                   recordType: r.recordType,
                 }))}
               />

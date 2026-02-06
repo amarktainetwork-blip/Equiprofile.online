@@ -11,11 +11,13 @@ By participating in this project, you agree to maintain a respectful and inclusi
 ### Reporting Bugs
 
 Before creating a bug report:
+
 1. Check the [existing issues](https://github.com/amarktainetwork-blip/Equiprofile.online/issues)
 2. Verify the bug in the latest version
 3. Collect relevant information (browser, OS, steps to reproduce)
 
 When reporting a bug, include:
+
 - Clear, descriptive title
 - Detailed steps to reproduce
 - Expected vs. actual behavior
@@ -25,6 +27,7 @@ When reporting a bug, include:
 ### Suggesting Features
 
 Feature requests are welcome! Please:
+
 1. Check if the feature has already been requested
 2. Describe the problem it solves
 3. Provide examples of how it would work
@@ -33,6 +36,7 @@ Feature requests are welcome! Please:
 ### Pull Requests
 
 #### Before Starting
+
 1. **Discuss major changes** in an issue first
 2. **Fork the repository** and create a branch
 3. **Follow the coding standards** outlined below
@@ -60,6 +64,7 @@ pnpm dev
 #### Making Changes
 
 1. **Create a feature branch**
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
@@ -70,6 +75,7 @@ pnpm dev
    - Keep functions small and focused
 
 3. **Write tests**
+
    ```bash
    # Run tests
    pnpm test
@@ -102,6 +108,7 @@ Follow the [Conventional Commits](https://www.conventionalcommits.org/) specific
 ```
 
 **Types:**
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation changes
@@ -111,6 +118,7 @@ Follow the [Conventional Commits](https://www.conventionalcommits.org/) specific
 - `chore`: Maintenance tasks
 
 **Examples:**
+
 ```
 feat(horses): add bulk import from CSV
 fix(auth): resolve session timeout issue
@@ -121,6 +129,7 @@ test(training): add tests for session completion
 #### Submitting a Pull Request
 
 1. **Push to your fork**
+
    ```bash
    git push origin feature/your-feature-name
    ```
@@ -182,7 +191,7 @@ test(training): add tests for session completion
 export async function createHorse(input: CreateHorseInput): Promise<Horse> {
   const validated = validateHorse(input);
   const horse = await db.horses.create(validated);
-  await logActivity('horse_created', horse.id);
+  await logActivity("horse_created", horse.id);
   return horse;
 }
 
@@ -238,12 +247,14 @@ server/
 ## Project Structure
 
 ### Frontend (React + Vite)
+
 - **Components**: Reusable UI components using shadcn/ui
 - **Pages**: Route-level components
 - **Hooks**: Custom React hooks
 - **Contexts**: Global state management
 
 ### Backend (Express + tRPC)
+
 - **Routers**: API route definitions
 - **Database**: Drizzle ORM with MySQL
 - **Auth**: OAuth 2.0 with session cookies
@@ -262,32 +273,35 @@ server/
 ## Testing Guidelines
 
 ### Unit Tests
+
 - Test individual functions and components
 - Mock external dependencies
 - Focus on business logic
 
 ### Integration Tests
+
 - Test API endpoints end-to-end
 - Use test database
 - Test authentication flows
 
 ### Best Practices
+
 ```typescript
 // Good test structure
-describe('horses router', () => {
+describe("horses router", () => {
   beforeEach(() => {
     // Setup
   });
 
-  it('creates a new horse', async () => {
+  it("creates a new horse", async () => {
     // Arrange
-    const input = { name: 'Thunder' };
-    
+    const input = { name: "Thunder" };
+
     // Act
     const result = await caller.horses.create(input);
-    
+
     // Assert
-    expect(result).toHaveProperty('id');
+    expect(result).toHaveProperty("id");
   });
 });
 ```
@@ -295,16 +309,19 @@ describe('horses router', () => {
 ## Documentation
 
 ### Code Comments
+
 - Use JSDoc for public APIs
 - Explain "why" not "what"
 - Keep comments up-to-date
 
 ### API Documentation
+
 - Update API.md for endpoint changes
 - Include request/response examples
 - Document error cases
 
 ### README Updates
+
 - Keep setup instructions current
 - Update feature list
 - Add troubleshooting tips
@@ -319,6 +336,7 @@ describe('horses router', () => {
 ## Recognition
 
 Contributors will be:
+
 - Listed in CONTRIBUTORS.md
 - Mentioned in release notes
 - Given credit in commit messages

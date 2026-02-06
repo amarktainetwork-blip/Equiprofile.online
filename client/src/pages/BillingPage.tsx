@@ -1,12 +1,24 @@
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AppLayout } from "@/components/AppLayout";
 import { PageTransition } from "@/components/PageTransition";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/_core/trpc";
-import { Loader2, Check, CreditCard, Calendar, AlertCircle } from "lucide-react";
+import {
+  Loader2,
+  Check,
+  CreditCard,
+  Calendar,
+  AlertCircle,
+} from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function BillingPage() {
@@ -15,13 +27,18 @@ export default function BillingPage() {
   const [error, setError] = useState("");
 
   // Calculate trial days remaining
-  const trialDaysLeft = user?.trialEndsAt 
-    ? Math.ceil((new Date(user.trialEndsAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+  const trialDaysLeft = user?.trialEndsAt
+    ? Math.ceil(
+        (new Date(user.trialEndsAt).getTime() - Date.now()) /
+          (1000 * 60 * 60 * 24),
+      )
     : 0;
 
-  const isTrialActive = user?.subscriptionStatus === "trial" && trialDaysLeft > 0;
+  const isTrialActive =
+    user?.subscriptionStatus === "trial" && trialDaysLeft > 0;
   const isSubscriptionActive = user?.subscriptionStatus === "active";
-  const isTrialExpired = user?.subscriptionStatus === "trial" && trialDaysLeft <= 0;
+  const isTrialExpired =
+    user?.subscriptionStatus === "trial" && trialDaysLeft <= 0;
 
   const handleSubscribe = async (plan: "monthly" | "yearly") => {
     setIsLoading(true);
@@ -83,22 +100,30 @@ export default function BillingPage() {
                     <div className="flex items-center gap-2 mb-2">
                       <Badge variant="secondary">Free Trial</Badge>
                       <span className="text-sm text-muted-foreground">
-                        {trialDaysLeft} {trialDaysLeft === 1 ? "day" : "days"} remaining
+                        {trialDaysLeft} {trialDaysLeft === 1 ? "day" : "days"}{" "}
+                        remaining
                       </span>
                     </div>
                     <p className="text-sm text-muted-foreground">
                       Your trial ends on{" "}
-                      <strong>{user?.trialEndsAt ? new Date(user.trialEndsAt).toLocaleDateString() : "N/A"}</strong>.
-                      Subscribe to continue using all features.
+                      <strong>
+                        {user?.trialEndsAt
+                          ? new Date(user.trialEndsAt).toLocaleDateString()
+                          : "N/A"}
+                      </strong>
+                      . Subscribe to continue using all features.
                     </p>
                   </div>
                 )}
 
                 {isTrialExpired && (
                   <div>
-                    <Badge variant="destructive" className="mb-2">Trial Ended</Badge>
+                    <Badge variant="destructive" className="mb-2">
+                      Trial Ended
+                    </Badge>
                     <p className="text-sm text-muted-foreground">
-                      Your trial has ended. Please subscribe to regain access to all features.
+                      Your trial has ended. Please subscribe to regain access to
+                      all features.
                     </p>
                   </div>
                 )}
@@ -106,7 +131,9 @@ export default function BillingPage() {
                 {isSubscriptionActive && (
                   <div>
                     <div className="flex items-center gap-2 mb-2">
-                      <Badge variant="default" className="bg-green-600">Active</Badge>
+                      <Badge variant="default" className="bg-green-600">
+                        Active
+                      </Badge>
                       <span className="text-sm text-muted-foreground capitalize">
                         {user?.subscriptionPlan || "Monthly"} Plan
                       </span>
@@ -117,7 +144,9 @@ export default function BillingPage() {
                         Next billing date:{" "}
                         <strong>
                           {user?.subscriptionEndsAt
-                            ? new Date(user.subscriptionEndsAt).toLocaleDateString()
+                            ? new Date(
+                                user.subscriptionEndsAt,
+                              ).toLocaleDateString()
                             : "N/A"}
                         </strong>
                       </span>
@@ -157,13 +186,15 @@ export default function BillingPage() {
           {!isSubscriptionActive && (
             <>
               <h2 className="text-2xl font-bold mb-6">Choose Your Plan</h2>
-              
+
               <div className="grid md:grid-cols-2 gap-6 mb-8">
                 {/* Monthly Plan */}
                 <Card className="border-2">
                   <CardHeader>
                     <CardTitle>Monthly</CardTitle>
-                    <CardDescription>Billed monthly, cancel anytime</CardDescription>
+                    <CardDescription>
+                      Billed monthly, cancel anytime
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="mb-6">
@@ -174,15 +205,21 @@ export default function BillingPage() {
                     <ul className="space-y-3 mb-6">
                       <li className="flex items-start gap-2">
                         <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm">Unlimited horse profiles</span>
+                        <span className="text-sm">
+                          Unlimited horse profiles
+                        </span>
                       </li>
                       <li className="flex items-start gap-2">
                         <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm">Complete health tracking</span>
+                        <span className="text-sm">
+                          Complete health tracking
+                        </span>
                       </li>
                       <li className="flex items-start gap-2">
                         <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm">Training session management</span>
+                        <span className="text-sm">
+                          Training session management
+                        </span>
                       </li>
                       <li className="flex items-start gap-2">
                         <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
@@ -225,7 +262,9 @@ export default function BillingPage() {
                   </div>
                   <CardHeader>
                     <CardTitle>Yearly</CardTitle>
-                    <CardDescription>Best value - save £16 per year</CardDescription>
+                    <CardDescription>
+                      Best value - save £16 per year
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="mb-6">
@@ -239,15 +278,21 @@ export default function BillingPage() {
                     <ul className="space-y-3 mb-6">
                       <li className="flex items-start gap-2">
                         <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm">Unlimited horse profiles</span>
+                        <span className="text-sm">
+                          Unlimited horse profiles
+                        </span>
                       </li>
                       <li className="flex items-start gap-2">
                         <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm">Complete health tracking</span>
+                        <span className="text-sm">
+                          Complete health tracking
+                        </span>
                       </li>
                       <li className="flex items-start gap-2">
                         <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm">Training session management</span>
+                        <span className="text-sm">
+                          Training session management
+                        </span>
                       </li>
                       <li className="flex items-start gap-2">
                         <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />

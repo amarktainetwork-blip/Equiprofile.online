@@ -1,5 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link, useLocation } from "wouter";
@@ -100,15 +106,15 @@ export default function ResetPassword() {
                       <CheckCircle className="w-16 h-16 text-green-500" />
                     </div>
                     <div>
-                      <h3 className="font-semibold mb-2">Password reset successful!</h3>
+                      <h3 className="font-semibold mb-2">
+                        Password reset successful!
+                      </h3>
                       <p className="text-sm text-muted-foreground">
                         You can now log in with your new password.
                       </p>
                     </div>
                     <Link href="/login">
-                      <Button className="w-full">
-                        Go to login
-                      </Button>
+                      <Button className="w-full">Go to login</Button>
                     </Link>
                   </div>
                 ) : (
@@ -132,7 +138,9 @@ export default function ResetPassword() {
 
                     {/* Confirm Password field */}
                     <div className="space-y-2">
-                      <Label htmlFor="confirm-password">Confirm New Password</Label>
+                      <Label htmlFor="confirm-password">
+                        Confirm New Password
+                      </Label>
                       <Input
                         id="confirm-password"
                         type="password"

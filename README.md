@@ -32,10 +32,11 @@
 
 - **Node.js** 20.x or higher ([Download](https://nodejs.org/))
 - **pnpm** 10.x or higher
+
   ```bash
   # Install pnpm globally
   npm install -g pnpm
-  
+
   # Or using corepack (recommended)
   corepack enable
   corepack prepare pnpm@latest --activate
@@ -45,10 +46,11 @@
 
 - **SQLite** (default, no setup required) - Good for development
 - **MySQL 8.0+** (recommended for production)
+
   ```bash
   # Ubuntu/Debian
   sudo apt-get install mysql-server
-  
+
   # Create database
   mysql -u root -p -e "CREATE DATABASE equiprofile CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
   ```
@@ -71,6 +73,7 @@
 **CRITICAL: Must be changed in production!**
 
 Generate secure secrets:
+
 ```bash
 # JWT Secret (32+ characters)
 openssl rand -base64 32
@@ -145,6 +148,7 @@ sudo bash ops/verify.sh --domain equiprofile.online
 ```
 
 **Features:**
+
 - ✅ **Idempotent & deterministic** - safe to run multiple times
 - ✅ **SSH disconnect-safe** - continues running if connection drops
 - ✅ **Git-based** - fetch/checkout/reset for clean deploys
@@ -156,6 +160,7 @@ sudo bash ops/verify.sh --domain equiprofile.online
 ### Prerequisites
 
 **Server requirements:**
+
 - Ubuntu 24.04 LTS (or 22.04 LTS)
 - Node.js 20.x or higher
 - 2GB RAM minimum (4GB recommended)
@@ -163,6 +168,7 @@ sudo bash ops/verify.sh --domain equiprofile.online
 - Domain name pointed to server IP
 
 **Required environment variables:**
+
 ```bash
 DATABASE_URL=mysql://user:password@localhost:3306/equiprofile
 JWT_SECRET=<generate-with-openssl-rand-hex-32>
@@ -212,6 +218,7 @@ sudo bash ops/verify.sh --domain equiprofile.online
 ```
 
 Checks performed:
+
 - ✓ Git SHA and build SHA
 - ✓ Service status (single service, no duplicates)
 - ✓ Health endpoints (200 OK)
@@ -261,32 +268,37 @@ sudo systemctl daemon-reload && sudo systemctl restart equiprofile
 ### Standard Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/amarktainetwork-blip/Equiprofile.online.git
    cd Equiprofile.online
    ```
 
 2. **Install dependencies**
+
    ```bash
    pnpm install
    ```
 
 3. **Configure environment** (see [Configuration](#-configuration))
+
    ```bash
    cp .env.default .env
    nano .env  # Edit with your settings
    ```
 
 4. **Setup database** (if using MySQL)
+
    ```bash
    # Create database
    mysql -u root -p -e "CREATE DATABASE equiprofile CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-   
+
    # Run migrations
    pnpm db:push
    ```
 
 5. **Build the application**
+
    ```bash
    pnpm build
    ```
@@ -460,6 +472,7 @@ Equiprofile.online/
 ### Build Process Details
 
 **Client Build (Vite):**
+
 ```bash
 # Input: client/
 # Output: dist/public/
@@ -472,6 +485,7 @@ Equiprofile.online/
 ```
 
 **Server Build (esbuild):**
+
 ```bash
 # Input: server/_core/index.ts
 # Output: dist/index.js
@@ -485,6 +499,7 @@ Equiprofile.online/
 ### Runtime Dependencies
 
 **IMPORTANT**: The server build uses `--packages=external`, which means:
+
 - ✅ All dependencies in `package.json` must be available at runtime
 - ✅ You must deploy `node_modules/` OR run `pnpm install --prod --frozen-lockfile` on server
 - ✅ `pnpm-lock.yaml` ensures identical dependency versions
@@ -493,14 +508,15 @@ Equiprofile.online/
 
 ### Cache Strategy
 
-| File/Path | Cache-Control | Rationale |
-|-----------|---------------|-----------|
-| `index.html` | `no-store, no-cache, must-revalidate` | Always fetch latest SPA entry point |
+| File/Path           | Cache-Control                         | Rationale                                  |
+| ------------------- | ------------------------------------- | ------------------------------------------ |
+| `index.html`        | `no-store, no-cache, must-revalidate` | Always fetch latest SPA entry point        |
 | `service-worker.js` | `no-store, no-cache, must-revalidate` | Force service worker updates on deployment |
-| `/assets/*` | `public, max-age=31536000, immutable` | Hashed filenames = immutable content |
-| Other static files | `public, max-age=86400` | Moderate caching for non-hashed assets |
+| `/assets/*`         | `public, max-age=31536000, immutable` | Hashed filenames = immutable content       |
+| Other static files  | `public, max-age=86400`               | Moderate caching for non-hashed assets     |
 
 **Why this matters:**
+
 - ❌ Caching `index.html` = users stuck on old versions
 - ❌ Caching `service-worker.js` = service worker never updates
 - ✅ Caching `/assets/*` = blazing fast repeat visits (content never changes due to hashing)
@@ -515,6 +531,7 @@ The service worker is automatically versioned during build:
 4. Version change forces cache invalidation in users' browsers
 
 **To deploy a new version:**
+
 ```bash
 # Bump version in package.json
 npm version patch  # or minor, major
@@ -557,6 +574,7 @@ NODE_ENV=production node dist/index.js
 If you prefer keeping dependencies external (uses less disk space but requires `node_modules`):
 
 1. Build with external packages:
+
    ```bash
    # Temporarily edit package.json build script to add --packages=external
    pnpm build
@@ -773,11 +791,11 @@ Example customizations:
 ```css
 :root {
   /* Change primary brand color */
-  --primary: 220 90% 56%;           /* Blue theme */
+  --primary: 220 90% 56%; /* Blue theme */
   --primary-foreground: 0 0% 100%;
-  
+
   /* Or use your brand colors */
-  --primary: 142 71% 45%;           /* Green theme */
+  --primary: 142 71% 45%; /* Green theme */
 }
 
 /* Custom button style */
@@ -810,17 +828,17 @@ Example configuration:
     "tagline": "Professional Horse Care",
     "description": "Your custom description"
   },
-  
+
   "colors": {
     "primary": "#2563eb",
     "secondary": "#7c3aed"
   },
-  
+
   "logos": {
     "header": "/images/my-logo.png",
     "footer": "/images/my-logo-white.png"
   },
-  
+
   "hero": {
     "title": "Your Custom Title",
     "subtitle": "Your custom subtitle",
@@ -850,10 +868,10 @@ scp hero-bg.jpg user@server:/var/www/equiprofile/dist/public/images/hero-bg.jpg
 Add to `theme-override.css`:
 
 ```css
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap");
 
 :root {
-  --font-sans: 'Poppins', sans-serif;
+  --font-sans: "Poppins", sans-serif;
 }
 
 body {
@@ -912,41 +930,41 @@ cp dist/public/visual-config.json backups/visual-config-$(date +%Y%m%d).json
 #### Critical Security Requirements
 
 1. **Change Default Secrets** ⚠️
-   
+
    The application **will not start** in production with default secrets:
-   
+
    ```bash
    # Generate secure JWT secret
    openssl rand -base64 32
-   
+
    # Use a strong admin password (min 12 characters)
    # Include uppercase, lowercase, numbers, and symbols
    ```
 
 2. **Use HTTPS in Production** ⚠️
-   
+
    Always use SSL/TLS encryption:
-   
+
    ```bash
    # Get free SSL certificate from Let's Encrypt
    sudo certbot --nginx -d yourdomain.com
    ```
 
 3. **Keep Dependencies Updated**
-   
+
    ```bash
    # Check for updates
    pnpm outdated
-   
+
    # Update dependencies
    pnpm update
-   
+
    # Audit for vulnerabilities
    pnpm audit
    ```
 
 4. **Configure Firewall**
-   
+
    ```bash
    # Allow only necessary ports
    sudo ufw allow 22    # SSH
@@ -1028,7 +1046,8 @@ We will respond within 48 hours.
 
 EquiProfile uses tRPC for type-safe API communication.
 
-**Base URL**: 
+**Base URL**:
+
 - Development: `http://localhost:3000/api/trpc`
 - Production: `https://yourdomain.com/api/trpc`
 
@@ -1094,7 +1113,7 @@ EquiProfile uses tRPC for type-safe API communication.
 
 ```typescript
 // Using tRPC client
-import { trpc } from '@/lib/trpc';
+import { trpc } from "@/lib/trpc";
 
 // Query example
 const { data: horses } = trpc.horses.list.useQuery();
@@ -1102,15 +1121,15 @@ const { data: horses } = trpc.horses.list.useQuery();
 // Mutation example
 const createHorse = trpc.horses.create.useMutation({
   onSuccess: () => {
-    console.log('Horse created successfully!');
-  }
+    console.log("Horse created successfully!");
+  },
 });
 
 createHorse.mutate({
-  name: 'Thunder',
-  breed: 'Thoroughbred',
+  name: "Thunder",
+  breed: "Thoroughbred",
   age: 5,
-  discipline: 'Show Jumping'
+  discipline: "Show Jumping",
 });
 ```
 
@@ -1173,6 +1192,7 @@ Equiprofile.online/
 ### Technology Stack
 
 **Frontend**:
+
 - React 19 - UI framework
 - TypeScript - Type safety
 - Tailwind CSS - Styling
@@ -1181,6 +1201,7 @@ Equiprofile.online/
 - TanStack Query - Data fetching
 
 **Backend**:
+
 - Node.js - Runtime
 - Express - Web framework
 - tRPC - Type-safe API
@@ -1189,10 +1210,12 @@ Equiprofile.online/
 - bcrypt - Password hashing
 
 **Database**:
+
 - SQLite (development)
 - MySQL (production)
 
 **Build Tools**:
+
 - Vite - Frontend bundler
 - esbuild - Backend bundler
 - TypeScript - Compiler
@@ -1241,6 +1264,7 @@ pnpm test --watch
 ```
 
 Tests use Vitest and follow the pattern:
+
 - Unit tests for business logic
 - Integration tests for API endpoints
 - Mock external services
@@ -1261,6 +1285,7 @@ Tests use Vitest and follow the pattern:
 #### Issue 1: Old Design Still Showing After Deployment
 
 **Symptoms:**
+
 - Users see old design/features after deployment
 - Changes don't appear even after hard refresh
 - Service worker serves stale content
@@ -1268,6 +1293,7 @@ Tests use Vitest and follow the pattern:
 **Solutions:**
 
 1. **Clear browser cache and service worker:**
+
    ```bash
    # In browser DevTools (F12):
    # 1. Application tab → Service Workers → Unregister
@@ -1276,33 +1302,36 @@ Tests use Vitest and follow the pattern:
    ```
 
 2. **Verify service worker version updated:**
+
    ```bash
    # Check service-worker.js has new version
    curl https://yourdomain.com/service-worker.js | grep CACHE_VERSION
-   
+
    # Should match package.json version
    cat package.json | grep version
    ```
 
 3. **Ensure proper cache headers:**
+
    ```bash
    # Check index.html headers (should be no-cache)
    curl -I https://yourdomain.com/
    # Should see: Cache-Control: no-store, no-cache, must-revalidate
-   
+
    # Check service-worker.js headers (should be no-cache)
    curl -I https://yourdomain.com/service-worker.js
    # Should see: Cache-Control: no-store, no-cache, must-revalidate
    ```
 
 4. **Force version bump:**
+
    ```bash
    # Bump version in package.json
    npm version patch
-   
+
    # Rebuild (service worker version auto-updates)
    bash scripts/build.sh
-   
+
    # Restart server
    sudo systemctl restart equiprofile
    ```
@@ -1310,6 +1339,7 @@ Tests use Vitest and follow the pattern:
 #### Issue 2: CSS/JS Returning HTML (MIME Type Error)
 
 **Symptoms:**
+
 - Browser console shows: "Refused to apply style because its MIME type ('text/html') is not a supported stylesheet MIME type"
 - Assets return HTML (index.html) instead of actual files
 - White screen or broken styles
@@ -1319,16 +1349,18 @@ Tests use Vitest and follow the pattern:
 **Solutions:**
 
 1. **Check build output exists:**
+
    ```bash
    # Verify dist/public/ contains assets
    ls -la dist/public/
    ls -la dist/public/assets/
-   
+
    # Verify index.js exists
    ls -la dist/index.js
    ```
 
 2. **Verify server static path in production:**
+
    ```javascript
    // In server/_core/vite.ts, check distPath:
    // Should be: path.resolve(import.meta.dirname, "public")
@@ -1336,11 +1368,12 @@ Tests use Vitest and follow the pattern:
    ```
 
 3. **Check Nginx configuration:**
+
    ```bash
    # If using nginx static serving, verify root path
    grep "root" /etc/nginx/sites-available/equiprofile
    # Should point to correct dist/public directory
-   
+
    # Test nginx config
    sudo nginx -t
    ```
@@ -1355,6 +1388,7 @@ Tests use Vitest and follow the pattern:
 #### Issue 3: CSP Blocking Inline Scripts (White Screen)
 
 **Symptoms:**
+
 - White screen after deployment
 - Browser console shows CSP errors: "Refused to execute inline script"
 - Application loads in development but not production
@@ -1366,6 +1400,7 @@ Tests use Vitest and follow the pattern:
 ✅ **This should NOT happen** - `client/index.html` contains NO inline scripts!
 
 Verify:
+
 ```bash
 # Check index.html for inline scripts
 grep "<script" client/index.html
@@ -1377,6 +1412,7 @@ grep "<script" dist/public/index.html
 ```
 
 If you see inline scripts:
+
 1. Move script content to separate `.js` file
 2. Reference with `<script src="/path/to/file.js"></script>`
 3. Rebuild application
@@ -1384,6 +1420,7 @@ If you see inline scripts:
 #### Issue 4: Multiple/Conflicting Nginx Configs
 
 **Symptoms:**
+
 - Nginx serves wrong configuration
 - Changes to nginx config don't take effect
 - Multiple server blocks listening on same port
@@ -1391,36 +1428,39 @@ If you see inline scripts:
 **Solutions:**
 
 1. **Check active nginx configs:**
+
    ```bash
    # List enabled sites
    ls -la /etc/nginx/sites-enabled/
-   
+
    # Check for conflicting server blocks
    sudo nginx -T | grep "server_name"
    ```
 
 2. **Remove conflicting configs:**
+
    ```bash
    # Remove old symlinks
    sudo rm /etc/nginx/sites-enabled/default
    sudo rm /etc/nginx/sites-enabled/nginx-*
-   
+
    # Keep only canonical config
    sudo ln -sf /etc/nginx/sites-available/equiprofile /etc/nginx/sites-enabled/equiprofile
-   
+
    # Test and reload
    sudo nginx -t && sudo systemctl reload nginx
    ```
 
 3. **Use canonical configuration:**
+
    ```bash
    # Copy recommended config
    sudo cp deployment/nginx/equiprofile.conf /etc/nginx/sites-available/equiprofile
-   
+
    # Edit domain name
    sudo nano /etc/nginx/sites-available/equiprofile
    # Replace YOUR_DOMAIN_HERE with actual domain
-   
+
    # Test and reload
    sudo nginx -t && sudo systemctl reload nginx
    ```
@@ -1428,6 +1468,7 @@ If you see inline scripts:
 #### Issue 5: Build/Runtime Module Errors
 
 **Symptoms:**
+
 - Error: "Cannot find module 'some-package'"
 - Application builds but crashes at runtime
 - Missing dependencies errors
@@ -1437,15 +1478,17 @@ If you see inline scripts:
 **Solutions:**
 
 1. **Install production dependencies on server:**
+
    ```bash
    # Install with frozen lockfile
    pnpm install --prod --frozen-lockfile
-   
+
    # Verify node_modules exists
    ls -la node_modules/
    ```
 
 2. **Rebuild native modules if needed:**
+
    ```bash
    # For bcrypt, esbuild, etc.
    pnpm rebuild
@@ -1539,6 +1582,7 @@ sudo certbot renew --dry-run
 #### Slow Initial Page Load
 
 1. **Enable compression in Nginx:**
+
    ```nginx
    gzip on;
    gzip_types text/plain text/css application/json application/javascript;
@@ -1546,6 +1590,7 @@ sudo certbot renew --dry-run
    ```
 
 2. **Verify assets are cached:**
+
    ```bash
    # Check /assets/* headers
    curl -I https://yourdomain.com/assets/index-[hash].js
@@ -1605,37 +1650,40 @@ pnpm install --frozen-lockfile
 If issues persist:
 
 1. **Check logs:**
+
    ```bash
    # Application logs
    sudo journalctl -u equiprofile -n 100 --no-pager
-   
+
    # Nginx access log
    sudo tail -f /var/log/nginx/equiprofile-access.log
-   
+
    # Nginx error log
    sudo tail -f /var/log/nginx/equiprofile-error.log
    ```
 
 2. **Run health checks:**
+
    ```bash
    # Local health check
    curl http://127.0.0.1:3000/healthz
-   
+
    # Public health check
    curl https://yourdomain.com/healthz
-   
+
    # Build info
    curl https://yourdomain.com/build
    ```
 
 3. **Verify configuration:**
+
    ```bash
    # Check environment variables
    grep -v "^#" .env | grep -v "^$"
-   
+
    # Test Nginx config
    sudo nginx -t
-   
+
    # Check service status
    sudo systemctl status equiprofile
    ```
@@ -1794,6 +1842,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 Built with:
+
 - [React](https://react.dev/)
 - [Node.js](https://nodejs.org/)
 - [tRPC](https://trpc.io/)

@@ -9,6 +9,7 @@
 ## Executive Summary
 
 This audit examines the current EquiProfile codebase to identify:
+
 - All client routes and pages
 - All server API endpoints
 - Current authentication and admin mechanisms
@@ -18,6 +19,7 @@ This audit examines the current EquiProfile codebase to identify:
 **Overall System Health**: 🟡 **Functional but needs improvements**
 
 ### Key Findings:
+
 1. ✅ Core horse management, health records, and training features work
 2. ⚠️ Breeding page has loading issues (horses not fetched properly)
 3. ⚠️ Lessons scheduling has navigation/menu bugs
@@ -35,56 +37,57 @@ This audit examines the current EquiProfile codebase to identify:
 
 ### 1.1 Marketing Pages (Public - No Auth Required)
 
-| Route | Component | Status | Notes |
-|-------|-----------|--------|-------|
-| `/` | Home.tsx | 🟡 Needs redesign | Landing page exists, needs marketing upgrade |
-| `/about` | About.tsx | 🟡 Needs redesign | Should be first in nav |
-| `/features` | Features.tsx | 🟡 Needs redesign | Needs UK-focused content |
-| `/pricing` | Pricing.tsx | ⚠️ Outdated | Shows wrong trial/pricing (needs 7-day, £7.99/£24.99) |
-| `/contact` | Contact.tsx | 🟡 Needs redesign | Should show email + WhatsApp only |
-| `/terms` | TermsPage.tsx | 🟡 Basic | Needs UK legal review |
-| `/privacy` | PrivacyPage.tsx | 🟡 Basic | Needs UK GDPR/PECR compliance |
+| Route       | Component       | Status            | Notes                                                 |
+| ----------- | --------------- | ----------------- | ----------------------------------------------------- |
+| `/`         | Home.tsx        | 🟡 Needs redesign | Landing page exists, needs marketing upgrade          |
+| `/about`    | About.tsx       | 🟡 Needs redesign | Should be first in nav                                |
+| `/features` | Features.tsx    | 🟡 Needs redesign | Needs UK-focused content                              |
+| `/pricing`  | Pricing.tsx     | ⚠️ Outdated       | Shows wrong trial/pricing (needs 7-day, £7.99/£24.99) |
+| `/contact`  | Contact.tsx     | 🟡 Needs redesign | Should show email + WhatsApp only                     |
+| `/terms`    | TermsPage.tsx   | 🟡 Basic          | Needs UK legal review                                 |
+| `/privacy`  | PrivacyPage.tsx | 🟡 Basic          | Needs UK GDPR/PECR compliance                         |
 
 **Missing Marketing Pages:**
+
 - ❌ Cookie notice + preferences modal (required for UK/PECR)
 - ❌ Image-based premium auth pages (Login/Register need backgrounds)
 
 ### 1.2 Authentication Pages
 
-| Route | Component | Status | Notes |
-|-------|-----------|--------|-------|
-| `/login` | auth/Login.tsx | ✅ Works | Needs premium image background |
-| `/register` | auth/Register.tsx | ✅ Works | Needs premium image background |
-| `/forgot-password` | auth/ForgotPassword.tsx | ✅ Works | - |
-| `/reset-password` | auth/ResetPassword.tsx | ✅ Works | - |
+| Route              | Component               | Status   | Notes                          |
+| ------------------ | ----------------------- | -------- | ------------------------------ |
+| `/login`           | auth/Login.tsx          | ✅ Works | Needs premium image background |
+| `/register`        | auth/Register.tsx       | ✅ Works | Needs premium image background |
+| `/forgot-password` | auth/ForgotPassword.tsx | ✅ Works | -                              |
+| `/reset-password`  | auth/ResetPassword.tsx  | ✅ Works | -                              |
 
 ### 1.3 Dashboard/App Pages (Protected - Auth Required)
 
-| Route | Component | Status | Issues/Notes |
-|-------|-----------|--------|--------------|
-| `/dashboard` | Dashboard.tsx | ✅ Works | Needs layout redesign (3 bottom blocks in row on desktop) |
-| `/horses` | Horses.tsx | ✅ Works | - |
-| `/horses/new` | HorseForm.tsx | ✅ Works | Needs photo upload capability |
-| `/horses/:id` | HorseDetail.tsx | ✅ Works | Needs to display uploaded photos |
-| `/horses/:id/edit` | HorseForm.tsx | ✅ Works | - |
-| `/health` | Health.tsx | ✅ Works | - |
-| `/training` | Training.tsx | ✅ Works | - |
-| `/training-templates` | TrainingTemplates.tsx | ✅ Works | - |
-| `/breeding` | BreedingManagement.tsx | ⚠️ **BROKEN** | Horses not loading properly in form |
-| `/lessons` | LessonScheduling.tsx | ⚠️ **BROKEN** | Navigation/menu bugs when accessing |
-| `/feeding` | Feeding.tsx | ✅ Works | - |
-| `/weather` | Weather.tsx | 🟡 Basic | Needs UK location search + Open-Meteo integration |
-| `/documents` | Documents.tsx | ✅ Works | Needs secure upload capability |
-| `/stable` | Stable.tsx | ✅ Works | - |
-| `/messages` | Messages.tsx | ✅ Works | - |
-| `/analytics` | Analytics.tsx | ✅ Works | - |
-| `/reports` | Reports.tsx | ✅ Works | - |
-| `/calendar` | Calendar.tsx | ✅ Works | - |
-| `/settings` | Settings.tsx | ✅ Works | No user-facing API keys section (correct) |
-| `/billing` | BillingPage.tsx | ✅ Works | Needs pricing update |
-| `/ai-chat` | AIChat.tsx | ⚠️ Shows "show admin" | Hint text must be removed |
-| `/client/:clientId` | ClientPortal.tsx | ✅ Works | - |
-| `/admin` | Admin.tsx | ⚠️ Shows "show admin" | Message must not instruct users |
+| Route                 | Component              | Status                | Issues/Notes                                              |
+| --------------------- | ---------------------- | --------------------- | --------------------------------------------------------- |
+| `/dashboard`          | Dashboard.tsx          | ✅ Works              | Needs layout redesign (3 bottom blocks in row on desktop) |
+| `/horses`             | Horses.tsx             | ✅ Works              | -                                                         |
+| `/horses/new`         | HorseForm.tsx          | ✅ Works              | Needs photo upload capability                             |
+| `/horses/:id`         | HorseDetail.tsx        | ✅ Works              | Needs to display uploaded photos                          |
+| `/horses/:id/edit`    | HorseForm.tsx          | ✅ Works              | -                                                         |
+| `/health`             | Health.tsx             | ✅ Works              | -                                                         |
+| `/training`           | Training.tsx           | ✅ Works              | -                                                         |
+| `/training-templates` | TrainingTemplates.tsx  | ✅ Works              | -                                                         |
+| `/breeding`           | BreedingManagement.tsx | ⚠️ **BROKEN**         | Horses not loading properly in form                       |
+| `/lessons`            | LessonScheduling.tsx   | ⚠️ **BROKEN**         | Navigation/menu bugs when accessing                       |
+| `/feeding`            | Feeding.tsx            | ✅ Works              | -                                                         |
+| `/weather`            | Weather.tsx            | 🟡 Basic              | Needs UK location search + Open-Meteo integration         |
+| `/documents`          | Documents.tsx          | ✅ Works              | Needs secure upload capability                            |
+| `/stable`             | Stable.tsx             | ✅ Works              | -                                                         |
+| `/messages`           | Messages.tsx           | ✅ Works              | -                                                         |
+| `/analytics`          | Analytics.tsx          | ✅ Works              | -                                                         |
+| `/reports`            | Reports.tsx            | ✅ Works              | -                                                         |
+| `/calendar`           | Calendar.tsx           | ✅ Works              | -                                                         |
+| `/settings`           | Settings.tsx           | ✅ Works              | No user-facing API keys section (correct)                 |
+| `/billing`            | BillingPage.tsx        | ✅ Works              | Needs pricing update                                      |
+| `/ai-chat`            | AIChat.tsx             | ⚠️ Shows "show admin" | Hint text must be removed                                 |
+| `/client/:clientId`   | ClientPortal.tsx       | ✅ Works              | -                                                         |
+| `/admin`              | Admin.tsx              | ⚠️ Shows "show admin" | Message must not instruct users                           |
 
 **Total Pages**: 35 page components
 
@@ -94,115 +97,134 @@ This audit examines the current EquiProfile codebase to identify:
 
 ### 2.1 Core HTTP/Express Routes
 
-| Method | Route | Purpose | Status |
-|--------|-------|---------|--------|
-| GET | `/healthz` | Simple health check | ✅ Works |
-| GET | `/build` | Build info | ✅ Works |
-| GET | `/api/health` | Detailed health check | ✅ Works |
-| GET | `/api/oauth/status` | OAuth config status | ✅ Works |
-| POST | `/api/webhooks/stripe` | Stripe webhook handler | ✅ Works |
-| * | `/api/auth/*` | Local authentication (authRouter) | ✅ Works |
-| * | `/api/billing/*` | Billing/Stripe (billingRouter) | ✅ Works |
-| POST | `/api/admin/send-test-email` | Admin test email | ✅ Works |
-| * | `/api/trpc/*` | tRPC API (main application API) | ✅ Works |
-| * | `/api/v1/*` | REST API v1 (third-party) | ✅ Works |
+| Method | Route                        | Purpose                           | Status   |
+| ------ | ---------------------------- | --------------------------------- | -------- |
+| GET    | `/healthz`                   | Simple health check               | ✅ Works |
+| GET    | `/build`                     | Build info                        | ✅ Works |
+| GET    | `/api/health`                | Detailed health check             | ✅ Works |
+| GET    | `/api/oauth/status`          | OAuth config status               | ✅ Works |
+| POST   | `/api/webhooks/stripe`       | Stripe webhook handler            | ✅ Works |
+| \*     | `/api/auth/*`                | Local authentication (authRouter) | ✅ Works |
+| \*     | `/api/billing/*`             | Billing/Stripe (billingRouter)    | ✅ Works |
+| POST   | `/api/admin/send-test-email` | Admin test email                  | ✅ Works |
+| \*     | `/api/trpc/*`                | tRPC API (main application API)   | ✅ Works |
+| \*     | `/api/v1/*`                  | REST API v1 (third-party)         | ✅ Works |
 
 **Note**: There is NO "EP_API_GUARD_BEFORE_STATIC" marker in the code. The `/api` routes are naturally protected by being defined before the static file handler.
 
 ### 2.2 tRPC API Routers (via `/api/trpc`)
 
 #### System Router (`system.*`)
+
 - Environment and system-level operations
 - Details in `server/_core/systemRouter.ts`
 
 #### Auth Router (`auth.*`)
-| Procedure | Type | Auth | Purpose |
-|-----------|------|------|---------|
-| me | query | public | Get current user |
-| logout | mutation | public | Clear session cookie |
+
+| Procedure | Type     | Auth   | Purpose              |
+| --------- | -------- | ------ | -------------------- |
+| me        | query    | public | Get current user     |
+| logout    | mutation | public | Clear session cookie |
 
 #### Admin Unlock Router (`adminUnlock.*`)
-| Procedure | Type | Auth | Purpose |
-|-----------|------|------|---------|
-| getStatus | query | protected | Check if admin mode unlocked |
-| requestUnlock | mutation | protected | Request admin unlock challenge |
-| submitPassword | mutation | protected | Submit admin password |
-| lock | mutation | protected | Revoke admin session |
+
+| Procedure      | Type     | Auth      | Purpose                        |
+| -------------- | -------- | --------- | ------------------------------ |
+| getStatus      | query    | protected | Check if admin mode unlocked   |
+| requestUnlock  | mutation | protected | Request admin unlock challenge |
+| submitPassword | mutation | protected | Submit admin password          |
+| lock           | mutation | protected | Revoke admin session           |
 
 **Admin Password**: Stored in env var `ADMIN_UNLOCK_PASSWORD` (default: `ashmor12@`)
 
 #### AI Router (`ai.*`)
-| Procedure | Type | Auth | Purpose | Issue |
-|-----------|------|------|---------|-------|
-| chat | mutation | protected | AI chat + admin unlock | ⚠️ Responds to "show admin" command |
+
+| Procedure | Type     | Auth      | Purpose                | Issue                               |
+| --------- | -------- | --------- | ---------------------- | ----------------------------------- |
+| chat      | mutation | protected | AI chat + admin unlock | ⚠️ Responds to "show admin" command |
 
 **Issue**: When user sends "show admin", AI returns instructions. This must be hidden.
 
 #### Admin Router (`admin.*`)
+
 All procedures require `adminUnlockedProcedure` (admin session active).
 
-| Sub-Router | Procedures | Purpose |
-|------------|------------|---------|
-| admin.{users} | getUsers, getUserDetails, suspendUser, unsuspendUser, deleteUser, updateUserRole | User management |
-| admin.{stats} | getStats, getOverdueUsers, getExpiredTrials | System statistics |
-| admin.{activity} | getActivityLogs | Activity audit logs |
-| admin.{settings} | getSettings, updateSetting | System settings (DB-stored) |
-| admin.{backups} | getBackupLogs | Backup history |
-| admin.apiKeys.{} | list, create, revoke, rotate, updateSettings | **API key management** |
-| admin.{envHealth} | getEnvHealth | Environment variable health check |
+| Sub-Router        | Procedures                                                                       | Purpose                           |
+| ----------------- | -------------------------------------------------------------------------------- | --------------------------------- |
+| admin.{users}     | getUsers, getUserDetails, suspendUser, unsuspendUser, deleteUser, updateUserRole | User management                   |
+| admin.{stats}     | getStats, getOverdueUsers, getExpiredTrials                                      | System statistics                 |
+| admin.{activity}  | getActivityLogs                                                                  | Activity audit logs               |
+| admin.{settings}  | getSettings, updateSetting                                                       | System settings (DB-stored)       |
+| admin.{backups}   | getBackupLogs                                                                    | Backup history                    |
+| admin.apiKeys.{}  | list, create, revoke, rotate, updateSettings                                     | **API key management**            |
+| admin.{envHealth} | getEnvHealth                                                                     | Environment variable health check |
 
 **⚠️ CRITICAL ISSUE: API Keys**
+
 - API keys are in the ADMIN router (correct)
 - But Admin panel shows them prominently
 - Users should NEVER see "API keys" UI
 - These are for system-wide configuration (OpenAI, SMTP, weather provider if needed)
 
 #### Billing Router (`billing.*`)
-| Procedure | Type | Auth | Purpose |
-|-----------|------|------|---------|
-| getPricing | query | public | Get pricing info | ⚠️ Returns old pricing |
-| createCheckout | mutation | protected | Create Stripe checkout |
-| createPortal | mutation | protected | Create Stripe portal |
-| getStatus | query | protected | Get subscription status |
+
+| Procedure      | Type     | Auth      | Purpose                 |
+| -------------- | -------- | --------- | ----------------------- | ---------------------- |
+| getPricing     | query    | public    | Get pricing info        | ⚠️ Returns old pricing |
+| createCheckout | mutation | protected | Create Stripe checkout  |
+| createPortal   | mutation | protected | Create Stripe portal    |
+| getStatus      | query    | protected | Get subscription status |
 
 **Issue**: Pricing shows old amounts, needs update to 7-day trial + £7.99/£24.99
 
 #### User Router (`user.*`)
-| Procedure | Type | Auth | Purpose |
-|-----------|------|------|---------|
-| getProfile | query | protected | Get user profile |
-| updateProfile | mutation | protected | Update user profile |
-| getSubscriptionStatus | query | protected | Get subscription |
-| getDashboardStats | query | subscribed | Get dashboard stats |
+
+| Procedure             | Type     | Auth       | Purpose             |
+| --------------------- | -------- | ---------- | ------------------- |
+| getProfile            | query    | protected  | Get user profile    |
+| updateProfile         | mutation | protected  | Update user profile |
+| getSubscriptionStatus | query    | protected  | Get subscription    |
+| getDashboardStats     | query    | subscribed | Get dashboard stats |
 
 #### Horses Router (`horses.*`)
+
 All require `subscribedProcedure`.
+
 - list, get, create, update, delete, exportCSV
 - ✅ All working correctly
 - ❌ Missing: Horse photo upload/display
 
 #### Health Records Router (`healthRecords.*`)
+
 All require `subscribedProcedure`.
+
 - listAll, listByHorse, get, create, update, delete, getReminders, exportCSV
 - ✅ All working
 
 #### Training Router (`training.*`)
+
 All require `subscribedProcedure`.
+
 - listByHorse, listAll, getUpcoming, create, update, delete, complete, exportCSV
 - ✅ All working
 
 #### Feeding Router (`feeding.*`)
+
 All require `subscribedProcedure`.
+
 - listAll, listByHorse, create, update, delete, exportCSV
 - ✅ All working
 
 #### Documents Router (`documents.*`)
+
 All require `subscribedProcedure`.
+
 - list, listByHorse, upload, delete, exportCSV
 - 🟡 Upload exists but uses S3 (BUILT_IN_FORGE or AWS)
 - ❌ No secure per-user VPS storage implementation
 
 #### Weather Router (`weather.*`)
+
 All require `subscribedProcedure`.
 | Procedure | Purpose | Status |
 |-----------|---------|--------|
@@ -213,21 +235,28 @@ All require `subscribedProcedure`.
 **Issue**: Weather is basic. Needs UK location search, Open-Meteo integration, forecast display.
 
 #### Breeding Router (`breeding.*`)
+
 All require `subscribedProcedure` or `protectedProcedure`.
+
 - createRecord, list, get, update, delete, confirmPregnancy, addFoal, listFoals, exportCSV
 - ⚠️ **BROKEN**: Frontend doesn't load horses properly (query issue)
 
 #### Lesson Bookings Router (`lessonBookings.*`)
+
 All require `protectedProcedure`.
+
 - create, list, get, update, delete, markCompleted, markCancelled
 - ⚠️ **BROKEN**: Frontend has navigation/menu bugs
 
 #### Trainer Availability Router (`trainerAvailability.*`)
+
 All require `protectedProcedure`.
+
 - create, list, update, delete
 - ✅ Works
 
 #### Other Routers
+
 - `stables.*` - Stable management ✅
 - `messages.*` - Messaging ✅
 - `analytics.*` - Analytics ✅
@@ -249,10 +278,12 @@ All require `protectedProcedure`.
 **Implementation**: `server/_core/context.ts` checks cookie and validates JWT
 
 **User Roles**:
+
 - `user` (default)
 - `admin`
 
 **Subscription Statuses**:
+
 - `trial` - Free trial (default, currently 14 days but needs to be 7)
 - `active` - Paid subscription
 - `cancelled` - Subscription cancelled
@@ -260,6 +291,7 @@ All require `protectedProcedure`.
 - `expired` - Trial/subscription expired
 
 **Plans**:
+
 - `monthly` - ⚠️ Needs update to £7.99/month, 5 horses max
 - `yearly` - ⚠️ Needs update to £79/year, 5 horses max
 - (Missing) "stable" plan - £24.99/month or £249/year, unlimited horses
@@ -267,6 +299,7 @@ All require `protectedProcedure`.
 ### 3.2 Admin Unlock Mechanism
 
 **How It Works**:
+
 1. User must have `role = 'admin'` in database
 2. User types "show admin" in AI chat (`/ai-chat`)
 3. AI responds with password challenge
@@ -275,6 +308,7 @@ All require `protectedProcedure`.
 6. Admin can access `/admin` panel
 
 **Admin Session Table**: `adminSessions` (schema.ts line ~185)
+
 - userId, expiresAt, createdAt
 - Rate limiting: Max 5 attempts, 15-minute lockout
 
@@ -294,7 +328,8 @@ All require `protectedProcedure`.
    - Users should never see "API keys" concept
    - Only hidden admin should manage global API keys
 
-**REQUIREMENT**: 
+**REQUIREMENT**:
+
 - Admin chat UI must NOT display "show admin" hint
 - Only admins who already know can unlock
 - Admin panel is hidden (no nav link)
@@ -304,6 +339,7 @@ All require `protectedProcedure`.
 **Model**: Strict tenancy via userId foreign key
 
 Every data table has `userId` column:
+
 - horses.userId
 - healthRecords.userId
 - trainingSessions.userId
@@ -313,6 +349,7 @@ Every data table has `userId` column:
 - etc.
 
 **Protection**: All tRPC procedures use `subscribedProcedure` which:
+
 1. Checks user is authenticated (`protectedProcedure`)
 2. Checks user has active subscription
 3. Filters all queries by `ctx.user.id`
@@ -329,40 +366,45 @@ Every data table has `userId` column:
 
 ### Core Tables
 
-| Table | Purpose | Key Columns |
-|-------|---------|-------------|
-| users | User accounts | id, openId, email, role, subscriptionStatus, subscriptionPlan |
-| horses | Horse profiles | id, userId, name, breed, photoUrl |
-| healthRecords | Health/vet records | id, userId, horseId, recordType, nextDueDate |
-| trainingSessions | Training logs | id, userId, horseId, sessionDate, sessionType |
-| feedingPlans | Feeding schedules | id, userId, horseId, feedType, mealTime |
-| documents | File uploads | id, userId, horseId, fileUrl, fileKey |
-| weatherLogs | Weather analysis | id, userId, location, temperature, ridingRecommendation |
-| adminSessions | Admin unlock sessions | id, userId, expiresAt |
-| activityLogs | Audit trail | id, userId, action, entityType, entityId |
-| settings | System settings (DB) | id, key, value, type |
-| apiKeys | Admin API keys | id, userId, keyHash, name, rateLimit |
-| stripeEvents | Stripe webhook dedup | id, eventId, eventType, processed |
-| backupLogs | Backup history | id, backupType, status, startedAt |
+| Table            | Purpose               | Key Columns                                                   |
+| ---------------- | --------------------- | ------------------------------------------------------------- |
+| users            | User accounts         | id, openId, email, role, subscriptionStatus, subscriptionPlan |
+| horses           | Horse profiles        | id, userId, name, breed, photoUrl                             |
+| healthRecords    | Health/vet records    | id, userId, horseId, recordType, nextDueDate                  |
+| trainingSessions | Training logs         | id, userId, horseId, sessionDate, sessionType                 |
+| feedingPlans     | Feeding schedules     | id, userId, horseId, feedType, mealTime                       |
+| documents        | File uploads          | id, userId, horseId, fileUrl, fileKey                         |
+| weatherLogs      | Weather analysis      | id, userId, location, temperature, ridingRecommendation       |
+| adminSessions    | Admin unlock sessions | id, userId, expiresAt                                         |
+| activityLogs     | Audit trail           | id, userId, action, entityType, entityId                      |
+| settings         | System settings (DB)  | id, key, value, type                                          |
+| apiKeys          | Admin API keys        | id, userId, keyHash, name, rateLimit                          |
+| stripeEvents     | Stripe webhook dedup  | id, eventId, eventType, processed                             |
+| backupLogs       | Backup history        | id, backupType, status, startedAt                             |
 
 ### Stable Management Tables
+
 - stables, stableMembers, stableInvites
 - messageThreads, messages
 
 ### Breeding Tables
+
 - breeding (mare + stallion records)
 - foals (offspring)
 
 ### Training Tables
+
 - trainingProgramTemplates
 - trainingPrograms (instances)
 
 ### Events & Reporting
+
 - events (calendar)
 - competitions
 - reports, reportSchedules
 
 ### Lessons
+
 - lessonBookings
 - trainerAvailability
 
@@ -381,17 +423,20 @@ Every data table has `userId` column:
 **Symptom**: When creating a breeding record, horse dropdown is empty or doesn't load.
 
 **Root Cause** (Suspected):
+
 - Line 30-50: Component mounts and tries to fetch horses
 - May be missing `trpc.horses.list.useQuery()` call
 - Or may have conditional rendering that hides form before data loads
 
 **Investigation Needed**:
+
 ```typescript
 // Check if this exists:
 const { data: horses = [] } = trpc.horses.list.useQuery();
 ```
 
 **Fix Strategy**:
+
 1. Ensure `trpc.horses.list.useQuery()` is called on component mount
 2. Add loading state while horses are fetching
 3. Show error if query fails
@@ -407,11 +452,13 @@ const { data: horses = [] } = trpc.horses.list.useQuery();
 **Symptom**: When navigating to `/lessons`, the page loads but dashboard navigation/menu breaks or disappears.
 
 **Root Cause** (Suspected):
+
 - Line 1-50: Component structure may not use `<DashboardLayout>`
 - Or may have styling issues that overlay/hide nav
 - Or may have router issue that breaks Wouter navigation
 
 **Investigation Needed**:
+
 ```typescript
 // Check if component is wrapped:
 export default function LessonScheduling() {
@@ -424,6 +471,7 @@ export default function LessonScheduling() {
 ```
 
 **Fix Strategy**:
+
 1. Verify `<DashboardLayout>` wrapper exists
 2. Check for z-index issues in CSS
 3. Check for state management issues that affect parent layout
@@ -435,18 +483,21 @@ export default function LessonScheduling() {
 ### 5.3 API Keys UI Confusing Users
 
 **Files**:
+
 - `client/src/pages/Admin.tsx` - Shows "API Keys" tab
 - `server/routers.ts` line 1099 - `admin.apiKeys` router
 
 **Symptom**: Admin panel prominently displays "API Keys" which confuses users. Users don't need API keys; only the admin manages system-wide keys.
 
-**Root Cause**: 
+**Root Cause**:
+
 - API keys are correctly admin-only in backend
 - But frontend makes them visible as a top-level tab
 - Users expect "API keys" to be for their own use (like GitHub personal access tokens)
 - In reality, these are for configuring the platform (OpenAI, SMTP, weather API if needed)
 
 **Fix Strategy**:
+
 1. Rename "API Keys" tab to "System Secrets" or "Integration Keys"
 2. Add clear description: "Configure global API keys for platform integrations (OpenAI, weather, SMTP, etc.)"
 3. Or move to a sub-section under "System Settings"
@@ -458,6 +509,7 @@ export default function LessonScheduling() {
 ### 5.4 "Show Admin" Command Exposed
 
 **Files with "show admin" mentions**:
+
 - `client/src/pages/Admin.tsx` line 89 - "type 'show admin' in AI chat"
 - `client/src/lib/adminToggle.ts` - Console commands (legacy, not used)
 - `server/routers.ts` line 176 - Checks for "show admin" in chat
@@ -465,11 +517,13 @@ export default function LessonScheduling() {
 
 **Symptom**: UI instructs users to type "show admin", but requirement is that only admins who already know can unlock.
 
-**Root Cause**: 
+**Root Cause**:
+
 - Instructions were added for convenience during development
 - Must be removed for production security-by-obscurity
 
 **Fix Strategy**:
+
 1. Remove all UI hints about "show admin"
 2. Keep the mechanism in backend (checking for "show admin" in chat)
 3. Update admin guide to be internal-only
@@ -485,20 +539,23 @@ export default function LessonScheduling() {
 **Symptom**: After signing out, user is not redirected to landing page.
 
 **Root Cause** (Suspected):
+
 - `auth.logout` mutation succeeds but doesn't trigger navigation
 - Or navigation goes to wrong route
 
 **Investigation Needed**:
+
 ```typescript
 // Check where logout is called
 const logoutMutation = trpc.auth.logout.useMutation({
   onSuccess: () => {
     // Should navigate to '/'
-  }
+  },
 });
 ```
 
 **Fix Strategy**:
+
 1. Find all logout button locations
 2. Ensure `navigate('/')` is called after successful logout
 3. Test across all pages with logout button
@@ -513,11 +570,13 @@ const logoutMutation = trpc.auth.logout.useMutation({
 ### 6.1 Secure Per-User File Storage (Missing)
 
 **Current State**:
+
 - `documents.upload` procedure exists (line 803-851 in routers.ts)
 - Uses S3 or "BUILT_IN_FORGE" API
 - Files stored at `{userId}/documents/{nanoid}-{filename}`
 
 **What's Missing**:
+
 - ❌ VPS-based secure storage (requirement: store on VPS, not S3)
 - ❌ Per-user directory structure `/var/equiprofile/storage/users/{userId}/`
 - ❌ Authenticated streaming endpoints (can't serve files via static route)
@@ -527,6 +586,7 @@ const logoutMutation = trpc.auth.logout.useMutation({
 - ❌ Admin storage dashboard (usage/quota/files per user)
 
 **Implementation Plan** (Phase 4):
+
 1. Create storage directory structure:
    ```
    /var/equiprofile/storage/
@@ -560,11 +620,13 @@ const logoutMutation = trpc.auth.logout.useMutation({
 ### 6.2 Admin Secrets Vault (Missing)
 
 **Current State**:
+
 - `settings` table exists for system settings
 - `apiKeys` table exists for admin keys
 - Keys stored as plain text or simple hash
 
 **What's Missing**:
+
 - ❌ Encrypted secrets storage
 - ❌ Master key from environment
 - ❌ Admin UI to manage secrets (weather API, SMTP, OpenAI)
@@ -572,6 +634,7 @@ const logoutMutation = trpc.auth.logout.useMutation({
 - ❌ Audit log of secrets changes
 
 **Implementation Plan** (Phase 2):
+
 1. Add encryption module:
    ```typescript
    // server/_core/secrets.ts
@@ -595,11 +658,13 @@ const logoutMutation = trpc.auth.logout.useMutation({
 ### 6.3 Weather Upgrade (Needs Enhancement)
 
 **Current State**:
+
 - Weather page exists (`client/src/pages/Weather.tsx`)
 - Weather API router exists (`weather.*`)
 - AI analysis works
 
 **What's Missing**:
+
 - ❌ UK location search (postcode/city)
 - ❌ Open-Meteo integration (currently no provider)
 - ❌ Current + forecast display
@@ -607,6 +672,7 @@ const logoutMutation = trpc.auth.logout.useMutation({
 - ❌ Automatic inclusion in AI recommendations
 
 **Implementation Plan** (Phase 3):
+
 1. Add location search using UK postcode/city database
    - Option 1: Use geoapify.com (free tier)
    - Option 2: Use postcodes.io (free UK postcode API)
@@ -625,7 +691,7 @@ const logoutMutation = trpc.auth.logout.useMutation({
 5. Update AI chat to include weather context:
    ```typescript
    // When user asks for advice, fetch latest weather and prepend:
-   systemMessage += `\n\nCurrent weather at ${location}: ${temp}°C, ${conditions}. Consider this in your recommendations.`
+   systemMessage += `\n\nCurrent weather at ${location}: ${temp}°C, ${conditions}. Consider this in your recommendations.`;
    ```
 
 **Effort**: Medium (6-8 hours)  
@@ -634,10 +700,12 @@ const logoutMutation = trpc.auth.logout.useMutation({
 ### 6.4 Marketing Pages Redesign (Needs Complete Overhaul)
 
 **Current State**:
+
 - All marketing pages exist (Home, About, Features, Pricing, Contact, Terms, Privacy)
 - Basic layout and content
 
 **What's Missing**:
+
 - ❌ Professional, modern "WOW factor" design
 - ❌ Mobile-responsive images
 - ❌ Conversion-focused landing page
@@ -648,6 +716,7 @@ const logoutMutation = trpc.auth.logout.useMutation({
 - ❌ Image management system for easy swapping
 
 **Implementation Plan** (Phase 6):
+
 1. Update all marketing pages with premium design
 2. Add About page as first in nav
 3. Update pricing display
@@ -657,13 +726,13 @@ const logoutMutation = trpc.auth.logout.useMutation({
    // client/src/assets/images.ts
    export const images = {
      landing: {
-       hero: '/assets/landing/hero.jpg',
-       feature1: '/assets/landing/feature1.jpg',
+       hero: "/assets/landing/hero.jpg",
+       feature1: "/assets/landing/feature1.jpg",
        // ...
      },
      auth: {
-       loginBg: '/assets/auth/login-bg.jpg',
-       registerBg: '/assets/auth/register-bg.jpg',
+       loginBg: "/assets/auth/login-bg.jpg",
+       registerBg: "/assets/auth/register-bg.jpg",
      },
    };
    ```
@@ -676,11 +745,13 @@ const logoutMutation = trpc.auth.logout.useMutation({
 ### 6.5 Admin Control Center Expansion (Needs Enhancement)
 
 **Current State**:
+
 - Admin panel exists
 - User management works (suspend, delete, change role)
 - Stats display works
 
 **What's Missing**:
+
 - ❌ Password reset capability (admin resets user password)
 - ❌ Force logout/revoke sessions
 - ❌ Email broadcast (send to all/selected users)
@@ -690,6 +761,7 @@ const logoutMutation = trpc.auth.logout.useMutation({
 - ❌ Environment health status dashboard
 
 **Implementation Plan** (Phase 5):
+
 1. Add user password reset:
    ```typescript
    admin.resetUserPassword({ userId, newPassword? })
@@ -697,16 +769,16 @@ const logoutMutation = trpc.auth.logout.useMutation({
    ```
 2. Add force logout:
    ```typescript
-   admin.revokeUserSessions({ userId })
+   admin.revokeUserSessions({ userId });
    // Delete all active sessions for user
    ```
 3. Add email broadcast:
    ```typescript
-   admin.sendEmail({ 
-     recipients: 'all' | userId[], 
-     subject, 
-     body, 
-     useTemplate? 
+   admin.sendEmail({
+     recipients: 'all' | userId[],
+     subject,
+     body,
+     useTemplate?
    })
    // Uses SMTP from secrets vault
    ```
@@ -734,15 +806,16 @@ const logoutMutation = trpc.auth.logout.useMutation({
 ### Current Pricing (INCORRECT)
 
 **In Code** (`server/stripe.ts`):
+
 ```typescript
 export const STRIPE_PRICING = {
   monthly: {
     amount: 999, // £9.99
-    interval: 'month',
+    interval: "month",
   },
   yearly: {
     amount: 9999, // £99.99
-    interval: 'year',
+    interval: "year",
   },
 };
 ```
@@ -752,6 +825,7 @@ export const STRIPE_PRICING = {
 ### Required Pricing (CORRECT)
 
 **Plans**:
+
 1. **Monthly Plan**:
    - £7.99/month OR £79/year
    - Max 5 horses per user
@@ -764,6 +838,7 @@ export const STRIPE_PRICING = {
 
 **Stats** (Marketing Pages):
 Must be realistic for early-stage product:
+
 - Active users: 120+
 - Horses managed: 480+
 - Uptime: 99.9%
@@ -788,6 +863,7 @@ Store in config file: `client/src/const.ts`
 ## 8. IMAGE MANAGEMENT SYSTEM
 
 ### Current State
+
 - Images hardcoded in components
 - Mix of local files and placeholder URLs
 - No central management
@@ -795,6 +871,7 @@ Store in config file: `client/src/const.ts`
 ### Required System
 
 **Structure**:
+
 ```
 client/src/assets/
   images.ts          # Central image map
@@ -813,6 +890,7 @@ client/src/assets/
 ```
 
 **Usage**:
+
 ```typescript
 // In any component
 import { images } from '@/assets/images';
@@ -821,6 +899,7 @@ import { images } from '@/assets/images';
 ```
 
 **Documentation** (`docs/ops/IMAGES.md`):
+
 - List all images
 - Specify dimensions
 - Explain replacement process
@@ -835,86 +914,86 @@ import { images } from '@/assets/images';
 
 ### Phase 1: Critical Fixes (Immediate)
 
-| # | Issue | File(s) | Effort | Risk | Priority |
-|---|-------|---------|--------|------|----------|
-| 1.1 | Remove "show admin" hints | Admin.tsx, AIChat.tsx | 1h | Low | **HIGH** |
-| 1.2 | Rename "API Keys" tab | Admin.tsx | 1h | Low | **HIGH** |
-| 1.3 | Fix breeding horses loading | BreedingManagement.tsx | 2h | Low | **HIGH** |
-| 1.4 | Fix lessons nav/menu bug | LessonScheduling.tsx | 3h | Low | **HIGH** |
-| 1.5 | Fix sign out redirect | Find logout buttons | 1h | Low | **HIGH** |
-| 1.6 | Resize/clean chat box | AIChat.tsx, Dashboard.tsx | 2h | Low | **MEDIUM** |
+| #   | Issue                       | File(s)                   | Effort | Risk | Priority   |
+| --- | --------------------------- | ------------------------- | ------ | ---- | ---------- |
+| 1.1 | Remove "show admin" hints   | Admin.tsx, AIChat.tsx     | 1h     | Low  | **HIGH**   |
+| 1.2 | Rename "API Keys" tab       | Admin.tsx                 | 1h     | Low  | **HIGH**   |
+| 1.3 | Fix breeding horses loading | BreedingManagement.tsx    | 2h     | Low  | **HIGH**   |
+| 1.4 | Fix lessons nav/menu bug    | LessonScheduling.tsx      | 3h     | Low  | **HIGH**   |
+| 1.5 | Fix sign out redirect       | Find logout buttons       | 1h     | Low  | **HIGH**   |
+| 1.6 | Resize/clean chat box       | AIChat.tsx, Dashboard.tsx | 2h     | Low  | **MEDIUM** |
 
 **Total Phase 1 Effort**: 10 hours  
 **Total Phase 1 Risk**: Low
 
 ### Phase 2: Admin Secrets Vault
 
-| # | Task | Effort | Risk |
-|---|------|--------|------|
-| 2.1 | Add encryption module | 3h | Medium |
-| 2.2 | Create secretsVault table | 1h | Low |
-| 2.3 | Build admin secrets UI | 4h | Medium |
-| 2.4 | Add audit logging | 2h | Low |
-| 2.5 | Testing | 2h | Medium |
+| #   | Task                      | Effort | Risk   |
+| --- | ------------------------- | ------ | ------ |
+| 2.1 | Add encryption module     | 3h     | Medium |
+| 2.2 | Create secretsVault table | 1h     | Low    |
+| 2.3 | Build admin secrets UI    | 4h     | Medium |
+| 2.4 | Add audit logging         | 2h     | Low    |
+| 2.5 | Testing                   | 2h     | Medium |
 
 **Total Phase 2 Effort**: 12 hours  
 **Total Phase 2 Risk**: Medium
 
 ### Phase 3: Weather Upgrade
 
-| # | Task | Effort | Risk |
-|---|------|--------|------|
-| 3.1 | Integrate UK location search | 2h | Low |
-| 3.2 | Integrate Open-Meteo | 2h | Low |
-| 3.3 | Update Weather UI | 3h | Low |
-| 3.4 | Add AI weather context | 1h | Low |
-| 3.5 | Testing | 2h | Low |
+| #   | Task                         | Effort | Risk |
+| --- | ---------------------------- | ------ | ---- |
+| 3.1 | Integrate UK location search | 2h     | Low  |
+| 3.2 | Integrate Open-Meteo         | 2h     | Low  |
+| 3.3 | Update Weather UI            | 3h     | Low  |
+| 3.4 | Add AI weather context       | 1h     | Low  |
+| 3.5 | Testing                      | 2h     | Low  |
 
 **Total Phase 3 Effort**: 10 hours  
 **Total Phase 3 Risk**: Low
 
 ### Phase 4: Secure Storage + Uploads
 
-| # | Task | Effort | Risk |
-|---|------|--------|------|
-| 4.1 | Create storage structure | 2h | Low |
-| 4.2 | Add files table | 1h | Low |
-| 4.3 | Build upload endpoint | 4h | Medium |
-| 4.4 | Build streaming endpoint | 3h | Medium |
-| 4.5 | Add horse photo upload UI | 3h | Low |
-| 4.6 | Add photo display | 2h | Low |
-| 4.7 | Add quota tracking | 3h | Medium |
-| 4.8 | Testing | 2h | Medium |
+| #   | Task                      | Effort | Risk   |
+| --- | ------------------------- | ------ | ------ |
+| 4.1 | Create storage structure  | 2h     | Low    |
+| 4.2 | Add files table           | 1h     | Low    |
+| 4.3 | Build upload endpoint     | 4h     | Medium |
+| 4.4 | Build streaming endpoint  | 3h     | Medium |
+| 4.5 | Add horse photo upload UI | 3h     | Low    |
+| 4.6 | Add photo display         | 2h     | Low    |
+| 4.7 | Add quota tracking        | 3h     | Medium |
+| 4.8 | Testing                   | 2h     | Medium |
 
 **Total Phase 4 Effort**: 20 hours  
 **Total Phase 4 Risk**: Medium
 
 ### Phase 5: Admin Control Center
 
-| # | Task | Effort | Risk |
-|---|------|--------|------|
-| 5.1 | Add password reset | 3h | Medium |
-| 5.2 | Add force logout | 2h | Low |
-| 5.3 | Add email broadcast | 5h | High |
-| 5.4 | Add storage dashboard | 4h | Medium |
-| 5.5 | Add system monitoring | 4h | Low |
-| 5.6 | Auto-refresh panels | 2h | Low |
+| #   | Task                  | Effort | Risk   |
+| --- | --------------------- | ------ | ------ |
+| 5.1 | Add password reset    | 3h     | Medium |
+| 5.2 | Add force logout      | 2h     | Low    |
+| 5.3 | Add email broadcast   | 5h     | High   |
+| 5.4 | Add storage dashboard | 4h     | Medium |
+| 5.5 | Add system monitoring | 4h     | Low    |
+| 5.6 | Auto-refresh panels   | 2h     | Low    |
 
 **Total Phase 5 Effort**: 20 hours  
 **Total Phase 5 Risk**: Medium-High
 
 ### Phase 6: UI Overhaul
 
-| # | Task | Effort | Risk |
-|---|------|--------|------|
-| 6.1 | Redesign marketing pages | 8h | Low |
-| 6.2 | Add cookie notice | 2h | Low |
-| 6.3 | Update auth page backgrounds | 3h | Low |
-| 6.4 | Modernize dashboard layout | 5h | Low |
-| 6.5 | Update pricing | 2h | Low |
-| 6.6 | Create image system | 4h | Low |
-| 6.7 | Add placeholder images | 2h | Low |
-| 6.8 | Document image replacement | 2h | Low |
+| #   | Task                         | Effort | Risk |
+| --- | ---------------------------- | ------ | ---- |
+| 6.1 | Redesign marketing pages     | 8h     | Low  |
+| 6.2 | Add cookie notice            | 2h     | Low  |
+| 6.3 | Update auth page backgrounds | 3h     | Low  |
+| 6.4 | Modernize dashboard layout   | 5h     | Low  |
+| 6.5 | Update pricing               | 2h     | Low  |
+| 6.6 | Create image system          | 4h     | Low  |
+| 6.7 | Add placeholder images       | 2h     | Low  |
+| 6.8 | Document image replacement   | 2h     | Low  |
 
 **Total Phase 6 Effort**: 28 hours  
 **Total Phase 6 Risk**: Low
@@ -926,6 +1005,7 @@ import { images } from '@/assets/images';
 ### Build Process
 
 **Scripts** (from package.json):
+
 ```bash
 npm run build:sw       # Update service worker version
 npm run build          # Full build (SW + Vite + esbuild server)
@@ -933,10 +1013,12 @@ npm start              # Production start
 ```
 
 **Build Output**:
+
 - Client: `dist/` (Vite output, served as static files)
 - Server: `dist/index.js` (esbuild bundle)
 
 **Service**:
+
 - Systemd service: `equiprofile`
 - Runs: `node dist/index.js`
 - Port: 3000 (proxied by Nginx)
@@ -944,6 +1026,7 @@ npm start              # Production start
 ### Smoke Tests Needed
 
 **Create** `scripts/smoke-test.sh`:
+
 ```bash
 #!/bin/bash
 # Basic smoke tests for post-deployment validation
@@ -966,6 +1049,7 @@ echo "✅ All smoke tests passed"
 ```
 
 **Create** `docs/ops/SMOKE_TESTS.md`:
+
 - Document all smoke tests
 - Expected responses
 - How to run
@@ -974,6 +1058,7 @@ echo "✅ All smoke tests passed"
 ### Deployment Process Needed
 
 **Create** `docs/ops/DEPLOYMENT.md`:
+
 1. Pre-deployment checklist
 2. Build steps
 3. Service restart steps
@@ -987,6 +1072,7 @@ echo "✅ All smoke tests passed"
 ### Current State Assessment
 
 ✅ **Strong Foundation**:
+
 - Comprehensive horse management
 - Working authentication
 - Subscription/billing system
@@ -994,6 +1080,7 @@ echo "✅ All smoke tests passed"
 - tRPC API well-structured
 
 ⚠️ **Needs Improvement**:
+
 - 2 broken pages (breeding, lessons)
 - Admin UI hints need hiding
 - Weather section is basic
@@ -1002,6 +1089,7 @@ echo "✅ All smoke tests passed"
 - Pricing is outdated
 
 ❌ **Missing Critical Features**:
+
 - Admin secrets vault
 - Per-user file upload/storage
 - Storage quota management
@@ -1011,17 +1099,20 @@ echo "✅ All smoke tests passed"
 ### Risk Assessment
 
 **Low Risk Changes** (Phases 1, 3, 6):
+
 - UI text changes
 - CSS/layout changes
 - External API integrations (weather)
 - Documentation
 
 **Medium Risk Changes** (Phases 2, 4):
+
 - Encrypted secrets storage
 - File upload/storage system
 - Quota tracking
 
 **High Risk Changes** (Phase 5):
+
 - Email sending (SMTP configuration)
 - Session revocation
 - Bulk operations
@@ -1064,6 +1155,7 @@ echo "✅ All smoke tests passed"
 ## 12. APPENDIX: FILE LOCATIONS
 
 ### Client Structure
+
 ```
 client/src/
   pages/              # 35 page components
@@ -1076,6 +1168,7 @@ client/src/
 ```
 
 ### Server Structure
+
 ```
 server/
   _core/              # Core server setup
@@ -1095,6 +1188,7 @@ server/
 ```
 
 ### Database
+
 ```
 drizzle/
   schema.ts           # All table definitions
@@ -1102,6 +1196,7 @@ drizzle/
 ```
 
 ### Documentation
+
 ```
 docs/
   audit/              # This audit

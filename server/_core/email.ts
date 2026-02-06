@@ -13,14 +13,17 @@ const SMTP_CONFIG = {
   },
 };
 
-const SMTP_FROM = process.env.SMTP_FROM || '"EquiProfile" <noreply@equiprofile.online>';
+const SMTP_FROM =
+  process.env.SMTP_FROM || '"EquiProfile" <noreply@equiprofile.online>';
 
 let transporter: Transporter | null = null;
 
 // Initialize transporter lazily
 function getTransporter(): Transporter | null {
   if (!SMTP_CONFIG.auth.user || !SMTP_CONFIG.auth.pass) {
-    console.warn("[Email] SMTP not configured (SMTP_USER and SMTP_PASS required)");
+    console.warn(
+      "[Email] SMTP not configured (SMTP_USER and SMTP_PASS required)",
+    );
     return null;
   }
 
@@ -44,7 +47,7 @@ export async function sendEmail(
   to: string,
   subject: string,
   html: string,
-  text?: string
+  text?: string,
 ): Promise<void> {
   const transporter = getTransporter();
   if (!transporter) {
@@ -77,7 +80,9 @@ export async function sendWelcomeEmail(user: User): Promise<void> {
   }
 
   const trialDays = user.trialEndsAt
-    ? Math.ceil((user.trialEndsAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+    ? Math.ceil(
+        (user.trialEndsAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24),
+      )
     : 7;
 
   const subject = "Welcome to EquiProfile!";
@@ -132,7 +137,10 @@ export async function sendWelcomeEmail(user: User): Promise<void> {
 /**
  * Send trial reminder email
  */
-export async function sendTrialReminderEmail(user: User, daysLeft: number): Promise<void> {
+export async function sendTrialReminderEmail(
+  user: User,
+  daysLeft: number,
+): Promise<void> {
   if (!user.email) return;
 
   let subject: string;
@@ -211,7 +219,10 @@ export async function sendTrialReminderEmail(user: User, daysLeft: number): Prom
 /**
  * Send payment success/subscription activated email
  */
-export async function sendPaymentSuccessEmail(user: User, plan?: "monthly" | "yearly"): Promise<void> {
+export async function sendPaymentSuccessEmail(
+  user: User,
+  plan?: "monthly" | "yearly",
+): Promise<void> {
   if (!user.email) return;
 
   const planName = plan === "yearly" ? "Yearly" : "Monthly";
@@ -274,9 +285,13 @@ export async function sendPaymentSuccessEmail(user: User, plan?: "monthly" | "ye
 /**
  * Send password reset email
  */
-export async function sendPasswordResetEmail(email: string, resetToken: string, name?: string): Promise<void> {
+export async function sendPasswordResetEmail(
+  email: string,
+  resetToken: string,
+  name?: string,
+): Promise<void> {
   const resetUrl = `${process.env.BASE_URL || "https://equiprofile.online"}/reset-password?token=${resetToken}`;
-  
+
   const subject = "Reset your EquiProfile password";
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -331,7 +346,7 @@ export async function sendTestEmail(to: string): Promise<boolean> {
             Sent at: ${new Date().toISOString()}
           </p>
         </div>
-      `
+      `,
     );
     return true;
   } catch (error) {

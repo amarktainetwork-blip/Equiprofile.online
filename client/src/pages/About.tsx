@@ -44,8 +44,7 @@ export default function About() {
             <ScrollReveal>
               <div className="text-center max-w-3xl mx-auto">
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-serif mb-6">
-                  About{" "}
-                  <span className="text-gradient">EquiProfile</span>
+                  About <span className="text-gradient">EquiProfile</span>
                 </h1>
                 <p className="text-lg md:text-xl text-muted-foreground">
                   We're on a mission to revolutionize horse management with
@@ -105,8 +104,8 @@ export default function About() {
                     </p>
                     <p>
                       Today, EquiProfile serves thousands of horse owners,
-                      trainers, and stable managers worldwide. We're proud to
-                      be part of the equestrian community and committed to
+                      trainers, and stable managers worldwide. We're proud to be
+                      part of the equestrian community and committed to
                       continuously improving our platform based on your
                       feedback.
                     </p>

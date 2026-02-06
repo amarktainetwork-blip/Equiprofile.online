@@ -23,12 +23,14 @@ router.post("/signup", async (req, res) => {
     }
 
     if (password.length < 8) {
-      return res.status(400).json({ error: "Password must be at least 8 characters" });
+      return res
+        .status(400)
+        .json({ error: "Password must be at least 8 characters" });
     }
 
     // Check if user already exists
     const existingUser = await db.getUserByEmail(userEmail);
-    
+
     if (existingUser) {
       return res.status(400).json({ error: "Email already registered" });
     }
@@ -77,9 +79,11 @@ router.post("/signup", async (req, res) => {
     });
 
     // Send welcome email (async, don't wait)
-    email.sendWelcomeEmail(user).catch(err => 
-      console.error("[Auth] Failed to send welcome email:", err)
-    );
+    email
+      .sendWelcomeEmail(user)
+      .catch((err) =>
+        console.error("[Auth] Failed to send welcome email:", err),
+      );
 
     res.json({
       success: true,
@@ -123,9 +127,9 @@ router.post("/login", async (req, res) => {
 
     // Check if account is suspended
     if (user.isSuspended) {
-      return res.status(403).json({ 
-        error: "Account suspended", 
-        reason: user.suspendedReason 
+      return res.status(403).json({
+        error: "Account suspended",
+        reason: user.suspendedReason,
       });
     }
 
@@ -179,8 +183,14 @@ router.post("/request-reset", async (req, res) => {
 
     // Always return success to prevent email enumeration
     if (!user) {
-      console.log("[Auth] Password reset requested for non-existent email:", userEmail);
-      return res.json({ success: true, message: "If that email exists, a reset link has been sent" });
+      console.log(
+        "[Auth] Password reset requested for non-existent email:",
+        userEmail,
+      );
+      return res.json({
+        success: true,
+        message: "If that email exists, a reset link has been sent",
+      });
     }
 
     // Generate reset token
@@ -195,11 +205,15 @@ router.post("/request-reset", async (req, res) => {
     });
 
     // Send reset email
-    await email.sendPasswordResetEmail(userEmail, resetToken, user.name || undefined);
+    await email.sendPasswordResetEmail(
+      userEmail,
+      resetToken,
+      user.name || undefined,
+    );
 
-    res.json({ 
-      success: true, 
-      message: "If that email exists, a reset link has been sent" 
+    res.json({
+      success: true,
+      message: "If that email exists, a reset link has been sent",
     });
   } catch (error) {
     console.error("[Auth] Request reset error:", error);
@@ -220,12 +234,14 @@ router.post("/reset-password", async (req, res) => {
     }
 
     if (password.length < 8) {
-      return res.status(400).json({ error: "Password must be at least 8 characters" });
+      return res
+        .status(400)
+        .json({ error: "Password must be at least 8 characters" });
     }
 
     // Find user by reset token
     const users = await db.getAllUsers();
-    const user = users.find(u => u.resetToken === token);
+    const user = users.find((u) => u.resetToken === token);
 
     if (!user) {
       return res.status(400).json({ error: "Invalid or expired reset token" });
@@ -246,9 +262,10 @@ router.post("/reset-password", async (req, res) => {
       resetTokenExpiry: null,
     });
 
-    res.json({ 
-      success: true, 
-      message: "Password reset successful. You can now login with your new password." 
+    res.json({
+      success: true,
+      message:
+        "Password reset successful. You can now login with your new password.",
     });
   } catch (error) {
     console.error("[Auth] Reset password error:", error);

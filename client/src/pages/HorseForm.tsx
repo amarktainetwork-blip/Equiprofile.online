@@ -1,11 +1,23 @@
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 import { useLocation, useParams } from "wouter";
 import { ArrowLeft, Save, Loader2 } from "lucide-react";
@@ -22,7 +34,7 @@ const disciplines = [
   "Racing",
   "Trail Riding",
   "Driving",
-  "Other"
+  "Other",
 ];
 
 const levels = [
@@ -31,7 +43,7 @@ const levels = [
   "Intermediate",
   "Advanced",
   "Competition",
-  "Professional"
+  "Professional",
 ];
 
 function HorseFormContent() {
@@ -59,7 +71,7 @@ function HorseFormContent() {
 
   const { data: horse, isLoading: horseLoading } = trpc.horses.get.useQuery(
     { id: horseId! },
-    { enabled: !!horseId }
+    { enabled: !!horseId },
   );
 
   const createMutation = trpc.horses.create.useMutation({
@@ -88,7 +100,9 @@ function HorseFormContent() {
         name: horse.name || "",
         breed: horse.breed || "",
         age: horse.age?.toString() || "",
-        dateOfBirth: horse.dateOfBirth ? new Date(horse.dateOfBirth).toISOString().split('T')[0] : "",
+        dateOfBirth: horse.dateOfBirth
+          ? new Date(horse.dateOfBirth).toISOString().split("T")[0]
+          : "",
         height: horse.height?.toString() || "",
         weight: horse.weight?.toString() || "",
         color: horse.color || "",
@@ -105,7 +119,7 @@ function HorseFormContent() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.name.trim()) {
       toast.error("Please enter a name for your horse");
       return;
@@ -158,7 +172,9 @@ function HorseFormContent() {
             {isEditing ? "Edit Horse" : "Add New Horse"}
           </h1>
           <p className="text-muted-foreground mt-1">
-            {isEditing ? "Update your horse's information" : "Enter details about your equine companion"}
+            {isEditing
+              ? "Update your horse's information"
+              : "Enter details about your equine companion"}
           </p>
         </div>
       </div>
@@ -167,7 +183,9 @@ function HorseFormContent() {
         <Card>
           <CardHeader>
             <CardTitle>Basic Information</CardTitle>
-            <CardDescription>Essential details about your horse</CardDescription>
+            <CardDescription>
+              Essential details about your horse
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid sm:grid-cols-2 gap-4">
@@ -176,7 +194,9 @@ function HorseFormContent() {
                 <Input
                   id="name"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                   placeholder="Enter horse's name"
                   required
                 />
@@ -186,7 +206,9 @@ function HorseFormContent() {
                 <Input
                   id="breed"
                   value={formData.breed}
-                  onChange={(e) => setFormData({ ...formData, breed: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, breed: e.target.value })
+                  }
                   placeholder="e.g., Thoroughbred, Arabian"
                 />
               </div>
@@ -201,7 +223,9 @@ function HorseFormContent() {
                   min="0"
                   max="50"
                   value={formData.age}
-                  onChange={(e) => setFormData({ ...formData, age: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, age: e.target.value })
+                  }
                   placeholder="Age"
                 />
               </div>
@@ -211,14 +235,18 @@ function HorseFormContent() {
                   id="dateOfBirth"
                   type="date"
                   value={formData.dateOfBirth}
-                  onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, dateOfBirth: e.target.value })
+                  }
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="gender">Gender</Label>
                 <Select
                   value={formData.gender}
-                  onValueChange={(value) => setFormData({ ...formData, gender: value as any })}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, gender: value as any })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select gender" />
@@ -241,7 +269,9 @@ function HorseFormContent() {
                   min="0"
                   max="250"
                   value={formData.height}
-                  onChange={(e) => setFormData({ ...formData, height: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, height: e.target.value })
+                  }
                   placeholder="Height in cm"
                 />
               </div>
@@ -253,7 +283,9 @@ function HorseFormContent() {
                   min="0"
                   max="1500"
                   value={formData.weight}
-                  onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, weight: e.target.value })
+                  }
                   placeholder="Weight in kg"
                 />
               </div>
@@ -262,7 +294,9 @@ function HorseFormContent() {
                 <Input
                   id="color"
                   value={formData.color}
-                  onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, color: e.target.value })
+                  }
                   placeholder="e.g., Bay, Chestnut"
                 />
               </div>
@@ -273,7 +307,9 @@ function HorseFormContent() {
         <Card className="mt-6">
           <CardHeader>
             <CardTitle>Training & Discipline</CardTitle>
-            <CardDescription>Your horse's specialty and skill level</CardDescription>
+            <CardDescription>
+              Your horse's specialty and skill level
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid sm:grid-cols-2 gap-4">
@@ -281,14 +317,18 @@ function HorseFormContent() {
                 <Label htmlFor="discipline">Discipline</Label>
                 <Select
                   value={formData.discipline}
-                  onValueChange={(value) => setFormData({ ...formData, discipline: value })}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, discipline: value })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select discipline" />
                   </SelectTrigger>
                   <SelectContent>
                     {disciplines.map((d) => (
-                      <SelectItem key={d} value={d}>{d}</SelectItem>
+                      <SelectItem key={d} value={d}>
+                        {d}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -297,14 +337,18 @@ function HorseFormContent() {
                 <Label htmlFor="level">Level</Label>
                 <Select
                   value={formData.level}
-                  onValueChange={(value) => setFormData({ ...formData, level: value })}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, level: value })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select level" />
                   </SelectTrigger>
                   <SelectContent>
                     {levels.map((l) => (
-                      <SelectItem key={l} value={l}>{l}</SelectItem>
+                      <SelectItem key={l} value={l}>
+                        {l}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -316,7 +360,9 @@ function HorseFormContent() {
         <Card className="mt-6">
           <CardHeader>
             <CardTitle>Identification</CardTitle>
-            <CardDescription>Registration and identification numbers</CardDescription>
+            <CardDescription>
+              Registration and identification numbers
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid sm:grid-cols-2 gap-4">
@@ -325,7 +371,12 @@ function HorseFormContent() {
                 <Input
                   id="registrationNumber"
                   value={formData.registrationNumber}
-                  onChange={(e) => setFormData({ ...formData, registrationNumber: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      registrationNumber: e.target.value,
+                    })
+                  }
                   placeholder="Passport/registration number"
                 />
               </div>
@@ -334,7 +385,12 @@ function HorseFormContent() {
                 <Input
                   id="microchipNumber"
                   value={formData.microchipNumber}
-                  onChange={(e) => setFormData({ ...formData, microchipNumber: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      microchipNumber: e.target.value,
+                    })
+                  }
                   placeholder="Microchip ID"
                 />
               </div>
@@ -354,7 +410,9 @@ function HorseFormContent() {
                 id="photoUrl"
                 type="url"
                 value={formData.photoUrl}
-                onChange={(e) => setFormData({ ...formData, photoUrl: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, photoUrl: e.target.value })
+                }
                 placeholder="https://example.com/photo.jpg"
               />
               <p className="text-xs text-muted-foreground">
@@ -366,7 +424,9 @@ function HorseFormContent() {
               <Textarea
                 id="notes"
                 value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, notes: e.target.value })
+                }
                 placeholder="Any additional notes about your horse..."
                 rows={4}
               />
@@ -376,7 +436,9 @@ function HorseFormContent() {
 
         <div className="flex justify-end gap-4 mt-6">
           <Link href="/horses">
-            <Button type="button" variant="outline">Cancel</Button>
+            <Button type="button" variant="outline">
+              Cancel
+            </Button>
           </Link>
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? (

@@ -1,37 +1,72 @@
 // @ts-nocheck - TODO: Fix type compatibility issues
 import { useState } from "react";
-import { Plus, FileText, Calendar as CalendarIcon, Download, Clock, Mail, Trash2 } from "lucide-react";
+import {
+  Plus,
+  FileText,
+  Calendar as CalendarIcon,
+  Download,
+  Clock,
+  Mail,
+  Trash2,
+} from "lucide-react";
 import { Button } from "../components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "../components/ui/dialog";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "../components/ui/dialog";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
 import { Badge } from "../components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../components/ui/tabs";
 import { Checkbox } from "../components/ui/checkbox";
 import { toast } from "sonner";
 import { trpc } from "../lib/trpc";
 import { format } from "date-fns";
 
 const REPORT_TYPES = [
-  { value: 'monthly_summary', label: 'Monthly Summary' },
-  { value: 'health_report', label: 'Health Report' },
-  { value: 'training_progress', label: 'Training Progress' },
-  { value: 'cost_analysis', label: 'Cost Analysis' },
-  { value: 'competition_summary', label: 'Competition Summary' },
+  { value: "monthly_summary", label: "Monthly Summary" },
+  { value: "health_report", label: "Health Report" },
+  { value: "training_progress", label: "Training Progress" },
+  { value: "cost_analysis", label: "Cost Analysis" },
+  { value: "competition_summary", label: "Competition Summary" },
 ];
 
 const FREQUENCIES = [
-  { value: 'daily', label: 'Daily' },
-  { value: 'weekly', label: 'Weekly' },
-  { value: 'monthly', label: 'Monthly' },
-  { value: 'quarterly', label: 'Quarterly' },
+  { value: "daily", label: "Daily" },
+  { value: "weekly", label: "Weekly" },
+  { value: "monthly", label: "Monthly" },
+  { value: "quarterly", label: "Quarterly" },
 ];
 
 export default function Reports() {
-  const [activeTab, setActiveTab] = useState<'generate' | 'history' | 'schedules'>('generate');
-  
+  const [activeTab, setActiveTab] = useState<
+    "generate" | "history" | "schedules"
+  >("generate");
+
   // Generate report state
   const [generateForm, setGenerateForm] = useState({
     reportType: "",
@@ -49,7 +84,8 @@ export default function Reports() {
   });
 
   // Queries
-  const { data: generatedReports = [], refetch: refetchReports } = trpc.reports.list.useQuery({ limit: 50 });
+  const { data: generatedReports = [], refetch: refetchReports } =
+    trpc.reports.list.useQuery({ limit: 50 });
   const { data: horses = [] } = trpc.horses.list.useQuery();
 
   // Mutations
@@ -60,7 +96,11 @@ export default function Reports() {
       resetGenerateForm();
     },
     onError: (error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
     },
   });
 
@@ -71,7 +111,11 @@ export default function Reports() {
       resetScheduleForm();
     },
     onError: (error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
     },
   });
 
@@ -94,27 +138,48 @@ export default function Reports() {
 
   const handleGenerateReport = () => {
     if (!generateForm.reportType) {
-      toast({ title: "Error", description: "Please select a report type", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Please select a report type",
+        variant: "destructive",
+      });
       return;
     }
 
     generateReport.mutate({
       reportType: generateForm.reportType as any,
-      horseId: generateForm.horseId ? parseInt(generateForm.horseId) : undefined,
+      horseId: generateForm.horseId
+        ? parseInt(generateForm.horseId)
+        : undefined,
       startDate: generateForm.startDate || undefined,
       endDate: generateForm.endDate || undefined,
     });
   };
 
   const handleScheduleReport = () => {
-    if (!scheduleForm.reportType || !scheduleForm.frequency || !scheduleForm.recipients) {
-      toast({ title: "Error", description: "Please fill in all required fields", variant: "destructive" });
+    if (
+      !scheduleForm.reportType ||
+      !scheduleForm.frequency ||
+      !scheduleForm.recipients
+    ) {
+      toast({
+        title: "Error",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
       return;
     }
 
-    const recipients = scheduleForm.recipients.split(',').map(email => email.trim()).filter(Boolean);
+    const recipients = scheduleForm.recipients
+      .split(",")
+      .map((email) => email.trim())
+      .filter(Boolean);
     if (recipients.length === 0) {
-      toast({ title: "Error", description: "Please enter at least one recipient email", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Please enter at least one recipient email",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -127,12 +192,12 @@ export default function Reports() {
 
   const getHorseName = (horseId: number | null) => {
     if (!horseId) return "All Horses";
-    const horse = horses.find(h => h.id === horseId);
+    const horse = horses.find((h) => h.id === horseId);
     return horse?.name || `Horse #${horseId}`;
   };
 
   const getReportTypeName = (type: string) => {
-    return REPORT_TYPES.find(t => t.value === type)?.label || type;
+    return REPORT_TYPES.find((t) => t.value === type)?.label || type;
   };
 
   return (
@@ -140,11 +205,17 @@ export default function Reports() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Reports</h1>
-          <p className="text-muted-foreground">Generate comprehensive reports and set up automated schedules</p>
+          <p className="text-muted-foreground">
+            Generate comprehensive reports and set up automated schedules
+          </p>
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="space-y-4">
+      <Tabs
+        value={activeTab}
+        onValueChange={(v) => setActiveTab(v as any)}
+        className="space-y-4"
+      >
         <TabsList>
           <TabsTrigger value="generate">Generate Report</TabsTrigger>
           <TabsTrigger value="history">Report History</TabsTrigger>
@@ -155,15 +226,19 @@ export default function Reports() {
           <Card>
             <CardHeader>
               <CardTitle>Generate New Report</CardTitle>
-              <CardDescription>Create a comprehensive report for your horses and activities</CardDescription>
+              <CardDescription>
+                Create a comprehensive report for your horses and activities
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
                   <Label htmlFor="reportType">Report Type *</Label>
-                  <Select 
-                    value={generateForm.reportType} 
-                    onValueChange={(value) => setGenerateForm({ ...generateForm, reportType: value })}
+                  <Select
+                    value={generateForm.reportType}
+                    onValueChange={(value) =>
+                      setGenerateForm({ ...generateForm, reportType: value })
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select report type" />
@@ -183,9 +258,11 @@ export default function Reports() {
 
                 <div>
                   <Label htmlFor="horse">Horse (Optional)</Label>
-                  <Select 
-                    value={generateForm.horseId} 
-                    onValueChange={(value) => setGenerateForm({ ...generateForm, horseId: value })}
+                  <Select
+                    value={generateForm.horseId}
+                    onValueChange={(value) =>
+                      setGenerateForm({ ...generateForm, horseId: value })
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="All horses" />
@@ -210,7 +287,12 @@ export default function Reports() {
                     id="startDate"
                     type="date"
                     value={generateForm.startDate}
-                    onChange={(e) => setGenerateForm({ ...generateForm, startDate: e.target.value })}
+                    onChange={(e) =>
+                      setGenerateForm({
+                        ...generateForm,
+                        startDate: e.target.value,
+                      })
+                    }
                   />
                   <p className="text-sm text-muted-foreground mt-1">
                     Start of reporting period
@@ -223,7 +305,12 @@ export default function Reports() {
                     id="endDate"
                     type="date"
                     value={generateForm.endDate}
-                    onChange={(e) => setGenerateForm({ ...generateForm, endDate: e.target.value })}
+                    onChange={(e) =>
+                      setGenerateForm({
+                        ...generateForm,
+                        endDate: e.target.value,
+                      })
+                    }
                   />
                   <p className="text-sm text-muted-foreground mt-1">
                     End of reporting period
@@ -234,21 +321,41 @@ export default function Reports() {
               <div className="bg-muted/50 rounded-lg p-4 space-y-2">
                 <h4 className="font-semibold">What's included:</h4>
                 <ul className="list-disc list-inside text-sm space-y-1 text-muted-foreground">
-                  <li><strong>Monthly Summary:</strong> Overview of all activities, costs, and health records</li>
-                  <li><strong>Health Report:</strong> Detailed health records, vaccinations, and upcoming care</li>
-                  <li><strong>Training Progress:</strong> Training sessions, performance metrics, and goals</li>
-                  <li><strong>Cost Analysis:</strong> Breakdown of expenses by category with trends</li>
-                  <li><strong>Competition Summary:</strong> Results, placements, and performance statistics</li>
+                  <li>
+                    <strong>Monthly Summary:</strong> Overview of all
+                    activities, costs, and health records
+                  </li>
+                  <li>
+                    <strong>Health Report:</strong> Detailed health records,
+                    vaccinations, and upcoming care
+                  </li>
+                  <li>
+                    <strong>Training Progress:</strong> Training sessions,
+                    performance metrics, and goals
+                  </li>
+                  <li>
+                    <strong>Cost Analysis:</strong> Breakdown of expenses by
+                    category with trends
+                  </li>
+                  <li>
+                    <strong>Competition Summary:</strong> Results, placements,
+                    and performance statistics
+                  </li>
                 </ul>
               </div>
 
               <div className="flex gap-3">
-                <Button onClick={handleGenerateReport} disabled={generateReport.isPending}>
+                <Button
+                  onClick={handleGenerateReport}
+                  disabled={generateReport.isPending}
+                >
                   <FileText className="mr-2 h-4 w-4" />
-                  {generateReport.isPending ? "Generating..." : "Generate Report"}
+                  {generateReport.isPending
+                    ? "Generating..."
+                    : "Generate Report"}
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={() => setIsScheduleDialogOpen(true)}
                 >
                   <Clock className="mr-2 h-4 w-4" />
@@ -268,8 +375,13 @@ export default function Reports() {
             <Card>
               <CardContent className="pt-6 text-center">
                 <FileText className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">No reports generated yet</p>
-                <Button className="mt-4" onClick={() => setActiveTab('generate')}>
+                <p className="text-muted-foreground">
+                  No reports generated yet
+                </p>
+                <Button
+                  className="mt-4"
+                  onClick={() => setActiveTab("generate")}
+                >
                   <Plus className="mr-2 h-4 w-4" />
                   Generate Your First Report
                 </Button>
@@ -282,7 +394,9 @@ export default function Reports() {
                   <CardHeader>
                     <div className="flex justify-between items-start">
                       <div>
-                        <CardTitle className="text-lg">{report.title}</CardTitle>
+                        <CardTitle className="text-lg">
+                          {report.title}
+                        </CardTitle>
                         <CardDescription>
                           <Badge variant="outline" className="mt-1">
                             {getReportTypeName(report.reportType)}
@@ -328,7 +442,10 @@ export default function Reports() {
               <p className="text-sm text-muted-foreground mt-2">
                 Schedule reports to be generated and emailed automatically
               </p>
-              <Button className="mt-4" onClick={() => setIsScheduleDialogOpen(true)}>
+              <Button
+                className="mt-4"
+                onClick={() => setIsScheduleDialogOpen(true)}
+              >
                 <Plus className="mr-2 h-4 w-4" />
                 Schedule Your First Report
               </Button>
@@ -338,18 +455,26 @@ export default function Reports() {
       </Tabs>
 
       {/* Schedule Report Dialog */}
-      <Dialog open={isScheduleDialogOpen} onOpenChange={setIsScheduleDialogOpen}>
+      <Dialog
+        open={isScheduleDialogOpen}
+        onOpenChange={setIsScheduleDialogOpen}
+      >
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Schedule Automatic Report</DialogTitle>
-            <DialogDescription>Set up a recurring report to be generated and emailed automatically</DialogDescription>
+            <DialogDescription>
+              Set up a recurring report to be generated and emailed
+              automatically
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
               <Label htmlFor="scheduleReportType">Report Type *</Label>
-              <Select 
-                value={scheduleForm.reportType} 
-                onValueChange={(value) => setScheduleForm({ ...scheduleForm, reportType: value })}
+              <Select
+                value={scheduleForm.reportType}
+                onValueChange={(value) =>
+                  setScheduleForm({ ...scheduleForm, reportType: value })
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select report type" />
@@ -365,9 +490,11 @@ export default function Reports() {
             </div>
             <div>
               <Label htmlFor="frequency">Frequency *</Label>
-              <Select 
-                value={scheduleForm.frequency} 
-                onValueChange={(value) => setScheduleForm({ ...scheduleForm, frequency: value })}
+              <Select
+                value={scheduleForm.frequency}
+                onValueChange={(value) =>
+                  setScheduleForm({ ...scheduleForm, frequency: value })
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select frequency" />
@@ -386,7 +513,12 @@ export default function Reports() {
               <Input
                 id="recipients"
                 value={scheduleForm.recipients}
-                onChange={(e) => setScheduleForm({ ...scheduleForm, recipients: e.target.value })}
+                onChange={(e) =>
+                  setScheduleForm({
+                    ...scheduleForm,
+                    recipients: e.target.value,
+                  })
+                }
                 placeholder="email1@example.com, email2@example.com"
               />
               <p className="text-sm text-muted-foreground mt-1">
@@ -395,7 +527,12 @@ export default function Reports() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsScheduleDialogOpen(false)}>Cancel</Button>
+            <Button
+              variant="outline"
+              onClick={() => setIsScheduleDialogOpen(false)}
+            >
+              Cancel
+            </Button>
             <Button onClick={handleScheduleReport}>Schedule Report</Button>
           </DialogFooter>
         </DialogContent>

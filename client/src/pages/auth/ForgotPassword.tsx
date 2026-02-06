@@ -1,5 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link } from "wouter";
@@ -82,7 +88,8 @@ export default function ForgotPassword() {
                     <div>
                       <h3 className="font-semibold mb-2">Check your email</h3>
                       <p className="text-sm text-muted-foreground">
-                        If an account exists with that email, we've sent password reset instructions.
+                        If an account exists with that email, we've sent
+                        password reset instructions.
                       </p>
                     </div>
                     <Link href="/login">

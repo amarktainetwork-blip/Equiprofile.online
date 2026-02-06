@@ -11,6 +11,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 ### 1. User Management & Authentication
 
 #### Features:
+
 - **Multi-user system** with role-based access control
 - **Secure authentication** with JWT tokens
 - **Password encryption** using bcrypt
@@ -21,6 +22,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - **Password reset** functionality
 
 #### User Roles:
+
 - **Admin**: Full system access, can manage all data
 - **Owner**: Manage their own horses and data
 - **Trainer**: View and update assigned horses
@@ -31,6 +33,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 ### 2. Horse Profile Management
 
 #### Features:
+
 - **Complete horse profiles** with:
   - Basic information (name, breed, age, color, sex)
   - Photos and documents
@@ -42,6 +45,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
   - Microchip information
 
 #### Functions:
+
 - Create, read, update, delete horse profiles
 - Search and filter horses
 - Bulk operations
@@ -54,7 +58,9 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 ### 3. Health Records Management
 
 #### 3.1 Vaccinations
+
 **Features**:
+
 - Track all vaccination records
 - Automatic reminders for due vaccinations
 - Vaccination history timeline
@@ -64,6 +70,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - Export vaccination certificates
 
 **Functions**:
+
 - Add/edit/delete vaccination records
 - Set custom reminder intervals
 - Upload vaccination certificates
@@ -71,7 +78,9 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - Get notifications before due dates
 
 #### 3.2 Veterinary Visits
+
 **Features**:
+
 - Complete vet visit logging
 - Diagnosis and treatment tracking
 - Cost management
@@ -80,6 +89,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - Emergency contacts
 
 **Functions**:
+
 - Schedule appointments
 - Log visit details
 - Track treatments and prescriptions
@@ -87,7 +97,9 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - Cost tracking and billing
 
 #### 3.3 Medications
+
 **Features**:
+
 - Active medications list
 - Dosage and schedule tracking
 - Medication reminders
@@ -96,6 +108,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - Prescription management
 
 **Functions**:
+
 - Add/manage medications
 - Set dosage schedules
 - Track administration
@@ -103,7 +116,9 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - Refill reminders
 
 #### 3.4 Dental Care
+
 **Features**:
+
 - Dental exam history
 - Dentist information
 - Procedure tracking
@@ -111,13 +126,16 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - Next appointment reminders
 
 **Functions**:
+
 - Log dental procedures
 - Track dental health
 - Schedule appointments
 - Upload dental reports
 
 #### 3.5 Hoof Care
+
 **Features**:
+
 - Farrier visit tracking
 - Shoeing schedule
 - Hoof condition monitoring
@@ -125,6 +143,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - Cost tracking
 
 **Functions**:
+
 - Schedule farrier visits
 - Log shoeing details
 - Track hoof health
@@ -132,7 +151,9 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - Upload photos
 
 #### 3.6 Deworming
+
 **Features**:
+
 - Deworming schedule
 - Product tracking
 - Rotation planning
@@ -140,6 +161,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - Next due date reminders
 
 **Functions**:
+
 - Log deworming treatments
 - Track products used
 - Calculate dosages
@@ -150,6 +172,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 ### 4. Training Management
 
 #### Features:
+
 - **Training session planning**
 - **Progress tracking** with metrics
 - **Performance analytics**
@@ -160,6 +183,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - **Custom training programs**
 
 #### Functions:
+
 - Create training plans
 - Log training sessions
 - Track performance metrics
@@ -169,6 +193,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - Generate training reports
 
 #### Metrics Tracked:
+
 - Duration and intensity
 - Exercises performed
 - Horse behavior
@@ -181,7 +206,9 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 ### 5. Feeding & Nutrition
 
 #### 5.1 Feeding Schedules
+
 **Features**:
+
 - Custom feeding plans
 - Meal scheduling
 - Portion control
@@ -190,6 +217,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - Cost tracking
 
 **Functions**:
+
 - Create feeding schedules
 - Set meal times and portions
 - Track feed inventory
@@ -197,7 +225,9 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - Generate feeding reports
 
 #### 5.2 Nutrition Logs
+
 **Features**:
+
 - Daily feed tracking
 - Weight monitoring
 - Body condition scoring
@@ -205,6 +235,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - Nutritional analysis
 
 **Functions**:
+
 - Log daily feeds
 - Track weight changes
 - Monitor body condition
@@ -212,7 +243,9 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - Export nutrition data
 
 #### 5.3 Nutrition Plans
+
 **Features**:
+
 - Custom diet plans
 - Nutritionist recommendations
 - Seasonal adjustments
@@ -220,6 +253,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - Weight management
 
 **Functions**:
+
 - Create nutrition plans
 - Track plan adherence
 - Adjust based on needs
@@ -231,6 +265,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 ### 6. Calendar & Scheduling
 
 #### Features:
+
 - **Integrated calendar** with all events
 - **Appointment scheduling**
 - **Reminders and notifications**
@@ -241,6 +276,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - **iCal export**
 
 #### Event Types:
+
 - Veterinary appointments
 - Farrier visits
 - Training sessions
@@ -251,6 +287,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - Custom events
 
 #### Functions:
+
 - Create/edit/delete events
 - Set reminders
 - View by horse or date
@@ -263,7 +300,9 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 ### 7. AI-Powered Features
 
 #### 7.1 AI Chat Assistant
+
 **Features**:
+
 - Natural language interaction
 - Horse care advice
 - Data insights
@@ -272,6 +311,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - Health analysis
 
 **Functions**:
+
 - Ask questions about horses
 - Get care recommendations
 - Analyze health trends
@@ -281,7 +321,9 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 **Requires**: OpenAI API key
 
 #### 7.2 AI Weather Analysis
+
 **Features**:
+
 - Real-time weather data
 - Riding condition recommendations
 - Weather-based scheduling
@@ -290,6 +332,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - Automated suggestions
 
 **Functions**:
+
 - Get current conditions
 - View forecasts
 - Receive riding recommendations
@@ -303,6 +346,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 ### 8. Document Management
 
 #### Features:
+
 - **Secure document storage**
 - **Multiple file formats** (PDF, images, videos)
 - **Folder organization**
@@ -312,6 +356,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - **Cloud storage integration**
 
 #### Document Types:
+
 - Veterinary reports
 - Vaccination certificates
 - Registration papers
@@ -322,6 +367,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - Medical records
 
 #### Functions:
+
 - Upload documents
 - Organize in folders
 - Search and filter
@@ -336,6 +382,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 ### 9. Breeding Management
 
 #### Features:
+
 - **Mare heat cycle tracking**
 - **Breeding records**
 - **Pregnancy monitoring**
@@ -344,6 +391,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - **Breeding analytics**
 
 #### Functions:
+
 - Track heat cycles
 - Log breeding dates
 - Monitor pregnancy
@@ -356,6 +404,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 ### 10. Competition Management
 
 #### Features:
+
 - **Competition scheduling**
 - **Results tracking**
 - **Performance records**
@@ -364,6 +413,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - **Achievement tracking**
 
 #### Functions:
+
 - Schedule competitions
 - Log results
 - Track placements
@@ -376,6 +426,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 ### 11. Financial Management
 
 #### Features:
+
 - **Expense tracking**
 - **Budget management**
 - **Cost per horse**
@@ -384,6 +435,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - **Financial reports**
 
 #### Tracked Expenses:
+
 - Veterinary costs
 - Farrier fees
 - Feed and supplies
@@ -394,6 +446,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - Equipment
 
 #### Functions:
+
 - Log expenses
 - Categorize costs
 - Generate reports
@@ -406,6 +459,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 ### 12. Stable Management
 
 #### Features:
+
 - **Multiple stable support**
 - **Stall assignments**
 - **Facility management**
@@ -414,6 +468,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - **Maintenance tracking**
 
 #### Functions:
+
 - Manage multiple stables
 - Assign stalls
 - Track equipment
@@ -425,12 +480,14 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 ### 13. Contacts Management
 
 #### Features:
+
 - **Comprehensive contact database**
 - **Categorized contacts**
 - **Quick access**
 - **Communication history**
 
 #### Contact Types:
+
 - Veterinarians
 - Farriers
 - Trainers
@@ -441,6 +498,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - Transportation services
 
 #### Functions:
+
 - Add/edit contacts
 - Categorize
 - Quick dial/email
@@ -452,6 +510,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 ### 14. Reports & Analytics
 
 #### Features:
+
 - **Comprehensive reporting**
 - **Data visualization**
 - **Custom date ranges**
@@ -460,6 +519,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - **Scheduled reports**
 
 #### Report Types:
+
 - Health summary reports
 - Training progress reports
 - Financial reports
@@ -470,6 +530,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - Custom reports
 
 #### Functions:
+
 - Generate reports
 - Customize parameters
 - Export to PDF/Excel
@@ -482,6 +543,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 ### 15. Notifications & Reminders
 
 #### Features:
+
 - **Smart notifications**
 - **Email alerts**
 - **In-app notifications**
@@ -490,6 +552,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - **Snooze functionality**
 
 #### Notification Types:
+
 - Upcoming appointments
 - Vaccination due dates
 - Deworming schedules
@@ -500,6 +563,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - Custom reminders
 
 #### Functions:
+
 - Set custom reminders
 - Configure notification preferences
 - Snooze reminders
@@ -513,6 +577,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 ### 16. Data Import & Export
 
 #### Features:
+
 - **Bulk data import**
 - **Multiple formats** (CSV, Excel, JSON)
 - **Data migration tools**
@@ -520,6 +585,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - **Export to various formats**
 
 #### Functions:
+
 - Import horse data
 - Export all data
 - Create backups
@@ -531,6 +597,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 ### 17. Mobile-Friendly Design
 
 #### Features:
+
 - **Responsive design**
 - **Touch-optimized**
 - **Mobile navigation**
@@ -539,6 +606,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - **Fast loading**
 
 #### Functions:
+
 - Works on all devices
 - Install as app
 - Offline access (PWA)
@@ -550,6 +618,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 ### 18. Security & Privacy
 
 #### Features:
+
 - **Bank-level encryption**
 - **Secure data storage**
 - **Role-based access**
@@ -559,6 +628,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - **Regular backups**
 
 #### Functions:
+
 - Encrypted communication
 - Secure authentication
 - Access control
@@ -571,6 +641,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 ### 19. Admin Panel
 
 #### Features:
+
 - **Hidden admin access** (protected by ADMIN_UNLOCK_PASSWORD)
 - **System-wide control**
 - **User management**
@@ -580,6 +651,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - **API key management**
 
 #### Admin Functions:
+
 - Add/remove users
 - Manage all horses
 - System configuration
@@ -596,6 +668,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 ### 20. Payment & Subscriptions
 
 #### Features:
+
 - **Stripe integration**
 - **Multiple subscription tiers**
 - **Secure payment processing**
@@ -604,12 +677,14 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - **Payment history**
 
 #### Subscription Plans:
+
 - Free trial (14 days)
 - Monthly subscription
 - Annual subscription
 - Custom enterprise plans
 
 #### Functions:
+
 - Subscribe/upgrade/downgrade
 - Payment method management
 - View billing history
@@ -623,6 +698,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 ## 🎨 User Interface Features
 
 ### Design Elements:
+
 - **Modern glassmorphism UI**
 - **Smooth animations**
 - **Video background support**
@@ -633,6 +709,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - **Search functionality**
 
 ### Animations:
+
 - Fade-in effects
 - Scroll-triggered animations
 - Hover effects
@@ -646,6 +723,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 ## 🔧 Technical Features
 
 ### Performance:
+
 - **Fast page loads**
 - **Optimized images**
 - **Lazy loading**
@@ -654,6 +732,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - **CDN support**
 
 ### Technology Stack:
+
 - **Frontend**: React, TypeScript, TailwindCSS
 - **Backend**: Node.js, Express
 - **Database**: MySQL with Drizzle ORM
@@ -669,6 +748,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 ## 📊 System Capabilities
 
 ### Scalability:
+
 - Supports unlimited horses
 - Unlimited users (based on plan)
 - Unlimited documents (storage-dependent)
@@ -676,6 +756,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - Optimized for large datasets
 
 ### Reliability:
+
 - 99.9% uptime target
 - Automatic backups
 - Error recovery
@@ -683,6 +764,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - Health monitoring
 
 ### Integration:
+
 - RESTful API
 - Webhook support
 - OAuth integration
@@ -706,6 +788,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 ## 📈 Roadmap
 
 ### Planned Features:
+
 - Mobile native apps (iOS/Android)
 - Advanced AI insights
 - Telemedicine integration
@@ -720,6 +803,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 ## 💡 Use Cases
 
 ### For Horse Owners:
+
 - Track single or multiple horses
 - Never miss health appointments
 - Monitor training progress
@@ -727,6 +811,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - Keep records organized
 
 ### For Trainers:
+
 - Manage client horses
 - Track training sessions
 - Share progress reports
@@ -734,6 +819,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - Monitor performance
 
 ### For Stable Managers:
+
 - Manage multiple horses
 - Staff scheduling
 - Facility management
@@ -741,6 +827,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 - Financial tracking
 
 ### For Veterinarians:
+
 - Access patient records
 - View health history
 - Update medical records
@@ -762,6 +849,7 @@ EquiProfile is a comprehensive, modern web application designed for equestrian p
 ## 📝 Summary
 
 EquiProfile is a **complete, production-ready horse management platform** with:
+
 - ✅ 20+ major feature modules
 - ✅ 100+ individual functions
 - ✅ AI-powered insights

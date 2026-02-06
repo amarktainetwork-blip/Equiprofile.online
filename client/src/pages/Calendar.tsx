@@ -1,7 +1,17 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Calendar as CalendarIcon, Plus, ChevronLeft, ChevronRight } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import {
+  Calendar as CalendarIcon,
+  Plus,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 
@@ -11,12 +21,28 @@ export default function CalendarPage() {
   const [view, setView] = useState<"month" | "week" | "day">("month");
 
   const monthNames = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
 
   const navigateMonth = (direction: number) => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + direction, 1));
+    setCurrentDate(
+      new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() + direction,
+        1,
+      ),
+    );
   };
 
   return (
@@ -65,13 +91,25 @@ export default function CalendarPage() {
                   Day
                 </Button>
               </div>
-              <Button variant="outline" size="icon" onClick={() => navigateMonth(-1)}>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => navigateMonth(-1)}
+              >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="sm" onClick={() => setCurrentDate(new Date())}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentDate(new Date())}
+              >
                 Today
               </Button>
-              <Button variant="outline" size="icon" onClick={() => navigateMonth(1)}>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => navigateMonth(1)}
+              >
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
@@ -81,16 +119,35 @@ export default function CalendarPage() {
           <div className="grid grid-cols-7 gap-2">
             {/* Day headers */}
             {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-              <div key={day} className="text-center font-medium text-sm text-muted-foreground p-2">
+              <div
+                key={day}
+                className="text-center font-medium text-sm text-muted-foreground p-2"
+              >
                 {day}
               </div>
             ))}
-            
+
             {/* Calendar days - simplified placeholder */}
             {Array.from({ length: 35 }, (_, i) => {
-              const dayNumber = i - new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay() + 1;
-              const isCurrentMonth = dayNumber > 0 && dayNumber <= new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
-              const isToday = isCurrentMonth && dayNumber === new Date().getDate() &&
+              const dayNumber =
+                i -
+                new Date(
+                  currentDate.getFullYear(),
+                  currentDate.getMonth(),
+                  1,
+                ).getDay() +
+                1;
+              const isCurrentMonth =
+                dayNumber > 0 &&
+                dayNumber <=
+                  new Date(
+                    currentDate.getFullYear(),
+                    currentDate.getMonth() + 1,
+                    0,
+                  ).getDate();
+              const isToday =
+                isCurrentMonth &&
+                dayNumber === new Date().getDate() &&
                 currentDate.getMonth() === new Date().getMonth() &&
                 currentDate.getFullYear() === new Date().getFullYear();
 
@@ -105,7 +162,9 @@ export default function CalendarPage() {
                 >
                   {isCurrentMonth && (
                     <>
-                      <div className={`text-sm ${isToday ? "font-bold text-primary" : "text-muted-foreground"}`}>
+                      <div
+                        className={`text-sm ${isToday ? "font-bold text-primary" : "text-muted-foreground"}`}
+                      >
                         {dayNumber}
                       </div>
                       {/* Event badges would go here */}
@@ -119,11 +178,30 @@ export default function CalendarPage() {
           <div className="mt-6 space-y-2">
             <h3 className="font-semibold text-sm">Event Types</h3>
             <div className="flex flex-wrap gap-2">
-              <Badge variant="outline" className="bg-blue-50 dark:bg-blue-950">Training</Badge>
-              <Badge variant="outline" className="bg-green-50 dark:bg-green-950">Competition</Badge>
-              <Badge variant="outline" className="bg-purple-50 dark:bg-purple-950">Veterinary</Badge>
-              <Badge variant="outline" className="bg-yellow-50 dark:bg-yellow-950">Farrier</Badge>
-              <Badge variant="outline" className="bg-red-50 dark:bg-red-950">Lesson</Badge>
+              <Badge variant="outline" className="bg-blue-50 dark:bg-blue-950">
+                Training
+              </Badge>
+              <Badge
+                variant="outline"
+                className="bg-green-50 dark:bg-green-950"
+              >
+                Competition
+              </Badge>
+              <Badge
+                variant="outline"
+                className="bg-purple-50 dark:bg-purple-950"
+              >
+                Veterinary
+              </Badge>
+              <Badge
+                variant="outline"
+                className="bg-yellow-50 dark:bg-yellow-950"
+              >
+                Farrier
+              </Badge>
+              <Badge variant="outline" className="bg-red-50 dark:bg-red-950">
+                Lesson
+              </Badge>
             </div>
           </div>
         </CardContent>

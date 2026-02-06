@@ -10,6 +10,7 @@
 ### ✅ Test 1: Preflight Script - Minimal Configuration
 
 **Environment:**
+
 ```bash
 DATABASE_URL=mysql://test:test@localhost:3306/test
 JWT_SECRET=test_secret
@@ -20,6 +21,7 @@ ENABLE_UPLOADS=false
 ```
 
 **Result:**
+
 ```
 ✓ DATABASE_URL is set
 ✓ JWT_SECRET is set
@@ -45,6 +47,7 @@ You can proceed with deployment.
 ### ✅ Test 2: Preflight Script - Stripe Enabled, Missing Credentials
 
 **Environment:**
+
 ```bash
 # ... (same as Test 1) ...
 ENABLE_STRIPE=true
@@ -52,6 +55,7 @@ ENABLE_STRIPE=true
 ```
 
 **Result:**
+
 ```
 Stripe Configuration (ENABLED):
 --------------------------------
@@ -75,6 +79,7 @@ Please fix the above errors before deploying.
 **Test:** TypeScript compilation of modified files
 
 **Files Tested:**
+
 - `server/_core/env.ts`
 - `server/_core/systemRouter.ts`
 - `server/stripe.ts`
@@ -92,6 +97,7 @@ Please fix the above errors before deploying.
 **Test:** Validation logic in env.ts
 
 **Test Cases:**
+
 1. **Minimal (both false):** Requires only core vars ✅
 2. **ENABLE_STRIPE=true:** Requires Stripe vars ✅
 3. **ENABLE_UPLOADS=true:** Requires upload vars ✅
@@ -107,6 +113,7 @@ Please fix the above errors before deploying.
 **Code Review:** `server/stripe.ts`
 
 **Verified:**
+
 - ✅ `checkStripeEnabled()` function throws `PRECONDITION_FAILED` when disabled
 - ✅ `getStripe()` returns null and logs warning when disabled
 - ✅ `createCheckoutSession()` calls `checkStripeEnabled()` first
@@ -121,6 +128,7 @@ Please fix the above errors before deploying.
 **Code Review:** `server/routers.ts` (billing section)
 
 **Verified:**
+
 - ✅ `billing.getPricing` returns `{ enabled: false, message: 'Billing is disabled' }` when flag off
 - ✅ `billing.createCheckout` throws `PRECONDITION_FAILED` when flag off
 - ✅ `billing.createPortal` throws `PRECONDITION_FAILED` when flag off
@@ -132,10 +140,12 @@ Please fix the above errors before deploying.
 ### ✅ Test 7: Upload Guards
 
 **Code Review:**
+
 - `server/storage.ts` - storage configuration check
 - `server/routers.ts` - documents router
 
 **Verified:**
+
 - ✅ `getStorageConfig()` throws error with instructions when uploads disabled
 - ✅ `documents.upload` checks `ENV.enableUploads` and throws error when disabled
 - ✅ `documents.list` and `documents.delete` continue to work (read-only operations)
@@ -149,11 +159,13 @@ Please fix the above errors before deploying.
 **Code Review:** `server/_core/systemRouter.ts`
 
 **Verified:**
+
 - ✅ `system.getFeatureFlags` is a public procedure (no auth required)
 - ✅ Returns `{ enableStripe: boolean, enableUploads: boolean }`
 - ✅ Reads directly from ENV object
 
 **Expected Response (minimal config):**
+
 ```json
 {
   "enableStripe": false,
@@ -170,6 +182,7 @@ Please fix the above errors before deploying.
 **Code Review:** `server/routers.ts` (admin.getEnvHealth)
 
 **Verified:**
+
 - ✅ Core vars always marked as critical
 - ✅ Stripe vars marked as critical only if `ENABLE_STRIPE=true`
 - ✅ Upload vars marked as critical only if `ENABLE_UPLOADS=true`
@@ -185,6 +198,7 @@ Please fix the above errors before deploying.
 **File Review:** `.env.example`
 
 **Verified:**
+
 - ✅ Reorganized into clear sections (Core, Feature Flags, Stripe, Uploads, Optional)
 - ✅ Feature flags clearly documented with defaults
 - ✅ Optional vars commented out
@@ -199,6 +213,7 @@ Please fix the above errors before deploying.
 **File Review:** `ecosystem.config.js`
 
 **Verified:**
+
 - ✅ Default instances changed from `2` to `1`
 - ✅ Supports `PM2_INSTANCES` environment variable override
 - ✅ Formula: `instances: process.env.PM2_INSTANCES || 1`
@@ -210,6 +225,7 @@ Please fix the above errors before deploying.
 ### ✅ Test 12: Package Management
 
 **Verified:**
+
 - ✅ `package-lock.json` removed
 - ✅ `pnpm-lock.yaml` present and up-to-date
 - ✅ `packageManager` field in package.json specifies pnpm
@@ -221,6 +237,7 @@ Please fix the above errors before deploying.
 ### ✅ Test 13: Documentation
 
 **Files Verified:**
+
 - ✅ `docs/reports/AUDIT_REPORT.md` - Comprehensive audit with security analysis
 - ✅ `docs/reports/DEPLOYMENT_PLUG_AND_PLAY.md` - Step-by-step deployment guide with 4 scenarios
 - ✅ `README.md` - Updated with quick deployment section and feature flag info
@@ -232,21 +249,21 @@ Please fix the above errors before deploying.
 
 ## Test Summary
 
-| Test # | Test Name | Status | Notes |
-|--------|-----------|--------|-------|
-| 1 | Preflight - Minimal | ✅ PASS | All checks passed |
-| 2 | Preflight - Missing Vars | ✅ PASS | Correctly fails |
-| 3 | Code Compilation | ✅ PASS | No new errors |
-| 4 | Feature Flag Logic | ✅ PASS | All cases covered |
-| 5 | Stripe Guards | ✅ PASS | Code review verified |
-| 6 | Billing Router | ✅ PASS | Code review verified |
-| 7 | Upload Guards | ✅ PASS | Code review verified |
-| 8 | Feature Flags Endpoint | ✅ PASS | Code review verified |
-| 9 | Admin Health Check | ✅ PASS | Code review verified |
-| 10 | Environment Config | ✅ PASS | Documentation verified |
-| 11 | PM2 Configuration | ✅ PASS | Code review verified |
-| 12 | Package Management | ✅ PASS | pnpm standardized |
-| 13 | Documentation | ✅ PASS | All docs created |
+| Test # | Test Name                | Status  | Notes                  |
+| ------ | ------------------------ | ------- | ---------------------- |
+| 1      | Preflight - Minimal      | ✅ PASS | All checks passed      |
+| 2      | Preflight - Missing Vars | ✅ PASS | Correctly fails        |
+| 3      | Code Compilation         | ✅ PASS | No new errors          |
+| 4      | Feature Flag Logic       | ✅ PASS | All cases covered      |
+| 5      | Stripe Guards            | ✅ PASS | Code review verified   |
+| 6      | Billing Router           | ✅ PASS | Code review verified   |
+| 7      | Upload Guards            | ✅ PASS | Code review verified   |
+| 8      | Feature Flags Endpoint   | ✅ PASS | Code review verified   |
+| 9      | Admin Health Check       | ✅ PASS | Code review verified   |
+| 10     | Environment Config       | ✅ PASS | Documentation verified |
+| 11     | PM2 Configuration        | ✅ PASS | Code review verified   |
+| 12     | Package Management       | ✅ PASS | pnpm standardized      |
+| 13     | Documentation            | ✅ PASS | All docs created       |
 
 **Overall Status:** ✅ **13/13 TESTS PASSED**
 
@@ -318,6 +335,7 @@ All feature flag functionality has been implemented and tested. The application 
 **Security:** ✅ Validated
 
 **Next Steps:**
+
 1. Merge to main branch
 2. Deploy to staging environment for integration testing
 3. Perform user acceptance testing

@@ -29,11 +29,11 @@ test_endpoint() {
   local name="$1"
   local url="$2"
   local expected_status="${3:-200}"
-  
+
   echo -n "Testing $name... "
-  
+
   status=$(curl -s -o /dev/null -w "%{http_code}" "$url" || echo "000")
-  
+
   if [ "$status" = "$expected_status" ]; then
     echo "✅ PASS (HTTP $status)"
     PASS=$((PASS + 1))
@@ -48,11 +48,11 @@ test_json() {
   local name="$1"
   local url="$2"
   local key="$3"
-  
+
   echo -n "Testing $name... "
-  
+
   response=$(curl -s "$url")
-  
+
   if echo "$response" | grep -q "\"$key\""; then
     echo "✅ PASS (JSON valid, '$key' present)"
     PASS=$((PASS + 1))
@@ -245,6 +245,7 @@ Open browser to `http://localhost:3000/` and check console:
 **Cause**: Server not running or not responding
 
 **Solution**:
+
 1. Check service status: `sudo systemctl status equiprofile`
 2. Check logs: `sudo journalctl -u equiprofile -n 50`
 3. Verify port 3000 is listening: `sudo netstat -tulpn | grep 3000`
@@ -254,6 +255,7 @@ Open browser to `http://localhost:3000/` and check console:
 **Cause**: Static files not built or served correctly
 
 **Solution**:
+
 1. Verify `dist/` directory exists: `ls -la dist/`
 2. Check Vite build completed: Look for `dist/index.html`
 3. Rebuild: `npm run build`
@@ -263,6 +265,7 @@ Open browser to `http://localhost:3000/` and check console:
 **Cause**: MySQL not running or wrong credentials
 
 **Solution**:
+
 1. Check MySQL status: `sudo systemctl status mysql`
 2. Test connection: `mysql -h localhost -u equiprofile -p`
 3. Verify DATABASE_URL in `.env`
@@ -272,6 +275,7 @@ Open browser to `http://localhost:3000/` and check console:
 **Cause**: Server-side error
 
 **Solution**:
+
 1. Check logs: `sudo journalctl -u equiprofile -n 100`
 2. Look for stack traces
 3. Verify all environment variables are set

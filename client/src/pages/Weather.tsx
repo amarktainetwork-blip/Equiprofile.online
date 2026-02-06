@@ -1,17 +1,23 @@
 import { useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { trpc } from "@/lib/trpc";
-import { 
-  CloudSun, 
-  Thermometer, 
-  Droplets, 
-  Wind, 
+import {
+  CloudSun,
+  Thermometer,
+  Droplets,
+  Wind,
   Eye,
   Sun,
   CloudRain,
@@ -20,7 +26,7 @@ import {
   RefreshCw,
   CheckCircle,
   AlertTriangle,
-  XCircle
+  XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Streamdown } from "streamdown";
@@ -37,9 +43,12 @@ function WeatherContent() {
     visibility: 10,
   });
 
-  const { data: latestWeather, isLoading: weatherLoading } = trpc.weather.getLatest.useQuery();
-  const { data: weatherHistory } = trpc.weather.getHistory.useQuery({ limit: 5 });
-  
+  const { data: latestWeather, isLoading: weatherLoading } =
+    trpc.weather.getLatest.useQuery();
+  const { data: weatherHistory } = trpc.weather.getHistory.useQuery({
+    limit: 5,
+  });
+
   const analyzeMutation = trpc.weather.analyze.useMutation({
     onSuccess: (data) => {
       toast.success("Weather analysis complete!");
@@ -54,7 +63,7 @@ function WeatherContent() {
       toast.error("Please enter a location");
       return;
     }
-    
+
     analyzeMutation.mutate({
       location,
       ...weatherData,
@@ -63,30 +72,30 @@ function WeatherContent() {
 
   const getRecommendationColor = (rec: string) => {
     switch (rec) {
-      case 'excellent':
-        return 'bg-green-100 text-green-700 border-green-200';
-      case 'good':
-        return 'bg-blue-100 text-blue-700 border-blue-200';
-      case 'fair':
-        return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-      case 'poor':
-        return 'bg-orange-100 text-orange-700 border-orange-200';
-      case 'not_recommended':
-        return 'bg-red-100 text-red-700 border-red-200';
+      case "excellent":
+        return "bg-green-100 text-green-700 border-green-200";
+      case "good":
+        return "bg-blue-100 text-blue-700 border-blue-200";
+      case "fair":
+        return "bg-yellow-100 text-yellow-700 border-yellow-200";
+      case "poor":
+        return "bg-orange-100 text-orange-700 border-orange-200";
+      case "not_recommended":
+        return "bg-red-100 text-red-700 border-red-200";
       default:
-        return 'bg-gray-100 text-gray-700 border-gray-200';
+        return "bg-gray-100 text-gray-700 border-gray-200";
     }
   };
 
   const getRecommendationIcon = (rec: string) => {
     switch (rec) {
-      case 'excellent':
-      case 'good':
+      case "excellent":
+      case "good":
         return <CheckCircle className="w-5 h-5" />;
-      case 'fair':
+      case "fair":
         return <AlertTriangle className="w-5 h-5" />;
-      case 'poor':
-      case 'not_recommended':
+      case "poor":
+      case "not_recommended":
         return <XCircle className="w-5 h-5" />;
       default:
         return <CloudSun className="w-5 h-5" />;
@@ -96,7 +105,9 @@ function WeatherContent() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-serif text-3xl font-bold text-foreground">Weather Analysis</h1>
+        <h1 className="font-serif text-3xl font-bold text-foreground">
+          Weather Analysis
+        </h1>
         <p className="text-muted-foreground mt-1">
           AI-powered riding condition recommendations based on current weather
         </p>
@@ -130,7 +141,10 @@ function WeatherContent() {
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="temperature" className="flex items-center gap-2">
+                <Label
+                  htmlFor="temperature"
+                  className="flex items-center gap-2"
+                >
                   <Thermometer className="w-4 h-4" />
                   Temperature (°C)
                 </Label>
@@ -138,7 +152,12 @@ function WeatherContent() {
                   id="temperature"
                   type="number"
                   value={weatherData.temperature}
-                  onChange={(e) => setWeatherData({ ...weatherData, temperature: parseInt(e.target.value) || 0 })}
+                  onChange={(e) =>
+                    setWeatherData({
+                      ...weatherData,
+                      temperature: parseInt(e.target.value) || 0,
+                    })
+                  }
                 />
               </div>
 
@@ -153,7 +172,12 @@ function WeatherContent() {
                   min="0"
                   max="100"
                   value={weatherData.humidity}
-                  onChange={(e) => setWeatherData({ ...weatherData, humidity: parseInt(e.target.value) || 0 })}
+                  onChange={(e) =>
+                    setWeatherData({
+                      ...weatherData,
+                      humidity: parseInt(e.target.value) || 0,
+                    })
+                  }
                 />
               </div>
 
@@ -167,12 +191,20 @@ function WeatherContent() {
                   type="number"
                   min="0"
                   value={weatherData.windSpeed}
-                  onChange={(e) => setWeatherData({ ...weatherData, windSpeed: parseInt(e.target.value) || 0 })}
+                  onChange={(e) =>
+                    setWeatherData({
+                      ...weatherData,
+                      windSpeed: parseInt(e.target.value) || 0,
+                    })
+                  }
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="precipitation" className="flex items-center gap-2">
+                <Label
+                  htmlFor="precipitation"
+                  className="flex items-center gap-2"
+                >
                   <CloudRain className="w-4 h-4" />
                   Rain (mm)
                 </Label>
@@ -181,7 +213,12 @@ function WeatherContent() {
                   type="number"
                   min="0"
                   value={weatherData.precipitation}
-                  onChange={(e) => setWeatherData({ ...weatherData, precipitation: parseInt(e.target.value) || 0 })}
+                  onChange={(e) =>
+                    setWeatherData({
+                      ...weatherData,
+                      precipitation: parseInt(e.target.value) || 0,
+                    })
+                  }
                 />
               </div>
             </div>
@@ -195,7 +232,12 @@ function WeatherContent() {
                 <Input
                   id="conditions"
                   value={weatherData.conditions}
-                  onChange={(e) => setWeatherData({ ...weatherData, conditions: e.target.value })}
+                  onChange={(e) =>
+                    setWeatherData({
+                      ...weatherData,
+                      conditions: e.target.value,
+                    })
+                  }
                   placeholder="e.g., sunny, cloudy, rainy"
                 />
               </div>
@@ -211,7 +253,12 @@ function WeatherContent() {
                   min="0"
                   max="11"
                   value={weatherData.uvIndex}
-                  onChange={(e) => setWeatherData({ ...weatherData, uvIndex: parseInt(e.target.value) || 0 })}
+                  onChange={(e) =>
+                    setWeatherData({
+                      ...weatherData,
+                      uvIndex: parseInt(e.target.value) || 0,
+                    })
+                  }
                 />
               </div>
 
@@ -225,13 +272,18 @@ function WeatherContent() {
                   type="number"
                   min="0"
                   value={weatherData.visibility}
-                  onChange={(e) => setWeatherData({ ...weatherData, visibility: parseInt(e.target.value) || 0 })}
+                  onChange={(e) =>
+                    setWeatherData({
+                      ...weatherData,
+                      visibility: parseInt(e.target.value) || 0,
+                    })
+                  }
                 />
               </div>
             </div>
 
-            <Button 
-              onClick={handleAnalyze} 
+            <Button
+              onClick={handleAnalyze}
               disabled={analyzeMutation.isPending}
               className="w-full"
               size="lg"
@@ -260,15 +312,19 @@ function WeatherContent() {
             <CardContent>
               {analyzeMutation.data ? (
                 <div className="space-y-4">
-                  <div className={`p-4 rounded-lg border ${getRecommendationColor(analyzeMutation.data.recommendation)}`}>
+                  <div
+                    className={`p-4 rounded-lg border ${getRecommendationColor(analyzeMutation.data.recommendation)}`}
+                  >
                     <div className="flex items-center gap-2 mb-2">
-                      {getRecommendationIcon(analyzeMutation.data.recommendation)}
+                      {getRecommendationIcon(
+                        analyzeMutation.data.recommendation,
+                      )}
                       <span className="font-semibold capitalize text-lg">
-                        {analyzeMutation.data.recommendation.replace('_', ' ')}
+                        {analyzeMutation.data.recommendation.replace("_", " ")}
                       </span>
                     </div>
                   </div>
-                  
+
                   {analyzeMutation.data.analysis && (
                     <div className="prose prose-sm max-w-none">
                       <Streamdown>{analyzeMutation.data.analysis}</Streamdown>
@@ -277,15 +333,23 @@ function WeatherContent() {
                 </div>
               ) : latestWeather ? (
                 <div className="space-y-4">
-                  <div className={`p-4 rounded-lg border ${getRecommendationColor(latestWeather.ridingRecommendation || 'fair')}`}>
+                  <div
+                    className={`p-4 rounded-lg border ${getRecommendationColor(latestWeather.ridingRecommendation || "fair")}`}
+                  >
                     <div className="flex items-center gap-2 mb-2">
-                      {getRecommendationIcon(latestWeather.ridingRecommendation || 'fair')}
+                      {getRecommendationIcon(
+                        latestWeather.ridingRecommendation || "fair",
+                      )}
                       <span className="font-semibold capitalize text-lg">
-                        {(latestWeather.ridingRecommendation || 'fair').replace('_', ' ')}
+                        {(latestWeather.ridingRecommendation || "fair").replace(
+                          "_",
+                          " ",
+                        )}
                       </span>
                     </div>
                     <p className="text-sm opacity-80">
-                      Last checked: {new Date(latestWeather.checkedAt).toLocaleString()}
+                      Last checked:{" "}
+                      {new Date(latestWeather.checkedAt).toLocaleString()}
                     </p>
                   </div>
                 </div>
@@ -313,15 +377,21 @@ function WeatherContent() {
               ) : (
                 <div className="space-y-2">
                   {weatherHistory.map((log) => (
-                    <div key={log.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/30">
+                    <div
+                      key={log.id}
+                      className="flex items-center justify-between p-2 rounded-lg bg-muted/30"
+                    >
                       <div>
                         <p className="text-sm font-medium">{log.location}</p>
                         <p className="text-xs text-muted-foreground">
                           {new Date(log.checkedAt).toLocaleDateString()}
                         </p>
                       </div>
-                      <Badge variant="outline" className={`capitalize ${getRecommendationColor(log.ridingRecommendation || 'fair')}`}>
-                        {(log.ridingRecommendation || 'fair').replace('_', ' ')}
+                      <Badge
+                        variant="outline"
+                        className={`capitalize ${getRecommendationColor(log.ridingRecommendation || "fair")}`}
+                      >
+                        {(log.ridingRecommendation || "fair").replace("_", " ")}
                       </Badge>
                     </div>
                   ))}
