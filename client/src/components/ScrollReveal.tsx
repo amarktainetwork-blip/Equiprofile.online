@@ -47,7 +47,7 @@ export function ScrollReveal({
   return (
     <motion.div
       ref={ref}
-      variants={variants}
+      variants={variants as any}
       initial="hidden"
       animate={isInView ? "visible" : "hidden"}
       transition={{
@@ -94,7 +94,7 @@ export function Stagger({
   return (
     <motion.div
       ref={ref}
-      variants={customVariants}
+      variants={customVariants as any}
       initial="hidden"
       animate={isInView ? "visible" : "hidden"}
       className={className}
@@ -116,7 +116,7 @@ const staggerItemVariants = {
 export function StaggerItem({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <motion.div
-      variants={staggerItemVariants}
+      variants={staggerItemVariants as any}
       transition={{ duration: 0.4, ease: "easeOut" }}
       className={className}
     >
