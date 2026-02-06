@@ -194,10 +194,10 @@ If you see CSP violations:
 
 ## Sign-Off
 
-Deployment tested by: ******\_\_\_******  
-Date: ******\_\_\_******  
-Environment: ******\_\_\_******  
-Version: ******\_\_\_******
+Deployment tested by: **\*\***\_\_\_**\*\***  
+Date: **\*\***\_\_\_**\*\***  
+Environment: **\*\***\_\_\_**\*\***  
+Version: **\*\***\_\_\_**\*\***
 
 All checks passed: ☐ Yes ☐ No
 

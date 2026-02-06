@@ -197,9 +197,7 @@ class SDKServer {
       .sign(secretKey);
   }
 
-  async verifySession(
-    cookieValue: string | undefined | null,
-  ): Promise<{
+  async verifySession(cookieValue: string | undefined | null): Promise<{
     openId: string;
     appId: string;
     name: string;

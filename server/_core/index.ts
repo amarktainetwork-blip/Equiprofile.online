@@ -117,11 +117,9 @@ async function startServer() {
           `[Stripe Webhook] Signature verification failed:`,
           err.message,
         );
-        return res
-          .status(400)
-          .json({
-            error: `Webhook signature verification failed: ${err.message}`,
-          });
+        return res.status(400).json({
+          error: `Webhook signature verification failed: ${err.message}`,
+        });
       }
 
       // Check for duplicate events (idempotency)
