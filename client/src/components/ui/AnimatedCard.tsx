@@ -7,6 +7,14 @@ interface AnimatedCardProps {
   delay?: number;
 }
 
+/**
+ * AnimatedCard component with fade-in and hover animations
+ * 
+ * Note: Using 'as any' type assertions for framer-motion props is a workaround
+ * for React 19 type compatibility issues with framer-motion 12.x. This is a
+ * known limitation and will be resolved when framer-motion releases full React 19 support.
+ * The props work correctly at runtime despite the TypeScript warnings.
+ */
 export function AnimatedCard({ children, className = '', delay = 0 }: AnimatedCardProps) {
   return (
     <motion.div

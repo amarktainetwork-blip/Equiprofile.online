@@ -338,7 +338,12 @@ export default function Settings() {
                       {["light", "dark"].map((themeOption) => (
                         <button
                           key={themeOption}
-                          onClick={toggleTheme}
+                          onClick={() => {
+                            // Only toggle if clicking on the non-active theme
+                            if (theme !== themeOption) {
+                              toggleTheme();
+                            }
+                          }}
                           className={`p-4 border-2 rounded-lg transition-all ${
                             theme === themeOption
                               ? "border-primary bg-primary/5"

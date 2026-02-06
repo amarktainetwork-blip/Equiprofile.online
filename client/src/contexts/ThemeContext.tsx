@@ -10,13 +10,18 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+// Helper function to check if current route is a dashboard route
+const isDashboardRoute = () => {
+  return window.location.pathname.startsWith('/dashboard') || 
+         window.location.pathname.startsWith('/horses') ||
+         window.location.pathname.startsWith('/health') ||
+         window.location.pathname.startsWith('/training');
+};
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {
     // Only apply saved theme in dashboard routes
-    if (window.location.pathname.startsWith('/dashboard') || 
-        window.location.pathname.startsWith('/horses') ||
-        window.location.pathname.startsWith('/health') ||
-        window.location.pathname.startsWith('/training')) {
+    if (isDashboardRoute()) {
       const saved = localStorage.getItem('equiprofile-theme') as Theme;
       return saved || 'light';
     }
@@ -24,12 +29,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   });
 
   useEffect(() => {
-    const isDashboard = window.location.pathname.startsWith('/dashboard') || 
-                        window.location.pathname.startsWith('/horses') ||
-                        window.location.pathname.startsWith('/health') ||
-                        window.location.pathname.startsWith('/training');
-    
-    if (isDashboard) {
+    if (isDashboardRoute()) {
       document.documentElement.classList.toggle('dark', theme === 'dark');
       localStorage.setItem('equiprofile-theme', theme);
     } else {
