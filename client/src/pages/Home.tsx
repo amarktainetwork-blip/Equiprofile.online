@@ -31,7 +31,6 @@ import { useState, useEffect } from "react";
 export default function Home() {
   const { isAuthenticated } = useAuth();
   const [activeTestimonial, setActiveTestimonial] = useState(0);
-  const [statsAnimated, setStatsAnimated] = useState(false);
 
   const features = [
     {
@@ -106,17 +105,13 @@ export default function Home() {
   const [animatedStats, setAnimatedStats] = useState(stats.map(() => 0));
 
   useEffect(() => {
-    if (statsAnimated) return;
-
     const observers = stats.map((stat, index) => {
       const element = document.getElementById(`stat-${index}`);
       if (!element) return null;
 
       const observer = new IntersectionObserver(
         (entries) => {
-          if (entries[0].isIntersecting && !statsAnimated) {
-            setStatsAnimated(true);
-            
+          if (entries[0].isIntersecting) {
             // Animate the stat
             const duration = 2000;
             const steps = 60;
@@ -135,6 +130,9 @@ export default function Home() {
                 return newStats;
               });
             }, duration / steps);
+            
+            // Disconnect after animating this specific stat
+            observer.disconnect();
           }
         },
         { threshold: 0.5 }
@@ -147,7 +145,7 @@ export default function Home() {
     return () => {
       observers.forEach(observer => observer?.disconnect());
     };
-  }, [statsAnimated]);
+  }, []); // Only run once on mount
 
   // Auto-rotate testimonials
   useEffect(() => {
@@ -172,7 +170,7 @@ export default function Home() {
                 muted
                 playsInline
                 className="video-background"
-                poster="/assets/horse-1.svg"
+                poster="/assets/hero-poster.jpg"
               >
                 {/* Fallback: We'll use a gradient background if video doesn't load */}
                 <source src="/videos/horses-background.mp4" type="video/mp4" />
@@ -238,7 +236,7 @@ export default function Home() {
                     </div>
                     <div className="flex items-center gap-2 glass px-4 py-2 rounded-full">
                       <Check className="w-5 h-5" />
-                      <span className="text-base">24/7 Support</span>
+                      <span className="text-base">Free support included</span>
                     </div>
                     <div className="flex items-center gap-2 glass px-4 py-2 rounded-full">
                       <Shield className="w-5 h-5" />
@@ -563,7 +561,7 @@ export default function Home() {
               
               <div className="border-t pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
                 <p>
-                  © {new Date().getFullYear()} EquiProfile. Part of <a href="https://www.amarktai.com" target="_blank" rel="noopener noreferrer" className="text-foreground font-semibold hover:text-primary transition-colors underline">Amarktai Network</a>. All rights reserved.
+                  © {new Date().getFullYear()} EquiProfile. Part of <a href="https://www.amarktai.com" target="_blank" rel="noopener noreferrer" className="text-foreground font-semibold hover:text-primary transition-colors underline" aria-label="Amarktai Network (opens in new tab)">Amarktai Network</a>. All rights reserved.
                 </p>
                 <div className="flex gap-6">
                   <a href="#" className="hover:text-foreground transition-colors">Privacy</a>
