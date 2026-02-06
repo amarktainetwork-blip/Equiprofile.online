@@ -4,6 +4,11 @@ import type { TrpcContext } from "./_core/context";
 
 // Mock the database module
 vi.mock("./db", () => ({
+  getAdminSession: vi.fn().mockResolvedValue({
+    userId: 1,
+    role: "admin",
+    isAdmin: true,
+  }),
   getAllUsers: vi.fn().mockResolvedValue([
     {
       id: 1,
@@ -218,7 +223,7 @@ describe("admin router - unauthorized access", () => {
     const ctx = createUserContext();
     const caller = appRouter.createCaller(ctx);
 
-    await expect(caller.admin.getUsers()).rejects.toThrow("Admin access required");
+    await expect(caller.admin.getUsers()).rejects.toThrow("You do not have required permission");
   });
 
   it("throws error for unauthenticated user", async () => {
