@@ -21,7 +21,8 @@ const pageVariants = {
 export function PageTransition({ children, className = "" }: PageTransitionProps) {
   return (
     <motion.div
-      variants={pageVariants as any}
+      // @ts-expect-error - framer-motion v12 type compatibility issue
+      variants={pageVariants}
       initial="initial"
       animate="animate"
       exit="exit"
@@ -46,7 +47,8 @@ export function AnimatedRoute({ children, routeKey }: AnimatedRouteProps) {
     <AnimatePresence mode="wait">
       <motion.div
         key={routeKey}
-        variants={pageVariants as any}
+        // @ts-expect-error - framer-motion v12 type compatibility issue
+        variants={pageVariants}
         initial="initial"
         animate="animate"
         exit="exit"

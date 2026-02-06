@@ -108,9 +108,10 @@ export function MarketingNav() {
         {mobileMenuOpen && (
           <motion.div
             key="mobile-menu"
-            initial={{ opacity: 0, height: 0 } as any}
-            animate={{ opacity: 1, height: "auto" } as any}
-            exit={{ opacity: 0, height: 0 } as any}
+            // @ts-expect-error - framer-motion v12 type compatibility issue
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
             className="md:hidden border-t bg-background/95 backdrop-blur-md overflow-hidden"
           >
