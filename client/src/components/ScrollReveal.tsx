@@ -47,7 +47,6 @@ export function ScrollReveal({
   return (
     <motion.div
       ref={ref}
-      // @ts-expect-error - framer-motion v12 type compatibility issue
       variants={variants}
       initial="hidden"
       animate={isInView ? "visible" : "hidden"}
@@ -95,7 +94,6 @@ export function Stagger({
   return (
     <motion.div
       ref={ref}
-      // @ts-expect-error - framer-motion v12 type compatibility issue
       variants={customVariants}
       initial="hidden"
       animate={isInView ? "visible" : "hidden"}
@@ -118,7 +116,6 @@ const staggerItemVariants = {
 export function StaggerItem({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <motion.div
-      // @ts-expect-error - framer-motion v12 type compatibility issue
       variants={staggerItemVariants}
       transition={{ duration: 0.4, ease: "easeOut" }}
       className={className}
