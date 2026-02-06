@@ -7,7 +7,7 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
-import { toast } from "../components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Syringe, Plus, Calendar, AlertCircle, Edit, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
@@ -22,6 +22,7 @@ export default function Vaccinations() {
 }
 
 function VaccinationsContent() {
+  const { toast } = useToast();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingVaccination, setEditingVaccination] = useState<any>(null);
   const [localVaccinations, setLocalVaccinations] = useState<any[]>([]);
