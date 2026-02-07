@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type compatibility issues
 import { useEffect, useState } from "react";
 import { useRoute } from "wouter";
 import {
@@ -39,9 +38,7 @@ export default function ClientPortal() {
   const { data: competitions = [] } = trpc.competitions.list.useQuery({
     horseId: undefined,
   });
-  const { data: documents = [] } = trpc.documents.list.useQuery({
-    folderId: undefined,
-  });
+  const { data: documents = [] } = trpc.documents.list.useQuery();
 
   if (!clientId) {
     return (
@@ -270,7 +267,7 @@ export default function ClientPortal() {
                                 className="text-xs p-2 bg-muted rounded"
                               >
                                 <div className="font-medium">
-                                  {comp.eventName}
+                                  {comp.competitionName}
                                 </div>
                                 <div className="text-muted-foreground">
                                   {comp.placement && `${comp.placement} place`}

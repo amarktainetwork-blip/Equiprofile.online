@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type compatibility issues
 import { useState } from "react";
 import { trpc } from "../_core/trpc";
 import { DashboardLayout } from "../components/DashboardLayout";
@@ -57,7 +56,7 @@ function HoofcareContent() {
     workPerformed: "",
     findings: "",
     nextDueDate: "",
-    costPence: 0,
+    cost: 0,
     notes: "",
   });
 
@@ -142,7 +141,7 @@ function HoofcareContent() {
       workPerformed: "",
       findings: "",
       nextDueDate: "",
-      costPence: 0,
+      cost: 0,
       notes: "",
     });
   };
@@ -150,37 +149,47 @@ function HoofcareContent() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const costInPence = Math.round(
-      parseFloat(formData.costPence.toString()) * 100,
+      parseFloat(formData.cost.toString()) * 100,
     );
+
+    const payload = {
+      horseId: parseInt(formData.horseId),
+      careDate: formData.date,
+      careType: formData.careType as "shoeing" | "trimming" | "remedial" | "inspection" | "other",
+      farrierName: formData.farrierName || undefined,
+      farrierPhone: formData.farrierContact || undefined,
+      hoofCondition: formData.hoofCondition as "excellent" | "good" | "fair" | "poor" | undefined,
+      workPerformed: formData.workPerformed || undefined,
+      findings: formData.findings || undefined,
+      nextDueDate: formData.nextDueDate || undefined,
+      cost: costInPence,
+      notes: formData.notes || undefined,
+    };
 
     if (editingRecord) {
       updateMutation.mutate({
         id: editingRecord.id,
-        ...formData,
-        costPence: costInPence,
+        ...payload,
       });
     } else {
-      createMutation.mutate({
-        ...formData,
-        costPence: costInPence,
-      });
+      createMutation.mutate(payload);
     }
   };
 
   const handleEdit = (record: any) => {
     setEditingRecord(record);
     setFormData({
-      horseId: record.horseId || "",
+      horseId: record.horseId?.toString() || "",
       date:
-        record.date?.split("T")[0] || new Date().toISOString().split("T")[0],
+        record.careDate?.split("T")[0] || new Date().toISOString().split("T")[0],
       careType: record.careType || "shoeing",
       farrierName: record.farrierName || "",
-      farrierContact: record.farrierContact || "",
+      farrierContact: record.farrierPhone || "",
       hoofCondition: record.hoofCondition || "good",
       workPerformed: record.workPerformed || "",
       findings: record.findings || "",
       nextDueDate: record.nextDueDate?.split("T")[0] || "",
-      costPence: (record.costPence || 0) / 100,
+      cost: (record.cost || 0) / 100,
       notes: record.notes || "",
     });
     setIsDialogOpen(true);
@@ -192,7 +201,7 @@ function HoofcareContent() {
     }
   };
 
-  const getHorseName = (horseId: string) => {
+  const getHorseName = (horseId: number) => {
     const horse = horses?.find((h) => h.id === horseId);
     return horse ? horse.name : "Unknown Horse";
   };
@@ -270,7 +279,7 @@ function HoofcareContent() {
                     </SelectTrigger>
                     <SelectContent>
                       {horses?.map((horse) => (
-                        <SelectItem key={horse.id} value={horse.id}>
+                        <SelectItem key={horse.id} value={horse.id.toString()}>
                           {horse.name}
                         </SelectItem>
                       ))}
@@ -415,11 +424,11 @@ function HoofcareContent() {
                       type="number"
                       step="0.01"
                       placeholder="0.00"
-                      value={formData.costPence}
+                      value={formData.cost}
                       onChange={(e) =>
                         setFormData({
                           ...formData,
-                          costPence: parseFloat(e.target.value) || 0,
+                          cost: parseFloat(e.target.value) || 0,
                         })
                       }
                     />
@@ -526,10 +535,10 @@ function HoofcareContent() {
                       {new Date(record.nextDueDate).toLocaleDateString()}
                     </div>
                   )}
-                  {record.costPence > 0 && (
+                  {record.cost > 0 && (
                     <div>
                       <span className="font-medium">Cost:</span> £
-                      {(record.costPence / 100).toFixed(2)}
+                      {(record.cost / 100).toFixed(2)}
                     </div>
                   )}
                   {record.notes && (

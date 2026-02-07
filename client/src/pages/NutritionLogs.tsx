@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type compatibility issues
 import { useState } from "react";
 import { DashboardLayout } from "../components/DashboardLayout";
 import { trpc } from "../_core/trpc";
@@ -79,20 +78,16 @@ function NutritionLogsContent() {
     try {
       const payload = {
         horseId: parseInt(formData.horseId),
-        date: formData.date,
-        feedType: formData.feedType || undefined,
-        feedAmount: formData.feedAmount
-          ? parseFloat(formData.feedAmount)
-          : undefined,
-        breakfast: formData.breakfast || undefined,
-        lunch: formData.lunch || undefined,
-        dinner: formData.dinner || undefined,
-        nightFeed: formData.nightFeed || undefined,
+        logDate: formData.date,
+        feedType: formData.feedType || "mixed",
+        feedName: formData.feedType || undefined,
+        amount: formData.feedAmount || undefined,
+        mealTime: [formData.breakfast, formData.lunch, formData.dinner, formData.nightFeed]
+          .filter(Boolean)
+          .join(", ") || undefined,
         supplements: formData.supplements || undefined,
-        hayAmount: formData.hayAmount || undefined,
-        waterConsumption: formData.waterConsumption
-          ? parseFloat(formData.waterConsumption)
-          : undefined,
+        hay: formData.hayAmount || undefined,
+        water: formData.waterConsumption || undefined,
         bodyConditionScore: formData.bodyConditionScore
           ? parseInt(formData.bodyConditionScore)
           : undefined,
@@ -118,16 +113,16 @@ function NutritionLogsContent() {
     setEditingLog(log);
     setFormData({
       horseId: log.horseId.toString(),
-      date: log.date,
-      feedType: log.feedType || "",
-      feedAmount: log.feedAmount?.toString() || "",
-      breakfast: log.breakfast || "",
-      lunch: log.lunch || "",
-      dinner: log.dinner || "",
-      nightFeed: log.nightFeed || "",
+      date: log.logDate?.split("T")[0] || log.date,
+      feedType: log.feedName || log.feedType || "",
+      feedAmount: log.amount || "",
+      breakfast: "",
+      lunch: "",
+      dinner: "",
+      nightFeed: "",
       supplements: log.supplements || "",
-      hayAmount: log.hayAmount || "",
-      waterConsumption: log.waterConsumption?.toString() || "",
+      hayAmount: log.hay || "",
+      waterConsumption: log.water || "",
       bodyConditionScore: log.bodyConditionScore?.toString() || "5",
       weight: log.weight?.toString() || "",
       notes: log.notes || "",

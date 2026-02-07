@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix React 19 type compatibility issues
 import { useState } from "react";
 import {
   Plus,
@@ -103,105 +102,91 @@ function LessonSchedulingContent() {
   // Mutations
   const createBooking = trpc.lessonBookings.create.useMutation({
     onSuccess: () => {
-      toast({ title: "Lesson booked successfully" });
+      toast.success("Lesson booked successfully");
       setIsCreateBookingOpen(false);
       resetBookingForm();
       refetchBookings();
     },
     onError: (error) => {
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: error.message,
-        variant: "destructive",
       });
     },
   });
 
   const updateBooking = trpc.lessonBookings.update.useMutation({
     onSuccess: () => {
-      toast({ title: "Lesson updated successfully" });
+      toast.success("Lesson updated successfully");
       refetchBookings();
       refetchMyTraining();
     },
     onError: (error) => {
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: error.message,
-        variant: "destructive",
       });
     },
   });
 
   const deleteBooking = trpc.lessonBookings.delete.useMutation({
     onSuccess: () => {
-      toast({ title: "Lesson deleted successfully" });
+      toast.success("Lesson deleted successfully");
       refetchBookings();
       refetchMyTraining();
     },
     onError: (error) => {
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: error.message,
-        variant: "destructive",
       });
     },
   });
 
   const markCompleted = trpc.lessonBookings.markCompleted.useMutation({
     onSuccess: () => {
-      toast({ title: "Lesson marked as completed" });
+      toast.success("Lesson marked as completed");
       refetchMyTraining();
     },
     onError: (error) => {
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: error.message,
-        variant: "destructive",
       });
     },
   });
 
   const markCancelled = trpc.lessonBookings.markCancelled.useMutation({
     onSuccess: () => {
-      toast({ title: "Lesson cancelled" });
+      toast.success("Lesson cancelled");
       refetchBookings();
       refetchMyTraining();
     },
     onError: (error) => {
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: error.message,
-        variant: "destructive",
       });
     },
   });
 
   const createAvailability = trpc.trainerAvailability.create.useMutation({
     onSuccess: () => {
-      toast({ title: "Availability added successfully" });
+      toast.success("Availability added successfully");
       setIsCreateAvailabilityOpen(false);
       resetAvailabilityForm();
       refetchAvailability();
     },
     onError: (error) => {
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: error.message,
-        variant: "destructive",
       });
     },
   });
 
   const deleteAvailability = trpc.trainerAvailability.delete.useMutation({
     onSuccess: () => {
-      toast({ title: "Availability removed" });
+      toast.success("Availability removed");
       refetchAvailability();
     },
     onError: (error) => {
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: error.message,
-        variant: "destructive",
       });
     },
   });
@@ -229,10 +214,8 @@ function LessonSchedulingContent() {
 
   const handleCreateBooking = () => {
     if (!bookingForm.trainerId || !bookingForm.lessonDate) {
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: "Please fill in required fields",
-        variant: "destructive",
       });
       return;
     }
@@ -255,10 +238,8 @@ function LessonSchedulingContent() {
       !availabilityForm.startTime ||
       !availabilityForm.endTime
     ) {
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: "Please fill in all fields",
-        variant: "destructive",
       });
       return;
     }

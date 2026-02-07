@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type compatibility issues
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -128,8 +127,8 @@ export default function Pricing() {
       );
     if (plan === "stable")
       return (
-        subscriptionStatus.plan === "stable_monthly" ||
-        subscriptionStatus.plan === "stable_yearly"
+        (subscriptionStatus.plan as string) === "stable_monthly" ||
+        (subscriptionStatus.plan as string) === "stable_yearly"
       );
     return false;
   };
@@ -222,7 +221,7 @@ export default function Pricing() {
               <div className="mt-4">
                 <span className="text-4xl font-bold">
                   £
-                  {pricing?.monthly.amount
+                  {pricing?.monthly?.amount
                     ? (pricing.monthly.amount / 100).toFixed(2)
                     : "7.99"}
                 </span>
@@ -230,7 +229,7 @@ export default function Pricing() {
               </div>
               <p className="text-sm text-muted-foreground">
                 or £
-                {pricing?.yearly.amount
+                {pricing?.yearly?.amount
                   ? (pricing.yearly.amount / 100).toFixed(2)
                   : "79.90"}
                 /year

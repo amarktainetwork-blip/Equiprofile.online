@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type compatibility issues
 import { useState } from "react";
 import { trpc } from "../_core/trpc";
 import { useRealtimeModule } from "../hooks/useRealtime";
@@ -98,17 +97,34 @@ function AppointmentsContent() {
 
     try {
       const payload = {
-        ...formData,
         horseId: parseInt(formData.horseId),
-        costInPence: formData.cost
+        appointmentType: formData.type,
+        title: `${formData.type} - ${formData.provider}`,
+        description: formData.notes || undefined,
+        appointmentDate: formData.appointmentDate,
+        appointmentTime: formData.appointmentTime || undefined,
+        providerName: formData.provider || undefined,
+        location: formData.location || undefined,
+        cost: formData.cost
           ? Math.round(parseFloat(formData.cost) * 100)
-          : null,
+          : undefined,
+        status: formData.status as "scheduled" | "confirmed" | "completed" | "cancelled" | undefined,
+        notes: formData.notes || undefined,
       };
 
       if (editingAppointment) {
         await updateMutation.mutateAsync({
           id: editingAppointment.id,
-          ...payload,
+          appointmentType: payload.appointmentType,
+          title: payload.title,
+          description: payload.description,
+          appointmentDate: payload.appointmentDate,
+          appointmentTime: payload.appointmentTime,
+          providerName: payload.providerName,
+          location: payload.location,
+          cost: payload.cost,
+          status: payload.status,
+          notes: payload.notes,
         });
         toast({ title: "Appointment updated successfully" });
       } else {
@@ -132,18 +148,18 @@ function AppointmentsContent() {
     setEditingAppointment(appointment);
     setFormData({
       horseId: appointment.horseId?.toString() || "",
-      type: appointment.type,
+      type: appointment.appointmentType || appointment.type || "",
       appointmentDate: appointment.appointmentDate
         ? new Date(appointment.appointmentDate).toISOString().split("T")[0]
         : "",
       appointmentTime: appointment.appointmentTime || "",
-      provider: appointment.provider || "",
+      provider: appointment.providerName || appointment.provider || "",
       location: appointment.location || "",
-      cost: appointment.costInPence
-        ? (appointment.costInPence / 100).toFixed(2)
+      cost: appointment.cost
+        ? (appointment.cost / 100).toFixed(2)
         : "",
-      status: appointment.status,
-      reminder: appointment.reminder || "",
+      status: appointment.status || "scheduled",
+      reminder: "",
       notes: appointment.notes || "",
     });
     setOpen(true);
@@ -423,12 +439,12 @@ function AppointmentsContent() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="font-semibold text-lg">
-                        {appointment.provider}
+                        {appointment.title || appointment.providerName || appointment.provider}
                       </h3>
                       <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${getTypeBadge(appointment.type)}`}
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${getTypeBadge(appointment.appointmentType || appointment.type)}`}
                       >
-                        {appointment.type}
+                        {appointment.appointmentType || appointment.type}
                       </span>
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadge(appointment.status)}`}
@@ -458,10 +474,10 @@ function AppointmentsContent() {
                         <strong>Location:</strong> {appointment.location}
                       </p>
                     )}
-                    {appointment.costInPence && (
+                    {appointment.cost && (
                       <p className="text-sm">
                         <strong>Cost:</strong> £
-                        {(appointment.costInPence / 100).toFixed(2)}
+                        {(appointment.cost / 100).toFixed(2)}
                       </p>
                     )}
                     {appointment.notes && (
@@ -507,11 +523,11 @@ function AppointmentsContent() {
               <div className="flex justify-between items-start">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <h3 className="font-semibold">{appointment.provider}</h3>
+                    <h3 className="font-semibold">{appointment.title || appointment.providerName || appointment.provider}</h3>
                     <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${getTypeBadge(appointment.type)}`}
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${getTypeBadge(appointment.appointmentType || appointment.type)}`}
                     >
-                      {appointment.type}
+                      {appointment.appointmentType || appointment.type}
                     </span>
                   </div>
                   <p className="text-sm text-gray-600">

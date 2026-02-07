@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type compatibility issues
 import { useState } from "react";
 import { DashboardLayout } from "../components/DashboardLayout";
 import { trpc } from "../lib/trpc";
@@ -89,18 +88,18 @@ export default function Pedigree() {
       setFormData({
         sireName: pedigreeData.sireName || "",
         damName: pedigreeData.damName || "",
-        paternalGrandsireName: pedigreeData.paternalGrandsireName || "",
-        paternalGrandamName: pedigreeData.paternalGrandamName || "",
-        maternalGrandsireName: pedigreeData.maternalGrandsireName || "",
-        maternalGrandamName: pedigreeData.maternalGrandamName || "",
-        paternalGreatGrandsire1: pedigreeData.paternalGreatGrandsire1 || "",
-        paternalGreatGranddam1: pedigreeData.paternalGreatGranddam1 || "",
-        paternalGreatGrandsire2: pedigreeData.paternalGreatGrandsire2 || "",
-        paternalGreatGranddam2: pedigreeData.paternalGreatGranddam2 || "",
-        maternalGreatGrandsire1: pedigreeData.maternalGreatGrandsire1 || "",
-        maternalGreatGranddam1: pedigreeData.maternalGreatGranddam1 || "",
-        maternalGreatGrandsire2: pedigreeData.maternalGreatGrandsire2 || "",
-        maternalGreatGranddam2: pedigreeData.maternalGreatGranddam2 || "",
+        paternalGrandsireName: pedigreeData.sireOfSireName || "",
+        paternalGrandamName: pedigreeData.damOfSireName || "",
+        maternalGrandsireName: pedigreeData.sireOfDamName || "",
+        maternalGrandamName: pedigreeData.damOfDamName || "",
+        paternalGreatGrandsire1: "",
+        paternalGreatGranddam1: "",
+        paternalGreatGrandsire2: "",
+        paternalGreatGranddam2: "",
+        maternalGreatGrandsire1: "",
+        maternalGreatGranddam1: "",
+        maternalGreatGrandsire2: "",
+        maternalGreatGranddam2: "",
       });
       setIsDialogOpen(true);
     }
@@ -513,7 +512,7 @@ export default function Pedigree() {
                               Paternal Grandsire
                             </p>
                             <p className="text-sm font-medium">
-                              {pedigreeData.paternalGrandsireName || "-"}
+                              {pedigreeData.sireOfSireName || "-"}
                             </p>
                           </CardContent>
                         </Card>
@@ -523,7 +522,7 @@ export default function Pedigree() {
                               Paternal Granddam
                             </p>
                             <p className="text-sm font-medium">
-                              {pedigreeData.paternalGrandamName || "-"}
+                              {pedigreeData.damOfSireName || "-"}
                             </p>
                           </CardContent>
                         </Card>
@@ -533,7 +532,7 @@ export default function Pedigree() {
                               Maternal Grandsire
                             </p>
                             <p className="text-sm font-medium">
-                              {pedigreeData.maternalGrandsireName || "-"}
+                              {pedigreeData.sireOfDamName || "-"}
                             </p>
                           </CardContent>
                         </Card>
@@ -543,7 +542,7 @@ export default function Pedigree() {
                               Maternal Granddam
                             </p>
                             <p className="text-sm font-medium">
-                              {pedigreeData.maternalGrandamName || "-"}
+                              {pedigreeData.damOfDamName || "-"}
                             </p>
                           </CardContent>
                         </Card>
@@ -559,56 +558,56 @@ export default function Pedigree() {
                         <Card className="bg-blue-100">
                           <CardContent className="pt-2 px-2">
                             <p className="text-xs">
-                              {pedigreeData.paternalGreatGrandsire1 || "-"}
+                              {"-"}
                             </p>
                           </CardContent>
                         </Card>
                         <Card className="bg-pink-100">
                           <CardContent className="pt-2 px-2">
                             <p className="text-xs">
-                              {pedigreeData.paternalGreatGranddam1 || "-"}
+                              {"-"}
                             </p>
                           </CardContent>
                         </Card>
                         <Card className="bg-blue-100">
                           <CardContent className="pt-2 px-2">
                             <p className="text-xs">
-                              {pedigreeData.paternalGreatGrandsire2 || "-"}
+                              {"-"}
                             </p>
                           </CardContent>
                         </Card>
                         <Card className="bg-pink-100">
                           <CardContent className="pt-2 px-2">
                             <p className="text-xs">
-                              {pedigreeData.paternalGreatGranddam2 || "-"}
+                              {"-"}
                             </p>
                           </CardContent>
                         </Card>
                         <Card className="bg-blue-100">
                           <CardContent className="pt-2 px-2">
                             <p className="text-xs">
-                              {pedigreeData.maternalGreatGrandsire1 || "-"}
+                              {"-"}
                             </p>
                           </CardContent>
                         </Card>
                         <Card className="bg-pink-100">
                           <CardContent className="pt-2 px-2">
                             <p className="text-xs">
-                              {pedigreeData.maternalGreatGranddam1 || "-"}
+                              {"-"}
                             </p>
                           </CardContent>
                         </Card>
                         <Card className="bg-blue-100">
                           <CardContent className="pt-2 px-2">
                             <p className="text-xs">
-                              {pedigreeData.maternalGreatGrandsire2 || "-"}
+                              {"-"}
                             </p>
                           </CardContent>
                         </Card>
                         <Card className="bg-pink-100">
                           <CardContent className="pt-2 px-2">
                             <p className="text-xs">
-                              {pedigreeData.maternalGreatGranddam2 || "-"}
+                              {"-"}
                             </p>
                           </CardContent>
                         </Card>
