@@ -82,9 +82,15 @@ function NutritionLogsContent() {
         feedType: formData.feedType || "mixed",
         feedName: formData.feedType || undefined,
         amount: formData.feedAmount || undefined,
-        mealTime: [formData.breakfast, formData.lunch, formData.dinner, formData.nightFeed]
-          .filter(Boolean)
-          .join(", ") || undefined,
+        mealTime:
+          [
+            formData.breakfast,
+            formData.lunch,
+            formData.dinner,
+            formData.nightFeed,
+          ]
+            .filter(Boolean)
+            .join(", ") || undefined,
         supplements: formData.supplements || undefined,
         hay: formData.hayAmount || undefined,
         water: formData.waterConsumption || undefined,

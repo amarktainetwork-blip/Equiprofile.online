@@ -151,9 +151,7 @@ function XraysContent() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const costInPence = Math.round(
-      parseFloat(formData.cost.toString()) * 100,
-    );
+    const costInPence = Math.round(parseFloat(formData.cost.toString()) * 100);
 
     const payload = {
       horseId: formData.horseId,

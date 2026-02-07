@@ -108,7 +108,12 @@ function AppointmentsContent() {
         cost: formData.cost
           ? Math.round(parseFloat(formData.cost) * 100)
           : undefined,
-        status: formData.status as "scheduled" | "confirmed" | "completed" | "cancelled" | undefined,
+        status: formData.status as
+          | "scheduled"
+          | "confirmed"
+          | "completed"
+          | "cancelled"
+          | undefined,
         notes: formData.notes || undefined,
       };
 
@@ -155,9 +160,7 @@ function AppointmentsContent() {
       appointmentTime: appointment.appointmentTime || "",
       provider: appointment.providerName || appointment.provider || "",
       location: appointment.location || "",
-      cost: appointment.cost
-        ? (appointment.cost / 100).toFixed(2)
-        : "",
+      cost: appointment.cost ? (appointment.cost / 100).toFixed(2) : "",
       status: appointment.status || "scheduled",
       reminder: "",
       notes: appointment.notes || "",
@@ -439,7 +442,9 @@ function AppointmentsContent() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="font-semibold text-lg">
-                        {appointment.title || appointment.providerName || appointment.provider}
+                        {appointment.title ||
+                          appointment.providerName ||
+                          appointment.provider}
                       </h3>
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${getTypeBadge(appointment.appointmentType || appointment.type)}`}
@@ -523,7 +528,11 @@ function AppointmentsContent() {
               <div className="flex justify-between items-start">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <h3 className="font-semibold">{appointment.title || appointment.providerName || appointment.provider}</h3>
+                    <h3 className="font-semibold">
+                      {appointment.title ||
+                        appointment.providerName ||
+                        appointment.provider}
+                    </h3>
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${getTypeBadge(appointment.appointmentType || appointment.type)}`}
                     >

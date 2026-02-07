@@ -15,5 +15,14 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["server/**/*.test.ts", "server/**/*.spec.ts"],
+    env: {
+      // Test environment variables
+      NODE_ENV: "test",
+      DATABASE_URL: "mysql://test:test@localhost:3306/test_db",
+      JWT_SECRET: "test_jwt_secret_for_testing_only_min_32_chars",
+      ADMIN_UNLOCK_PASSWORD: "test_admin_password",
+      ENABLE_STRIPE: "false",
+      ENABLE_UPLOADS: "false",
+    },
   },
 });

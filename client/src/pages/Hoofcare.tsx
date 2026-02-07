@@ -148,17 +148,25 @@ function HoofcareContent() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const costInPence = Math.round(
-      parseFloat(formData.cost.toString()) * 100,
-    );
+    const costInPence = Math.round(parseFloat(formData.cost.toString()) * 100);
 
     const payload = {
       horseId: parseInt(formData.horseId),
       careDate: formData.date,
-      careType: formData.careType as "shoeing" | "trimming" | "remedial" | "inspection" | "other",
+      careType: formData.careType as
+        | "shoeing"
+        | "trimming"
+        | "remedial"
+        | "inspection"
+        | "other",
       farrierName: formData.farrierName || undefined,
       farrierPhone: formData.farrierContact || undefined,
-      hoofCondition: formData.hoofCondition as "excellent" | "good" | "fair" | "poor" | undefined,
+      hoofCondition: formData.hoofCondition as
+        | "excellent"
+        | "good"
+        | "fair"
+        | "poor"
+        | undefined,
       workPerformed: formData.workPerformed || undefined,
       findings: formData.findings || undefined,
       nextDueDate: formData.nextDueDate || undefined,
@@ -181,7 +189,8 @@ function HoofcareContent() {
     setFormData({
       horseId: record.horseId?.toString() || "",
       date:
-        record.careDate?.split("T")[0] || new Date().toISOString().split("T")[0],
+        record.careDate?.split("T")[0] ||
+        new Date().toISOString().split("T")[0],
       careType: record.careType || "shoeing",
       farrierName: record.farrierName || "",
       farrierContact: record.farrierPhone || "",

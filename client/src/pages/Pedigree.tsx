@@ -557,58 +557,42 @@ export default function Pedigree() {
                       <div className="grid grid-cols-8 gap-1">
                         <Card className="bg-blue-100">
                           <CardContent className="pt-2 px-2">
-                            <p className="text-xs">
-                              {"-"}
-                            </p>
+                            <p className="text-xs">{"-"}</p>
                           </CardContent>
                         </Card>
                         <Card className="bg-pink-100">
                           <CardContent className="pt-2 px-2">
-                            <p className="text-xs">
-                              {"-"}
-                            </p>
+                            <p className="text-xs">{"-"}</p>
                           </CardContent>
                         </Card>
                         <Card className="bg-blue-100">
                           <CardContent className="pt-2 px-2">
-                            <p className="text-xs">
-                              {"-"}
-                            </p>
+                            <p className="text-xs">{"-"}</p>
                           </CardContent>
                         </Card>
                         <Card className="bg-pink-100">
                           <CardContent className="pt-2 px-2">
-                            <p className="text-xs">
-                              {"-"}
-                            </p>
+                            <p className="text-xs">{"-"}</p>
                           </CardContent>
                         </Card>
                         <Card className="bg-blue-100">
                           <CardContent className="pt-2 px-2">
-                            <p className="text-xs">
-                              {"-"}
-                            </p>
+                            <p className="text-xs">{"-"}</p>
                           </CardContent>
                         </Card>
                         <Card className="bg-pink-100">
                           <CardContent className="pt-2 px-2">
-                            <p className="text-xs">
-                              {"-"}
-                            </p>
+                            <p className="text-xs">{"-"}</p>
                           </CardContent>
                         </Card>
                         <Card className="bg-blue-100">
                           <CardContent className="pt-2 px-2">
-                            <p className="text-xs">
-                              {"-"}
-                            </p>
+                            <p className="text-xs">{"-"}</p>
                           </CardContent>
                         </Card>
                         <Card className="bg-pink-100">
                           <CardContent className="pt-2 px-2">
-                            <p className="text-xs">
-                              {"-"}
-                            </p>
+                            <p className="text-xs">{"-"}</p>
                           </CardContent>
                         </Card>
                       </div>

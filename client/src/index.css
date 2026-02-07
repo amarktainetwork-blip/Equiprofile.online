@@ -484,7 +484,9 @@
 
   /* Enhanced 3D Hover Effects */
   .hover-lift {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
   }
 
   .hover-lift:hover {
@@ -661,7 +663,8 @@
 
   /* Hero text animation */
   .hero-text-glow {
-    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5),
+    text-shadow:
+      0 0 20px rgba(255, 255, 255, 0.5),
       0 0 40px rgba(255, 255, 255, 0.3);
   }
 

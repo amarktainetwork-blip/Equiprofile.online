@@ -84,7 +84,9 @@ export default function Dewormings() {
         activeIngredient: formData.activeIngredient || undefined,
         dosage: formData.dosage || undefined,
         weight: formData.weight ? parseFloat(formData.weight) : undefined,
-        nextDueDate: formData.nextDueDate ? new Date(formData.nextDueDate) : undefined,
+        nextDueDate: formData.nextDueDate
+          ? new Date(formData.nextDueDate)
+          : undefined,
         dateAdministered: new Date(formData.dateAdministered),
         cost: formData.cost
           ? Math.round(parseFloat(formData.cost) * 100)

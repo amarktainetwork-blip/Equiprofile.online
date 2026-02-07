@@ -111,7 +111,11 @@ function TreatmentsContent() {
         cost: formData.cost
           ? Math.round(parseFloat(formData.cost) * 100)
           : undefined,
-        status: formData.status as "active" | "completed" | "discontinued" | undefined,
+        status: formData.status as
+          | "active"
+          | "completed"
+          | "discontinued"
+          | undefined,
         notes: formData.notes || undefined,
       };
 
@@ -164,9 +168,7 @@ function TreatmentsContent() {
         : "",
       vet: treatment.vetName || treatment.vet || "",
       vetClinic: treatment.vetClinic || "",
-      cost: treatment.cost
-        ? (treatment.cost / 100).toFixed(2)
-        : "",
+      cost: treatment.cost ? (treatment.cost / 100).toFixed(2) : "",
       status: treatment.status,
       notes: treatment.notes || "",
     });
@@ -529,7 +531,9 @@ function TreatmentsContent() {
               <div className="flex justify-between items-start">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <h3 className="font-semibold">{treatment.treatmentName || treatment.name}</h3>
+                    <h3 className="font-semibold">
+                      {treatment.treatmentName || treatment.name}
+                    </h3>
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadge(treatment.status)}`}
                     >
