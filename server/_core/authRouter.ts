@@ -2,12 +2,23 @@ import express, { Router } from "express";
 import bcrypt from "bcrypt";
 import { nanoid } from "nanoid";
 import { SignJWT } from "jose";
+import rateLimit from "express-rate-limit";
 import * as db from "../db";
 import * as email from "./email";
 import { ENV } from "./env";
 import { COOKIE_NAME } from "@shared/const";
 
 const router: Router = express.Router();
+
+// Rate limiter for login attempts (5 attempts per 15 minutes)
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5,
+  message: "Too many login attempts from this IP, please try again later.",
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true, // Don't count successful logins
+});
 
 /**
  * POST /api/auth/signup
@@ -22,10 +33,10 @@ router.post("/signup", async (req, res) => {
       return res.status(400).json({ error: "Email and password are required" });
     }
 
-    if (password.length < 8) {
+    if (password.length < 12) {
       return res
         .status(400)
-        .json({ error: "Password must be at least 8 characters" });
+        .json({ error: "Password must be at least 12 characters" });
     }
 
     // Check if user already exists
@@ -104,7 +115,7 @@ router.post("/signup", async (req, res) => {
  * POST /api/auth/login
  * Login with email/password
  */
-router.post("/login", async (req, res) => {
+router.post("/login", loginLimiter, async (req, res) => {
   try {
     const { email: userEmail, password } = req.body;
 
@@ -233,10 +244,10 @@ router.post("/reset-password", async (req, res) => {
       return res.status(400).json({ error: "Token and password are required" });
     }
 
-    if (password.length < 8) {
+    if (password.length < 12) {
       return res
         .status(400)
-        .json({ error: "Password must be at least 8 characters" });
+        .json({ error: "Password must be at least 12 characters" });
     }
 
     // Find user by reset token
