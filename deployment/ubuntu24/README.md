@@ -108,7 +108,7 @@ curl http://your-server-ip
 
 ## Environment Variables
 
-When the installation script pauses, you'll need to configure `/var/www/equiprofile/.env`.
+When the installation script pauses, you'll need to configure `/var/equiprofile/app/.env`.
 
 ### Required Variables (Core)
 
@@ -181,7 +181,7 @@ VITE_PWA_ENABLED=false  # Set to 'true' to enable
 
 ```bash
 # Edit environment file
-nano /var/www/equiprofile/.env
+nano /var/equiprofile/app/.env
 
 # Minimal production configuration:
 NODE_ENV=production
@@ -291,7 +291,7 @@ journalctl -u equiprofile -n 100
 
 # Common issues:
 # 1. Check .env file exists and is configured
-ls -la /var/www/equiprofile/.env
+ls -la /var/equiprofile/app/.env
 
 # 2. Check database connection
 mysql -u username -p -h localhost database_name
@@ -334,7 +334,7 @@ FLUSH PRIVILEGES;
 openssl rand -base64 32
 
 # Update .env
-nano /var/www/equiprofile/.env
+nano /var/equiprofile/app/.env
 # Set JWT_SECRET=<generated value>
 
 # Restart
@@ -415,7 +415,7 @@ journalctl -u equiprofile -n 100
 
 ```bash
 # Navigate to application directory
-cd /var/www/equiprofile
+cd /var/equiprofile/app
 
 # Pull latest changes
 sudo -u equiprofile git pull
@@ -445,7 +445,7 @@ mysqldump -u username -p'password' equiprofile > $BACKUP_DIR/db-$DATE.sql
 gzip $BACKUP_DIR/db-$DATE.sql
 
 # Backup uploads (if enabled)
-tar -czf $BACKUP_DIR/uploads-$DATE.tar.gz /var/www/equiprofile/uploads 2>/dev/null
+tar -czf $BACKUP_DIR/uploads-$DATE.tar.gz /var/equiprofile/app/uploads 2>/dev/null
 
 # Keep last 7 days
 find $BACKUP_DIR -name "*.gz" -mtime +7 -delete
@@ -500,7 +500,7 @@ This will:
 
 ```bash
 # Edit .env
-nano /var/www/equiprofile/.env
+nano /var/equiprofile/app/.env
 # Change: PORT=3001
 
 # Update nginx config
