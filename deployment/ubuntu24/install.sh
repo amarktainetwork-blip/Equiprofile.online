@@ -112,7 +112,7 @@ echo ""
 # ==============================================================================
 log_info "Step 2/8: Setting up application directory..."
 
-APP_DIR="/var/www/equiprofile"
+APP_DIR="/var/equiprofile/app"
 
 if [ ! -d "$APP_DIR" ]; then
     mkdir -p "$APP_DIR"
@@ -121,9 +121,11 @@ else
     log_info "Directory already exists: $APP_DIR"
 fi
 
-# Set ownership
-chown -R equiprofile:equiprofile "$APP_DIR"
-log_success "Set ownership to equiprofile:equiprofile"
+# Set ownership - using www-data for compatibility with nginx
+# Note: We use www-data instead of creating a separate user for simplicity
+# and compatibility with standard web server deployments
+chown -R www-data:www-data "$APP_DIR"
+log_success "Set ownership to www-data:www-data"
 echo ""
 
 # ==============================================================================
@@ -141,7 +143,7 @@ if [[ "$SCRIPT_DIR" == *"/deployment/ubuntu24"* ]]; then
     if [ "$REPO_ROOT" != "$APP_DIR" ]; then
         log_info "Copying files to $APP_DIR..."
         rsync -av --exclude='.git' --exclude='node_modules' --exclude='dist' "$REPO_ROOT/" "$APP_DIR/"
-        chown -R equiprofile:equiprofile "$APP_DIR"
+        chown -R www-data:www-data "$APP_DIR"
     fi
 else
     log_warn "Not running from repository. You'll need to manually copy files to $APP_DIR"
@@ -186,7 +188,7 @@ else
     log_info ".env already exists"
 fi
 
-chown equiprofile:equiprofile "$APP_DIR/.env"
+chown www-data:www-data "$APP_DIR/.env"
 chmod 600 "$APP_DIR/.env"
 log_success "Environment configuration ready"
 echo ""
@@ -196,9 +198,9 @@ echo ""
 # ==============================================================================
 log_info "Step 5/8: Installing dependencies and building..."
 
-# Switch to equiprofile user for npm operations
-sudo -u equiprofile bash << 'EOF'
-cd /var/www/equiprofile
+# Switch to www-data user for npm operations
+sudo -u www-data bash << 'EOF'
+cd /var/equiprofile/app
 pnpm install --frozen-lockfile
 if [ $? -ne 0 ]; then
     echo "Failed to install dependencies"
@@ -210,8 +212,8 @@ log_success "Dependencies installed"
 
 # Build application
 log_info "Building application..."
-sudo -u equiprofile bash << 'EOF'
-cd /var/www/equiprofile
+sudo -u www-data bash << 'EOF'
+cd /var/equiprofile/app
 pnpm build
 if [ $? -ne 0 ]; then
     echo "Build failed"
