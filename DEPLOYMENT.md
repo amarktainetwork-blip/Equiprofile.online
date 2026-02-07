@@ -44,16 +44,19 @@ Complete guide to deploying EquiProfile on Ubuntu 24.04 VPS (optimized for Webdo
 
 ## Quick Start
 
-Deploy EquiProfile in under 20 minutes on a fresh Webdock VPS:
+Deploy EquiProfile in under 20 minutes on a fresh Ubuntu 24.04 VPS:
 
 ```bash
-# 1. Clone repository to deployment directory
+# Fresh install on Ubuntu 24.04
+sudo bash deployment/ubuntu24/install.sh
+
+# Or clone and deploy manually
 sudo mkdir -p /var/equiprofile
 cd /var/equiprofile
 sudo git clone https://github.com/amarktainetwork-blip/Equiprofile.online.git app
 cd app
 
-# 2. Create environment file
+# Create environment file
 sudo cp .env.example .env
 sudo nano .env
 # REQUIRED: Set these variables:
@@ -62,11 +65,11 @@ sudo nano .env
 #   ADMIN_UNLOCK_PASSWORD=<secure-password>
 #   BASE_URL=https://equiprofile.online
 
-# 3. Run deployment script
-sudo bash ops/deploy.sh --domain equiprofile.online
+# Run deployment script
+sudo bash deployment/deploy.sh --domain equiprofile.online
 
-# 4. Verify deployment
-sudo bash ops/verify.sh --domain equiprofile.online
+# Verify deployment
+bash scripts/smoke_prod.sh https://equiprofile.online
 ```
 
 Your EquiProfile instance is now running at `https://equiprofile.online`!
@@ -182,10 +185,10 @@ APP_SECRET=<oauth-app-secret>
 
 ```bash
 # Full deployment with SSL
-sudo bash ops/deploy.sh --domain equiprofile.online
+sudo bash deployment/deploy.sh --domain equiprofile.online
 
 # Or specify custom options
-sudo bash ops/deploy.sh \
+sudo bash deployment/deploy.sh \
   --domain equiprofile.online \
   --root /var/equiprofile/app \
   --user www-data \
@@ -194,24 +197,26 @@ sudo bash ops/deploy.sh \
 
 The deployment script will:
 
-1. ✓ Run pre-flight checks
-2. ✓ Install Node.js and dependencies
-3. ✓ Setup deployment directory
-4. ✓ Set proper ownership
-5. ✓ Stop old services
-6. ✓ Install dependencies (npm ci)
-7. ✓ Build application
-8. ✓ Configure systemd service
-9. ✓ Configure nginx with SSL
-10. ✓ Setup log rotation
-11. ✓ Start application
-12. ✓ Run health checks
+1. ✓ Install Node.js and dependencies
+2. ✓ Setup deployment directory
+3. ✓ Set proper ownership
+4. ✓ Stop old services
+5. ✓ Install dependencies (npm ci)
+6. ✓ Build application
+7. ✓ Configure systemd service (deployment/equiprofile.service)
+8. ✓ Configure nginx with SSL (deployment/nginx/equiprofile.conf)
+9. ✓ Setup log rotation
+10. ✓ Start application
+11. ✓ Run health checks
 
 ### Step 3: Verify Deployment
 
 ```bash
-# Run verification script
-sudo bash ops/verify.sh --domain equiprofile.online
+# Run smoke test
+bash scripts/smoke_prod.sh https://equiprofile.online
+
+# Or run system health check
+sudo bash deployment/doctor.sh
 ```
 
 Verification checks:
@@ -235,22 +240,25 @@ Verification checks:
 cd /var/equiprofile/app
 
 # Deploy latest from main branch
-sudo bash ops/deploy.sh --domain equiprofile.online main
+sudo bash deployment/deploy.sh --domain equiprofile.online main
 
 # Or deploy from specific branch
-sudo bash ops/deploy.sh --domain equiprofile.online develop
+sudo bash deployment/deploy.sh --domain equiprofile.online develop
 ```
 
 ### Deployment Logs
 
-All deployment logs are saved to `/var/equiprofile/_ops/deploy_YYYYMMDD_HHMMSS.log`
+Deployment progress is logged to `/var/log/equiprofile/`
 
 ```bash
-# View latest deployment log
-ls -lt /var/equiprofile/_ops/deploy_*.log | head -1 | xargs cat
+# View recent logs
+sudo journalctl -u equiprofile -n 100
 
-# Follow deployment in real-time (in another terminal)
-tail -f /var/equiprofile/_ops/deploy_*.log
+# Follow logs in real-time
+sudo journalctl -u equiprofile -f
+
+# View nginx error logs
+tail -f /var/log/nginx/equiprofile-error.log
 ```
 
 ### SSH-Disconnect-Safe Deployment
@@ -260,12 +268,12 @@ To run deployment that continues even if SSH disconnects:
 ```bash
 # Option 1: Use screen
 screen -S deploy
-sudo bash ops/deploy.sh --domain equiprofile.online
+sudo bash deployment/deploy.sh --domain equiprofile.online
 # Press Ctrl+A then D to detach
 # Reattach with: screen -r deploy
 
 # Option 2: Use nohup
-nohup sudo bash ops/deploy.sh --domain equiprofile.online > /tmp/deploy.log 2>&1 &
+nohup sudo bash deployment/deploy.sh --domain equiprofile.online > /tmp/deploy.log 2>&1 &
 tail -f /tmp/deploy.log
 ```
 
@@ -457,8 +465,8 @@ journalctl -u equiprofile -f
 # Check deployed version
 curl http://127.0.0.1:3000/api/version
 
-# Run verification
-sudo bash /var/equiprofile/app/ops/verify.sh --domain equiprofile.online
+# Run system health check
+sudo bash /var/equiprofile/app/deployment/doctor.sh
 ```
 
 ---
@@ -469,7 +477,7 @@ sudo bash /var/equiprofile/app/ops/verify.sh --domain equiprofile.online
 
 ```bash
 # Deploy on different port
-sudo bash ops/deploy.sh --domain equiprofile.online --port 3001
+sudo bash deployment/deploy.sh --domain equiprofile.online --port 3001
 
 # Update .env
 sudo nano /var/equiprofile/app/.env
@@ -480,10 +488,10 @@ sudo nano /var/equiprofile/app/.env
 
 ```bash
 # Production
-sudo bash ops/deploy.sh --domain equiprofile.online --root /var/equiprofile/prod main
+sudo bash deployment/deploy.sh --domain equiprofile.online --root /var/equiprofile/app main
 
 # Staging
-sudo bash ops/deploy.sh --domain staging.equiprofile.online --root /var/equiprofile/staging --port 3001 develop
+sudo bash deployment/deploy.sh --domain staging.equiprofile.online --root /var/equiprofile/staging --port 3001 develop
 ```
 
 ### Resource Limits
@@ -545,243 +553,27 @@ For issues or questions:
 
 MIT License - See LICENSE file for details
 
-# Option 2: Use corepack (recommended)
-
-corepack enable
-corepack prepare pnpm@latest --activate
-
-# Verify installation
-
-pnpm --version # Should be v10.x or higher
-
-````
-
-#### 1.4. Install Nginx
-
-```bash
-sudo apt-get install -y nginx
-
-# Start and enable nginx
-sudo systemctl start nginx
-sudo systemctl enable nginx
-
-# Verify installation
-nginx -v
-````
-
-#### 1.5. Install Certbot (for SSL)
-
-```bash
-sudo apt-get install -y certbot python3-certbot-nginx
-
-# Verify installation
-certbot --version
-```
-
-#### 1.6. Install MySQL (Optional)
-
-For production deployments, MySQL is recommended:
-
-```bash
-sudo apt-get install -y mysql-server
-
-# Secure installation
-sudo mysql_secure_installation
-
-# Create database
-sudo mysql <<EOF
-CREATE DATABASE equiprofile CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'equiprofile'@'localhost' IDENTIFIED BY 'your_strong_password';
-GRANT ALL PRIVILEGES ON equiprofile.* TO 'equiprofile'@'localhost';
-FLUSH PRIVILEGES;
-EOF
-```
-
-For small deployments, SQLite works fine (no installation required).
-
-### Step 2: Clone Repository
-
-```bash
-# Clone to home directory or /opt
-cd /opt
-sudo git clone https://github.com/amarktainetwork-blip/Equiprofile.online.git
-cd Equiprofile.online
-```
-
-### Step 3: Configure Environment
-
-#### 3.1. Create .env File
-
-```bash
-cp .env.example .env
-nano .env
-```
-
-#### 3.2. Required Configuration
-
-Update these critical values:
-
-```env
-# Application
-NODE_ENV=production
-PORT=3000
-HOST=127.0.0.1
-BASE_URL=https://your-domain.com
-
-# Database (choose one)
-# MySQL:
-DATABASE_URL=mysql://equiprofile:your_db_password@localhost:3306/equiprofile
-# SQLite:
-# DATABASE_URL=sqlite:./data/equiprofile.db
-
-# Security (MUST CHANGE!)
-JWT_SECRET=<run: openssl rand -base64 32>
-ADMIN_UNLOCK_PASSWORD=<your_secure_admin_password>
-
-# Feature flags
-ENABLE_STRIPE=false    # Set to true only if you need billing
-ENABLE_UPLOADS=false   # Set to true only if you need file uploads
-ENABLE_PWA=false       # Set to true only if you want offline support
-```
-
-#### 3.3. Generate Secure Secrets
-
-```bash
-# Generate JWT secret (32+ characters)
-openssl rand -base64 32
-
-# Generate admin password
-openssl rand -base64 16
-```
-
-⚠️ **CRITICAL**: The application will refuse to start in production if you don't change JWT_SECRET and ADMIN_UNLOCK_PASSWORD from defaults!
-
-#### 3.4. Optional Features
-
-**Stripe Billing** (if ENABLE_STRIPE=true):
-
-```env
-STRIPE_SECRET_KEY=sk_live_xxxxx
-STRIPE_PUBLISHABLE_KEY=pk_live_xxxxx
-STRIPE_WEBHOOK_SECRET=whsec_xxxxx
-STRIPE_MONTHLY_PRICE_ID=price_xxxxx
-STRIPE_YEARLY_PRICE_ID=price_xxxxx
-```
-
-**File Uploads** (if ENABLE_UPLOADS=true):
-
-```env
-BUILT_IN_FORGE_API_URL=https://your-forge-api.com
-BUILT_IN_FORGE_API_KEY=your_forge_api_key
-# OR use AWS S3:
-# AWS_ACCESS_KEY_ID=your_key
-# AWS_SECRET_ACCESS_KEY=your_secret
-# AWS_REGION=us-east-1
-# AWS_S3_BUCKET=equiprofile-uploads
-```
-
-**Email Notifications** (optional):
-
-```env
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your-email@gmail.com
-SMTP_PASSWORD=your-app-password
-SMTP_FROM=noreply@equiprofile.online
-```
-
-### Step 4: Run Pre-flight Checks
-
-Before deploying, verify your system is ready:
-
-```bash
-bash ops/preflight.sh
-```
-
-This checks:
-
-- ✅ OS version (Ubuntu 24.04 or 22.04)
-- ✅ Node.js version (≥20.x)
-- ✅ pnpm version (≥10.x)
-- ✅ Port availability (3000, 80, 443)
-- ✅ Disk space (≥5GB)
-- ✅ RAM (≥2GB)
-- ✅ nginx installed
-- ✅ MySQL/MariaDB (optional)
-- ✅ certbot installed
-
-Fix any critical issues before proceeding.
-
-### Step 5: Deploy
-
-Run the automated deployment script:
-
-```bash
-sudo bash ops/deploy.sh \
-  --domain your-domain.com \
-  --root /var/equiprofile/app \
-  --user www-data \
-  --port 3000
-```
-
-**Command Options:**
-
-- `--domain DOMAIN` - Your domain name (required for SSL)
-- `--root PATH` - Installation directory (default: `/var/equiprofile/app`)
-- `--user USER` - System user to run service (default: `www-data`)
-- `--port PORT` - Backend port (default: `3000`)
-- `--no-ssl` - Skip SSL setup (HTTP-only mode)
-- `--resume` - Resume failed deployment
-
-**What the script does:**
-
-1. ✅ Validates Node.js and pnpm
-2. ✅ Sets up deployment directory
-3. ✅ Sets ownership and permissions
-4. ✅ Stops old services and clears port conflicts
-5. ✅ Installs dependencies (`pnpm install --frozen-lockfile`)
-6. ✅ Builds application (with memory-safe flags)
-7. ✅ Configures systemd service
-8. ✅ Configures nginx with proper cache headers
-9. ✅ Sets up log rotation
-10. ✅ Starts service
-11. ✅ Runs health checks
-12. ✅ Configures SSL with Let's Encrypt (if domain provided)
-
-The deployment takes 5-10 minutes depending on server specs.
-
-### Step 6: Verify Deployment
-
-```bash
-bash ops/verify.sh --domain your-domain.com
-```
-
-This checks:
-
-- ✅ Only ONE service running (no duplicates)
-- ✅ Health endpoints return 200
-- ✅ Frontend serves hashed assets
-- ✅ nginx listens on ports 80 and 443
-- ✅ Service bound to correct port (no auto-switching)
-- ✅ Service worker disabled by default
-
-If all checks pass, you're done! 🎉
-
-### Step 7: Access Your Application
-
-Your EquiProfile instance is now available at:
-
-- **HTTPS**: `https://your-domain.com`
-- **API Health**: `https://your-domain.com/api/health`
-- **Backend**: `http://127.0.0.1:3000` (local only)
-
 ---
 
 ## Configuration
 
+### Canonical Deployment Settings
+
+EquiProfile uses these standard paths and settings:
+
+- **App root**: `/var/equiprofile/app`
+- **Logs directory**: `/var/log/equiprofile/`
+- **Node.js listens on**: `127.0.0.1:3000` (localhost only)
+- **Systemd service name**: `equiprofile`
+- **Systemd service file**: `deployment/equiprofile.service`
+- **Nginx config template**: `deployment/nginx/equiprofile.conf`
+- **Build outputs**: `dist/public/` (static files), `dist/index.js` (server)
+- **Deployment scripts**: `deployment/deploy.sh`, `deployment/ubuntu24/install.sh`
+- **Verification**: `scripts/smoke_prod.sh`, `deployment/doctor.sh`
+
 ### Nginx Configuration
 
-The deployment automatically configures nginx at `/etc/nginx/sites-available/equiprofile`.
+The deployment automatically configures nginx at `/etc/nginx/sites-available/equiprofile` (from `deployment/nginx/equiprofile.conf`).
 
 **Key features:**
 
@@ -813,7 +605,7 @@ sudo tail -f /var/log/nginx/equiprofile-error.log
 
 ### Systemd Service
 
-The service is installed at `/etc/systemd/system/equiprofile.service`.
+The service is installed at `/etc/systemd/system/equiprofile.service` (from `deployment/equiprofile.service`).
 
 **Service management:**
 
@@ -870,52 +662,9 @@ sudo logrotate -f /etc/logrotate.d/equiprofile
 
 ### Deployment Issues
 
-#### Pre-flight Checks Fail
-
-**Problem**: `ops/preflight.sh` reports errors
-
-**Solutions**:
-
-1. **Node.js version too old**:
-
-   ```bash
-   curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-   sudo apt-get install -y nodejs
-   ```
-
-2. **pnpm not installed**:
-
-   ```bash
-   npm install -g pnpm@latest
-   ```
-
-3. **Port already in use**:
-
-   ```bash
-   # Find process using port
-   lsof -i :3000
-
-   # Kill process
-   sudo kill -9 <PID>
-
-   # Or change port
-   sudo bash ops/deploy.sh --domain your-domain.com --port 3001
-   ```
-
-4. **Insufficient disk space**:
-
-   ```bash
-   # Check disk usage
-   df -h
-
-   # Clean up if needed
-   sudo apt-get autoremove
-   sudo apt-get clean
-   ```
-
 #### Build Fails
 
-**Problem**: Build fails during `pnpm build`
+**Problem**: Build fails during `npm run build`
 
 **Solutions**:
 
@@ -935,13 +684,45 @@ sudo logrotate -f /etc/logrotate.d/equiprofile
    ```bash
    # Clean install
    rm -rf node_modules
-   pnpm install --frozen-lockfile
+   npm ci
    ```
 
 3. **TypeScript errors**:
+
    ```bash
    # Check for syntax errors
-   pnpm check
+   npm run check
+   ```
+
+4. **Node.js version too old**:
+
+   ```bash
+   curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+   sudo apt-get install -y nodejs
+   ```
+
+5. **Port already in use**:
+
+   ```bash
+   # Find process using port
+   lsof -i :3000
+
+   # Kill process
+   sudo kill -9 <PID>
+
+   # Or change port
+   sudo bash deployment/deploy.sh --domain your-domain.com --port 3001
+   ```
+
+6. **Insufficient disk space**:
+
+   ```bash
+   # Check disk usage
+   df -h
+
+   # Clean up if needed
+   sudo apt-get autoremove
+   sudo apt-get clean
    ```
 
 #### Service Won't Start
@@ -1098,7 +879,7 @@ If legitimate files are missing:
 2. **Rebuild if needed**:
    ```bash
    cd /var/equiprofile/app
-   sudo -u www-data pnpm build
+   sudo -u www-data npm run build
    sudo systemctl restart equiprofile
    ```
 
@@ -1119,7 +900,7 @@ By default, service worker is **disabled**. If you previously had PWA enabled:
 
    ```bash
    cd /var/equiprofile/app
-   sudo -u www-data ENABLE_PWA=false pnpm build
+   sudo -u www-data ENABLE_PWA=false npm run build
    sudo systemctl restart equiprofile
    ```
 
@@ -1131,11 +912,11 @@ By default, service worker is **disabled**. If you previously had PWA enabled:
 Use these commands to verify system health:
 
 ```bash
-# Check all services
-bash ops/healthcheck.sh --domain your-domain.com
+# Run system health check
+sudo bash deployment/doctor.sh
 
-# Run full verification
-bash ops/verify.sh --domain your-domain.com
+# Run smoke tests
+bash scripts/smoke_prod.sh https://your-domain.com
 
 # Manual health checks
 curl http://127.0.0.1:3000/api/health
@@ -1156,9 +937,9 @@ sudo tail -f /var/log/nginx/equiprofile-error.log
 To update to a new version:
 
 ```bash
-cd /opt/Equiprofile.online
+cd /var/equiprofile/app
 sudo git pull origin main
-sudo bash ops/deploy.sh --domain your-domain.com --resume
+sudo bash deployment/deploy.sh --domain your-domain.com --resume
 ```
 
 The `--resume` flag safely updates without re-running SSL setup.
@@ -1240,11 +1021,11 @@ sudo apt update && sudo apt upgrade -y
 
 # Update Node.js dependencies
 cd /var/equiprofile/app
-pnpm update
-pnpm audit
+npm update
+npm audit
 
 # Rebuild after updates
-sudo bash ops/deploy.sh --domain your-domain.com --resume
+sudo bash deployment/deploy.sh --domain your-domain.com --resume
 ```
 
 ### Monitoring
@@ -1289,10 +1070,10 @@ sudo nethogs
    sudo journalctl -u equiprofile -n 100
    ```
 
-2. **Run verification**:
+2. **Run health check**:
 
    ```bash
-   bash ops/verify.sh --domain your-domain.com
+   sudo bash deployment/doctor.sh
    ```
 
 3. **Open an issue** on GitHub with:
@@ -1305,19 +1086,21 @@ sudo nethogs
 
 ```bash
 # Deployment
-sudo bash ops/deploy.sh --domain your-domain.com
+sudo bash deployment/deploy.sh --domain your-domain.com
 
-# Verification
-bash ops/verify.sh --domain your-domain.com
+# Fresh install (Ubuntu 24.04)
+sudo bash deployment/ubuntu24/install.sh
 
 # Health checks
-bash ops/healthcheck.sh --domain your-domain.com
+sudo bash deployment/doctor.sh
+bash scripts/smoke_prod.sh --domain your-domain.com
 
 # Service management
 sudo systemctl start|stop|restart|status equiprofile
 
 # View logs
 sudo journalctl -u equiprofile -f
+tail -f /var/log/equiprofile/error.log
 
 # Nginx
 sudo nginx -t

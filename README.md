@@ -116,7 +116,7 @@ The application will be available at `http://localhost:3000`
 
 ## 🚢 Production Deployment
 
-EquiProfile includes a **plug-and-play production deployment system** for Ubuntu 24.04 VPS (optimized for Webdock).
+EquiProfile includes a **plug-and-play production deployment system** for Ubuntu 24.04 VPS.
 
 ### One-Command Deployment
 
@@ -137,14 +137,19 @@ sudo cp .env.example .env
 sudo nano .env
 # REQUIRED: Set DATABASE_URL, JWT_SECRET, ADMIN_UNLOCK_PASSWORD, BASE_URL
 
-# 4. Deploy with SSH-disconnect-safe mode
-sudo bash ops/deploy.sh --unit --domain equiprofile.online
+# 4. Deploy with one of these options:
+
+# Option 1: Fresh Ubuntu 24.04 install (automated setup)
+sudo bash deployment/ubuntu24/install.sh
+
+# Option 2: Manual deployment (if system already configured)
+sudo bash deployment/deploy.sh
 
 # 5. Monitor deployment
 tail -f /var/equiprofile/_ops/deploy_*.log
 
 # 6. Verify after deployment completes
-sudo bash ops/verify.sh --domain equiprofile.online
+bash scripts/smoke_prod.sh https://equiprofile.online
 ```
 
 **Features:**
@@ -154,8 +159,16 @@ sudo bash ops/verify.sh --domain equiprofile.online
 - ✅ **Git-based** - fetch/checkout/reset for clean deploys
 - ✅ **Build verification** - validates all outputs before restart
 - ✅ **Health checks** - confirms API responds before exit
-- ✅ **PWA blocked** - service worker and manifest return 404
 - ✅ **Full logs** - everything logged to `/var/equiprofile/_ops/`
+
+**Canonical Settings:**
+
+- App root: `/var/equiprofile/app`
+- Logs: `/var/log/equiprofile`
+- Node listens on: `127.0.0.1:3000`
+- Systemd service: `equiprofile`
+- Systemd service file: `deployment/equiprofile.service`
+- Nginx config: `deployment/nginx/equiprofile.conf`
 
 ### Prerequisites
 
@@ -199,11 +212,9 @@ The deployment script performs these steps automatically:
 To deploy latest changes:
 
 ```bash
-# Update to latest main branch (SSH-safe)
-sudo bash ops/deploy.sh --unit --domain equiprofile.online main
-
-# Or deploy specific branch
-sudo bash ops/deploy.sh --unit --domain equiprofile.online develop
+# Update to latest main branch
+cd /var/equiprofile/app
+sudo bash deployment/deploy.sh
 
 # View deployment log
 tail -f $(ls -t /var/equiprofile/_ops/deploy_*.log | head -1)
@@ -214,17 +225,16 @@ tail -f $(ls -t /var/equiprofile/_ops/deploy_*.log | head -1)
 After any deployment, run the verification script:
 
 ```bash
-sudo bash ops/verify.sh --domain equiprofile.online
+bash scripts/smoke_prod.sh https://equiprofile.online
 ```
 
 Checks performed:
 
-- ✓ Git SHA and build SHA
-- ✓ Service status (single service, no duplicates)
+- ✓ Service status and health
 - ✓ Health endpoints (200 OK)
-- ✓ Nginx listening on 80/443
-- ✓ PWA files return 404
-- ✓ Build SHA in HTML meta tag
+- ✓ Database connectivity
+- ✓ API responses
+- ✓ Static asset serving
 
 ### Troubleshooting & Recovery
 
@@ -238,11 +248,11 @@ journalctl -u equiprofile -n 100 --no-pager
 ls -lt /var/equiprofile/_ops/deploy_*.log | head -1 | xargs tail -200
 
 # Restore nginx config from repo
-sudo cp ops/nginx/equiprofile.webdock.conf /etc/nginx/sites-available/equiprofile
+sudo cp deployment/nginx/equiprofile.conf /etc/nginx/sites-available/equiprofile
 sudo nginx -t && sudo systemctl reload nginx
 
 # Restore systemd service from repo
-sudo cp ops/systemd/equiprofile.service /etc/systemd/system/equiprofile.service
+sudo cp deployment/equiprofile.service /etc/systemd/system/equiprofile.service
 sudo systemctl daemon-reload && sudo systemctl restart equiprofile
 ```
 
@@ -557,13 +567,13 @@ The recommended approach bundles all dependencies into the production build, eli
 pnpm build
 
 # Copy dist/ to your server
-scp -r dist/ user@server:/var/www/equiprofile/
+scp -r dist/ user@server:/var/equiprofile/app/
 
 # Copy .env file
-scp .env user@server:/var/www/equiprofile/
+scp .env user@server:/var/equiprofile/app/
 
 # On the server, start the application
-cd /var/www/equiprofile
+cd /var/equiprofile/app
 NODE_ENV=production node dist/index.js
 ```
 
@@ -610,11 +620,11 @@ sudo mysql_secure_installation
 
 ```bash
 # Create application directory
-sudo mkdir -p /var/www/equiprofile
-sudo chown -R $USER:$USER /var/www/equiprofile
+sudo mkdir -p /var/equiprofile/app
+sudo chown -R $USER:$USER /var/equiprofile/app
 
 # Deploy application files
-cd /var/www/equiprofile
+cd /var/equiprofile/app
 # Transfer dist/ and .env files here
 
 # Create data directory (for SQLite or uploads)
@@ -656,7 +666,7 @@ server {
 
     # Serve static files from dist/public
     location /assets/ {
-        alias /var/www/equiprofile/dist/public/assets/;
+        alias /var/equiprofile/app/dist/public/assets/;
         expires 1y;
         add_header Cache-Control "public, immutable";
     }
@@ -720,7 +730,7 @@ tar -czf equiprofile-offline.tar.gz dist/ .env.default
 scp equiprofile-offline.tar.gz user@secure-server:/tmp/
 
 # On the air-gapped server:
-cd /var/www/equiprofile
+cd /var/equiprofile/app
 tar -xzf /tmp/equiprofile-offline.tar.gz
 cp .env.default .env
 nano .env  # Configure for your environment
@@ -780,10 +790,10 @@ You can update your EquiProfile deployment's visual appearance without rebuildin
 
 #### 1. Update Colors and Styles
 
-Edit `/var/www/equiprofile/dist/public/theme-override.css`:
+Edit `/var/equiprofile/app/dist/public/theme-override.css`:
 
 ```bash
-nano /var/www/equiprofile/dist/public/theme-override.css
+nano /var/equiprofile/app/dist/public/theme-override.css
 ```
 
 Example customizations:
@@ -813,10 +823,10 @@ header {
 
 #### 2. Update Branding Configuration
 
-Edit `/var/www/equiprofile/dist/public/visual-config.json`:
+Edit `/var/equiprofile/app/dist/public/visual-config.json`:
 
 ```bash
-nano /var/www/equiprofile/dist/public/visual-config.json
+nano /var/equiprofile/app/dist/public/visual-config.json
 ```
 
 Example configuration:
@@ -851,14 +861,14 @@ Example configuration:
 
 #### 3. Replace Images and Logos
 
-Simply replace files in `/var/www/equiprofile/dist/public/images/`:
+Simply replace files in `/var/equiprofile/app/dist/public/images/`:
 
 ```bash
 # Upload your custom logo
-scp my-logo.png user@server:/var/www/equiprofile/dist/public/images/logo.png
+scp my-logo.png user@server:/var/equiprofile/app/dist/public/images/logo.png
 
 # Upload custom hero background
-scp hero-bg.jpg user@server:/var/www/equiprofile/dist/public/images/hero-bg.jpg
+scp hero-bg.jpg user@server:/var/equiprofile/app/dist/public/images/hero-bg.jpg
 ```
 
 ### Advanced Visual Customization
@@ -907,8 +917,8 @@ button.primary {
 
 ```bash
 # 1. Edit theme or config files
-nano /var/www/equiprofile/dist/public/theme-override.css
-nano /var/www/equiprofile/dist/public/visual-config.json
+nano /var/equiprofile/app/dist/public/theme-override.css
+nano /var/equiprofile/app/dist/public/visual-config.json
 
 # 2. No restart needed! Just refresh browser
 # Changes are visible immediately
@@ -1698,8 +1708,8 @@ If issues persist:
 
 ```bash
 # Check uploads directory exists and is writable
-mkdir -p /var/www/equiprofile/uploads
-chmod 755 /var/www/equiprofile/uploads
+mkdir -p /var/equiprofile/app/uploads
+chmod 755 /var/equiprofile/app/uploads
 
 # Check AWS S3 credentials (if using S3)
 # Verify AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY in .env

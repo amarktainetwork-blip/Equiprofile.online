@@ -10,7 +10,7 @@
 set -e
 
 LOG_FILE="/var/log/equiprofile-deploy.log"
-DEPLOY_DIR="/var/www/equiprofile"
+DEPLOY_DIR="/var/equiprofile/app"
 
 # Ensure we're running with proper permissions
 if [ "$EUID" -ne 0 ]; then 
@@ -50,6 +50,10 @@ if [ "$CURRENT_OWNER" != "www-data" ]; then
     echo "Fixing ownership..."
     chown -R www-data:www-data .
 fi
+
+# Create log directory
+mkdir -p /var/log/equiprofile
+chown -R www-data:www-data /var/log/equiprofile
 
 # Step 3: Pull latest code (if git repo)
 echo ""
@@ -93,17 +97,17 @@ echo "Build successful!"
 echo ""
 echo "[6/9] Installing systemd service..."
 if [ ! -f /etc/systemd/system/equiprofile.service ]; then
-    if [ -f deployment/systemd/equiprofile.service ]; then
-        cp deployment/systemd/equiprofile.service /etc/systemd/system/
+    if [ -f deployment/equiprofile.service ]; then
+        cp deployment/equiprofile.service /etc/systemd/system/
         systemctl daemon-reload
         echo "Systemd service installed"
     else
-        echo "WARNING: deployment/systemd/equiprofile.service not found"
+        echo "WARNING: deployment/equiprofile.service not found"
     fi
 else
     echo "Systemd service already installed"
     # Reload in case it changed
-    cp deployment/systemd/equiprofile.service /etc/systemd/system/ 2>/dev/null || true
+    cp deployment/equiprofile.service /etc/systemd/system/ 2>/dev/null || true
     systemctl daemon-reload
 fi
 
@@ -113,7 +117,7 @@ echo "[7/9] Checking nginx configuration..."
 if [ ! -f /etc/nginx/sites-available/equiprofile ]; then
     echo "WARNING: Nginx config not installed at /etc/nginx/sites-available/equiprofile"
     echo "Please:"
-    echo "  1. Edit deployment/nginx-equiprofile.conf"
+    echo "  1. Edit deployment/nginx/equiprofile.conf"
     echo "  2. Replace ALL instances of YOUR_DOMAIN_HERE with your actual domain"
     echo "  3. Copy to /etc/nginx/sites-available/equiprofile"
     echo "  4. Create symlink: ln -s /etc/nginx/sites-available/equiprofile /etc/nginx/sites-enabled/"
@@ -159,11 +163,15 @@ else
 fi
 
 # Check local health endpoint
-if curl -sf http://127.0.0.1:3000/healthz > /dev/null; then
+if curl -sf http://127.0.0.1:3000/api/health > /dev/null; then
     echo "✓ Local health check passed"
 else
-    echo "✗ Local health check failed"
-    echo "Service may still be starting, or there's a configuration issue"
+    echo "✗ Local health check failed (trying legacy /healthz)"
+    if curl -sf http://127.0.0.1:3000/healthz > /dev/null; then
+        echo "✓ Legacy health check passed"
+    else
+        echo "Service may still be starting, or there's a configuration issue"
+    fi
 fi
 
 # Try HTTPS check (may fail if SSL not configured)
