@@ -8,6 +8,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { MarketingNav } from "@/components/MarketingNav";
 import { PageTransition } from "@/components/PageTransition";
 import { ScrollReveal, Stagger, StaggerItem } from "@/components/ScrollReveal";
@@ -28,11 +34,22 @@ import {
   TrendingUp,
   Users,
   Award,
-  Clock,
   ArrowRight,
   PlayCircle,
+  ChevronLeft,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+
+const TESTIMONIAL_ROTATION_INTERVAL = 6000;
+
+function formatStatValue(value: number, suffix: string): string {
+  if (suffix === "★" || suffix === "%") {
+    return value.toFixed(1);
+  }
+  return Math.floor(value)
+    .toString()
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
 
 export default function Home() {
   const { isAuthenticated } = useAuth();
@@ -111,64 +128,152 @@ export default function Home() {
   ];
 
   const stats = [
-    { value: 5000, label: "Active Users", suffix: "+" },
-    { value: 15000, label: "Horses Managed", suffix: "+" },
+    { value: 2500, label: "Active Users", suffix: "+" },
+    { value: 8000, label: "Horses", suffix: "+" },
     { value: 99.9, label: "Uptime", suffix: "%" },
-    { value: 4.9, label: "User Rating", suffix: "/5" },
+    { value: 4.8, label: "Rating", suffix: "★" },
   ];
 
-  const [animatedStats, setAnimatedStats] = useState(stats.map(() => 0));
+  const pricingTiers = [
+    {
+      name: "Hobby",
+      price: "$9",
+      period: "/month",
+      description: "Perfect for individual horse owners",
+      features: [
+        "Up to 3 horses",
+        "Health & vaccination tracking",
+        "Basic training logs",
+        "Document storage (1GB)",
+        "Mobile app access",
+        "Email support",
+      ],
+      highlighted: false,
+    },
+    {
+      name: "Professional",
+      price: "$29",
+      period: "/month",
+      description: "Ideal for trainers and small stables",
+      features: [
+        "Up to 15 horses",
+        "Advanced analytics",
+        "Custom training templates",
+        "Document storage (10GB)",
+        "Priority support",
+        "Client portal access",
+        "Calendar integration",
+        "Automated reminders",
+      ],
+      highlighted: true,
+    },
+    {
+      name: "Enterprise",
+      price: "Custom",
+      period: "",
+      description: "For large stables and organizations",
+      features: [
+        "Unlimited horses",
+        "White-label options",
+        "API access",
+        "Unlimited storage",
+        "24/7 phone support",
+        "Custom integrations",
+        "Multi-location support",
+        "Dedicated account manager",
+      ],
+      highlighted: false,
+    },
+  ];
+
+  const faqs = [
+    {
+      question: "How does the 14-day free trial work?",
+      answer:
+        "Start using EquiProfile immediately with full access to all features. No credit card required. After 14 days, choose a plan that fits your needs or continue with our free tier for up to 1 horse.",
+    },
+    {
+      question: "Can I manage multiple horses?",
+      answer:
+        "Absolutely! Our plans support anywhere from 3 horses on the Hobby plan to unlimited horses on the Enterprise plan. Each horse gets its own complete profile with health records, training logs, and more.",
+    },
+    {
+      question: "Is my data secure?",
+      answer:
+        "Yes! We use bank-level encryption (AES-256) for all data. Your information is stored securely in the cloud with automatic backups. We're GDPR compliant and never share your data with third parties.",
+    },
+    {
+      question: "Can I access EquiProfile on mobile?",
+      answer:
+        "Yes! EquiProfile works seamlessly on all devices - desktop, tablet, and mobile. Our responsive design ensures you have full access to your horses' information anywhere, anytime.",
+    },
+    {
+      question: "What happens if I cancel my subscription?",
+      answer:
+        "You can cancel anytime. Your data remains accessible in read-only mode for 30 days, giving you time to export everything. We also offer a free tier to keep managing one horse if you'd like to continue.",
+    },
+    {
+      question: "Do you offer training or onboarding?",
+      answer:
+        "Yes! All new users get access to our comprehensive video tutorials and help center. Professional and Enterprise plans include personalized onboarding sessions with our team.",
+    },
+  ];
+
+  const [animatedStats, setAnimatedStats] = useState(
+    stats.map(() => ({ current: 0, hasAnimated: false }))
+  );
+  const statsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const observers = stats.map((stat, index) => {
-      const element = document.getElementById(`stat-${index}`);
-      if (!element) return null;
-
-      const observer = new IntersectionObserver(
-        (entries) => {
-          if (entries[0].isIntersecting) {
-            // Animate the stat
-            const duration = 2000;
-            const steps = 60;
-            const increment = stat.value / steps;
-            let current = 0;
-
-            const interval = setInterval(() => {
-              current += increment;
-              if (current >= stat.value) {
-                current = stat.value;
-                clearInterval(interval);
-              }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            stats.forEach((stat, index) => {
               setAnimatedStats((prev) => {
-                const newStats = [...prev];
-                newStats[index] = current;
-                return newStats;
-              });
-            }, duration / steps);
+                if (prev[index].hasAnimated) return prev;
 
-            // Disconnect after animating this specific stat
+                const duration = 2000;
+                const steps = 60;
+                const increment = stat.value / steps;
+                let current = 0;
+
+                const interval = setInterval(() => {
+                  current += increment;
+                  if (current >= stat.value) {
+                    current = stat.value;
+                    clearInterval(interval);
+                  }
+                  setAnimatedStats((prevStats) => {
+                    const newStats = [...prevStats];
+                    newStats[index] = { current, hasAnimated: true };
+                    return newStats;
+                  });
+                }, duration / steps);
+
+                return prev;
+              });
+            });
             observer.disconnect();
           }
-        },
-        { threshold: 0.5 },
-      );
+        });
+      },
+      { threshold: 0.3 }
+    );
 
-      observer.observe(element);
-      return observer;
-    });
+    if (statsRef.current) {
+      observer.observe(statsRef.current);
+    }
 
-    return () => {
-      observers.forEach((observer) => observer?.disconnect());
-    };
-  }, []); // Only run once on mount
+    return () => observer.disconnect();
+  }, []);
 
-  // Auto-rotate testimonials
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveTestimonial((prev) => (prev + 1) % testimonials.length);
-    }, 5000);
+    }, TESTIMONIAL_ROTATION_INTERVAL);
     return () => clearInterval(interval);
-  }, []);
+  }, [testimonials.length]);
 
   return (
     <>
@@ -177,7 +282,6 @@ export default function Home() {
         <div className="min-h-screen overflow-hidden">
           {/* Hero Section with Video Background */}
           <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-            {/* Video Background */}
             <div className="absolute inset-0 z-0">
               <video
                 autoPlay
@@ -187,554 +291,401 @@ export default function Home() {
                 className="video-background"
                 poster="/assets/hero-poster.jpg"
               >
-                {/* Fallback: We'll use a gradient background if video doesn't load */}
                 <source src="/videos/horses-background.mp4" type="video/mp4" />
               </video>
               <div className="video-overlay" />
-
-              {/* Animated gradient overlay as fallback */}
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/95 via-primary/90 to-accent/95" />
               <div
-                className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-accent animate-gradient"
-                style={{ opacity: 0.95 }}
-              />
-
-              {/* Floating particles */}
-              <div
-                className="absolute top-20 left-10 w-64 h-64 particle animate-float"
+                className="absolute top-20 left-10 w-64 h-64 bg-white/5 rounded-full blur-3xl animate-float"
                 style={{ animationDelay: "0s" }}
               />
               <div
-                className="absolute bottom-20 right-10 w-96 h-96 particle animate-float"
+                className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-float"
                 style={{ animationDelay: "2s" }}
               />
               <div
-                className="absolute top-1/3 right-1/4 w-32 h-32 particle animate-float"
+                className="absolute top-1/3 right-1/4 w-32 h-32 bg-white/5 rounded-full blur-2xl animate-float"
                 style={{ animationDelay: "4s" }}
               />
             </div>
 
-            <div className="container relative z-10 pt-24 pb-16">
+            <div className="container relative z-10 pt-24 pb-16 px-4">
               <div className="max-w-6xl mx-auto">
-                {/* Hero Content */}
-                <div
-                  className="text-center mb-12"
-                  style={{ animation: "fadeInUp 0.8s ease-out" }}
-                >
-                  <Badge className="mb-6 inline-flex items-center gap-2 px-6 py-2 text-base glass-strong animate-pulse-glow">
+                <div className="text-center fade-in-up">
+                  <Badge className="mb-6 inline-flex items-center gap-2 px-6 py-2 text-base glass-strong pulse-glow">
                     <Sparkles className="w-5 h-5" />
                     14-Day Free Trial • No Credit Card Required
                   </Badge>
-
-                  <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight mb-8 text-white drop-shadow-2xl">
-                    Professional Horse
-                    <br />
-                    Management Made{" "}
-                    <span className="relative inline-block">
-                      <span className="relative z-10">Simple</span>
-                      <span className="absolute bottom-2 left-0 w-full h-4 bg-white/30 -rotate-1 rounded" />
-                    </span>
-                  </h1>
-
-                  <p className="text-xl md:text-2xl lg:text-3xl text-white/95 mb-12 leading-relaxed max-w-4xl mx-auto drop-shadow-lg font-light">
-                    The ultimate digital platform for horse owners, trainers,
-                    and equestrian professionals. Track health, manage training,
-                    and provide exceptional care—all in one beautiful place.
-                  </p>
-
-                  <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
+                  <div className="glass p-8 md:p-12 rounded-3xl mb-8">
+                    <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight mb-6 text-white drop-shadow-2xl">
+                      Professional Horse
+                      <br />
+                      Management Made{" "}
+                      <span className="relative inline-block">
+                        <span className="relative z-10">Simple</span>
+                        <span className="absolute bottom-2 left-0 w-full h-4 bg-white/30 -rotate-1 rounded" />
+                      </span>
+                    </h1>
+                    <p className="text-lg md:text-xl lg:text-2xl text-white/95 mb-8 leading-relaxed max-w-4xl mx-auto drop-shadow-lg font-light">
+                      The ultimate digital platform for horse owners, trainers,
+                      and equestrian professionals. Track health, manage
+                      training, and provide exceptional care—all in one
+                      beautiful place.
+                    </p>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
                     <Link href={isAuthenticated ? "/dashboard" : "/register"}>
                       <Button
                         size="lg"
-                        className="text-xl px-10 py-7 bg-white text-primary hover:bg-white/90 shadow-2xl hover:scale-105 transition-all duration-300 group"
+                        className="text-lg px-10 py-6 bg-white text-primary hover:bg-white/90 shadow-2xl hover-lift group"
                       >
-                        {isAuthenticated
-                          ? "Go to Dashboard"
-                          : "Start Free Trial"}
+                        {isAuthenticated ? "Go to Dashboard" : "Start Free Trial"}
                         <ChevronRight className="w-6 h-6 ml-2 group-hover:translate-x-1 transition-transform" />
                       </Button>
                     </Link>
-                    <Link href="/features">
-                      <Button
-                        size="lg"
-                        variant="outline"
-                        className="text-xl px-10 py-7 glass-strong text-white border-white/30 hover:bg-white/20 shadow-xl group"
-                      >
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="text-lg px-10 py-6 bg-white/10 text-white border-white/30 hover:bg-white/20 backdrop-blur-sm shadow-xl hover-lift group"
+                      asChild
+                    >
+                      <Link href="/features">
                         <PlayCircle className="w-6 h-6 mr-2" />
                         Watch Demo
-                      </Button>
-                    </Link>
-                  </div>
-
-                  <div className="flex flex-wrap justify-center items-center gap-8 text-white/90">
-                    <div className="flex items-center gap-2 glass px-4 py-2 rounded-full">
-                      <Check className="w-5 h-5" />
-                      <span className="text-base">No credit card required</span>
-                    </div>
-                    <div className="flex items-center gap-2 glass px-4 py-2 rounded-full">
-                      <Check className="w-5 h-5" />
-                      <span className="text-base">Cancel anytime</span>
-                    </div>
-                    <div className="flex items-center gap-2 glass px-4 py-2 rounded-full">
-                      <Check className="w-5 h-5" />
-                      <span className="text-base">Free support included</span>
-                    </div>
-                    <div className="flex items-center gap-2 glass px-4 py-2 rounded-full">
-                      <Shield className="w-5 h-5" />
-                      <span className="text-base">Bank-level security</span>
-                    </div>
+                      </Link>
+                    </Button>
                   </div>
                 </div>
-
-                {/* Hero Feature Cards */}
-                <div
-                  className="grid md:grid-cols-3 gap-6 mt-16"
-                  style={{ animation: "fadeInUp 0.8s ease-out 0.3s both" }}
-                >
-                  <Card className="glass-strong hover-3d border-white/20 backdrop-blur-xl">
-                    <CardContent className="pt-6">
-                      <div className="flex items-center gap-4 mb-3">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center">
-                          <Zap className="w-6 h-6 text-white" />
-                        </div>
-                        <div className="text-2xl font-bold">5K+</div>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Active professionals worldwide
-                      </p>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="glass-strong hover-3d border-white/20 backdrop-blur-xl">
-                    <CardContent className="pt-6">
-                      <div className="flex items-center gap-4 mb-3">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center">
-                          <TrendingUp className="w-6 h-6 text-white" />
-                        </div>
-                        <div className="text-2xl font-bold">15K+</div>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Horses managed daily
-                      </p>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="glass-strong hover-3d border-white/20 backdrop-blur-xl">
-                    <CardContent className="pt-6">
-                      <div className="flex items-center gap-4 mb-3">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-400 to-emerald-400 flex items-center justify-center">
-                          <Award className="w-6 h-6 text-white" />
-                        </div>
-                        <div className="text-2xl font-bold">4.9★</div>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Average user rating
-                      </p>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-            </div>
-
-            {/* Scroll indicator */}
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce">
-              <div className="w-6 h-10 border-2 border-white/50 rounded-full flex items-start justify-center p-2">
-                <div className="w-1 h-3 bg-white/50 rounded-full" />
               </div>
             </div>
           </section>
 
-          {/* Stats Section */}
-          <section className="py-20 bg-gradient-to-br from-muted/50 to-background">
-            <div className="container">
+          {/* Animated Stats Section */}
+          <section
+            ref={statsRef}
+            className="py-20 bg-gradient-to-br from-background to-muted/30 relative overflow-hidden"
+          >
+            <div className="container px-4">
               <ScrollReveal>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
                   {stats.map((stat, index) => (
-                    <div
+                    <Card
                       key={index}
-                      id={`stat-${index}`}
-                      className="text-center"
+                      className="text-center p-8 glass-strong hover-lift hover-3d border-none"
                     >
-                      <div className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-3">
-                        {animatedStats[index].toFixed(
-                          stat.value % 1 === 0 ? 0 : 1,
-                        )}
-                        {stat.suffix}
-                      </div>
-                      <div className="text-base md:text-lg text-muted-foreground font-medium">
-                        {stat.label}
-                      </div>
-                    </div>
+                      <CardContent className="p-0">
+                        <div className="text-5xl md:text-6xl font-bold text-primary mb-2">
+                          {formatStatValue(animatedStats[index].current, stat.suffix)}
+                          {stat.suffix}
+                        </div>
+                        <div className="text-sm md:text-base text-muted-foreground font-medium">
+                          {stat.label}
+                        </div>
+                      </CardContent>
+                    </Card>
                   ))}
                 </div>
               </ScrollReveal>
             </div>
           </section>
 
-          {/* Features Section */}
-          <section className="py-24 lg:py-32 relative overflow-hidden">
-            {/* Background decoration */}
-            <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-primary/5 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-accent/5 rounded-full blur-3xl" />
-
-            <div className="container relative z-10">
-              <ScrollReveal>
-                <div className="text-center max-w-3xl mx-auto mb-20">
-                  <Badge
-                    className="mb-6 text-base px-6 py-2"
-                    variant="secondary"
-                  >
-                    <Star className="w-4 h-4 mr-2" />
-                    Powerful Features
-                  </Badge>
-                  <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-                    Everything You Need for{" "}
-                    <span className="text-gradient">Complete Care</span>
-                  </h2>
-                  <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed">
-                    From health tracking to AI-powered insights, EquiProfile
-                    provides all the tools you need to keep your horses healthy,
-                    happy, and performing at their absolute best.
-                  </p>
-                </div>
+          {/* Features Grid */}
+          <section className="py-24 bg-background relative">
+            <div className="container px-4">
+              <ScrollReveal className="text-center mb-16">
+                <Badge className="mb-4 inline-flex items-center gap-2 px-4 py-2">
+                  <Zap className="w-4 h-4" />
+                  Powerful Features
+                </Badge>
+                <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+                  Everything You Need to Manage
+                  <br />
+                  <span className="text-primary">Your Equestrian Life</span>
+                </h2>
+                <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+                  From health tracking to training logs, EquiProfile provides
+                  comprehensive tools for modern horse management.
+                </p>
               </ScrollReveal>
+              <Stagger className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+                {features.map((feature, index) => {
+                  const Icon = feature.icon;
+                  return (
+                    <StaggerItem key={index}>
+                      <Card className="h-full glass hover-lift hover-3d group cursor-pointer transition-all duration-300 border-none">
+                        <CardHeader>
+                          <div
+                            className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.color} p-4 mb-4 group-hover:scale-110 transition-transform duration-300`}
+                          >
+                            <Icon className="w-full h-full text-white" />
+                          </div>
+                          <CardTitle className="text-2xl mb-2">
+                            {feature.title}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <CardDescription className="text-base leading-relaxed">
+                            {feature.description}
+                          </CardDescription>
+                        </CardContent>
+                      </Card>
+                    </StaggerItem>
+                  );
+                })}
+              </Stagger>
+            </div>
+          </section>
 
-              <Stagger className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {features.map((feature, index) => (
-                  <StaggerItem key={index}>
-                    <Card className="h-full card-hover group border-2 hover:border-primary/50 transition-all duration-300">
-                      <CardHeader>
-                        <div
-                          className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}
-                        >
-                          <feature.icon className="w-8 h-8 text-white" />
+          {/* Testimonials Carousel */}
+          <section className="py-24 bg-gradient-to-br from-muted/50 to-background relative overflow-hidden">
+            <div className="container px-4">
+              <ScrollReveal className="text-center mb-16">
+                <Badge className="mb-4 inline-flex items-center gap-2 px-4 py-2">
+                  <Users className="w-4 h-4" />
+                  Testimonials
+                </Badge>
+                <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+                  Loved by Horse Owners
+                  <br />
+                  <span className="text-primary">Around the World</span>
+                </h2>
+              </ScrollReveal>
+              <div className="max-w-4xl mx-auto relative">
+                <Card className="glass-strong p-8 md:p-12 border-none">
+                  <CardContent className="p-0">
+                    <div className="mb-6 flex gap-1">
+                      {[...Array(testimonials[activeTestimonial].rating)].map((_, i) => (
+                        <Star key={i} className="w-6 h-6 fill-yellow-400 text-yellow-400" />
+                      ))}
+                    </div>
+                    <blockquote className="text-xl md:text-2xl leading-relaxed mb-8 text-foreground">
+                      "{testimonials[activeTestimonial].content}"
+                    </blockquote>
+                    <div className="flex items-center gap-4">
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-xl">
+                        {testimonials[activeTestimonial].avatar}
+                      </div>
+                      <div>
+                        <div className="font-bold text-lg">
+                          {testimonials[activeTestimonial].name}
                         </div>
-                        <CardTitle className="text-2xl mb-3">
-                          {feature.title}
-                        </CardTitle>
+                        <div className="text-muted-foreground">
+                          {testimonials[activeTestimonial].role}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <div className="flex justify-center gap-3 mt-8">
+                  {testimonials.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setActiveTestimonial(index)}
+                      className={`carousel-dot ${
+                        index === activeTestimonial
+                          ? "bg-primary w-12"
+                          : "bg-muted-foreground/30"
+                      }`}
+                      aria-label={`Go to testimonial ${index + 1}`}
+                    />
+                  ))}
+                </div>
+                <button
+                  onClick={() =>
+                    setActiveTestimonial(
+                      (prev) => (prev - 1 + testimonials.length) % testimonials.length
+                    )
+                  }
+                  className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-16 w-12 h-12 rounded-full glass-strong hover:bg-primary/20 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                  aria-label="Previous testimonial"
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+                <button
+                  onClick={() =>
+                    setActiveTestimonial((prev) => (prev + 1) % testimonials.length)
+                  }
+                  className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-16 w-12 h-12 rounded-full glass-strong hover:bg-primary/20 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                  aria-label="Next testimonial"
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </button>
+              </div>
+            </div>
+          </section>
+
+          {/* Pricing Comparison */}
+          <section className="py-24 bg-background relative">
+            <div className="container px-4">
+              <ScrollReveal className="text-center mb-16">
+                <Badge className="mb-4 inline-flex items-center gap-2 px-4 py-2">
+                  <TrendingUp className="w-4 h-4" />
+                  Simple Pricing
+                </Badge>
+                <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+                  Choose Your Perfect Plan
+                </h2>
+                <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+                  Start with a 14-day free trial. No credit card required. Cancel anytime.
+                </p>
+              </ScrollReveal>
+              <Stagger className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+                {pricingTiers.map((tier, index) => (
+                  <StaggerItem key={index}>
+                    <Card
+                      className={`h-full relative overflow-hidden ${
+                        tier.highlighted
+                          ? "glass-strong border-2 border-primary shadow-2xl hover-lift hover-3d"
+                          : "glass hover-lift border-none"
+                      }`}
+                    >
+                      {tier.highlighted && (
+                        <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-4 py-1 text-sm font-bold rounded-bl-lg">
+                          POPULAR
+                        </div>
+                      )}
+                      <CardHeader className="pb-8">
+                        <CardTitle className="text-2xl mb-2">{tier.name}</CardTitle>
+                        <div className="mb-4">
+                          <span className="text-5xl font-bold">{tier.price}</span>
+                          <span className="text-muted-foreground">{tier.period}</span>
+                        </div>
+                        <CardDescription className="text-base">
+                          {tier.description}
+                        </CardDescription>
                       </CardHeader>
                       <CardContent>
-                        <CardDescription className="text-base leading-relaxed">
-                          {feature.description}
-                        </CardDescription>
+                        <ul className="space-y-4 mb-8">
+                          {tier.features.map((feature, i) => (
+                            <li key={i} className="flex items-start gap-3">
+                              <Check className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                              <span className="text-sm">{feature}</span>
+                            </li>
+                          ))}
+                        </ul>
+                        <Button
+                          className={`w-full ${
+                            tier.highlighted ? "bg-primary hover:bg-primary/90" : ""
+                          }`}
+                          variant={tier.highlighted ? "default" : "outline"}
+                          size="lg"
+                          asChild
+                        >
+                          <Link href="/register">
+                            Get Started
+                            <ArrowRight className="w-4 h-4 ml-2" />
+                          </Link>
+                        </Button>
                       </CardContent>
                     </Card>
                   </StaggerItem>
                 ))}
               </Stagger>
-
-              <ScrollReveal delay={0.3}>
-                <div className="text-center mt-16">
-                  <Link href="/features">
-                    <Button
-                      size="lg"
-                      className="text-lg px-8 py-6 shadow-xl hover:shadow-2xl transition-all group"
-                    >
-                      Explore All Features
-                      <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                    </Button>
-                  </Link>
-                </div>
-              </ScrollReveal>
             </div>
           </section>
 
-          {/* Testimonials Section */}
-          <section className="py-24 lg:py-32 bg-gradient-to-br from-primary/5 to-accent/5 relative overflow-hidden">
-            <div className="container relative z-10">
-              <ScrollReveal>
-                <div className="text-center max-w-3xl mx-auto mb-16">
-                  <Badge
-                    className="mb-6 text-base px-6 py-2"
-                    variant="secondary"
-                  >
-                    <Users className="w-4 h-4 mr-2" />
-                    Testimonials
-                  </Badge>
-                  <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-                    Loved by Equestrians Worldwide
-                  </h2>
-                  <p className="text-xl text-muted-foreground">
-                    Join thousands of satisfied horse owners and professionals
-                  </p>
-                </div>
-              </ScrollReveal>
-
-              {/* Testimonial Carousel */}
-              <div className="max-w-4xl mx-auto">
-                <Card className="p-8 md:p-12 border-2 shadow-2xl">
-                  <div className="flex gap-2 mb-6 justify-center">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star
-                        key={i}
-                        className="w-6 h-6 fill-amber-400 text-amber-400"
-                      />
-                    ))}
-                  </div>
-
-                  <CardDescription className="text-xl md:text-2xl leading-relaxed text-center mb-8 text-foreground">
-                    "{testimonials[activeTestimonial].content}"
-                  </CardDescription>
-
-                  <div className="flex items-center justify-center gap-4">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-xl font-bold">
-                      {testimonials[activeTestimonial].avatar}
-                    </div>
-                    <div className="text-left">
-                      <div className="font-semibold text-lg">
-                        {testimonials[activeTestimonial].name}
-                      </div>
-                      <div className="text-muted-foreground">
-                        {testimonials[activeTestimonial].role}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Dots indicator */}
-                  <div className="flex gap-2 justify-center mt-8">
-                    {testimonials.map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setActiveTestimonial(index)}
-                        className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                          index === activeTestimonial
-                            ? "bg-primary w-8"
-                            : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                </Card>
-              </div>
-            </div>
-          </section>
-
-          {/* Pricing CTA */}
-          <section className="py-24 lg:py-32">
-            <div className="container">
-              <ScrollReveal>
-                <Card className="p-10 md:p-16 lg:p-20 bg-gradient-to-br from-primary via-primary to-accent text-white border-0 shadow-2xl relative overflow-hidden">
-                  {/* Background decoration */}
-                  <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
-                  <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
-
-                  <div className="text-center max-w-4xl mx-auto relative z-10">
-                    <Badge className="mb-8 inline-flex items-center gap-2 px-6 py-3 text-base bg-white/20 text-white border-white/30">
-                      <Clock className="w-5 h-5" />
-                      Limited Time Offer
-                    </Badge>
-
-                    <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-8">
-                      Simple, Transparent Pricing
-                    </h2>
-                    <p className="text-xl md:text-2xl text-white/95 mb-12 leading-relaxed">
-                      Start with a 14-day free trial. Plans start at just
-                      $9/month. No credit card required to get started. Cancel
-                      anytime.
-                    </p>
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                      <Link href="/pricing">
-                        <Button
-                          size="lg"
-                          className="text-xl px-10 py-7 bg-white text-primary hover:bg-white/90 shadow-xl hover:scale-105 transition-all"
-                        >
-                          View Pricing Plans
-                        </Button>
-                      </Link>
-                      <Link href="/register">
-                        <Button
-                          size="lg"
-                          variant="outline"
-                          className="text-xl px-10 py-7 border-white/30 text-white hover:bg-white/10"
-                        >
-                          Start Free Trial
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
-                </Card>
-              </ScrollReveal>
-            </div>
-          </section>
-
-          {/* Final CTA */}
-          <section className="py-24 lg:py-32 bg-gradient-to-br from-background via-muted/30 to-background">
-            <div className="container">
-              <ScrollReveal>
-                <div className="text-center max-w-4xl mx-auto">
-                  <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-8">
-                    Ready to Transform Your Horse Care?
-                  </h2>
-                  <p className="text-xl md:text-2xl text-muted-foreground mb-12 leading-relaxed">
-                    Join thousands of horse owners who trust EquiProfile to
-                    manage their equine companions. Start your free trial
-                    today—no credit card required.
-                  </p>
-                  <Link href="/register">
-                    <Button
-                      size="lg"
-                      className="text-xl px-12 py-8 shadow-2xl hover:shadow-3xl hover:scale-105 transition-all group"
-                    >
-                      Start Your Free Trial Now
-                      <ChevronRight className="w-6 h-6 ml-3 group-hover:translate-x-1 transition-transform" />
-                    </Button>
-                  </Link>
-
-                  <div className="mt-12 flex flex-wrap justify-center gap-12 text-sm text-muted-foreground">
-                    <div className="flex flex-col items-center gap-2">
-                      <Shield className="w-8 h-8 text-primary" />
-                      <span>Secure & Encrypted</span>
-                    </div>
-                    <div className="flex flex-col items-center gap-2">
-                      <Users className="w-8 h-8 text-primary" />
-                      <span>5000+ Users</span>
-                    </div>
-                    <div className="flex flex-col items-center gap-2">
-                      <Award className="w-8 h-8 text-primary" />
-                      <span>Award Winning</span>
-                    </div>
-                    <div className="flex flex-col items-center gap-2">
-                      <Clock className="w-8 h-8 text-primary" />
-                      <span>24/7 Support</span>
-                    </div>
-                  </div>
-                </div>
-              </ScrollReveal>
-            </div>
-          </section>
-
-          {/* Footer */}
-          <footer className="py-16 lg:py-20 border-t bg-card">
-            <div className="container">
-              <div className="grid md:grid-cols-4 gap-12 mb-12">
-                <div className="md:col-span-2">
-                  <div className="text-3xl font-bold font-serif mb-6">
-                    <span className="text-gradient">EquiProfile</span>
-                  </div>
-                  <p className="text-muted-foreground text-base mb-6 max-w-md">
-                    Professional horse management platform for the modern
-                    equestrian. Trusted by thousands of horse owners worldwide.
-                  </p>
-                  <div className="flex gap-4">
-                    <Badge variant="secondary" className="px-4 py-2">
-                      <Shield className="w-4 h-4 mr-2" />
-                      Secure
-                    </Badge>
-                    <Badge variant="secondary" className="px-4 py-2">
-                      <Award className="w-4 h-4 mr-2" />
-                      Award Winning
-                    </Badge>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-semibold text-lg mb-6">Product</h4>
-                  <ul className="space-y-3 text-muted-foreground">
-                    <li>
-                      <Link href="/features">
-                        <a className="hover:text-foreground transition-colors hover:underline">
-                          Features
-                        </a>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/pricing">
-                        <a className="hover:text-foreground transition-colors hover:underline">
-                          Pricing
-                        </a>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/dashboard">
-                        <a className="hover:text-foreground transition-colors hover:underline">
-                          Dashboard
-                        </a>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/about">
-                        <a className="hover:text-foreground transition-colors hover:underline">
-                          About Us
-                        </a>
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-
-                <div>
-                  <h4 className="font-semibold text-lg mb-6">Support</h4>
-                  <ul className="space-y-3 text-muted-foreground">
-                    <li>
-                      <Link href="/contact">
-                        <a className="hover:text-foreground transition-colors hover:underline">
-                          Contact
-                        </a>
-                      </Link>
-                    </li>
-                    <li>
-                      <a
-                        href="#"
-                        className="hover:text-foreground transition-colors hover:underline"
-                      >
-                        Help Center
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="#"
-                        className="hover:text-foreground transition-colors hover:underline"
-                      >
-                        Privacy Policy
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="#"
-                        className="hover:text-foreground transition-colors hover:underline"
-                      >
-                        Terms of Service
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              <div className="border-t pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
-                <p>
-                  © {new Date().getFullYear()} EquiProfile. Part of{" "}
-                  <a
-                    href="https://www.amarktai.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-foreground font-semibold hover:text-primary transition-colors underline"
-                    aria-label="Amarktai Network (opens in new tab)"
-                  >
-                    Amarktai Network
-                  </a>
-                  . All rights reserved.
+          {/* FAQ Section */}
+          <section className="py-24 bg-gradient-to-br from-muted/50 to-background">
+            <div className="container px-4">
+              <ScrollReveal className="text-center mb-16">
+                <Badge className="mb-4 inline-flex items-center gap-2 px-4 py-2">
+                  <Shield className="w-4 h-4" />
+                  FAQ
+                </Badge>
+                <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+                  Frequently Asked Questions
+                </h2>
+                <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+                  Everything you need to know about EquiProfile.
                 </p>
-                <div className="flex gap-6">
-                  <a
-                    href="#"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Privacy
-                  </a>
-                  <a
-                    href="#"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Terms
-                  </a>
-                  <a
-                    href="#"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Cookies
-                  </a>
+              </ScrollReveal>
+              <ScrollReveal>
+                <div className="max-w-4xl mx-auto">
+                  <Accordion type="single" collapsible className="space-y-4">
+                    {faqs.map((faq, index) => (
+                      <AccordionItem
+                        key={index}
+                        value={`item-${index}`}
+                        className="glass border-none rounded-lg px-6 py-2"
+                      >
+                        <AccordionTrigger className="text-lg font-semibold text-left hover:no-underline">
+                          {faq.question}
+                        </AccordionTrigger>
+                        <AccordionContent className="text-base text-muted-foreground leading-relaxed">
+                          {faq.answer}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
                 </div>
-              </div>
+              </ScrollReveal>
             </div>
-          </footer>
+          </section>
+
+          {/* Final CTA Section */}
+          <section className="py-32 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent" />
+            <div className="absolute inset-0 bg-[url('/assets/pattern.svg')] opacity-10" />
+            <div
+              className="absolute top-10 left-10 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-float"
+              style={{ animationDelay: "0s" }}
+            />
+            <div
+              className="absolute bottom-10 right-10 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-float"
+              style={{ animationDelay: "3s" }}
+            />
+            <div className="container px-4 relative z-10">
+              <ScrollReveal>
+                <div className="max-w-4xl mx-auto text-center glass-dark p-12 md:p-16 rounded-3xl">
+                  <Award className="w-20 h-20 text-white mx-auto mb-8" />
+                  <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
+                    Ready to Transform Your
+                    <br />
+                    Horse Management?
+                  </h2>
+                  <p className="text-xl md:text-2xl text-white/90 mb-12 leading-relaxed">
+                    Join thousands of equestrians who trust EquiProfile to care
+                    for their horses. Start your free 14-day trial today—no credit
+                    card required.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-6 justify-center">
+                    <Button
+                      size="lg"
+                      className="text-lg px-12 py-7 bg-white text-primary hover:bg-white/90 shadow-2xl hover-lift group"
+                      asChild
+                    >
+                      <Link href="/register">
+                        Start Free Trial
+                        <ChevronRight className="w-6 h-6 ml-2 group-hover:translate-x-1 transition-transform" />
+                      </Link>
+                    </Button>
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="text-lg px-12 py-7 bg-white/10 text-white border-white/30 hover:bg-white/20 backdrop-blur-sm shadow-xl hover-lift"
+                      asChild
+                    >
+                      <Link href="/contact">Contact Sales</Link>
+                    </Button>
+                  </div>
+                  <div className="mt-12 flex items-center justify-center gap-8 text-white/80 text-sm flex-wrap">
+                    <div className="flex items-center gap-2">
+                      <Check className="w-5 h-5" />
+                      <span>No credit card</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Check className="w-5 h-5" />
+                      <span>14-day trial</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Check className="w-5 h-5" />
+                      <span>Cancel anytime</span>
+                    </div>
+                  </div>
+                </div>
+              </ScrollReveal>
+            </div>
+          </section>
         </div>
       </PageTransition>
     </>
