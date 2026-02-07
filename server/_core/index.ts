@@ -3,6 +3,7 @@ import express from "express";
 import { createServer } from "http";
 import net from "net";
 import helmet from "helmet";
+import cors from "cors";
 import rateLimit from "express-rate-limit";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
@@ -31,6 +32,35 @@ async function startServer() {
   // Must be set BEFORE rate limiter and any middleware that reads req.ip
   app.set("trust proxy", 1);
   console.log("✅ Trust proxy enabled for reverse proxy support");
+
+  // CORS configuration
+  const allowedOrigins = process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(",")
+    : [
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "https://equiprofile.online",
+        "https://www.equiprofile.online",
+      ];
+
+  app.use(
+    cors({
+      origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps or Postman)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error("Not allowed by CORS"));
+        }
+      },
+      credentials: true,
+      methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization", "X-Request-ID"],
+      maxAge: 86400, // 24 hours
+    }),
+  );
+  console.log("✅ CORS configured with allowed origins:", allowedOrigins);
 
   // Security middleware with strict CSP
   // NOTE: scriptSrc does NOT include 'unsafe-inline' - all scripts must be external

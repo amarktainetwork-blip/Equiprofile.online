@@ -154,7 +154,21 @@ export const appRouter = router({
           });
         }
 
-        if (input.password !== adminPassword) {
+        // Use constant-time comparison to prevent timing attacks
+        const bcrypt = await import("bcrypt");
+        let isValid = false;
+        
+        // For backward compatibility, check if password is bcrypt hash or plaintext
+        if (adminPassword.startsWith("$2a$") || adminPassword.startsWith("$2b$")) {
+          // It's already a bcrypt hash, compare directly
+          isValid = await bcrypt.compare(input.password, adminPassword);
+        } else {
+          // It's plaintext (legacy), do direct comparison (but log warning)
+          console.warn("⚠️  WARNING: ADMIN_UNLOCK_PASSWORD is stored in plaintext. Consider hashing it.");
+          isValid = input.password === adminPassword;
+        }
+
+        if (!isValid) {
           await db.logActivity({
             userId: ctx.user!.id,
             action: "admin_unlock_failed",
