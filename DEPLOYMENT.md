@@ -688,6 +688,7 @@ sudo logrotate -f /etc/logrotate.d/equiprofile
    ```
 
 3. **TypeScript errors**:
+
    ```bash
    # Check for syntax errors
    npm run check
