@@ -21,7 +21,7 @@ export async function setupVite(app: Express, server: Server) {
   });
 
   app.use(vite.middlewares);
-  app.use("*", async (req, res, next) => {
+  app.use("/*", async (req, res, next) => {
     const url = req.originalUrl;
 
     try {
@@ -116,7 +116,7 @@ export function serveStatic(app: Express) {
 
   // SPA fallback - serve index.html ONLY for navigation requests
   // NOT for asset requests (prevents CSS/JS returning HTML)
-  app.use("*", (req, res) => {
+  app.use("/*", (req, res) => {
     // Don't fallback to index.html for asset paths
     const isStaticFile =
       req.originalUrl.startsWith("/assets/") ||
