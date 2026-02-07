@@ -3,46 +3,139 @@
 ![EquiProfile](https://img.shields.io/badge/status-production-green)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Node](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)
-![Version](https://img.shields.io/badge/version-1.0.0-blue) <!-- Update when package.json version changes -->
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
 
 > **A comprehensive, modern web application for equestrian professionals to manage horses' health records, training schedules, feeding plans, and more.**
 
 ---
 
-## 📖 Table of Contents
+## 📋 Table of Contents
 
-- [Prerequisites](#-prerequisites)
-- [Quick Start (Local Development)](#-quick-start-local-development)
-- [Production Deployment](#-production-deployment)
-  - [One-Command Deployment](#one-command-deployment)
-  - [Manual Deployment Steps](#manual-deployment-steps)
-  - [Nginx Configuration](#nginx-configuration)
-- [Configuration](#-configuration)
-- [Build Structure](#-build-structure)
-- [Features](#-features)
-- [Troubleshooting](#-troubleshooting)
-- [Contributing](#-contributing)
-- [License](#-license)
+- [Overview](#overview)
+- [Features](#features)
+- [Quick Start](#quick-start)
+  - [Prerequisites](#prerequisites)
+  - [Local Development](#local-development)
+  - [Docker Setup](#docker-setup)
+- [Production Deployment](#production-deployment)
+  - [Ubuntu 24.04 (Recommended)](#ubuntu-2404-deployment)
+  - [Manual Deployment](#manual-deployment)
+  - [Environment Variables](#environment-variables)
+  - [SSL Setup](#ssl-setup)
+- [API Keys & Integrations](#api-keys--integrations)
+  - [Required (Core)](#required-core)
+  - [Optional (Enhanced Features)](#optional-enhanced-features)
+  - [Stripe Payment Setup](#stripe-setup)
+  - [AWS S3 Storage Setup](#aws-s3-setup)
+  - [OpenAI Integration](#openai-integration)
+  - [Weather API](#weather-api)
+  - [Email SMTP](#email-smtp)
+- [Architecture](#architecture)
+  - [Tech Stack](#tech-stack)
+  - [Project Structure](#project-structure)
+  - [Database Schema](#database-schema)
+  - [Real-time Updates (SSE)](#realtime-sse)
+- [Features Breakdown](#features-breakdown)
+  - [Core Modules (20+)](#core-modules)
+  - [Health & Vet Management](#health-vet)
+  - [Training & Performance](#training)
+  - [Nutrition & Feeding](#nutrition)
+  - [Breeding Management](#breeding)
+  - [Administrative Tools](#admin)
+- [Development](#development)
+  - [Available Scripts](#available-scripts)
+  - [Testing](#testing)
+  - [Code Style](#code-style)
+- [Troubleshooting](#troubleshooting)
+  - [Common Issues](#common-issues)
+  - [Recovery Procedures](#recovery-procedures)
+  - [Nginx Configuration Issues](#nginx-issues)
+  - [Database Problems](#database-problems)
+  - [Build Errors](#build-errors)
+- [Maintenance](#maintenance)
+  - [Updates & Upgrades](#updates)
+  - [Backup Procedures](#backups)
+  - [Monitoring](#monitoring)
+- [Contributing](#contributing)
+- [License](#license)
+- [Support](#support)
 
 ---
 
-## 📋 Prerequisites
+## Overview
 
-### Required Software
+EquiProfile is a production-ready, comprehensive horse management platform designed for equestrian professionals, stable managers, trainers, and horse owners. With **20+ feature modules** and **100+ functions**, it provides everything needed to manage horses' health, training, nutrition, breeding, and more.
+
+### Key Highlights
+
+- ✅ **Production-Ready** - Fully tested and deployed
+- ✅ **Modern UI** - Glassmorphism design with smooth animations
+- ✅ **AI-Powered** - OpenAI integration for intelligent insights
+- ✅ **Mobile-First** - Responsive design works on all devices
+- ✅ **Secure** - Bank-level encryption, GDPR compliant
+- ✅ **Scalable** - Supports unlimited horses and users
+- ✅ **Extensible** - REST API and webhook support
+
+### Use Cases
+
+- **Horse Owners**: Track single or multiple horses, manage health records
+- **Trainers**: Manage client horses, track training sessions, share progress
+- **Stable Managers**: Multi-horse management, staff scheduling, facility management
+- **Veterinarians**: Access patient records, update medical records, schedule appointments
+
+---
+
+## Features
+
+### Core Modules (20+)
+
+1. ✅ **User Management** - Multi-role authentication with JWT
+2. ✅ **Horse Profiles** - Complete profile management with photos
+3. ✅ **Health Records** - Vaccinations, vet visits, medications, dental, hoof care, deworming
+4. ✅ **Training Management** - Session planning, progress tracking, performance analytics
+5. ✅ **Feeding & Nutrition** - Custom feeding plans, nutrition tracking, weight management
+6. ✅ **Calendar & Scheduling** - Integrated calendar with automated reminders
+7. ✅ **AI Chat Assistant** - OpenAI-powered insights and recommendations
+8. ✅ **Weather Analysis** - Real-time weather with riding recommendations
+9. ✅ **Document Storage** - Secure cloud storage for files and photos
+10. ✅ **Breeding Management** - Heat cycles, breeding records, pregnancy monitoring
+11. ✅ **Competition Tracking** - Show planning, results tracking, achievements
+12. ✅ **Financial Management** - Expense tracking, budgets, invoices
+13. ✅ **Stable Management** - Multi-stable support, stall assignments
+14. ✅ **Contacts Database** - Vets, farriers, trainers, suppliers
+15. ✅ **Reports & Analytics** - Custom reports, data visualization, exports
+16. ✅ **Notifications** - Email alerts, reminders, in-app notifications
+17. ✅ **Mobile-Friendly** - Responsive PWA design
+18. ✅ **Security** - Bank-level encryption, role-based access
+19. ✅ **Admin Panel** - Hidden admin control at `/admin`
+20. ✅ **Payments** - Stripe integration for subscriptions
+
+### Landing Page Features
+
+- **Video background** hero section with gradient fallback
+- **Glassmorphism UI** with modern backdrop-blur effects
+- **Advanced animations** - floating particles, 3D hover effects, animated statistics
+- **Auto-rotating testimonials** carousel
+- **Mobile-responsive** design with accessibility improvements
+
+---
+
+## Quick Start
+
+### Prerequisites
+
+#### Required Software
 
 - **Node.js** 20.x or higher ([Download](https://nodejs.org/))
-- **pnpm** 10.x or higher
+- **npm** 10.x or higher (comes with Node.js)
 
   ```bash
-  # Install pnpm globally
-  npm install -g pnpm
-
-  # Or using corepack (recommended)
-  corepack enable
-  corepack prepare pnpm@latest --activate
+  # Verify installation
+  node --version  # Should be v20.x or higher
+  npm --version   # Should be v10.x or higher
   ```
 
-### Database (Choose One)
+#### Database (Choose One)
 
 - **SQLite** (default, no setup required) - Good for development
 - **MySQL 8.0+** (recommended for production)
@@ -52,39 +145,15 @@
   sudo apt-get install mysql-server
 
   # Create database
-  mysql -u root -p -e "CREATE DATABASE equiprofile CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+  mysql -u root -p
+  CREATE DATABASE equiprofile CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+  CREATE USER 'equiprofile'@'localhost' IDENTIFIED BY 'your_secure_password';
+  GRANT ALL PRIVILEGES ON equiprofile.* TO 'equiprofile'@'localhost';
+  FLUSH PRIVILEGES;
+  EXIT;
   ```
 
-### Production Server Requirements
-
-- **Ubuntu 22.04 LTS or 24.04 LTS** (or similar Linux distribution)
-- **Nginx** (for reverse proxy and SSL termination)
-  ```bash
-  sudo apt-get install nginx
-  ```
-- **Certbot** (for SSL certificates)
-  ```bash
-  sudo apt-get install certbot python3-certbot-nginx
-  ```
-- **Domain name** pointed to your server IP
-
-### Required Environment Variables
-
-**CRITICAL: Must be changed in production!**
-
-Generate secure secrets:
-
-```bash
-# JWT Secret (32+ characters)
-openssl rand -base64 32
-
-# Admin password (use a strong password manager)
-openssl rand -base64 16
-```
-
----
-
-## 🚀 Quick Start (Local Development)
+### Local Development
 
 Get EquiProfile running locally in 5 minutes:
 
@@ -93,32 +162,64 @@ Get EquiProfile running locally in 5 minutes:
 git clone https://github.com/amarktainetwork-blip/Equiprofile.online.git
 cd Equiprofile.online
 
-# 2. Install dependencies with frozen lockfile
-bash scripts/install.sh
-# Or: pnpm install --frozen-lockfile
+# 2. Install dependencies
+npm install --legacy-peer-deps
 
 # 3. Copy environment configuration
 cp .env.example .env
 
-# 4. Edit .env file with your configuration
+# 4. Generate secure secrets
+# JWT Secret (copy to .env)
+openssl rand -base64 32
+
+# Admin password (copy to .env)
+openssl rand -base64 16
+
+# 5. Edit .env file with your configuration
 # CRITICAL: Change JWT_SECRET and ADMIN_UNLOCK_PASSWORD!
 nano .env
 
-# 5. Start development server
-pnpm dev
+# 6. Setup database (pushes schema to database)
+npm run db:push
+
+# 7. Start development server
+npm run dev
 ```
 
-The application will be available at `http://localhost:3000`
+The application will be available at `http://localhost:5173`
 
 > **Note**: The default configuration uses SQLite for easy local development. For production, configure MySQL in your `.env` file.
 
+### Docker Setup
+
+```bash
+# Build and run with Docker Compose
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop containers
+docker-compose down
+```
+
 ---
 
-## 🚢 Production Deployment
+## Production Deployment
 
-EquiProfile includes a **plug-and-play production deployment system** for Ubuntu 24.04 VPS.
+### Ubuntu 24.04 Deployment
 
-### One-Command Deployment
+EquiProfile includes a **plug-and-play production deployment system** optimized for Ubuntu 24.04 VPS.
+
+#### Server Requirements
+
+- **OS**: Ubuntu 24.04 LTS (or 22.04 LTS)
+- **RAM**: 2GB minimum (4GB recommended for builds)
+- **Disk**: 10GB available
+- **CPU**: 1 core minimum (2 cores recommended)
+- **Domain**: Domain name pointing to your server IP
+
+#### Quick Installation
 
 Deploy to production in under 20 minutes:
 
@@ -137,1730 +238,1387 @@ sudo cp .env.example .env
 sudo nano .env
 # REQUIRED: Set DATABASE_URL, JWT_SECRET, ADMIN_UNLOCK_PASSWORD, BASE_URL
 
-# 4. Deploy with one of these options:
-
-# Option 1: Fresh Ubuntu 24.04 install (automated setup)
+# 4. Run installation script (Ubuntu 24.04 only)
 sudo bash deployment/ubuntu24/install.sh
 
-# Option 2: Manual deployment (if system already configured)
-sudo bash deployment/deploy.sh
+# The script will:
+# ✅ Install Node.js 20.x LTS, npm, and nginx
+# ✅ Create system user 'www-data'
+# ✅ Setup application directory at /var/equiprofile/app
+# ✅ Install dependencies and build application
+# ✅ Install systemd service
+# ✅ Configure nginx reverse proxy
+# ✅ Verify installation
 
-# 5. Monitor deployment
-tail -f /var/equiprofile/_ops/deploy_*.log
+# 5. Setup SSL with Let's Encrypt
+sudo apt install -y certbot python3-certbot-nginx
+sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
 
-# 6. Verify after deployment completes
-bash scripts/smoke_prod.sh https://equiprofile.online
+# 6. Verify deployment
+bash scripts/smoke_prod.sh https://yourdomain.com
 ```
 
-**Features:**
+**Your EquiProfile instance is now running!** 🎉
 
-- ✅ **Idempotent & deterministic** - safe to run multiple times
-- ✅ **SSH disconnect-safe** - continues running if connection drops
-- ✅ **Git-based** - fetch/checkout/reset for clean deploys
-- ✅ **Build verification** - validates all outputs before restart
-- ✅ **Health checks** - confirms API responds before exit
-- ✅ **Full logs** - everything logged to `/var/equiprofile/_ops/`
+#### Canonical Deployment Settings
 
-**Canonical Settings:**
+- **App root**: `/var/equiprofile/app`
+- **Logs directory**: `/var/log/equiprofile/`
+- **Node.js listens on**: `127.0.0.1:3000` (localhost only)
+- **Systemd service name**: `equiprofile`
+- **Systemd service file**: `deployment/equiprofile.service`
+- **Nginx config template**: `deployment/nginx/equiprofile.conf`
+- **Build outputs**: `dist/public/` (static files), `dist/index.js` (server)
 
-- App root: `/var/equiprofile/app`
-- Logs: `/var/log/equiprofile`
-- Node listens on: `127.0.0.1:3000`
-- Systemd service: `equiprofile`
-- Systemd service file: `deployment/equiprofile.service`
-- Nginx config: `deployment/nginx/equiprofile.conf`
+### Manual Deployment
 
-### Prerequisites
+If not using Ubuntu 24.04, follow these manual steps:
 
-**Server requirements:**
-
-- Ubuntu 24.04 LTS (or 22.04 LTS)
-- Node.js 20.x or higher
-- 2GB RAM minimum (4GB recommended)
-- 10GB disk space
-- Domain name pointed to server IP
-
-**Required environment variables:**
-
-```bash
-DATABASE_URL=mysql://user:password@localhost:3306/equiprofile
-JWT_SECRET=<generate-with-openssl-rand-hex-32>
-ADMIN_UNLOCK_PASSWORD=<secure-password>
-BASE_URL=https://equiprofile.online
-NODE_ENV=production
-
-# PWA disabled by default (recommended for production)
-VITE_PWA_ENABLED=false
-ENABLE_PWA=false
-```
-
-### Deployment Workflow
-
-The deployment script performs these steps automatically:
-
-1. **Pre-flight checks** - validates system requirements
-2. **Git operations** - fetch/checkout/reset to target branch
-3. **Clean install** - `npm ci` for reproducible builds
-4. **Build** - clean dist, build with verification
-5. **Configure services** - updates nginx + systemd if needed
-6. **Restart** - stops old service, starts new one
-7. **Health checks** - verifies endpoints respond
-8. **PWA verification** - confirms service worker blocked
-
-### Updating Production
-
-To deploy latest changes:
-
-```bash
-# Update to latest main branch
-cd /var/equiprofile/app
-sudo bash deployment/deploy.sh
-
-# View deployment log
-tail -f $(ls -t /var/equiprofile/_ops/deploy_*.log | head -1)
-```
-
-### Verification
-
-After any deployment, run the verification script:
-
-```bash
-bash scripts/smoke_prod.sh https://equiprofile.online
-```
-
-Checks performed:
-
-- ✓ Service status and health
-- ✓ Health endpoints (200 OK)
-- ✓ Database connectivity
-- ✓ API responses
-- ✓ Static asset serving
-
-### Troubleshooting & Recovery
-
-If anything goes wrong:
-
-```bash
-# View service logs
-journalctl -u equiprofile -n 100 --no-pager
-
-# View deployment logs
-ls -lt /var/equiprofile/_ops/deploy_*.log | head -1 | xargs tail -200
-
-# Restore nginx config from repo
-sudo cp deployment/nginx/equiprofile.conf /etc/nginx/sites-available/equiprofile
-sudo nginx -t && sudo systemctl reload nginx
-
-# Restore systemd service from repo
-sudo cp deployment/equiprofile.service /etc/systemd/system/equiprofile.service
-sudo systemctl daemon-reload && sudo systemctl restart equiprofile
-```
-
-👉 **See [DEPLOYMENT.md](DEPLOYMENT.md)** for complete deployment guide.  
-👉 **See [RECOVERY.md](RECOVERY.md)** for detailed recovery procedures.
-
----
-
-## ⚙️ Configuration
-
-### Prerequisites
-
-- **Node.js** 22.x or higher ([Download](https://nodejs.org/))
-- **pnpm** 10.x or higher (`npm install -g pnpm`)
-- **Database** (choose one):
-  - SQLite (default, no setup required)
-  - MySQL 8.0+ (recommended for production)
-- **Optional Services**:
-  - AWS S3 or compatible storage (for file uploads)
-  - OpenAI API key (for AI weather analysis)
-  - Stripe account (for billing features)
-
-### Standard Installation
-
-1. **Clone the repository**
-
-   ```bash
-   git clone https://github.com/amarktainetwork-blip/Equiprofile.online.git
-   cd Equiprofile.online
-   ```
-
-2. **Install dependencies**
-
-   ```bash
-   pnpm install
-   ```
-
-3. **Configure environment** (see [Configuration](#-configuration))
-
-   ```bash
-   cp .env.default .env
-   nano .env  # Edit with your settings
-   ```
-
-4. **Setup database** (if using MySQL)
-
-   ```bash
-   # Create database
-   mysql -u root -p -e "CREATE DATABASE equiprofile CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-
-   # Run migrations
-   pnpm db:push
-   ```
-
-5. **Build the application**
-
-   ```bash
-   pnpm build
-   ```
-
-6. **Start the server**
-   ```bash
-   pnpm start
-   ```
-
-### Docker Installation
-
-```bash
-# Using Docker Compose
-docker-compose up -d
-
-# Or using Docker directly
-docker build -t equiprofile .
-docker run -p 3000:3000 --env-file .env equiprofile
-```
-
----
-
-## ⚙️ Configuration
-
-### Environment Variables
-
-All configuration is done through environment variables in the `.env` file. Start with `.env.default` and customize for your needs.
-
-#### Core Configuration (Required)
-
-```env
-# Database Connection
-# SQLite (development): sqlite:./data/equiprofile.db
-# MySQL (production): mysql://username:password@host:port/database
-DATABASE_URL=sqlite:./data/equiprofile.db
-
-# JWT Secret for token signing (CRITICAL - CHANGE IN PRODUCTION!)
-# Generate with: openssl rand -base64 32
-JWT_SECRET=your_secure_jwt_secret_here_min_32_chars
-
-# Admin Unlock Password (CRITICAL - CHANGE IN PRODUCTION!)
-# Used to unlock admin panel features
-ADMIN_UNLOCK_PASSWORD=your_secure_admin_password
-
-# Application Environment
-NODE_ENV=production
-PORT=3000
-BASE_URL=https://yourdomain.com
-```
-
-> **🔒 SECURITY WARNING**: The application will **refuse to start** in production if `JWT_SECRET` or `ADMIN_UNLOCK_PASSWORD` are still set to default values!
-
-#### Feature Flags (Optional)
-
-```env
-# Enable/disable optional features
-ENABLE_STRIPE=false        # Set to 'true' to enable billing
-ENABLE_UPLOADS=false       # Set to 'true' to enable file uploads
-```
-
-#### Stripe Configuration (if ENABLE_STRIPE=true)
-
-```env
-STRIPE_SECRET_KEY=sk_live_xxxxx
-STRIPE_WEBHOOK_SECRET=whsec_xxxxx
-STRIPE_PUBLISHABLE_KEY=pk_live_xxxxx
-STRIPE_MONTHLY_PRICE_ID=price_xxxxx
-STRIPE_YEARLY_PRICE_ID=price_xxxxx
-```
-
-#### Upload/Storage Configuration (if ENABLE_UPLOADS=true)
-
-```env
-# Built-in Forge Storage API
-BUILT_IN_FORGE_API_URL=https://your-forge-api.com
-BUILT_IN_FORGE_API_KEY=your_forge_api_key
-
-# OR AWS S3 (legacy)
-AWS_ACCESS_KEY_ID=your_access_key
-AWS_SECRET_ACCESS_KEY=your_secret_key
-AWS_REGION=us-east-1
-AWS_S3_BUCKET=equiprofile-uploads
-```
-
-#### OAuth Configuration (Optional)
-
-```env
-# OAuth Server URL (leave empty to disable OAuth)
-OAUTH_SERVER_URL=https://oauth.example.com
-
-# OAuth Application ID
-VITE_APP_ID=your_app_id
-
-# Owner OpenID (gets automatic admin access)
-OWNER_OPEN_ID=user_openid_here
-```
-
-#### Additional Optional Features
-
-```env
-# OpenAI for AI features
-OPENAI_API_KEY=sk-xxxxx
-
-# Email Configuration (SMTP)
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your-email@gmail.com
-SMTP_PASSWORD=your-app-password
-SMTP_FROM=noreply@equiprofile.online
-
-# Rate Limiting
-RATE_LIMIT_WINDOW_MS=900000        # 15 minutes
-RATE_LIMIT_MAX_REQUESTS=100
-
-# Cookie Security
-COOKIE_DOMAIN=.equiprofile.online
-COOKIE_SECURE=true
-```
-
----
-
-## 🏗️ Build Structure
-
-Understanding the build output structure is critical for deployment:
-
-### Directory Structure
-
-```
-Equiprofile.online/
-├── client/                    # Frontend source (React + Vite)
-│   ├── src/                   # React application source
-│   ├── public/                # Public static assets
-│   │   ├── service-worker.js  # PWA service worker (versioned)
-│   │   ├── manifest.json      # PWA manifest
-│   │   └── assets/            # Static images, icons
-│   └── index.html             # HTML entry point (NO inline scripts)
-│
-├── server/                    # Backend source (Express + tRPC)
-│   ├── _core/                 # Core server files
-│   │   ├── index.ts           # Main server entry point
-│   │   ├── vite.ts            # Static file serving logic
-│   │   └── ...                # Other core modules
-│   └── ...                    # API routers and business logic
-│
-├── dist/                      # BUILD OUTPUT (generated by `pnpm build`)
-│   ├── index.js               # Bundled server (from esbuild)
-│   └── public/                # Bundled client (from Vite)
-│       ├── index.html         # SPA entry point (NO CACHE)
-│       ├── service-worker.js  # Service worker (NO CACHE)
-│       ├── manifest.json      # PWA manifest
-│       └── assets/            # Hashed static assets (IMMUTABLE CACHE)
-│           ├── index-[hash].js
-│           ├── index-[hash].css
-│           └── ...
-│
-├── scripts/                   # Deployment scripts
-│   ├── install.sh             # Install dependencies (frozen lockfile)
-│   ├── build.sh               # Build for production
-│   ├── deploy.sh              # Orchestrate install + build
-│   └── update-sw-version.js   # Update service worker version
-│
-└── deployment/                # Deployment configurations
-    ├── nginx/                 # Nginx configurations
-    │   ├── equiprofile.conf         # Proxy-all (RECOMMENDED)
-    │   ├── equiprofile-static.conf  # Nginx serves static
-    │   └── archive/                 # Old configs (deprecated)
-    └── systemd/               # systemd service files
-        └── equiprofile.service
-```
-
-### Build Process Details
-
-**Client Build (Vite):**
-
-```bash
-# Input: client/
-# Output: dist/public/
-# Process:
-#   1. Update service worker version from package.json
-#   2. Bundle React app with code splitting
-#   3. Hash all assets for cache busting
-#   4. Copy public/ folder (service-worker.js, manifest.json, etc.)
-#   5. Generate index.html with hashed script/style links
-```
-
-**Server Build (esbuild):**
-
-```bash
-# Input: server/_core/index.ts
-# Output: dist/index.js
-# Process:
-#   1. Bundle all server code into single file
-#   2. Mark dependencies as external (requires node_modules at runtime)
-#   3. Minify for production
-#   4. Generate source maps (optional)
-```
-
-### Runtime Dependencies
-
-**IMPORTANT**: The server build uses `--packages=external`, which means:
-
-- ✅ All dependencies in `package.json` must be available at runtime
-- ✅ You must deploy `node_modules/` OR run `pnpm install --prod --frozen-lockfile` on server
-- ✅ `pnpm-lock.yaml` ensures identical dependency versions
-
-**Alternative** (not recommended): Remove `--packages=external` to bundle all dependencies into `dist/index.js`, but this increases build size and complexity.
-
-### Cache Strategy
-
-| File/Path           | Cache-Control                         | Rationale                                  |
-| ------------------- | ------------------------------------- | ------------------------------------------ |
-| `index.html`        | `no-store, no-cache, must-revalidate` | Always fetch latest SPA entry point        |
-| `service-worker.js` | `no-store, no-cache, must-revalidate` | Force service worker updates on deployment |
-| `/assets/*`         | `public, max-age=31536000, immutable` | Hashed filenames = immutable content       |
-| Other static files  | `public, max-age=86400`               | Moderate caching for non-hashed assets     |
-
-**Why this matters:**
-
-- ❌ Caching `index.html` = users stuck on old versions
-- ❌ Caching `service-worker.js` = service worker never updates
-- ✅ Caching `/assets/*` = blazing fast repeat visits (content never changes due to hashing)
-
-### Service Worker Versioning
-
-The service worker is automatically versioned during build:
-
-1. `scripts/update-sw-version.js` reads `package.json` version
-2. Updates `CACHE_VERSION` constant in `client/public/service-worker.js`
-3. Vite plugin copies versioned service worker to `dist/public/`
-4. Version change forces cache invalidation in users' browsers
-
-**To deploy a new version:**
-
-```bash
-# Bump version in package.json
-npm version patch  # or minor, major
-
-# Build (service worker version auto-updated)
-bash scripts/build.sh
-
-# Deploy and restart
-# Users' browsers will detect new service worker version
-# Old caches are automatically cleaned up
-```
-
----
-
-## 🚀 Deployment
-
-### Quick Deployment (Bundled Dependencies)
-
-The recommended approach bundles all dependencies into the production build, eliminating the need for `node_modules` in production:
-
-```bash
-# Build the application (dependencies are bundled)
-pnpm build
-
-# Copy dist/ to your server
-scp -r dist/ user@server:/var/equiprofile/app/
-
-# Copy .env file
-scp .env user@server:/var/equiprofile/app/
-
-# On the server, start the application
-cd /var/equiprofile/app
-NODE_ENV=production node dist/index.js
-```
-
-> **✅ Advantage**: No need to run `pnpm install` on the server!
-
-### Alternative: External Dependencies
-
-If you prefer keeping dependencies external (uses less disk space but requires `node_modules`):
-
-1. Build with external packages:
-
-   ```bash
-   # Temporarily edit package.json build script to add --packages=external
-   pnpm build
-   ```
-
-2. On server:
-   ```bash
-   pnpm install --prod --frozen-lockfile
-   NODE_ENV=production node dist/index.js
-   ```
-
-### Production Server Setup (VPS/Cloud)
-
-#### 1. Prerequisites
+#### Step 1: Install Dependencies
 
 ```bash
 # Update system
 sudo apt update && sudo apt upgrade -y
 
-# Install Node.js 22.x
-curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+# Install Node.js 20.x LTS
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
-# Install pnpm
-npm install -g pnpm
+# Install Nginx
+sudo apt-get install -y nginx
 
-# Install MySQL (if using)
-sudo apt install -y mysql-server
+# Install MySQL
+sudo apt-get install -y mysql-server
 sudo mysql_secure_installation
 ```
 
-#### 2. Setup Application
+#### Step 2: Configure Database
 
 ```bash
-# Create application directory
-sudo mkdir -p /var/equiprofile/app
-sudo chown -R $USER:$USER /var/equiprofile/app
+# Create database and user
+sudo mysql
 
-# Deploy application files
-cd /var/equiprofile/app
-# Transfer dist/ and .env files here
-
-# Create data directory (for SQLite or uploads)
-mkdir -p data
+CREATE DATABASE equiprofile CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'equiprofile'@'localhost' IDENTIFIED BY 'your_secure_password';
+GRANT ALL PRIVILEGES ON equiprofile.* TO 'equiprofile'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
 ```
 
-#### 3. Process Management (PM2)
+#### Step 3: Deploy Application
 
 ```bash
-# Install PM2
-npm install -g pm2
+# Clone repository
+sudo mkdir -p /var/equiprofile
+cd /var/equiprofile
+sudo git clone https://github.com/amarktainetwork-blip/Equiprofile.online.git app
+cd app
 
-# Start application
-pm2 start dist/index.js --name equiprofile
+# Create environment file
+sudo cp .env.example .env
+sudo nano .env
+# Configure all required variables (see Environment Variables section)
 
-# Enable startup script
-pm2 startup
-pm2 save
+# Install dependencies
+sudo npm ci
 
-# Monitor application
-pm2 status
-pm2 logs equiprofile
-```
+# Build application
+sudo npm run build
 
-#### 4. Nginx Configuration
+# Setup systemd service
+sudo cp deployment/equiprofile.service /etc/systemd/system/equiprofile.service
+sudo systemctl daemon-reload
+sudo systemctl enable equiprofile
+sudo systemctl start equiprofile
 
-Create `/etc/nginx/sites-available/equiprofile`:
-
-```nginx
-server {
-    listen 80;
-    server_name equiprofile.online www.equiprofile.online;
-
-    # Security headers
-    add_header X-Frame-Options "SAMEORIGIN" always;
-    add_header X-Content-Type-Options "nosniff" always;
-    add_header X-XSS-Protection "1; mode=block" always;
-    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-
-    # Serve static files from dist/public
-    location /assets/ {
-        alias /var/equiprofile/app/dist/public/assets/;
-        expires 1y;
-        add_header Cache-Control "public, immutable";
-    }
-
-    location / {
-        proxy_pass http://localhost:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_cache_bypass $http_upgrade;
-    }
-}
-```
-
-Enable and test:
-
-```bash
+# Setup nginx
+sudo cp deployment/nginx/equiprofile.conf /etc/nginx/sites-available/equiprofile
 sudo ln -s /etc/nginx/sites-available/equiprofile /etc/nginx/sites-enabled/
+sudo rm /etc/nginx/sites-enabled/default
 sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-#### 5. SSL Certificate (Let's Encrypt)
+#### Step 4: Verify Deployment
 
 ```bash
-# Install Certbot
+# Check service status
+sudo systemctl status equiprofile
+
+# Check application logs
+sudo journalctl -u equiprofile -n 50
+
+# Test health endpoint
+curl http://127.0.0.1:3000/api/health
+curl https://yourdomain.com/api/health
+
+# Run smoke tests
+bash scripts/smoke_prod.sh https://yourdomain.com
+```
+
+### Environment Variables
+
+#### Required (Core)
+
+These **must** be configured for the application to start:
+
+```env
+# Database
+DATABASE_URL=mysql://equiprofile:password@localhost:3306/equiprofile
+
+# Security - CRITICAL: Generate secure values!
+JWT_SECRET=<generate-with: openssl rand -base64 32>
+ADMIN_UNLOCK_PASSWORD=<your-secure-password>
+
+# Application
+NODE_ENV=production
+PORT=3000
+BASE_URL=https://yourdomain.com
+
+# PWA (disabled by default for production)
+VITE_PWA_ENABLED=false
+ENABLE_PWA=false
+```
+
+#### Generating Secure Secrets
+
+```bash
+# Generate JWT secret (64+ characters recommended)
+openssl rand -hex 32
+
+# Generate admin password
+openssl rand -base64 24
+```
+
+### SSL Setup
+
+Enable HTTPS with Let's Encrypt (free SSL certificates):
+
+#### Step 1: Install Certbot
+
+```bash
+sudo apt update
 sudo apt install -y certbot python3-certbot-nginx
+```
 
-# Obtain certificate
-sudo certbot --nginx -d equiprofile.online -d www.equiprofile.online
+#### Step 2: Obtain Certificate
 
-# Auto-renewal is configured automatically
+```bash
+# Replace with your domain
+sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
+```
+
+Follow the prompts:
+- Enter email address (for renewal notifications)
+- Agree to terms of service
+- Choose whether to redirect HTTP to HTTPS (recommended: yes)
+
+#### Step 3: Verify SSL
+
+```bash
+# Test your SSL setup
+curl -I https://yourdomain.com
+
+# Check SSL rating
+# Visit: https://www.ssllabs.com/ssltest/analyze.html?d=yourdomain.com
+```
+
+#### Step 4: Auto-Renewal
+
+Certbot automatically sets up renewal. Test it:
+
+```bash
 sudo certbot renew --dry-run
 ```
 
----
-
-## 📦 Offline/Air-Gapped Deployment
-
-For environments without internet access (air-gapped, secure networks, etc.):
-
-### Method 1: Bundled Dependencies (Recommended)
-
-The default build bundles all dependencies, making offline deployment simple:
-
-```bash
-# On a machine with internet:
-git clone https://github.com/amarktainetwork-blip/Equiprofile.online.git
-cd Equiprofile.online
-pnpm install
-pnpm build
-
-# Create deployment package
-tar -czf equiprofile-offline.tar.gz dist/ .env.default
-
-# Transfer to air-gapped server
-scp equiprofile-offline.tar.gz user@secure-server:/tmp/
-
-# On the air-gapped server:
-cd /var/equiprofile/app
-tar -xzf /tmp/equiprofile-offline.tar.gz
-cp .env.default .env
-nano .env  # Configure for your environment
-
-# Start (no npm/pnpm needed!)
-NODE_ENV=production node dist/index.js
-```
-
-### Method 2: Pack Dependencies
-
-If you need to use the external dependencies approach:
-
-```bash
-# On machine with internet:
-pnpm install --frozen-lockfile
-pnpm build
-
-# Create offline bundle with node_modules
-tar -czf equiprofile-full.tar.gz dist/ node_modules/ package.json pnpm-lock.yaml .env.default
-
-# Transfer and extract on air-gapped server
-# No pnpm install needed - node_modules included!
-```
-
-### Method 3: Internal NPM Registry
-
-For organizations with internal npm registries:
-
-```bash
-# Configure .npmrc on air-gapped server
-registry=https://internal-registry.company.com/
-
-# Then deploy normally
-pnpm install --frozen-lockfile
-pnpm build
-pnpm start
-```
-
-### Offline Deployment Checklist
-
-- [ ] Build application with dependencies bundled
-- [ ] Package `dist/` directory
-- [ ] Include `.env.default` as template
-- [ ] Transfer to secure server
-- [ ] Configure `.env` with production values
-- [ ] Verify database is accessible
-- [ ] Start application
-- [ ] Test all features work
+SSL certificates will auto-renew before expiration.
 
 ---
 
-## 🎨 Updating Visuals Post-Deployment
+## API Keys & Integrations
 
-You can update your EquiProfile deployment's visual appearance without rebuilding the application!
+### Required (Core)
 
-### Quick Visual Updates
+These are essential for the system to function:
 
-#### 1. Update Colors and Styles
+#### Database Configuration
 
-Edit `/var/equiprofile/app/dist/public/theme-override.css`:
+```env
+DATABASE_URL=mysql://username:password@host:port/database
+```
+
+**Purpose**: Primary database connection for storing all application data  
+**Where to get it**: Configure your MySQL/MariaDB database server  
+**Cost**: Free (self-hosted) or varies by cloud provider
+
+#### JWT Secret
+
+```env
+JWT_SECRET=your_jwt_secret_here_minimum_32_characters
+```
+
+**Purpose**: Secure authentication tokens  
+**How to generate**:
 
 ```bash
-nano /var/equiprofile/app/dist/public/theme-override.css
+openssl rand -base64 32
 ```
 
-Example customizations:
+**Cost**: Free
 
-```css
-:root {
-  /* Change primary brand color */
-  --primary: 220 90% 56%; /* Blue theme */
-  --primary-foreground: 0 0% 100%;
+#### Admin Password
 
-  /* Or use your brand colors */
-  --primary: 142 71% 45%; /* Green theme */
-}
-
-/* Custom button style */
-.btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-/* Custom header */
-header {
-  background: #1a202c;
-}
+```env
+ADMIN_UNLOCK_PASSWORD=your_secure_admin_password
 ```
 
-**Changes take effect immediately** - just reload the page!
+**Purpose**: Access to hidden admin panel at `/admin` that controls the entire site  
+**Important**: MUST be changed from default in production  
+**Cost**: Free
 
-#### 2. Update Branding Configuration
+### Optional (Enhanced Features)
 
-Edit `/var/equiprofile/app/dist/public/visual-config.json`:
+These enable additional functionality:
 
-```bash
-nano /var/equiprofile/app/dist/public/visual-config.json
+<a name="stripe-setup"></a>
+#### Stripe Payment Setup
+
+```env
+ENABLE_STRIPE=true
+STRIPE_SECRET_KEY=sk_live_xxxxxxxxxxxxx
+STRIPE_PUBLISHABLE_KEY=pk_live_xxxxxxxxxxxxx
+STRIPE_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxx
+STRIPE_MONTHLY_PRICE_ID=price_xxxxxxxxxxxxx
+STRIPE_YEARLY_PRICE_ID=price_xxxxxxxxxxxxx
 ```
 
-Example configuration:
+**Purpose**: Real-time payment processing for subscriptions  
+**Where to get it**: https://dashboard.stripe.com/apikeys
 
-```json
-{
-  "branding": {
-    "siteName": "MyEquineApp",
-    "tagline": "Professional Horse Care",
-    "description": "Your custom description"
-  },
+**Setup Steps**:
+1. Create Stripe account at https://stripe.com
+2. Navigate to Developers → API keys
+3. Copy both Publishable and Secret keys
+4. Set up webhook endpoint for subscription events
+5. Copy webhook signing secret
+6. Go to https://dashboard.stripe.com/products
+7. Create product "EquiProfile"
+8. Add monthly and yearly price options
+9. Copy the price IDs
 
-  "colors": {
-    "primary": "#2563eb",
-    "secondary": "#7c3aed"
-  },
+**Cost**: Free to start, 2.9% + $0.30 per transaction
 
-  "logos": {
-    "header": "/images/my-logo.png",
-    "footer": "/images/my-logo-white.png"
-  },
+<a name="aws-s3-setup"></a>
+#### AWS S3 Storage Setup
 
-  "hero": {
-    "title": "Your Custom Title",
-    "subtitle": "Your custom subtitle",
-    "backgroundGradient": "linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)"
-  }
-}
+```env
+ENABLE_UPLOADS=true
+AWS_ACCESS_KEY_ID=AKIAxxxxxxxxxxxxx
+AWS_SECRET_ACCESS_KEY=xxxxxxxxxxxxx
+AWS_REGION=us-east-1
+AWS_S3_BUCKET=equiprofile-uploads
 ```
 
-**Changes take effect on page reload** - no rebuild needed!
+**Purpose**: Secure document and file storage  
+**Where to get it**: https://aws.amazon.com/s3/
 
-#### 3. Replace Images and Logos
+**Setup Steps**:
+1. Create AWS account
+2. Navigate to IAM → Users → Create user
+3. Attach policy: `AmazonS3FullAccess`
+4. Create access keys
+5. Create S3 bucket in desired region
+6. Configure bucket CORS if needed
 
-Simply replace files in `/var/equiprofile/app/dist/public/images/`:
+**Cost**:
+- First 50 TB: $0.023 per GB/month
+- First 50,000 GET requests: Free
+- PUT requests: $0.005 per 1,000 requests
 
-```bash
-# Upload your custom logo
-scp my-logo.png user@server:/var/equiprofile/app/dist/public/images/logo.png
+<a name="openai-integration"></a>
+#### OpenAI Integration
 
-# Upload custom hero background
-scp hero-bg.jpg user@server:/var/equiprofile/app/dist/public/images/hero-bg.jpg
+```env
+OPENAI_API_KEY=sk-xxxxxxxxxxxxx
 ```
 
-### Advanced Visual Customization
+**Purpose**:
+- AI-powered chat assistant
+- Intelligent insights and recommendations
+- Natural language processing
+- Smart data analysis
 
-#### Custom Fonts
+**Where to get it**: https://platform.openai.com/api-keys
 
-Add to `theme-override.css`:
+**Setup Steps**:
+1. Create account at https://openai.com
+2. Navigate to API keys section
+3. Create new secret key
+4. Copy and save immediately (only shown once)
 
-```css
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap");
+**Cost**:
+- Pay-as-you-go pricing
+- GPT-4: ~$0.03 per 1K input tokens, ~$0.06 per 1K output tokens
+- GPT-3.5-turbo: ~$0.0005 per 1K input tokens, ~$0.0015 per 1K output tokens
 
-:root {
-  --font-sans: "Poppins", sans-serif;
-}
+<a name="weather-api"></a>
+#### Weather API
 
-body {
-  font-family: var(--font-sans);
-}
+```env
+WEATHER_API_KEY=xxxxxxxxxxxxx
+WEATHER_API_PROVIDER=openweathermap
 ```
 
-#### Custom Components
+**Purpose**: Real-time weather analysis for riding recommendations  
+**Where to get it**: https://openweathermap.org/api
 
-Override specific component styles:
+**Alternative providers**:
+- WeatherAPI.com
+- Weatherstack
+- Tomorrow.io
 
-```css
-/* Customize cards */
-.card {
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
+**Setup Steps**:
+1. Sign up at https://openweathermap.org/api
+2. Subscribe to API plan (free tier available)
+3. Generate API key from dashboard
+4. Copy API key
 
-/* Customize navigation */
-nav {
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-}
+**Cost**:
+- Free tier: 1,000 calls/day
+- Paid plans: Start at $40/month for 100,000 calls/day
 
-/* Customize buttons */
-button.primary {
-  background: #667eea;
-  border-radius: 8px;
-  padding: 12px 24px;
-}
+<a name="email-smtp"></a>
+#### Email SMTP
+
+```env
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_email@gmail.com
+SMTP_PASSWORD=your_app_password
+SMTP_FROM=noreply@equiprofile.online
 ```
 
-### Visual Update Workflow
+**Purpose**:
+- Send appointment reminders
+- Vaccination alerts
+- System notifications
+- Password resets
 
-```bash
-# 1. Edit theme or config files
-nano /var/equiprofile/app/dist/public/theme-override.css
-nano /var/equiprofile/app/dist/public/visual-config.json
+**Recommended providers**:
+- Gmail (with App Password)
+- SendGrid (https://sendgrid.com)
+- Mailgun (https://mailgun.com)
+- Amazon SES (https://aws.amazon.com/ses/)
 
-# 2. No restart needed! Just refresh browser
-# Changes are visible immediately
+**Gmail Setup**:
+1. Enable 2-factor authentication
+2. Generate App Password at https://myaccount.google.com/apppasswords
+3. Use app password in SMTP_PASSWORD
 
-# 3. Test in browser
-# Open https://yourdomain.com and verify changes
+**Cost**:
+- Gmail: Free (limited)
+- SendGrid: Free tier 100 emails/day, paid from $15/month
+- Mailgun: First 5,000 emails free/month
+- Amazon SES: $0.10 per 1,000 emails
 
-# 4. Backup your customizations
-cp dist/public/theme-override.css backups/theme-override-$(date +%Y%m%d).css
-cp dist/public/visual-config.json backups/visual-config-$(date +%Y%m%d).json
+### Complete Configuration Example
+
+#### Minimal Setup (Basic Functionality)
+
+```env
+NODE_ENV=production
+PORT=3000
+BASE_URL=https://equiprofile.online
+DATABASE_URL=mysql://user:pass@localhost:3306/equiprofile
+JWT_SECRET=<generate_with_openssl>
+ADMIN_UNLOCK_PASSWORD=<secure_password>
 ```
+
+#### Full Setup (All Features)
+
+```env
+# Core
+NODE_ENV=production
+PORT=3000
+BASE_URL=https://equiprofile.online
+DATABASE_URL=mysql://user:pass@localhost:3306/equiprofile
+JWT_SECRET=<generate_with_openssl>
+ADMIN_UNLOCK_PASSWORD=<secure_password>
+
+# Payments
+ENABLE_STRIPE=true
+STRIPE_SECRET_KEY=sk_live_xxx
+STRIPE_PUBLISHABLE_KEY=pk_live_xxx
+STRIPE_WEBHOOK_SECRET=whsec_xxx
+STRIPE_MONTHLY_PRICE_ID=price_xxx
+STRIPE_YEARLY_PRICE_ID=price_xxx
+
+# AI
+OPENAI_API_KEY=sk-xxx
+
+# Weather
+WEATHER_API_KEY=xxx
+WEATHER_API_PROVIDER=openweathermap
+
+# Storage
+ENABLE_UPLOADS=true
+AWS_ACCESS_KEY_ID=AKIAxxx
+AWS_SECRET_ACCESS_KEY=xxx
+AWS_REGION=us-east-1
+AWS_S3_BUCKET=equiprofile-uploads
+
+# Email
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_email@gmail.com
+SMTP_PASSWORD=your_app_password
+SMTP_FROM=noreply@equiprofile.online
+
+# PWA (optional)
+ENABLE_PWA=false
+VITE_PWA_ENABLED=false
+```
+
+### Cost Estimate
+
+#### Minimal Setup (Basic Features)
+
+- Database (self-hosted): $0
+- Server: $5-10/month
+- **Total: $5-10/month**
+
+#### Full Setup (All Features)
+
+- Database: $0-20/month
+- Server: $10-50/month
+- Stripe: Pay-per-transaction (2.9% + $0.30)
+- OpenAI API: $10-50/month (usage-based)
+- Weather API: $0-40/month
+- AWS S3: $5-20/month
+- Email (SendGrid): $0-15/month
+- **Total: $25-195/month** (plus transaction fees)
 
 ---
 
-## 🔒 Security
-
-### Security Best Practices
-
-#### Critical Security Requirements
-
-1. **Change Default Secrets** ⚠️
-
-   The application **will not start** in production with default secrets:
-
-   ```bash
-   # Generate secure JWT secret
-   openssl rand -base64 32
-
-   # Use a strong admin password (min 12 characters)
-   # Include uppercase, lowercase, numbers, and symbols
-   ```
-
-2. **Use HTTPS in Production** ⚠️
-
-   Always use SSL/TLS encryption:
-
-   ```bash
-   # Get free SSL certificate from Let's Encrypt
-   sudo certbot --nginx -d yourdomain.com
-   ```
-
-3. **Keep Dependencies Updated**
-
-   ```bash
-   # Check for updates
-   pnpm outdated
-
-   # Update dependencies
-   pnpm update
-
-   # Audit for vulnerabilities
-   pnpm audit
-   ```
-
-4. **Configure Firewall**
-
-   ```bash
-   # Allow only necessary ports
-   sudo ufw allow 22    # SSH
-   sudo ufw allow 80    # HTTP
-   sudo ufw allow 443   # HTTPS
-   sudo ufw enable
-   ```
-
-### Authentication & Authorization
-
-- **Email/Password Authentication** - bcrypt hashing with salting
-- **OAuth 2.0 Support** - Optional integration with external providers
-- **Session-based Authentication** - HTTP-only cookies
-- **Role-Based Access Control** - User and Admin roles
-- **Admin Panel** - Protected by unlock password
-
-### Data Protection
-
-- **Encryption in Transit** - TLS 1.2+ required
-- **Encryption at Rest** - Database supports encryption
-- **Input Validation** - All inputs validated with Zod schemas
-- **SQL Injection Prevention** - Drizzle ORM with parameterized queries
-- **XSS Protection** - React's built-in escaping
-- **CSRF Protection** - Automatic token validation
-
-### Rate Limiting
-
-- **Public endpoints**: 100 requests per 15 minutes
-- **Authenticated endpoints**: 1000 requests per 15 minutes
-- **File uploads**: 50 requests per hour
-- **AI endpoints**: 20 requests per hour
-
-### Security Headers
-
-Recommended Nginx configuration:
-
-```nginx
-add_header X-Frame-Options "SAMEORIGIN" always;
-add_header X-Content-Type-Options "nosniff" always;
-add_header X-XSS-Protection "1; mode=block" always;
-add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';" always;
-```
-
-### Reporting Security Vulnerabilities
-
-If you discover a security vulnerability:
-
-1. **DO NOT** open a public GitHub issue
-2. Email: security@equiprofile.online
-3. Include:
-   - Description of vulnerability
-   - Steps to reproduce
-   - Potential impact
-   - Suggested fix (if any)
-
-We will respond within 48 hours.
-
-### Security Checklist for Production
-
-- [ ] Changed `JWT_SECRET` from default
-- [ ] Changed `ADMIN_UNLOCK_PASSWORD` from default
-- [ ] HTTPS enabled with valid SSL certificate
-- [ ] Database using encrypted connections
-- [ ] Firewall configured (ports 80, 443, 22 only)
-- [ ] Security headers configured in Nginx
-- [ ] Rate limiting enabled
-- [ ] Error monitoring configured
-- [ ] Backup system tested
-- [ ] Dependencies updated to latest secure versions
-- [ ] Fail2ban configured for SSH protection
-- [ ] Regular security updates scheduled
-
----
-
-## 📚 API Documentation
-
-### API Overview
-
-EquiProfile uses tRPC for type-safe API communication.
-
-**Base URL**:
-
-- Development: `http://localhost:3000/api/trpc`
-- Production: `https://yourdomain.com/api/trpc`
-
-**Authentication**: Session-based with HTTP-only cookies
-
-### Key API Routers
-
-#### System Router (`system.*`)
-
-- `system.status` - Get system health status
-
-#### Auth Router (`auth.*`)
-
-- `auth.me` - Get current authenticated user
-- `auth.logout` - Logout current user
-- `auth.register` - Register new user (email/password)
-- `auth.login` - Login with email/password
-
-#### User Router (`user.*`)
-
-- `user.getProfile` - Get user profile
-- `user.updateProfile` - Update user profile
-- `user.getSubscriptionStatus` - Get subscription details
-- `user.getDashboardStats` - Get dashboard statistics
-
-#### Horses Router (`horses.*`)
-
-- `horses.list` - List all user's horses
-- `horses.get` - Get specific horse details
-- `horses.create` - Create new horse profile
-- `horses.update` - Update horse profile
-- `horses.delete` - Delete horse profile
-
-#### Health Router (`health.*`)
-
-- `health.list` - List health records for a horse
-- `health.create` - Create health record
-- `health.update` - Update health record
-- `health.delete` - Delete health record
-
-#### Training Router (`training.*`)
-
-- `training.list` - List training sessions
-- `training.create` - Create training session
-- `training.update` - Update training session
-- `training.delete` - Delete training session
-
-#### Feeding Router (`feeding.*`)
-
-- `feeding.list` - List feeding plans
-- `feeding.create` - Create feeding plan
-- `feeding.update` - Update feeding plan
-- `feeding.delete` - Delete feeding plan
-
-#### Admin Router (`admin.*`) - Requires Admin Role
-
-- `admin.listUsers` - List all users
-- `admin.suspendUser` - Suspend user account
-- `admin.getSystemStats` - Get system statistics
-- `admin.getActivityLogs` - Get activity logs
-
-### Example API Usage
-
-```typescript
-// Using tRPC client
-import { trpc } from "@/lib/trpc";
-
-// Query example
-const { data: horses } = trpc.horses.list.useQuery();
-
-// Mutation example
-const createHorse = trpc.horses.create.useMutation({
-  onSuccess: () => {
-    console.log("Horse created successfully!");
-  },
-});
-
-createHorse.mutate({
-  name: "Thunder",
-  breed: "Thoroughbred",
-  age: 5,
-  discipline: "Show Jumping",
-});
-```
-
-For complete API documentation, see the auto-generated TypeScript types in `shared/schema.ts`.
-
----
-
-## 👨‍💻 Development
-
-### Development Setup
-
-```bash
-# Install dependencies
-pnpm install
-
-# Start development server (with hot reload)
-pnpm dev
-
-# Run type checking
-pnpm check
-
-# Format code
-pnpm format
-
-# Run tests
-pnpm test
-```
+## Architecture
+
+### Tech Stack
+
+#### Frontend
+- **React 18** - UI library
+- **TypeScript** - Type-safe JavaScript
+- **TailwindCSS** - Utility-first CSS framework
+- **Framer Motion** - Animation library
+- **TanStack Query** - Data fetching and caching
+- **Vite** - Build tool and dev server
+
+#### Backend
+- **Node.js** - JavaScript runtime
+- **Express** - Web framework
+- **tRPC** - Type-safe API layer
+- **Drizzle ORM** - Type-safe database ORM
+- **MySQL** - Relational database
+- **JWT + bcrypt** - Authentication and encryption
+
+#### Infrastructure
+- **Nginx** - Reverse proxy and static file server
+- **Systemd** - Process management
+- **Let's Encrypt** - SSL certificates
+- **PM2** (optional) - Process manager
 
 ### Project Structure
 
 ```
 Equiprofile.online/
-├── client/                 # Frontend React application
+├── client/               # Frontend React application
 │   ├── src/
-│   │   ├── components/    # Reusable UI components
-│   │   ├── pages/         # Page components
-│   │   ├── lib/           # Utilities and helpers
-│   │   └── main.tsx       # Application entry point
-│   ├── public/            # Static assets
-│   └── index.html         # HTML template
-│
-├── server/                # Backend Node.js application
-│   ├── _core/             # Core server setup
-│   │   ├── index.ts       # Server entry point
-│   │   └── env.ts         # Environment configuration
-│   ├── routers/           # tRPC API routers
-│   ├── services/          # Business logic services
-│   └── middleware/        # Authentication & validation
-│
-├── shared/                # Shared code (client & server)
-│   ├── schema.ts          # Zod validation schemas
-│   └── types.ts           # TypeScript types
-│
-├── drizzle/               # Database schema and migrations
-├── scripts/               # Build and deployment scripts
-├── dist/                  # Production build output
-└── package.json           # Dependencies and scripts
+│   │   ├── components/  # React components
+│   │   ├── hooks/       # Custom React hooks
+│   │   ├── lib/         # Utilities and helpers
+│   │   ├── pages/       # Page components
+│   │   └── main.tsx     # Entry point
+│   └── public/          # Static assets
+├── server/              # Backend Node.js application
+│   ├── index.ts         # Server entry point
+│   ├── routes.ts        # tRPC routes
+│   ├── db/              # Database schema and migrations
+│   └── lib/             # Server utilities
+├── shared/              # Shared types and utilities
+├── deployment/          # Deployment scripts and configs
+│   ├── ubuntu24/        # Ubuntu 24.04 installation
+│   ├── nginx/           # Nginx configuration
+│   ├── deploy.sh        # Deployment script
+│   └── equiprofile.service # Systemd service
+├── scripts/             # Utility scripts
+├── docs/                # Documentation
+└── dist/                # Build output (generated)
+    ├── public/          # Frontend static files
+    └── index.js         # Backend server bundle
 ```
 
-### Technology Stack
+### Database Schema
 
-**Frontend**:
+EquiProfile uses MySQL with Drizzle ORM for type-safe database operations.
 
-- React 19 - UI framework
-- TypeScript - Type safety
-- Tailwind CSS - Styling
-- Wouter - Routing
-- tRPC - Type-safe API client
-- TanStack Query - Data fetching
+**Main Tables**:
+- `users` - User accounts and authentication
+- `horses` - Horse profiles and basic information
+- `health_records` - Vaccinations, vet visits, medications
+- `training_sessions` - Training logs and progress
+- `feeding_schedules` - Nutrition plans and feeding times
+- `breeding_records` - Heat cycles and breeding data
+- `competitions` - Show entries and results
+- `expenses` - Financial tracking
+- `documents` - File metadata and storage
+- `calendar_events` - Appointments and reminders
+- `contacts` - Veterinarians, farriers, trainers
 
-**Backend**:
-
-- Node.js - Runtime
-- Express - Web framework
-- tRPC - Type-safe API
-- Drizzle ORM - Database
-- Jose - JWT handling
-- bcrypt - Password hashing
-
-**Database**:
-
-- SQLite (development)
-- MySQL (production)
-
-**Build Tools**:
-
-- Vite - Frontend bundler
-- esbuild - Backend bundler
-- TypeScript - Compiler
-
-### Development Scripts
+**Schema Management**:
 
 ```bash
-# Development
-pnpm dev                   # Start dev server with hot reload
+# Push schema changes to database
+npm run db:push
 
-# Building
-pnpm build                 # Build for production
-pnpm build:sw              # Update service worker version
+# Generate migrations
+npm run db:generate
 
-# Testing
-pnpm test                  # Run all tests
-pnpm test -- health        # Run specific test file
-
-# Code Quality
-pnpm check                 # TypeScript type checking
-pnpm format                # Format code with Prettier
-
-# Database
-pnpm db:push               # Push schema changes to database
+# Run migrations
+npm run db:migrate
 ```
 
-### Adding New Features
+<a name="realtime-sse"></a>
+### Real-time Updates (SSE)
 
-1. **Create database schema** in `drizzle/schema.ts`
-2. **Create tRPC router** in `server/routers/`
-3. **Create frontend pages** in `client/src/pages/`
-4. **Add routes** to `client/src/App.tsx`
-5. **Write tests** in `server/*.test.ts`
+EquiProfile supports Server-Sent Events (SSE) for real-time notifications:
 
-### Testing
-
-```bash
-# Run all tests
-pnpm test
-
-# Run specific test file
-pnpm test -- horses.test.ts
-
-# Watch mode
-pnpm test --watch
-```
-
-Tests use Vitest and follow the pattern:
-
-- Unit tests for business logic
-- Integration tests for API endpoints
-- Mock external services
-
-### Code Style
-
-- **TypeScript**: Strict mode enabled
-- **Formatting**: Prettier with default config
-- **Linting**: ESLint for code quality
-- **Commits**: Conventional commits recommended
+- Health check reminders
+- Upcoming appointments
+- Training session alerts
+- Weather updates
+- System notifications
 
 ---
 
-## 🔧 Troubleshooting
+## Features Breakdown
 
-### Common Deployment Issues
+<a name="core-modules"></a>
+### Core Modules (20+)
 
-#### Issue 1: Old Design Still Showing After Deployment
+<a name="health-vet"></a>
+#### 1. Health & Vet Management
 
-**Symptoms:**
+**Vaccinations**
+- Track all vaccination records with automatic reminders
+- Vaccination history timeline
+- Veterinarian information
+- Batch numbers and expiration dates
+- Adverse reactions tracking
+- Export vaccination certificates
 
-- Users see old design/features after deployment
-- Changes don't appear even after hard refresh
-- Service worker serves stale content
+**Veterinary Visits**
+- Complete vet visit logging
+- Diagnosis and treatment tracking
+- Cost management
+- Multiple vet profiles
+- Visit history and emergency contacts
 
-**Solutions:**
+**Medications**
+- Active medications list with dosage schedules
+- Medication reminders and side effects monitoring
+- Cost tracking and prescription management
+- Inventory tracking with refill reminders
 
-1. **Clear browser cache and service worker:**
+**Dental Care**
+- Dental exam history
+- Dentist information and procedure tracking
+- Cost management
+- Next appointment reminders
 
-   ```bash
-   # In browser DevTools (F12):
-   # 1. Application tab → Service Workers → Unregister
-   # 2. Application tab → Clear Storage → Clear site data
-   # 3. Hard refresh (Ctrl+Shift+R or Cmd+Shift+R)
-   ```
+**Hoof Care**
+- Farrier visit tracking and shoeing schedule
+- Hoof condition monitoring
+- Farrier contact management
+- Cost tracking and photo uploads
 
-2. **Verify service worker version updated:**
+**Deworming**
+- Deworming schedule with product tracking
+- Rotation planning
+- Weight-based dosage calculations
+- Next due date reminders
 
-   ```bash
-   # Check service-worker.js has new version
-   curl https://yourdomain.com/service-worker.js | grep CACHE_VERSION
+<a name="training"></a>
+#### 2. Training & Performance
 
-   # Should match package.json version
-   cat package.json | grep version
-   ```
+- **Training session planning** with custom programs
+- **Progress tracking** with comprehensive metrics
+- **Performance analytics** with data visualization
+- **Training logs** with notes and video upload support
+- **Goal setting and tracking**
+- **Trainer assignments** and collaboration
+- **Metrics tracked**: Duration, intensity, exercises, behavior, progress notes
 
-3. **Ensure proper cache headers:**
+<a name="nutrition"></a>
+#### 3. Nutrition & Feeding
 
-   ```bash
-   # Check index.html headers (should be no-cache)
-   curl -I https://yourdomain.com/
-   # Should see: Cache-Control: no-store, no-cache, must-revalidate
+**Feeding Schedules**
+- Custom feeding plans with meal scheduling
+- Portion control and multiple feeds per day
+- Special dietary requirements
+- Cost tracking and inventory management
 
-   # Check service-worker.js headers (should be no-cache)
-   curl -I https://yourdomain.com/service-worker.js
-   # Should see: Cache-Control: no-store, no-cache, must-revalidate
-   ```
+**Nutrition Logs**
+- Daily feed tracking
+- Weight monitoring
+- Body condition scoring
+- Supplement tracking
+- Nutritional analysis
 
-4. **Force version bump:**
+**Nutrition Plans**
+- Custom diet plans with nutritionist recommendations
+- Seasonal adjustments
+- Performance-based nutrition
+- Weight management programs
 
-   ```bash
-   # Bump version in package.json
-   npm version patch
+<a name="breeding"></a>
+#### 4. Breeding Management
 
-   # Rebuild (service worker version auto-updates)
-   bash scripts/build.sh
+- **Mare heat cycle tracking**
+- **Breeding records** with detailed logging
+- **Pregnancy monitoring**
+- **Foaling schedules**
+- **Pedigree information**
+- **Breeding analytics**
 
-   # Restart server
-   sudo systemctl restart equiprofile
-   ```
+<a name="admin"></a>
+#### 5. Administrative Tools
 
-#### Issue 2: CSS/JS Returning HTML (MIME Type Error)
+**Admin Panel** (accessible at `/admin`)
+- System-wide control
+- User management (add/remove users)
+- Database operations
+- System monitoring
+- API key management
+- Feature toggles
+- Backup management
+- Configuration management
 
-**Symptoms:**
+**Financial Management**
+- Expense tracking by category
+- Budget management
+- Cost per horse calculations
+- Invoice generation
+- Payment tracking
+- Financial reports and exports
 
-- Browser console shows: "Refused to apply style because its MIME type ('text/html') is not a supported stylesheet MIME type"
-- Assets return HTML (index.html) instead of actual files
-- White screen or broken styles
+**Contacts Database**
+- Comprehensive contact management
+- Categories: Veterinarians, Farriers, Trainers, Dentists, Emergency contacts, Suppliers
+- Quick dial/email functionality
+- Communication history tracking
 
-**Root Cause:** SPA fallback incorrectly serving index.html for asset requests
+**Document Management**
+- Secure document storage with cloud integration
+- Multiple file formats (PDF, images, videos)
+- Folder organization and search functionality
+- Version control and sharing capabilities
 
-**Solutions:**
+**Calendar & Scheduling**
+- Integrated calendar with all events
+- Color-coded event types
+- Multiple views (day, week, month)
+- Recurring events and reminders
+- iCal export and sync
 
-1. **Check build output exists:**
+**Reports & Analytics**
+- Health summary reports
+- Training progress reports
+- Financial reports
+- Vaccination schedules
+- Custom reports with export to PDF/Excel
+- Data visualization
 
-   ```bash
-   # Verify dist/public/ contains assets
-   ls -la dist/public/
-   ls -la dist/public/assets/
+#### 6. AI & Weather Features
 
-   # Verify index.js exists
-   ls -la dist/index.js
-   ```
+**AI Chat Assistant** (requires OpenAI API key)
+- Natural language interaction
+- Horse care advice and data insights
+- Training recommendations
+- Health analysis and quick information lookup
 
-2. **Verify server static path in production:**
+**Weather Analysis** (requires Weather API key)
+- Real-time weather data
+- Riding condition recommendations
+- Weather-based scheduling
+- Temperature and humidity tracking
+- Forecast integration with automated suggestions
 
-   ```javascript
-   // In server/_core/vite.ts, check distPath:
-   // Should be: path.resolve(import.meta.dirname, "public")
-   // NOT: path.resolve(import.meta.dirname, "../..", "dist", "public")
-   ```
+#### 7. Payment & Subscriptions
 
-3. **Check Nginx configuration:**
+**Stripe Integration** (requires Stripe API keys)
+- Multiple subscription tiers (monthly/yearly)
+- Secure payment processing
+- Automatic billing
+- Invoice generation
+- Payment history
+- Free trial (14 days)
+- Custom enterprise plans
 
-   ```bash
-   # If using nginx static serving, verify root path
-   grep "root" /etc/nginx/sites-available/equiprofile
-   # Should point to correct dist/public directory
+#### 8. Security & Privacy
 
-   # Test nginx config
-   sudo nginx -t
-   ```
+- **Bank-level encryption** with secure data storage
+- **Role-based access control** (Admin, Owner, Trainer, Viewer)
+- **Audit logging** for all actions
+- **Data privacy controls** with GDPR compliance
+- **Regular backups** and data redundancy
+- **JWT authentication** with bcrypt password hashing
+- **Rate limiting** and HTTPS-only in production
 
-4. **Use recommended proxy-all nginx config:**
-   ```bash
-   # Switch to simpler config (avoids path issues)
-   sudo cp deployment/nginx/equiprofile.conf /etc/nginx/sites-available/equiprofile
-   sudo nginx -t && sudo systemctl reload nginx
-   ```
+---
 
-#### Issue 3: CSP Blocking Inline Scripts (White Screen)
+## Development
 
-**Symptoms:**
-
-- White screen after deployment
-- Browser console shows CSP errors: "Refused to execute inline script"
-- Application loads in development but not production
-
-**Root Cause:** Content Security Policy blocks inline scripts
-
-**Solution:**
-
-✅ **This should NOT happen** - `client/index.html` contains NO inline scripts!
-
-Verify:
+### Available Scripts
 
 ```bash
-# Check index.html for inline scripts
-grep "<script" client/index.html
-# Should ONLY show: <script type="module" src="/src/main.tsx"></script>
+# Development
+npm run dev              # Start dev server (Vite + Node.js)
+npm run dev:client       # Start frontend only
+npm run dev:server       # Start backend only
 
-# Check built index.html
-grep "<script" dist/public/index.html
-# Should ONLY show external scripts with src="..."
+# Building
+npm run build            # Build for production
+npm run build:client     # Build frontend only
+npm run build:server     # Build backend only
+
+# Database
+npm run db:push          # Push schema to database
+npm run db:generate      # Generate migrations
+npm run db:migrate       # Run migrations
+npm run db:studio        # Open Drizzle Studio
+
+# Testing
+npm test                 # Run tests
+npm run test:watch       # Run tests in watch mode
+
+# Code Quality
+npm run check            # TypeScript type checking
+npm run lint             # Run ESLint
+npm run format           # Format with Prettier
+
+# Production
+npm start                # Start production server
+npm run preview          # Preview production build
 ```
 
-If you see inline scripts:
+### Testing
 
-1. Move script content to separate `.js` file
-2. Reference with `<script src="/path/to/file.js"></script>`
-3. Rebuild application
-
-#### Issue 4: Multiple/Conflicting Nginx Configs
-
-**Symptoms:**
-
-- Nginx serves wrong configuration
-- Changes to nginx config don't take effect
-- Multiple server blocks listening on same port
-
-**Solutions:**
-
-1. **Check active nginx configs:**
-
-   ```bash
-   # List enabled sites
-   ls -la /etc/nginx/sites-enabled/
-
-   # Check for conflicting server blocks
-   sudo nginx -T | grep "server_name"
-   ```
-
-2. **Remove conflicting configs:**
-
-   ```bash
-   # Remove old symlinks
-   sudo rm /etc/nginx/sites-enabled/default
-   sudo rm /etc/nginx/sites-enabled/nginx-*
-
-   # Keep only canonical config
-   sudo ln -sf /etc/nginx/sites-available/equiprofile /etc/nginx/sites-enabled/equiprofile
-
-   # Test and reload
-   sudo nginx -t && sudo systemctl reload nginx
-   ```
-
-3. **Use canonical configuration:**
-
-   ```bash
-   # Copy recommended config
-   sudo cp deployment/nginx/equiprofile.conf /etc/nginx/sites-available/equiprofile
-
-   # Edit domain name
-   sudo nano /etc/nginx/sites-available/equiprofile
-   # Replace YOUR_DOMAIN_HERE with actual domain
-
-   # Test and reload
-   sudo nginx -t && sudo systemctl reload nginx
-   ```
-
-#### Issue 5: Build/Runtime Module Errors
-
-**Symptoms:**
-
-- Error: "Cannot find module 'some-package'"
-- Application builds but crashes at runtime
-- Missing dependencies errors
-
-**Root Cause:** `--packages=external` requires dependencies at runtime
-
-**Solutions:**
-
-1. **Install production dependencies on server:**
-
-   ```bash
-   # Install with frozen lockfile
-   pnpm install --prod --frozen-lockfile
-
-   # Verify node_modules exists
-   ls -la node_modules/
-   ```
-
-2. **Rebuild native modules if needed:**
-
-   ```bash
-   # For bcrypt, esbuild, etc.
-   pnpm rebuild
-   ```
-
-3. **Verify package.json and pnpm-lock.yaml are present:**
-   ```bash
-   ls -la package.json pnpm-lock.yaml
-   # Both must be deployed to production server
-   ```
-
-### Common Runtime Errors
-
-#### Application Refuses to Start
-
-**Error: "JWT_SECRET is still set to default value"**
+EquiProfile uses Vitest for testing:
 
 ```bash
-# Generate secure JWT secret
-openssl rand -base64 32
+# Run all tests
+npm test
 
-# Add to .env file
-echo "JWT_SECRET=$(openssl rand -base64 32)" >> .env
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with coverage
+npm run test:coverage
 ```
 
-**Error: "Database connection failed"**
+### Code Style
 
+The project uses:
+- **ESLint** for code linting
+- **Prettier** for code formatting
+- **TypeScript** for type safety
+
+Configuration files:
+- `.eslintrc.js` - ESLint configuration
+- `.prettierrc` - Prettier configuration
+- `tsconfig.json` - TypeScript configuration
+
+---
+
+## Troubleshooting
+
+### Common Issues
+
+<a name="nginx-issues"></a>
+#### Nginx Configuration Issues
+
+**Problem**: Nginx returns 502 Bad Gateway
+
+**Solution**:
 ```bash
-# For MySQL: Test connection
-mysql -u username -p -h localhost equiprofile
-
-# Check DATABASE_URL format
-# Correct: mysql://username:password@localhost:3306/equiprofile
-# Incorrect: mysql://username@localhost/equiprofile (missing password/port)
-
-# For SQLite: Check data directory exists
-mkdir -p data/
-chmod 755 data/
-```
-
-**Error: "Port 3000 already in use"**
-
-```bash
-# Find process using port
-lsof -i :3000
-
-# Kill the process (replace PID)
-kill -9 <PID>
-
-# Or change port in .env
-echo "PORT=3001" >> .env
-```
-
-#### 502 Bad Gateway (Nginx)
-
-```bash
-# Check if application is running
+# Check if service is running
 sudo systemctl status equiprofile
 
-# Check application logs
+# Check backend health
+curl http://127.0.0.1:3000/api/health
+
+# Check nginx configuration
+sudo nginx -t
+
+# View nginx error logs
+sudo tail -f /var/log/nginx/error.log
+
+# Restart services
+sudo systemctl restart equiprofile
+sudo systemctl reload nginx
+```
+
+<a name="database-problems"></a>
+#### Database Problems
+
+**Problem**: Database connection fails
+
+**Solution**:
+```bash
+# Verify MySQL is running
+systemctl status mysql
+
+# Test connection
+mysql -u equiprofile -p -e "SELECT 1;"
+
+# Check DATABASE_URL format
+# mysql://username:password@localhost:3306/database_name
+
+# Create database if missing
+mysql -u root -p
+CREATE DATABASE equiprofile CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT ALL PRIVILEGES ON equiprofile.* TO 'equiprofile'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+<a name="build-errors"></a>
+#### Build Errors
+
+**Problem**: Build fails during `npm run build`
+
+**Solution**:
+```bash
+# Check Node.js version (must be v20.x or higher)
+node --version
+
+# Clean and rebuild
+rm -rf dist node_modules
+npm ci
+npm run build
+
+# Check for memory issues
+# If out of memory, increase swap:
+sudo fallocate -l 2G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+
+# Check disk space
+df -h
+
+# Clean old packages
+sudo apt-get autoremove
+sudo apt-get clean
+```
+
+#### Service Won't Start
+
+**Problem**: `systemctl start equiprofile` fails
+
+**Solution**:
+```bash
+# Check logs
 sudo journalctl -u equiprofile -n 50 --no-pager
 
-# Restart application
-sudo systemctl restart equiprofile
+# Verify .env file exists and is configured
+ls -la /var/equiprofile/app/.env
 
-# Verify application responds locally
-curl http://127.0.0.1:3000/healthz
+# Check critical variables
+grep JWT_SECRET /var/equiprofile/app/.env
+grep DATABASE_URL /var/equiprofile/app/.env
 
-# Check Nginx error log
-sudo tail -f /var/log/nginx/error.log
+# Check if port is in use
+lsof -i :3000
+
+# Try manual start for debugging
+cd /var/equiprofile/app
+sudo -u www-data node dist/index.js
 ```
 
 #### SSL Certificate Issues
 
+**Problem**: SSL certificate errors or HTTPS not working
+
+**Solution**:
 ```bash
 # Check certificate status
 sudo certbot certificates
 
 # Renew certificate
-sudo certbot renew
+sudo certbot renew --dry-run  # Test
+sudo certbot renew             # Actually renew
 
-# Force renewal (if near expiry)
-sudo certbot renew --force-renewal
+# Re-run certbot
+sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
 
-# Test renewal process
-sudo certbot renew --dry-run
+# Check nginx configuration
+sudo nginx -t
+grep ssl_certificate /etc/nginx/sites-available/equiprofile
 ```
 
-### Performance Issues
+#### Old UI Still Showing
 
-#### Slow Initial Page Load
+**Problem**: Users see old design after deployment
 
-1. **Enable compression in Nginx:**
+**Solution**:
+```bash
+# 1. Clear service worker (if PWA was previously enabled)
+# In browser DevTools (F12):
+# Application → Service Workers → Unregister
+# Application → Clear Storage → Clear site data
+# Hard refresh: Ctrl+Shift+R
 
-   ```nginx
-   gzip on;
-   gzip_types text/plain text/css application/json application/javascript;
-   gzip_min_length 1000;
-   ```
+# 2. Verify cache headers
+curl -I https://yourdomain.com/
+# Should show: Cache-Control: no-store, no-cache, must-revalidate
 
-2. **Verify assets are cached:**
+# 3. Check build version
+curl https://yourdomain.com/ | grep "assets/index-"
+# Should show hashed assets like: /assets/index-abc123.js
+```
 
-   ```bash
-   # Check /assets/* headers
-   curl -I https://yourdomain.com/assets/index-[hash].js
-   # Should see: Cache-Control: public, max-age=31536000, immutable
-   ```
+### Recovery Procedures
 
-3. **Check service worker is active:**
-   ```bash
-   # In browser DevTools → Application → Service Workers
-   # Should show "activated and is running"
-   ```
+#### Emergency Rollback
 
-#### High Memory Usage
+If deployment fails or causes issues:
 
 ```bash
-# Check Node.js memory usage
-pm2 monit
+# 1. Find previous good commit
+cd /var/equiprofile/app
+git log --oneline -10
 
-# Increase memory limit if needed
-NODE_OPTIONS="--max-old-space-size=2048" node dist/index.js
+# 2. Reset to previous commit
+sudo git reset --hard <commit-sha>
 
-# Check for memory leaks
-pm2 logs --lines 100 | grep "heap"
+# 3. Rebuild
+sudo rm -rf dist
+sudo npm ci
+sudo npm run build
+
+# 4. Restart
+sudo systemctl restart equiprofile
+
+# 5. Verify
+curl http://127.0.0.1:3000/api/health
 ```
 
-### Development Issues
-
-#### Hot Module Reload Not Working
+#### Restore Configuration Files
 
 ```bash
-# Check Vite is running in dev mode
-NODE_ENV=development pnpm dev
+# Restore nginx config from repo
+sudo cp /var/equiprofile/app/deployment/nginx/equiprofile.conf \
+  /etc/nginx/sites-available/equiprofile
+sudo nginx -t && sudo systemctl reload nginx
 
-# Clear Vite cache
-rm -rf node_modules/.vite
-
-# Restart dev server
-pnpm dev
+# Restore systemd service from repo
+sudo cp /var/equiprofile/app/deployment/equiprofile.service \
+  /etc/systemd/system/equiprofile.service
+sudo systemctl daemon-reload
+sudo systemctl restart equiprofile
 ```
 
-#### TypeScript Errors
+#### Nuclear Option - Full Redeployment
 
 ```bash
-# Run type checking
-pnpm check
+# 1. Backup .env file
+sudo cp /var/equiprofile/app/.env /tmp/.env.backup
 
-# Clear TypeScript build info
-rm -rf *.tsbuildinfo
+# 2. Stop services
+sudo systemctl stop equiprofile
 
-# Reinstall dependencies
-rm -rf node_modules/
-pnpm install --frozen-lockfile
+# 3. Remove app directory
+sudo rm -rf /var/equiprofile/app
+
+# 4. Clone fresh
+cd /var/equiprofile
+sudo git clone https://github.com/amarktainetwork-blip/Equiprofile.online.git app
+cd app
+
+# 5. Restore .env
+sudo cp /tmp/.env.backup .env
+
+# 6. Run full deployment
+sudo bash deployment/deploy.sh --domain yourdomain.com
+
+# 7. Verify
+bash scripts/smoke_prod.sh https://yourdomain.com
 ```
 
-### Getting Help
+### Diagnostic Commands
 
-If issues persist:
+```bash
+# Check service status
+systemctl status equiprofile
 
-1. **Check logs:**
+# View recent logs
+journalctl -u equiprofile -n 100 --no-pager
 
-   ```bash
-   # Application logs
-   sudo journalctl -u equiprofile -n 100 --no-pager
+# Follow logs in real-time
+journalctl -u equiprofile -f
 
-   # Nginx access log
-   sudo tail -f /var/log/nginx/equiprofile-access.log
+# Check nginx logs
+tail -f /var/log/nginx/equiprofile-error.log
+tail -f /var/log/nginx/equiprofile-access.log
 
-   # Nginx error log
-   sudo tail -f /var/log/nginx/equiprofile-error.log
-   ```
+# Test health endpoint
+curl http://127.0.0.1:3000/api/health
+curl http://127.0.0.1:3000/api/health/ping
 
-2. **Run health checks:**
+# Check version/build info
+curl http://127.0.0.1:3000/api/version
 
-   ```bash
-   # Local health check
-   curl http://127.0.0.1:3000/healthz
+# Check listening ports
+ss -tlnp | grep -E ':(80|443|3000)'
 
-   # Public health check
-   curl https://yourdomain.com/healthz
+# Check disk space
+df -h
 
-   # Build info
-   curl https://yourdomain.com/build
-   ```
+# Check memory
+free -h
 
-3. **Verify configuration:**
-
-   ```bash
-   # Check environment variables
-   grep -v "^#" .env | grep -v "^$"
-
-   # Test Nginx config
-   sudo nginx -t
-
-   # Check service status
-   sudo systemctl status equiprofile
-   ```
-
-4. **Report issues:**
-   - GitHub Issues: [amarktainetwork-blip/Equiprofile.online/issues](https://github.com/amarktainetwork-blip/Equiprofile.online/issues)
-   - Include logs, error messages, and configuration (redact sensitive data!)
+# View deployment logs
+ls -lt /var/equiprofile/_ops/deploy_*.log | head -1
+```
 
 ---
 
-**File Upload Errors**
+## Maintenance
+
+<a name="updates"></a>
+### Updates & Upgrades
+
+#### Update Application
 
 ```bash
-# Check uploads directory exists and is writable
-mkdir -p /var/equiprofile/app/uploads
-chmod 755 /var/equiprofile/app/uploads
+cd /var/equiprofile/app
 
-# Check AWS S3 credentials (if using S3)
-# Verify AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY in .env
+# Pull latest changes
+sudo git pull origin main
 
-# Check file size limits in Nginx
-# Edit /etc/nginx/nginx.conf and add:
-client_max_body_size 20M;
+# Install dependencies
+sudo npm ci
+
+# Rebuild
+sudo npm run build
+
+# Restart service
+sudo systemctl restart equiprofile
+
+# Verify
+bash scripts/smoke_prod.sh https://yourdomain.com
 ```
 
-#### Performance Issues
-
-**Slow page loads**
+#### Update System Packages
 
 ```bash
-# Enable production mode
-NODE_ENV=production node dist/index.js
+# Update system
+sudo apt update && sudo apt upgrade -y
 
-# Check database indexes
-# Review slow query logs
+# Update Node.js dependencies
+cd /var/equiprofile/app
+npm update
+npm audit
 
-# Enable Nginx caching
-# Add to Nginx config:
-proxy_cache_path /var/cache/nginx levels=1:2 keys_zone=my_cache:10m;
+# Rebuild after updates
+sudo npm run build
+sudo systemctl restart equiprofile
 ```
 
-**High memory usage**
+<a name="backups"></a>
+### Backup Procedures
+
+#### Database Backup
+
+**For MySQL**:
+```bash
+# Manual backup
+mysqldump -u equiprofile -p equiprofile > backup-$(date +%Y%m%d).sql
+
+# Restore
+mysql -u equiprofile -p equiprofile < backup-20260109.sql
+```
+
+**For SQLite**:
+```bash
+# Backup
+cp /var/equiprofile/app/data/equiprofile.db backup-$(date +%Y%m%d).db
+
+# Restore
+cp backup-20260109.db /var/equiprofile/app/data/equiprofile.db
+sudo systemctl restart equiprofile
+```
+
+#### Automated Backup Script
 
 ```bash
-# Increase Node.js memory limit
-NODE_OPTIONS="--max-old-space-size=4096" node dist/index.js
+# Create backup script
+cat > /usr/local/bin/backup-equiprofile << 'EOF'
+#!/bin/bash
+BACKUP_DIR="/var/backups/equiprofile"
+DATE=$(date +%Y%m%d-%H%M%S)
+mkdir -p $BACKUP_DIR
 
-# Monitor with PM2
-pm2 monit
+# Backup database
+mysqldump -u equiprofile -p'password' equiprofile > $BACKUP_DIR/db-$DATE.sql
+gzip $BACKUP_DIR/db-$DATE.sql
 
-# Check for memory leaks
-node --inspect dist/index.js
+# Backup environment file
+cp /var/equiprofile/app/.env $BACKUP_DIR/.env-$DATE
+
+# Backup uploads (if any)
+tar -czf $BACKUP_DIR/uploads-$DATE.tar.gz /var/equiprofile/app/uploads 2>/dev/null
+
+# Keep last 7 days
+find $BACKUP_DIR -name "*.gz" -mtime +7 -delete
+
+echo "Backup completed: $DATE"
+EOF
+
+chmod +x /usr/local/bin/backup-equiprofile
+
+# Schedule daily backup at 2 AM
+sudo crontab -e
+# Add: 0 2 * * * /usr/local/bin/backup-equiprofile
 ```
 
-#### Database Issues
+<a name="monitoring"></a>
+### Monitoring
 
-**Migration Errors**
-
-```bash
-# Reset database (CAUTION: Deletes all data!)
-rm data/equiprofile.db
-pnpm db:push
-
-# For MySQL, recreate database:
-mysql -u root -p -e "DROP DATABASE equiprofile; CREATE DATABASE equiprofile;"
-pnpm db:push
-```
-
-**Connection Pool Exhausted**
-
-```bash
-# Increase connection pool size in drizzle.config.ts
-# Or restart the application
-pm2 restart equiprofile
-```
-
-### Getting Help
-
-- **GitHub Issues**: [Report bugs or request features](https://github.com/amarktainetwork-blip/Equiprofile.online/issues)
-- **Documentation**: Check docs/ folder for detailed guides
-- **Community**: Join our Discord server (link in repo)
-- **Email Support**: support@equiprofile.online
-
-### Debug Mode
-
-Enable debug logging:
-
-```bash
-# Set debug environment variable
-DEBUG=* NODE_ENV=development pnpm dev
-
-# Or for specific modules
-DEBUG=trpc:* pnpm dev
-```
-
-### Health Check
+#### Application Monitoring
 
 ```bash
 # Check application health
-curl http://localhost:3000/api/trpc/system.status
+watch -n 5 'curl -s http://127.0.0.1:3000/api/health | jq'
 
-# Should return:
-# {"status":"ok","version":"1.0.0"}
+# Monitor resource usage
+htop
+
+# Check service uptime
+systemctl status equiprofile | grep Active
+```
+
+#### Log Monitoring
+
+```bash
+# View recent logs
+journalctl -u equiprofile -n 100
+
+# Follow logs in real-time
+journalctl -u equiprofile -f
+
+# View nginx access logs
+tail -f /var/log/nginx/equiprofile-access.log
+
+# View nginx error logs
+tail -f /var/log/nginx/equiprofile-error.log
+
+# Search for errors
+journalctl -u equiprofile | grep -i error
+```
+
+#### Resource Monitoring
+
+```bash
+# Check disk usage
+df -h
+
+# Check memory usage
+free -m
+
+# Check CPU usage
+top
+
+# Check network connections
+ss -tuln | grep :3000
+```
+
+### Log Rotation
+
+Logs are automatically rotated at `/etc/logrotate.d/equiprofile`:
+
+- Rotated daily
+- Keep 14 days of logs
+- Compressed after rotation
+- Reload service after rotation
+
+**Manual log rotation**:
+
+```bash
+# Test rotation
+sudo logrotate -d /etc/logrotate.d/equiprofile
+
+# Force rotation
+sudo logrotate -f /etc/logrotate.d/equiprofile
+```
+
+### Performance Tuning
+
+For high-traffic deployments:
+
+**1. Increase worker processes in nginx**:
+```nginx
+# /etc/nginx/nginx.conf
+worker_processes auto;
+worker_connections 1024;
+```
+
+**2. Enable connection pooling for MySQL**:
+```env
+# .env
+DATABASE_POOL_SIZE=10
+```
+
+**3. Increase Node.js memory**:
+```bash
+# Edit /etc/systemd/system/equiprofile.service
+Environment="NODE_OPTIONS=--max_old_space_size=4096"
+
+sudo systemctl daemon-reload
+sudo systemctl restart equiprofile
 ```
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
-We welcome contributions! Here's how to get started:
+We welcome contributions to EquiProfile! Here's how you can help:
 
-### How to Contribute
+### Getting Started
 
-1. **Fork the repository**
-2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
-3. **Make your changes**
-4. **Write tests** for new features
-5. **Run tests**: `pnpm test`
-6. **Format code**: `pnpm format`
-7. **Commit changes**: `git commit -m 'Add amazing feature'`
-8. **Push to branch**: `git push origin feature/amazing-feature`
-9. **Open a Pull Request**
+1. Fork the repository
+2. Clone your fork: `git clone https://github.com/yourusername/Equiprofile.online.git`
+3. Create a feature branch: `git checkout -b feature/amazing-feature`
+4. Make your changes
+5. Run tests: `npm test`
+6. Commit your changes: `git commit -m 'Add amazing feature'`
+7. Push to the branch: `git push origin feature/amazing-feature`
+8. Open a Pull Request
 
 ### Development Guidelines
 
-- Follow existing code style
-- Write clear commit messages
-- Add tests for new features
+- Follow the existing code style
+- Write tests for new features
 - Update documentation as needed
-- Keep PRs focused and small
+- Keep commits focused and atomic
+- Write clear commit messages
 
-### Code of Conduct
+### Code Review Process
 
-- Be respectful and inclusive
-- Provide constructive feedback
-- Help others learn and grow
-- Follow the [Contributor Covenant](https://www.contributor-covenant.org/)
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+1. All submissions require review
+2. Changes should pass all tests
+3. Code should follow style guidelines
+4. Documentation should be updated
 
 ---
 
-## 📞 Contact & Support
+## License
 
-- **Website**: https://equiprofile.online
+MIT License
+
+Copyright (c) 2026 Amarktai Network
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+## Support
+
+### Documentation
+
+- **Quick Start Guide**: See above or QUICK_START.md
+- **Deployment Guide**: See DEPLOYMENT.md
+- **API Keys Setup**: See API_KEYS_GUIDE.md
+- **Features Documentation**: See FEATURES_BREAKDOWN.md
+- **Recovery Guide**: See RECOVERY.md
+- **Ubuntu 24.04 Guide**: See deployment/ubuntu24/README.md
+
+### Getting Help
+
+- **GitHub Issues**: https://github.com/amarktainetwork-blip/Equiprofile.online/issues
 - **Email**: support@equiprofile.online
-- **Security**: security@equiprofile.online
-- **GitHub**: https://github.com/amarktainetwork-blip/Equiprofile.online
+- **Website**: https://equiprofile.online
+- **Part of**: [Amarktai Network](https://www.amarktai.com)
+
+### Security
+
+For security issues, please email: security@equiprofile.online
+
+Do not open public issues for security vulnerabilities.
+
+### Useful Commands
+
+```bash
+# Service management
+sudo systemctl start|stop|restart|status equiprofile
+
+# View logs
+sudo journalctl -u equiprofile -f
+
+# Nginx
+sudo nginx -t
+sudo systemctl reload nginx
+
+# Database
+mysql -u equiprofile -p equiprofile  # MySQL
+sqlite3 /var/equiprofile/app/data/equiprofile.db  # SQLite
+
+# Health checks
+curl http://127.0.0.1:3000/api/health
+bash scripts/smoke_prod.sh https://yourdomain.com
+```
 
 ---
 
-## 🙏 Acknowledgments
+## Next Steps
 
-Built with:
+After successful deployment:
 
-- [React](https://react.dev/)
-- [Node.js](https://nodejs.org/)
-- [tRPC](https://trpc.io/)
-- [Drizzle ORM](https://orm.drizzle.team/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Vite](https://vitejs.dev/)
+1. ✅ Create admin account at `https://yourdomain.com/register`
+2. ✅ Access admin panel at `https://yourdomain.com/admin` with ADMIN_UNLOCK_PASSWORD
+3. ✅ Configure API keys for optional features
+4. ✅ Set up database backups
+5. ✅ Configure email notifications (optional)
+6. ✅ Enable billing if needed (ENABLE_STRIPE=true)
+7. ✅ Customize branding with `/theme-override.css`
+8. ✅ Set up monitoring and alerts
+9. ✅ Review security checklist
 
 ---
 
-<p align="center">Made with ❤️ for the equestrian community</p>
-<p align="center">© 2024 EquiProfile. All rights reserved.</p>
+**Congratulations! Your EquiProfile instance is ready!** 🎉
+
+**Status**: Production-Ready  
+**Version**: 1.0.0  
+**Last Updated**: February 2026  
+**Part of**: [Amarktai Network](https://www.amarktai.com)  
+**License**: MIT
+
+---
+
+_EquiProfile - Professional Horse Management Made Simple_
