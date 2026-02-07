@@ -7,15 +7,14 @@
 # Usage: sudo bash install.sh
 #
 # This script will:
-# 1. Install prerequisites (Node.js LTS, pnpm, nginx)
-# 2. Create system user 'equiprofile'
-# 3. Setup application directory (/var/www/equiprofile)
-# 4. Clone or use existing repository
-# 5. Configure environment
-# 6. Build application
-# 7. Install systemd service
-# 8. Configure nginx
-# 9. Verify installation
+# 1. Install prerequisites (Node.js 20 LTS, pnpm, mysql-server, nginx)
+# 2. Setup application directory (/var/equiprofile/app)
+# 3. Clone or use existing repository
+# 4. Configure environment
+# 5. Build application
+# 6. Install systemd service
+# 7. Configure nginx
+# 8. Verify installation
 # ==============================================================================
 
 set -e  # Exit on error
@@ -61,7 +60,7 @@ echo ""
 # ==============================================================================
 # 1. Install Prerequisites
 # ==============================================================================
-log_info "Step 1/9: Installing prerequisites..."
+log_info "Step 1/8: Installing prerequisites..."
 
 # Update system
 log_info "Updating system packages..."
@@ -71,10 +70,10 @@ apt-get update -qq
 log_info "Installing curl, git, and build essentials..."
 apt-get install -y curl git build-essential > /dev/null 2>&1
 
-# Install Node.js LTS (using nodesource)
+# Install Node.js 20 LTS (using nodesource)
 if ! command -v node &> /dev/null; then
-    log_info "Installing Node.js LTS..."
-    curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - > /dev/null 2>&1
+    log_info "Installing Node.js 20 LTS..."
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - > /dev/null 2>&1
     apt-get install -y nodejs > /dev/null 2>&1
 else
     log_info "Node.js already installed: $(node --version)"
@@ -86,6 +85,15 @@ if ! command -v pnpm &> /dev/null; then
     npm install -g pnpm > /dev/null 2>&1
 else
     log_info "pnpm already installed: $(pnpm --version)"
+fi
+
+# Install mysql-server
+if ! command -v mysql &> /dev/null; then
+    log_info "Installing mysql-server..."
+    apt-get install -y mysql-server > /dev/null 2>&1
+    log_success "MySQL installed"
+else
+    log_info "MySQL already installed"
 fi
 
 # Install nginx
@@ -100,22 +108,9 @@ log_success "Prerequisites installed successfully"
 echo ""
 
 # ==============================================================================
-# 2. Create System User
+# 2. Setup Application Directory
 # ==============================================================================
-log_info "Step 2/9: Creating system user..."
-
-if ! id -u equiprofile &> /dev/null; then
-    useradd -r -m -s /bin/bash equiprofile
-    log_success "Created user 'equiprofile'"
-else
-    log_info "User 'equiprofile' already exists"
-fi
-echo ""
-
-# ==============================================================================
-# 3. Setup Application Directory
-# ==============================================================================
-log_info "Step 3/9: Setting up application directory..."
+log_info "Step 2/8: Setting up application directory..."
 
 APP_DIR="/var/www/equiprofile"
 
@@ -132,9 +127,9 @@ log_success "Set ownership to equiprofile:equiprofile"
 echo ""
 
 # ==============================================================================
-# 4. Clone/Copy Repository
+# 3. Clone/Copy Repository
 # ==============================================================================
-log_info "Step 4/9: Setting up repository..."
+log_info "Step 3/8: Setting up repository..."
 
 # Check if we're running from within the repo
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -159,9 +154,9 @@ log_success "Repository ready at $APP_DIR"
 echo ""
 
 # ==============================================================================
-# 5. Configure Environment
+# 4. Configure Environment
 # ==============================================================================
-log_info "Step 5/9: Configuring environment..."
+log_info "Step 4/8: Configuring environment..."
 
 if [ ! -f "$APP_DIR/.env" ]; then
     if [ -f "$APP_DIR/.env.example" ]; then
@@ -197,9 +192,9 @@ log_success "Environment configuration ready"
 echo ""
 
 # ==============================================================================
-# 6. Install Dependencies and Build
+# 5. Install Dependencies and Build
 # ==============================================================================
-log_info "Step 6/9: Installing dependencies and building..."
+log_info "Step 5/8: Installing dependencies and building..."
 
 # Switch to equiprofile user for npm operations
 sudo -u equiprofile bash << 'EOF'
@@ -241,30 +236,44 @@ log_success "Build verification passed"
 echo ""
 
 # ==============================================================================
-# 7. Install Systemd Service
+# 6. Install Systemd Service
 # ==============================================================================
-log_info "Step 7/9: Installing systemd service..."
+log_info "Step 6/8: Installing systemd service..."
 
-# Create systemd service file
+# Note: The service runs as www-data user (not equiprofile)
+# This is for compatibility with nginx and standard web deployment practices
 cat > /etc/systemd/system/equiprofile.service << 'SYSTEMD_EOF'
 [Unit]
-Description=Equiprofile Application
-After=network.target
+Description=EquiProfile Node.js Application
+After=network.target mysql.service mariadb.service
 
 [Service]
 Type=simple
-User=equiprofile
-WorkingDirectory=/var/www/equiprofile
-Environment=NODE_ENV=production
+User=www-data
+WorkingDirectory=/var/equiprofile/app
+EnvironmentFile=/var/equiprofile/app/.env
 ExecStart=/usr/bin/node dist/index.js
-Restart=always
+Restart=on-failure
 RestartSec=10
 StandardOutput=journal
 StandardError=journal
+SyslogIdentifier=equiprofile
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/equiprofile/app
+ReadWritePaths=/var/log/equiprofile
 
 [Install]
 WantedBy=multi-user.target
 SYSTEMD_EOF
+
+# Update ownership to www-data for service compatibility
+chown -R www-data:www-data "$APP_DIR"
+chown -R www-data:www-data /var/log/equiprofile
 
 # Reload systemd and enable service
 systemctl daemon-reload
@@ -287,9 +296,9 @@ fi
 echo ""
 
 # ==============================================================================
-# 8. Configure Nginx
+# 7. Configure Nginx
 # ==============================================================================
-log_info "Step 8/9: Configuring nginx..."
+log_info "Step 7/8: Configuring nginx..."
 
 # Get port from .env or default to 3000
 PORT=$(grep -E '^PORT=' "$APP_DIR/.env" | cut -d '=' -f2 || echo "3000")
@@ -337,9 +346,9 @@ log_success "Nginx configured and reloaded"
 echo ""
 
 # ==============================================================================
-# 9. Verify Installation
+# 8. Verify Installation
 # ==============================================================================
-log_info "Step 9/9: Verifying installation..."
+log_info "Step 8/8: Verifying installation..."
 
 # Wait a moment for service to fully start
 sleep 3
