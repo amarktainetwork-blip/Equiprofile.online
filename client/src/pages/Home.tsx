@@ -40,6 +40,17 @@ import {
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
+const TESTIMONIAL_ROTATION_INTERVAL = 6000;
+
+function formatStatValue(value: number, suffix: string): string {
+  if (suffix === "★" || suffix === "%") {
+    return value.toFixed(1);
+  }
+  return Math.floor(value)
+    .toString()
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
 export default function Home() {
   const { isAuthenticated } = useAuth();
   const [activeTestimonial, setActiveTestimonial] = useState(0);
@@ -260,7 +271,7 @@ export default function Home() {
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveTestimonial((prev) => (prev + 1) % testimonials.length);
-    }, 6000);
+    }, TESTIMONIAL_ROTATION_INTERVAL);
     return () => clearInterval(interval);
   }, [testimonials.length]);
 
@@ -364,11 +375,7 @@ export default function Home() {
                     >
                       <CardContent className="p-0">
                         <div className="text-5xl md:text-6xl font-bold text-primary mb-2">
-                          {stat.suffix === "★" || stat.suffix === "%"
-                            ? animatedStats[index].current.toFixed(1)
-                            : Math.floor(animatedStats[index].current)
-                                .toString()
-                                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                          {formatStatValue(animatedStats[index].current, stat.suffix)}
                           {stat.suffix}
                         </div>
                         <div className="text-sm md:text-base text-muted-foreground font-medium">
