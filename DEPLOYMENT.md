@@ -69,7 +69,7 @@ sudo nano .env
 sudo bash deployment/deploy.sh --domain equiprofile.online
 
 # Verify deployment
-sudo bash scripts/smoke_prod.sh --domain equiprofile.online
+bash scripts/smoke_prod.sh https://equiprofile.online
 ```
 
 Your EquiProfile instance is now running at `https://equiprofile.online`!
@@ -213,7 +213,7 @@ The deployment script will:
 
 ```bash
 # Run smoke test
-sudo bash scripts/smoke_prod.sh --domain equiprofile.online
+bash scripts/smoke_prod.sh https://equiprofile.online
 
 # Or run system health check
 sudo bash deployment/doctor.sh
@@ -915,7 +915,7 @@ Use these commands to verify system health:
 sudo bash deployment/doctor.sh
 
 # Run smoke tests
-bash scripts/smoke_prod.sh --domain your-domain.com
+bash scripts/smoke_prod.sh https://your-domain.com
 
 # Manual health checks
 curl http://127.0.0.1:3000/api/health
