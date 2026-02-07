@@ -418,13 +418,13 @@ journalctl -u equiprofile -n 100
 cd /var/equiprofile/app
 
 # Pull latest changes
-sudo -u equiprofile git pull
+sudo -u www-data git pull
 
 # Install dependencies
-sudo -u equiprofile pnpm install --frozen-lockfile
+sudo -u www-data pnpm install --frozen-lockfile
 
 # Rebuild
-sudo -u equiprofile pnpm build
+sudo -u www-data pnpm build
 
 # Restart service
 systemctl restart equiprofile
