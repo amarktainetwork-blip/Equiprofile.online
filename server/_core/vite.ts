@@ -72,6 +72,9 @@ export function serveStatic(app: Express) {
     ".jpeg",
     ".gif",
     ".ico",
+    ".txt",
+    ".mp4",
+    ".webm",
   ];
 
   // Serve static files with explicit MIME types and cache headers
