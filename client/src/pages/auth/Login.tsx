@@ -155,21 +155,16 @@ export default function Login() {
                       transition={{ duration: 0.4, delay: 0.2 }}
                     >
                       <Label htmlFor="email" className="text-white">Email</Label>
-                      <motion.div
-                        whileFocus={{ scale: 1.02 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <Input
-                          id="email"
-                          type="email"
-                          placeholder="you@example.com"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          disabled={isLoading}
-                          required
-                          className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:bg-white/10 focus:border-white/20 transition-all duration-200"
-                        />
-                      </motion.div>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="you@example.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        disabled={isLoading}
+                        required
+                        className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:bg-white/10 focus:border-white/20 focus:scale-[1.01] transition-all duration-200"
+                      />
                     </motion.div>
 
                     {/* Password field */}
@@ -180,21 +175,16 @@ export default function Login() {
                       transition={{ duration: 0.4, delay: 0.3 }}
                     >
                       <Label htmlFor="password" className="text-white">Password</Label>
-                      <motion.div
-                        whileFocus={{ scale: 1.02 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <Input
-                          id="password"
-                          type="password"
-                          placeholder="••••••••"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          disabled={isLoading}
-                          required
-                          className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:bg-white/10 focus:border-white/20 transition-all duration-200"
-                        />
-                      </motion.div>
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        disabled={isLoading}
+                        required
+                        className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:bg-white/10 focus:border-white/20 focus:scale-[1.01] transition-all duration-200"
+                      />
                     </motion.div>
 
                     {/* Remember me & Forgot password */}
