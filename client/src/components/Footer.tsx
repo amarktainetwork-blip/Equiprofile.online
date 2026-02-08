@@ -117,18 +117,7 @@ export function Footer() {
         </div>
 
         <div className="border-t pt-8 text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} EquiProfile. All rights reserved.</p>
-          <p className="mt-2">
-            Built with ❤️ by{" "}
-            <a
-              href="https://amarktai.network"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:underline font-medium"
-            >
-              Amarktai Network
-            </a>
-          </p>
+          <p>© 2026 EquiProfile — Part of Amarktai Network. All rights reserved.</p>
           {buildInfo && (
             <p className="mt-2 text-xs opacity-70">
               {buildInfo.version && `v${buildInfo.version}`}

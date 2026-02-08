@@ -8,6 +8,7 @@ import {
   SkipToContent,
   useKeyboardNavigation,
 } from "./components/AccessibilityHelpers";
+import { useScrollToTop } from "./hooks/useScrollToTop";
 import "./i18n/config";
 
 // Marketing Pages (Public)
@@ -66,6 +67,7 @@ import Tags from "./pages/Tags";
 
 function Router() {
   useKeyboardNavigation();
+  useScrollToTop();
 
   return (
     <>
