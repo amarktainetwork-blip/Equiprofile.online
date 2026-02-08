@@ -74,7 +74,11 @@ export default function Features() {
                 </span>
                 <span className="flex items-center gap-2">
                   <Icons.Sparkles className="w-5 h-5 text-purple-400" />
-                  {featuresRegistry.reduce((acc, cat) => acc + cat.features.length, 0)}+ Features
+                  {featuresRegistry.reduce(
+                    (acc, cat) => acc + cat.features.length,
+                    0,
+                  )}
+                  + Features
                 </span>
               </div>
             </motion.div>

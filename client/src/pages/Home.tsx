@@ -127,8 +127,6 @@ export default function Home() {
     { value: 4.8, label: "Rating", suffix: "★" },
   ];
 
-
-
   const faqs = [
     {
       question: "How does the 7-day free trial work?",
@@ -482,8 +480,6 @@ export default function Home() {
               </div>
             </div>
           </section>
-
-
 
           {/* Final CTA Section */}
           <section className="py-32 relative overflow-hidden">

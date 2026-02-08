@@ -3,26 +3,31 @@
 ## Production Deployment Commands
 
 ### 1. Install Dependencies
+
 ```bash
 pnpm install
 ```
 
 ### 2. Build Application
+
 ```bash
 pnpm run build
 ```
 
 Expected output:
+
 - `dist/index.js` - Server bundle (~179KB)
 - `dist/public/` - Client assets
 - Build should complete in ~20-25 seconds
 
 ### 3. Restart Service
+
 ```bash
 sudo systemctl restart equiprofile
 ```
 
 ### 4. Verify Health
+
 ```bash
 # Check service status
 sudo systemctl status equiprofile
@@ -35,6 +40,7 @@ curl http://127.0.0.1:3000/api/health
 ```
 
 ### 5. Verify Nginx Proxy
+
 ```bash
 # Test through Nginx
 curl -I https://equiprofile.online/
@@ -70,22 +76,26 @@ HOST=127.0.0.1
 ## Key Changes in This Release
 
 ### Authentication
+
 - Password requirement now 12 characters minimum (matches backend)
 - New 50/50 split screen layout on desktop
 - Mobile uses full-screen background with glass overlay
 
 ### Navigation
+
 - Menu items: About, Features, Pricing, Contact (in that order)
 - Footer added to ALL pages with "© 2026 EquiProfile — Part of Amarktai Network..."
 - Automatic scroll-to-top on route change
 
 ### Marketing Pages
+
 - **Home**: Removed pricing, FAQ, and "Watch Demo"; 7-day trial messaging
 - **Features**: Complete 70+ features list in 13 categories
 - **Pricing**: Already updated with 7-day trial
 - **Auth pages**: New split-screen layout
 
 ### Technical Fixes
+
 - Fixed Express 5 wildcard routing compatibility
 - Server reliably starts on 127.0.0.1:3000
 - All media assets organized in proper locations
@@ -93,6 +103,7 @@ HOST=127.0.0.1
 ## Troubleshooting
 
 ### Build Fails
+
 ```bash
 # Clear cache and rebuild
 rm -rf node_modules dist
@@ -101,6 +112,7 @@ pnpm run build
 ```
 
 ### Server Won't Start
+
 ```bash
 # Check logs
 sudo journalctl -u equiprofile -n 50
@@ -112,6 +124,7 @@ sudo journalctl -u equiprofile -n 50
 ```
 
 ### Assets Not Loading
+
 ```bash
 # Verify assets exist
 ls -la /home/equiprofile/Equiprofile.online/dist/public/assets/marketing/
@@ -124,6 +137,7 @@ sudo systemctl reload nginx
 ## Rollback Procedure
 
 If issues occur:
+
 ```bash
 # Revert to previous commit
 cd /home/equiprofile/Equiprofile.online

@@ -113,192 +113,190 @@ export default function Login() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                  {error && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3 }}
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <Alert
+                      variant="destructive"
+                      className="bg-red-950/50 border-red-500/50 backdrop-blur-sm"
                     >
-                      <Alert
-                        variant="destructive"
-                        className="bg-red-950/50 border-red-500/50 backdrop-blur-sm"
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription className="text-red-200">
+                        {error}
+                      </AlertDescription>
+                    </Alert>
+                  </motion.div>
+                )}
+
+                <form onSubmit={handleEmailLogin} className="space-y-4">
+                  {/* Email field */}
+                  <motion.div
+                    className="space-y-2"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: 0.2 }}
+                  >
+                    <Label htmlFor="email" className="text-white">
+                      Email
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      disabled={isLoading}
+                      required
+                      className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:bg-white/10 focus:border-white/20 focus:scale-[1.01] transition-all duration-200"
+                    />
+                  </motion.div>
+
+                  {/* Password field */}
+                  <motion.div
+                    className="space-y-2"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: 0.3 }}
+                  >
+                    <Label htmlFor="password" className="text-white">
+                      Password
+                    </Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={isLoading}
+                      required
+                      className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:bg-white/10 focus:border-white/20 focus:scale-[1.01] transition-all duration-200"
+                    />
+                  </motion.div>
+
+                  {/* Remember me & Forgot password */}
+                  <motion.div
+                    className="flex items-center justify-between"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.4, delay: 0.4 }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        id="remember"
+                        checked={rememberMe}
+                        onCheckedChange={(checked) =>
+                          setRememberMe(checked as boolean)
+                        }
+                        className="border-white/20 data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-blue-500 data-[state=checked]:to-purple-600"
+                      />
+                      <Label
+                        htmlFor="remember"
+                        className="text-sm font-normal cursor-pointer text-gray-300"
                       >
-                        <AlertCircle className="h-4 w-4" />
-                        <AlertDescription className="text-red-200">
-                          {error}
-                        </AlertDescription>
-                      </Alert>
-                    </motion.div>
-                  )}
-
-                  <form onSubmit={handleEmailLogin} className="space-y-4">
-                    {/* Email field */}
-                    <motion.div
-                      className="space-y-2"
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.4, delay: 0.2 }}
-                    >
-                      <Label htmlFor="email" className="text-white">
-                        Email
+                        Remember me
                       </Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="you@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        disabled={isLoading}
-                        required
-                        className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:bg-white/10 focus:border-white/20 focus:scale-[1.01] transition-all duration-200"
-                      />
-                    </motion.div>
+                    </div>
+                    <Link href="/forgot-password">
+                      <a className="text-sm bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent hover:from-blue-300 hover:to-purple-300 transition-all duration-200">
+                        Forgot password?
+                      </a>
+                    </Link>
+                  </motion.div>
 
-                    {/* Password field */}
-                    <motion.div
-                      className="space-y-2"
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.4, delay: 0.3 }}
+                  {/* Sign in button */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.5 }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <Button
+                      type="submit"
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white border-0 shadow-lg shadow-blue-500/20 transition-all duration-200"
+                      size="lg"
+                      disabled={isLoading}
                     >
-                      <Label htmlFor="password" className="text-white">
-                        Password
-                      </Label>
-                      <Input
-                        id="password"
-                        type="password"
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        disabled={isLoading}
-                        required
-                        className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:bg-white/10 focus:border-white/20 focus:scale-[1.01] transition-all duration-200"
-                      />
-                    </motion.div>
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Signing in...
+                        </>
+                      ) : (
+                        "Sign in"
+                      )}
+                    </Button>
+                  </motion.div>
+                </form>
 
-                    {/* Remember me & Forgot password */}
-                    <motion.div
-                      className="flex items-center justify-between"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.4, delay: 0.4 }}
-                    >
-                      <div className="flex items-center gap-2">
-                        <Checkbox
-                          id="remember"
-                          checked={rememberMe}
-                          onCheckedChange={(checked) =>
-                            setRememberMe(checked as boolean)
-                          }
-                          className="border-white/20 data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-blue-500 data-[state=checked]:to-purple-600"
-                        />
-                        <Label
-                          htmlFor="remember"
-                          className="text-sm font-normal cursor-pointer text-gray-300"
-                        >
-                          Remember me
-                        </Label>
+                {/* OAuth option if available */}
+                {oauthEnabled && (
+                  <>
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t border-white/10" />
                       </div>
-                      <Link href="/forgot-password">
-                        <a className="text-sm bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent hover:from-blue-300 hover:to-purple-300 transition-all duration-200">
-                          Forgot password?
-                        </a>
-                      </Link>
-                    </motion.div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-black/40 px-2 text-gray-400">
+                          Or continue with
+                        </span>
+                      </div>
+                    </div>
 
-                    {/* Sign in button */}
                     <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4, delay: 0.5 }}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
                       <Button
-                        type="submit"
-                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white border-0 shadow-lg shadow-blue-500/20 transition-all duration-200"
-                        size="lg"
+                        type="button"
+                        variant="outline"
+                        className="w-full bg-white/5 border-white/10 text-white hover:bg-white/10 hover:border-white/20 transition-all duration-200"
+                        onClick={handleOAuthLogin}
                         disabled={isLoading}
                       >
-                        {isLoading ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Signing in...
-                          </>
-                        ) : (
-                          "Sign in"
-                        )}
+                        OAuth Sign In
                       </Button>
                     </motion.div>
-                  </form>
+                  </>
+                )}
 
-                  {/* OAuth option if available */}
-                  {oauthEnabled && (
-                    <>
-                      <div className="relative">
-                        <div className="absolute inset-0 flex items-center">
-                          <span className="w-full border-t border-white/10" />
-                        </div>
-                        <div className="relative flex justify-center text-xs uppercase">
-                          <span className="bg-black/40 px-2 text-gray-400">
-                            Or continue with
-                          </span>
-                        </div>
-                      </div>
-
-                      <motion.div
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <Button
-                          type="button"
-                          variant="outline"
-                          className="w-full bg-white/5 border-white/10 text-white hover:bg-white/10 hover:border-white/20 transition-all duration-200"
-                          onClick={handleOAuthLogin}
-                          disabled={isLoading}
-                        >
-                          OAuth Sign In
-                        </Button>
-                      </motion.div>
-                    </>
-                  )}
-
-                  {/* Divider */}
-                  <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                      <span className="w-full border-t border-white/10" />
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-black/40 px-2 text-gray-400">Or</span>
-                    </div>
+                {/* Divider */}
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-white/10" />
                   </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-black/40 px-2 text-gray-400">Or</span>
+                  </div>
+                </div>
 
-                  {/* Register link */}
-                  <motion.div
-                    className="text-center text-sm"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.4, delay: 0.6 }}
-                  >
-                    <span className="text-gray-400">
-                      Don't have an account?{" "}
-                    </span>
-                    <Link href="/register">
-                      <a className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent font-medium hover:from-blue-300 hover:to-purple-300 transition-all duration-200">
-                        Create account
-                      </a>
-                    </Link>
-                  </motion.div>
-                </CardContent>
-              </Card>
+                {/* Register link */}
+                <motion.div
+                  className="text-center text-sm"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.4, delay: 0.6 }}
+                >
+                  <span className="text-gray-400">Don't have an account? </span>
+                  <Link href="/register">
+                    <a className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent font-medium hover:from-blue-300 hover:to-purple-300 transition-all duration-200">
+                      Create account
+                    </a>
+                  </Link>
+                </motion.div>
+              </CardContent>
+            </Card>
 
-              {/* Note */}
-              <p className="text-xs text-center text-gray-500 mt-4">
-                {oauthEnabled
-                  ? "Secure authentication with OAuth or email/password"
-                  : "Secure email/password authentication"}
-              </p>
-            </motion.div>
+            {/* Note */}
+            <p className="text-xs text-center text-gray-500 mt-4">
+              {oauthEnabled
+                ? "Secure authentication with OAuth or email/password"
+                : "Secure email/password authentication"}
+            </p>
+          </motion.div>
         </AuthSplitLayout>
       </PageTransition>
       <Footer />

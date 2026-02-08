@@ -12,7 +12,11 @@ export function useScrollToTop() {
     // Scroll to top instantly on route change
     // Use try-catch for browsers that don't support ScrollToOptions
     try {
-      window.scrollTo({ top: 0, left: 0, behavior: "instant" as ScrollBehavior });
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: "instant" as ScrollBehavior,
+      });
     } catch {
       // Fallback for older browsers
       window.scrollTo(0, 0);
