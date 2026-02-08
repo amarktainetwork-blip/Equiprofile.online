@@ -402,8 +402,8 @@ async function startServer() {
     res.json({ status: "ok", timestamp: new Date().toISOString() });
   });
 
-  // Version endpoint with build fingerprint
-  app.get("/api/version", (req, res) => {
+  // Version endpoint with build fingerprint (rate limited like other info endpoints)
+  app.get("/api/version", healthLimiter, (req, res) => {
     const path = require("path");
 
     // Try to read build.txt for build fingerprint
@@ -444,8 +444,8 @@ async function startServer() {
     });
   });
 
-  // Favicon handler - serve favicon.svg as favicon.ico with correct headers
-  app.get("/favicon.ico", (req, res) => {
+  // Favicon handler - serve favicon.svg as favicon.ico with correct headers (rate limited)
+  app.get("/favicon.ico", healthLimiter, (req, res) => {
     const faviconPath =
       process.env.NODE_ENV === "development"
         ? resolve(process.cwd(), "client/public/favicon.svg")
