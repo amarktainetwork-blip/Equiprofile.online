@@ -263,7 +263,10 @@ export default function Home() {
                   </h1>
 
                   <p className="text-lg md:text-xl lg:text-2xl text-white/90 mb-10 leading-relaxed max-w-4xl mx-auto drop-shadow-lg">
-                    Stop juggling spreadsheets and paper records. Manage everything about your horses in one powerful platform—health records, training schedules, feeding plans, and more. Start your free 7-day trial today.
+                    Stop juggling spreadsheets and paper records. Manage
+                    everything about your horses in one powerful platform—health
+                    records, training schedules, feeding plans, and more. Start
+                    your free 7-day trial today.
                   </p>
 
                   <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
