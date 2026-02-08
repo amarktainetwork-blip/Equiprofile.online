@@ -17,6 +17,8 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { marketingAssets } from "@/config/marketingAssets";
 
+const YEARLY_SAVINGS_PERCENTAGE = 17;
+
 export default function Pricing() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
@@ -138,6 +140,17 @@ export default function Pricing() {
 
   const hasActiveSubscription = subscriptionStatus?.status === "active";
 
+  const getProPlanPrice = () => {
+    if (billingPeriod === "monthly") {
+      return pricing?.monthly?.amount 
+        ? (pricing.monthly.amount / 100).toFixed(2) 
+        : "7.99";
+    }
+    return pricing?.yearly?.amount 
+      ? (pricing.yearly.amount / 100).toFixed(2) 
+      : "79.90";
+  };
+
   const pricingPlans = [
     {
       name: "Free Trial",
@@ -153,9 +166,7 @@ export default function Pricing() {
       name: "Pro",
       plan: "pro",
       description: "For individual horse owners",
-      price: billingPeriod === "monthly" 
-        ? (pricing?.monthly?.amount ? (pricing.monthly.amount / 100).toFixed(2) : "7.99")
-        : (pricing?.yearly?.amount ? (pricing.yearly.amount / 100).toFixed(2) : "79.90"),
+      price: getProPlanPrice(),
       period: billingPeriod === "monthly" ? "/month" : "/year",
       yearlyPrice: pricing?.yearly?.amount ? (pricing.yearly.amount / 100).toFixed(2) : "79.90",
       monthlySavings: true,
@@ -225,7 +236,7 @@ export default function Pricing() {
             >
               Yearly
               <span className="ml-2 text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">
-                Save 17%
+                Save {YEARLY_SAVINGS_PERCENTAGE}%
               </span>
             </button>
           </motion.div>
@@ -315,7 +326,7 @@ export default function Pricing() {
                     {planData.monthlySavings && billingPeriod === "yearly" && (
                       <p className="text-sm text-gray-400 mt-2">
                         <span className="text-green-400 font-semibold">
-                          Save 17% with yearly billing
+                          Save {YEARLY_SAVINGS_PERCENTAGE}% with yearly billing
                         </span>
                       </p>
                     )}
