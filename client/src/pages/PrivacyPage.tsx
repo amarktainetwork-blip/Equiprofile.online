@@ -286,19 +286,26 @@ export default function PrivacyPage() {
                       <strong>Support:</strong> support@equiprofile.online
                       <br />
                       <strong>Website:</strong> https://equiprofile.online
+                      <br />
+                      <strong>WhatsApp:</strong> +44 7347 258089
                     </p>
                   </CardContent>
                 </Card>
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>13. GDPR Compliance (European Users)</CardTitle>
+                    <CardTitle>13. UK GDPR and Data Protection</CardTitle>
                   </CardHeader>
                   <CardContent className="prose prose-slate dark:prose-invert max-w-none">
                     <p>
-                      If you are located in the European Economic Area (EEA), we
-                      process your personal data based on the following legal
-                      grounds:
+                      We comply with the UK General Data Protection Regulation
+                      (UK GDPR) and the Data Protection Act 2018. These Terms
+                      are governed by the laws of England and Wales.
+                    </p>
+                    <p>
+                      If you are located in the European Economic Area (EEA) or
+                      UK, we process your personal data based on the following
+                      legal grounds:
                     </p>
                     <ul>
                       <li>

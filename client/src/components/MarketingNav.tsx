@@ -58,10 +58,10 @@ export function MarketingNav() {
             {navLinks.map((link) => (
               <Link key={link.path} href={link.path}>
                 <a
-                  className={`text-sm font-medium transition-colors hover:text-primary ${
+                  className={`text-sm font-medium transition-colors ${
                     location === link.path
-                      ? "text-primary"
-                      : "text-foreground/80"
+                      ? "text-white hover:text-white/90"
+                      : "text-white/90 hover:text-white"
                   }`}
                 >
                   {link.label}
@@ -120,10 +120,10 @@ export function MarketingNav() {
               {navLinks.map((link) => (
                 <Link key={link.path} href={link.path}>
                   <a
-                    className={`block py-2 text-base font-medium transition-colors hover:text-primary ${
+                    className={`block py-2 text-base font-medium transition-colors ${
                       location === link.path
-                        ? "text-primary"
-                        : "text-foreground/80"
+                        ? "text-white hover:text-white/90"
+                        : "text-white/90 hover:text-white"
                     }`}
                     onClick={() => setMobileMenuOpen(false)}
                   >

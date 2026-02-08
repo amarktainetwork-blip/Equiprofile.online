@@ -101,10 +101,23 @@ import { ENV } from "./_core/env";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
+// Helper to fix localhost to IPv4 address
+function fixDatabaseUrl(url: string): string {
+  // Replace localhost with 127.0.0.1 to avoid IPv6 resolution (::1)
+  return url.replace(/localhost/g, "127.0.0.1");
+}
+
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
-      _db = drizzle(process.env.DATABASE_URL);
+      const fixedUrl = fixDatabaseUrl(process.env.DATABASE_URL);
+
+      // Log database connection info (redacting password)
+      const urlWithoutPassword = fixedUrl.replace(/:([^@]+)@/, ":****@");
+      console.log("[Database] Connecting to:", urlWithoutPassword);
+
+      _db = drizzle(fixedUrl);
+      console.log("[Database] Connection established");
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
       _db = null;
