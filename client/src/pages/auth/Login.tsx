@@ -21,6 +21,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AuthSplitLayout } from "@/components/AuthSplitLayout";
 import { motion } from "framer-motion";
 
+import { marketingAssets } from "@/config/marketingAssets";
+
 /**
  * Login page
  *
@@ -88,7 +90,7 @@ export default function Login() {
     <>
       <MarketingNav />
       <PageTransition>
-        <AuthSplitLayout>
+        <AuthSplitLayout imageUrl={marketingAssets.landing.training}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

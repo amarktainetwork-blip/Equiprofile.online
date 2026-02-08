@@ -105,7 +105,7 @@ export default function Register() {
     <>
       <MarketingNav />
       <PageTransition>
-        <AuthSplitLayout>
+        <AuthSplitLayout imageUrl={marketingAssets.landing.stable}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

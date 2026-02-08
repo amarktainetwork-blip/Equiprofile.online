@@ -219,7 +219,18 @@ export default function TermsPage() {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>12. Contact Information</CardTitle>
+                    <CardTitle>12. Governing Law and Jurisdiction</CardTitle>
+                  </CardHeader>
+                  <CardContent className="prose prose-slate dark:prose-invert max-w-none">
+                    <p>
+                      These Terms shall be governed by and construed in accordance with the laws of England and Wales. Any disputes arising under or in connection with these Terms shall be subject to the exclusive jurisdiction of the courts of England and Wales.
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>13. Contact Information</CardTitle>
                   </CardHeader>
                   <CardContent className="prose prose-slate dark:prose-invert max-w-none">
                     <p>
@@ -230,6 +241,8 @@ export default function TermsPage() {
                       <strong>Email:</strong> support@equiprofile.online
                       <br />
                       <strong>Website:</strong> https://equiprofile.online
+                      <br />
+                      <strong>WhatsApp:</strong> +44 7347 258089
                     </p>
                   </CardContent>
                 </Card>
