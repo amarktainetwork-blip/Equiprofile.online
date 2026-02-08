@@ -18,7 +18,7 @@ import { PageTransition } from "@/components/PageTransition";
 import { MarketingNav } from "@/components/MarketingNav";
 import { Footer } from "@/components/Footer";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { marketingAssets } from "@/config/marketingAssets";
+import { AuthSplitLayout } from "@/components/AuthSplitLayout";
 import { motion } from "framer-motion";
 
 /**
@@ -105,44 +105,21 @@ export default function Register() {
     <>
       <MarketingNav />
       <PageTransition>
-        {/* Full screen background with gradient and image overlay */}
-        <div className="fixed inset-0 bg-gradient-to-br from-black via-gray-900 to-black">
-          {/* Background image with overlay */}
-          <div
-            className="absolute inset-0 opacity-20"
-            style={{
-              backgroundImage: `url(${marketingAssets.auth.background})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
-            }}
-          />
-          {/* Dark overlay */}
-          <div className="absolute inset-0 bg-black/40" />
-        </div>
-
-        {/* Content */}
-        <div className="relative min-h-screen flex items-center justify-center px-4 py-20">
+        <AuthSplitLayout>
           <motion.div
-            className="w-full max-w-md"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
             {/* Back button */}
             <Link href="/">
-              <a className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors mb-6">
+              <a className="inline-flex items-center gap-2 text-sm text-white/60 hover:text-white transition-colors mb-6">
                 <ArrowLeft className="w-4 h-4" />
                 Back to home
               </a>
             </Link>
 
             {/* Dark Glass Form Card */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-            >
               <Card className="bg-black/40 backdrop-blur-xl border border-white/10 shadow-2xl">
                 <CardHeader className="space-y-1">
                   <CardTitle className="text-3xl font-bold text-center bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
@@ -381,14 +358,8 @@ export default function Register() {
                   </motion.div>
                 </CardContent>
               </Card>
-            </motion.div>
 
-            {/* Note */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.4, delay: 0.9 }}
-            >
+              {/* Note */}
               <p className="text-xs text-center text-gray-500 mt-4">
                 {oauthEnabled
                   ? "Secure authentication with OAuth or email/password"
@@ -400,8 +371,7 @@ export default function Register() {
                 credit card required
               </p>
             </motion.div>
-          </motion.div>
-        </div>
+        </AuthSplitLayout>
       </PageTransition>
       <Footer />
     </>
