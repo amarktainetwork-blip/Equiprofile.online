@@ -17,6 +17,8 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { PageTransition } from "@/components/PageTransition";
 import { MarketingNav } from "@/components/MarketingNav";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { marketingAssets } from "@/config/marketingAssets";
+import { motion } from "framer-motion";
 
 /**
  * Register page
@@ -102,202 +104,302 @@ export default function Register() {
     <>
       <MarketingNav />
       <PageTransition>
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 px-4 pt-20">
-          <div className="w-full max-w-md">
+        {/* Full screen background with gradient and image overlay */}
+        <div className="fixed inset-0 bg-gradient-to-br from-black via-gray-900 to-black">
+          {/* Background image with overlay */}
+          <div
+            className="absolute inset-0 opacity-20"
+            style={{
+              backgroundImage: `url(${marketingAssets.auth.background})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+            }}
+          />
+          {/* Dark overlay */}
+          <div className="absolute inset-0 bg-black/40" />
+        </div>
+
+        {/* Content */}
+        <div className="relative min-h-screen flex items-center justify-center px-4 py-20">
+          <motion.div
+            className="w-full max-w-md"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
             {/* Back button */}
             <Link href="/">
-              <a className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6">
+              <a className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors mb-6">
                 <ArrowLeft className="w-4 h-4" />
                 Back to home
               </a>
             </Link>
 
-            <Card className="shadow-xl">
-              <CardHeader className="space-y-1">
-                <CardTitle className="text-2xl font-bold text-center">
-                  Create an account
-                </CardTitle>
-                <CardDescription className="text-center">
-                  Get started with EquiProfile today
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {error && (
-                  <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
-                )}
-
-                <form onSubmit={handleEmailRegister} className="space-y-4">
-                  {/* Name field */}
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Full Name</Label>
-                    <Input
-                      id="name"
-                      type="text"
-                      placeholder="John Doe"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      disabled={isLoading}
-                    />
-                  </div>
-
-                  {/* Email field */}
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="you@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      disabled={isLoading}
-                      required
-                    />
-                  </div>
-
-                  {/* Password field */}
-                  <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
-                    <Input
-                      id="password"
-                      type="password"
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      disabled={isLoading}
-                      required
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      At least 8 characters
-                    </p>
-                  </div>
-
-                  {/* Confirm Password field */}
-                  <div className="space-y-2">
-                    <Label htmlFor="confirm-password">Confirm Password</Label>
-                    <Input
-                      id="confirm-password"
-                      type="password"
-                      placeholder="••••••••"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      disabled={isLoading}
-                      required
-                    />
-                  </div>
-
-                  {/* Terms acceptance */}
-                  <div className="flex items-start gap-2">
-                    <Checkbox
-                      id="terms"
-                      className="mt-1"
-                      checked={acceptTerms}
-                      onCheckedChange={(checked) =>
-                        setAcceptTerms(checked as boolean)
-                      }
-                    />
-                    <Label
-                      htmlFor="terms"
-                      className="text-sm font-normal cursor-pointer leading-relaxed"
+            {/* Dark Glass Form Card */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              <Card className="bg-black/40 backdrop-blur-xl border border-white/10 shadow-2xl">
+                <CardHeader className="space-y-1">
+                  <CardTitle className="text-3xl font-bold text-center bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                    Create an account
+                  </CardTitle>
+                  <CardDescription className="text-center text-gray-400">
+                    Get started with EquiProfile today
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {error && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
                     >
-                      I agree to the{" "}
-                      <Link href="/terms">
-                        <a className="text-primary hover:underline">
-                          Terms of Service
-                        </a>
-                      </Link>{" "}
-                      and{" "}
-                      <Link href="/privacy">
-                        <a className="text-primary hover:underline">
-                          Privacy Policy
-                        </a>
-                      </Link>
-                    </Label>
-                  </div>
+                      <Alert
+                        variant="destructive"
+                        className="bg-red-950/50 border-red-500/50 backdrop-blur-sm"
+                      >
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription className="text-red-200">
+                          {error}
+                        </AlertDescription>
+                      </Alert>
+                    </motion.div>
+                  )}
 
-                  {/* Create account button */}
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    size="lg"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Creating account...
-                      </>
-                    ) : (
-                      "Create account"
-                    )}
-                  </Button>
-                </form>
+                  <form onSubmit={handleEmailRegister} className="space-y-4">
+                    {/* Name field */}
+                    <motion.div
+                      className="space-y-2"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.4, delay: 0.2 }}
+                    >
+                      <Label htmlFor="name" className="text-white">
+                        Full Name
+                      </Label>
+                      <Input
+                        id="name"
+                        type="text"
+                        placeholder="John Doe"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        disabled={isLoading}
+                        className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:bg-white/10 focus:border-white/20 focus:scale-[1.01] transition-all duration-200"
+                      />
+                    </motion.div>
 
-                {/* OAuth option if available */}
-                {oauthEnabled && (
-                  <>
-                    <div className="relative">
-                      <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t" />
+                    {/* Email field */}
+                    <motion.div
+                      className="space-y-2"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.4, delay: 0.3 }}
+                    >
+                      <Label htmlFor="email" className="text-white">
+                        Email
+                      </Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="you@example.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        disabled={isLoading}
+                        required
+                        className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:bg-white/10 focus:border-white/20 focus:scale-[1.01] transition-all duration-200"
+                      />
+                    </motion.div>
+
+                    {/* Password field */}
+                    <motion.div
+                      className="space-y-2"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.4, delay: 0.4 }}
+                    >
+                      <Label htmlFor="password" className="text-white">
+                        Password
+                      </Label>
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        disabled={isLoading}
+                        required
+                        className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:bg-white/10 focus:border-white/20 focus:scale-[1.01] transition-all duration-200"
+                      />
+                      <p className="text-xs text-gray-500">
+                        At least 8 characters
+                      </p>
+                    </motion.div>
+
+                    {/* Confirm Password field */}
+                    <motion.div
+                      className="space-y-2"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.4, delay: 0.5 }}
+                    >
+                      <Label htmlFor="confirm-password" className="text-white">
+                        Confirm Password
+                      </Label>
+                      <Input
+                        id="confirm-password"
+                        type="password"
+                        placeholder="••••••••"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        disabled={isLoading}
+                        required
+                        className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:bg-white/10 focus:border-white/20 focus:scale-[1.01] transition-all duration-200"
+                      />
+                    </motion.div>
+
+                    {/* Terms acceptance */}
+                    <motion.div
+                      className="flex items-start gap-2"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.4, delay: 0.6 }}
+                    >
+                      <Checkbox
+                        id="terms"
+                        className="mt-1 border-white/20 data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-indigo-500 data-[state=checked]:to-cyan-500"
+                        checked={acceptTerms}
+                        onCheckedChange={(checked) =>
+                          setAcceptTerms(checked as boolean)
+                        }
+                      />
+                      <Label
+                        htmlFor="terms"
+                        className="text-sm font-normal cursor-pointer leading-relaxed text-gray-300"
+                      >
+                        I agree to the{" "}
+                        <Link href="/terms">
+                          <a className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent hover:from-indigo-300 hover:to-cyan-300 transition-all duration-200">
+                            Terms of Service
+                          </a>
+                        </Link>{" "}
+                        and{" "}
+                        <Link href="/privacy">
+                          <a className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent hover:from-indigo-300 hover:to-cyan-300 transition-all duration-200">
+                            Privacy Policy
+                          </a>
+                        </Link>
+                      </Label>
+                    </motion.div>
+
+                    {/* Create account button */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: 0.7 }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <Button
+                        type="submit"
+                        className="w-full bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white border-0 shadow-lg shadow-indigo-500/20 transition-all duration-200"
+                        size="lg"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Creating account...
+                          </>
+                        ) : (
+                          "Create account"
+                        )}
+                      </Button>
+                    </motion.div>
+                  </form>
+
+                  {/* OAuth option if available */}
+                  {oauthEnabled && (
+                    <>
+                      <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                          <span className="w-full border-t border-white/10" />
+                        </div>
+                        <div className="relative flex justify-center text-xs uppercase">
+                          <span className="bg-black/40 px-2 text-gray-400">
+                            Or continue with
+                          </span>
+                        </div>
                       </div>
-                      <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-card px-2 text-muted-foreground">
-                          Or continue with
-                        </span>
-                      </div>
+
+                      <motion.div
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="w-full bg-white/5 border-white/10 text-white hover:bg-white/10 hover:border-white/20 transition-all duration-200"
+                          onClick={handleOAuthRegister}
+                          disabled={isLoading}
+                        >
+                          OAuth Sign Up
+                        </Button>
+                      </motion.div>
+                    </>
+                  )}
+
+                  {/* Divider */}
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t border-white/10" />
                     </div>
-
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full"
-                      onClick={handleOAuthRegister}
-                      disabled={isLoading}
-                    >
-                      OAuth Sign Up
-                    </Button>
-                  </>
-                )}
-
-                {/* Divider */}
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t" />
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-black/40 px-2 text-gray-400">Or</span>
+                    </div>
                   </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-card px-2 text-muted-foreground">
-                      Or
+
+                  {/* Login link */}
+                  <motion.div
+                    className="text-center text-sm"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.4, delay: 0.8 }}
+                  >
+                    <span className="text-gray-400">
+                      Already have an account?{" "}
                     </span>
-                  </div>
-                </div>
-
-                {/* Login link */}
-                <div className="text-center text-sm">
-                  <span className="text-muted-foreground">
-                    Already have an account?{" "}
-                  </span>
-                  <Link href="/login">
-                    <a className="text-primary font-medium hover:underline">
-                      Sign in
-                    </a>
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
+                    <Link href="/login">
+                      <a className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent font-medium hover:from-indigo-300 hover:to-cyan-300 transition-all duration-200">
+                        Sign in
+                      </a>
+                    </Link>
+                  </motion.div>
+                </CardContent>
+              </Card>
+            </motion.div>
 
             {/* Note */}
-            <p className="text-xs text-center text-muted-foreground mt-4">
-              {oauthEnabled
-                ? "Secure authentication with OAuth or email/password"
-                : "Secure email/password authentication"}
-            </p>
-            <p className="text-xs text-center text-muted-foreground mt-2">
-              Start your <strong>7-day free trial</strong> - no credit card
-              required
-            </p>
-          </div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.9 }}
+            >
+              <p className="text-xs text-center text-gray-500 mt-4">
+                {oauthEnabled
+                  ? "Secure authentication with OAuth or email/password"
+                  : "Secure email/password authentication"}
+              </p>
+              <p className="text-xs text-center text-gray-500 mt-2">
+                Start your{" "}
+                <strong className="text-gray-400">7-day free trial</strong> - no
+                credit card required
+              </p>
+            </motion.div>
+          </motion.div>
         </div>
       </PageTransition>
     </>

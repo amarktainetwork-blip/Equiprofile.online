@@ -51,6 +51,19 @@ import ClientPortal from "./pages/ClientPortal";
 import Settings from "./pages/Settings";
 import BillingPage from "./pages/BillingPage";
 
+// Additional Health & Management Pages
+import Appointments from "./pages/Appointments";
+import NutritionLogs from "./pages/NutritionLogs";
+import NutritionPlans from "./pages/NutritionPlans";
+import Hoofcare from "./pages/Hoofcare";
+import Pedigree from "./pages/Pedigree";
+import Xrays from "./pages/Xrays";
+import Treatments from "./pages/Treatments";
+import Vaccinations from "./pages/Vaccinations";
+import DentalCare from "./pages/DentalCare";
+import Dewormings from "./pages/Dewormings";
+import Tags from "./pages/Tags";
+
 function Router() {
   useKeyboardNavigation();
 
@@ -86,6 +99,15 @@ function Router() {
 
           {/* Health records */}
           <Route path="/health" component={Health} />
+          <Route path="/vaccinations" component={Vaccinations} />
+          <Route path="/dental" component={DentalCare} />
+          <Route path="/hoofcare" component={Hoofcare} />
+          <Route path="/dewormings" component={Dewormings} />
+          <Route path="/treatments" component={Treatments} />
+          <Route path="/xrays" component={Xrays} />
+
+          {/* Pedigree */}
+          <Route path="/pedigree" component={Pedigree} />
 
           {/* Training */}
           <Route path="/training" component={Training} />
@@ -101,6 +123,8 @@ function Router() {
 
           {/* Feeding plans */}
           <Route path="/feeding" component={Feeding} />
+          <Route path="/nutrition-plans" component={NutritionPlans} />
+          <Route path="/nutrition-logs" component={NutritionLogs} />
 
           {/* Weather */}
           <Route path="/weather" component={Weather} />
@@ -128,6 +152,10 @@ function Router() {
 
           {/* Calendar */}
           <Route path="/calendar" component={Calendar} />
+          <Route path="/appointments" component={Appointments} />
+
+          {/* Tags */}
+          <Route path="/tags" component={Tags} />
 
           {/* Settings */}
           <Route path="/settings" component={Settings} />
