@@ -25,7 +25,8 @@ const fadeInUpVariants = {
 const featureSections = [
   {
     title: "Complete Health Management",
-    description: "Keep detailed health records for all your horses in one place",
+    description:
+      "Keep detailed health records for all your horses in one place",
     image: "/images/gallery/1.jpg",
     imagePosition: "right",
     features: [
@@ -136,9 +137,7 @@ export default function Features() {
                   viewport={{ once: true, margin: "-100px" }}
                   variants={fadeInUpVariants}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className={`py-16 ${
-                    index % 2 === 1 ? "bg-gray-900/30" : ""
-                  }`}
+                  className={`py-16 ${index % 2 === 1 ? "bg-gray-900/30" : ""}`}
                 >
                   <div className="container mx-auto px-4">
                     <div

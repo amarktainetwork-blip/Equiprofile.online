@@ -170,7 +170,9 @@ export default function About() {
                           Smart Training Insights
                         </h3>
                         <p className="text-lg text-gray-300 mb-6">
-                          Get AI-powered analytics on your horse's training progress, health patterns, and performance trends. Make data-driven decisions for optimal care.
+                          Get AI-powered analytics on your horse's training
+                          progress, health patterns, and performance trends.
+                          Make data-driven decisions for optimal care.
                         </p>
                         <Link href="/features">
                           <Button
@@ -200,7 +202,9 @@ export default function About() {
                         Join Our Community
                       </h2>
                       <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-                        Thousands of equestrians trust EquiProfile to manage their horses. Start your free trial today and experience the difference.
+                        Thousands of equestrians trust EquiProfile to manage
+                        their horses. Start your free trial today and experience
+                        the difference.
                       </p>
                       <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Link href="/register">

@@ -11,7 +11,7 @@ interface PageBannerProps {
 
 /**
  * PageBanner Component
- * 
+ *
  * A reusable banner component for marketing pages.
  * Features:
  * - Responsive design with proper image scaling

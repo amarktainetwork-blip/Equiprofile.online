@@ -329,9 +329,7 @@ async function startServer() {
   let cachedBuildInfo: any = null;
   try {
     const packageJsonPath = resolve(process.cwd(), "package.json");
-    const packageJson = JSON.parse(
-      fs.readFileSync(packageJsonPath, "utf-8"),
-    );
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
 
     // Try to get git commit (only once at startup)
     let commit = "unknown";
@@ -450,7 +448,7 @@ async function startServer() {
       process.env.NODE_ENV === "development"
         ? resolve(process.cwd(), "client/public/favicon.svg")
         : resolve(import.meta.dirname, "public/favicon.svg");
-    
+
     if (fs.existsSync(faviconPath)) {
       res.setHeader("Content-Type", "image/svg+xml");
       res.setHeader("Cache-Control", "public, max-age=86400"); // 1 day

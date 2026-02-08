@@ -227,9 +227,12 @@ export default function Pricing() {
                   <div className="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 flex items-center justify-center mb-4">
                     <Check className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">What's Included</h3>
+                  <h3 className="text-xl font-semibold text-white mb-2">
+                    What's Included
+                  </h3>
                   <p className="text-gray-400 text-sm">
-                    All plans include unlimited updates, priority support, and access to all core features
+                    All plans include unlimited updates, priority support, and
+                    access to all core features
                   </p>
                 </div>
               </div>
@@ -238,9 +241,12 @@ export default function Pricing() {
                   <div className="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 flex items-center justify-center mb-4">
                     <Clock className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">7-Day Free Trial</h3>
+                  <h3 className="text-xl font-semibold text-white mb-2">
+                    7-Day Free Trial
+                  </h3>
                   <p className="text-gray-400 text-sm">
-                    Try EquiProfile risk-free with full access to Pro features for 7 days
+                    Try EquiProfile risk-free with full access to Pro features
+                    for 7 days
                   </p>
                 </div>
               </div>
@@ -249,9 +255,12 @@ export default function Pricing() {
                   <div className="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 flex items-center justify-center mb-4">
                     <XCircle className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">Cancel Anytime</h3>
+                  <h3 className="text-xl font-semibold text-white mb-2">
+                    Cancel Anytime
+                  </h3>
                   <p className="text-gray-400 text-sm">
-                    No long-term contracts. Cancel or change your plan anytime with no hidden fees
+                    No long-term contracts. Cancel or change your plan anytime
+                    with no hidden fees
                   </p>
                 </div>
               </div>
@@ -463,7 +472,7 @@ export default function Pricing() {
                             )}
                           </Button>
                         ) : (
-                          <Button 
+                          <Button
                             className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 text-white border-0 hover:from-indigo-600 hover:to-cyan-600 shadow-lg hover:shadow-indigo-500/50 transition-all duration-300"
                             onClick={() => handleSubscribe(billingPeriod)}
                             disabled={loadingPlan === billingPeriod}

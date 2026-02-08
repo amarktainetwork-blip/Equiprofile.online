@@ -270,7 +270,8 @@ export default function Contact() {
                     </h3>
                     <p className="text-sm text-gray-400">
                       We typically respond to all inquiries within 24 hours
-                      during business days. For urgent matters, contact us via WhatsApp for faster support.
+                      during business days. For urgent matters, contact us via
+                      WhatsApp for faster support.
                     </p>
                   </div>
                 </motion.div>
