@@ -8,13 +8,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { MarketingNav } from "@/components/MarketingNav";
+import { Footer } from "@/components/Footer";
 import { PageTransition } from "@/components/PageTransition";
 import { ScrollReveal, Stagger, StaggerItem } from "@/components/ScrollReveal";
 import { Link } from "wouter";
@@ -29,13 +24,9 @@ import {
   Activity,
   Utensils,
   Star,
-  Shield,
   Zap,
-  TrendingUp,
   Users,
   Award,
-  ArrowRight,
-  PlayCircle,
   ChevronLeft,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
@@ -136,63 +127,11 @@ export default function Home() {
     { value: 4.8, label: "Rating", suffix: "★" },
   ];
 
-  const pricingTiers = [
-    {
-      name: "Hobby",
-      price: "$9",
-      period: "/month",
-      description: "Perfect for individual horse owners",
-      features: [
-        "Up to 3 horses",
-        "Health & vaccination tracking",
-        "Basic training logs",
-        "Document storage (1GB)",
-        "Mobile app access",
-        "Email support",
-      ],
-      highlighted: false,
-    },
-    {
-      name: "Professional",
-      price: "$29",
-      period: "/month",
-      description: "Ideal for trainers and small stables",
-      features: [
-        "Up to 15 horses",
-        "Advanced analytics",
-        "Custom training templates",
-        "Document storage (10GB)",
-        "Priority support",
-        "Client portal access",
-        "Calendar integration",
-        "Automated reminders",
-      ],
-      highlighted: true,
-    },
-    {
-      name: "Enterprise",
-      price: "Custom",
-      period: "",
-      description: "For large stables and organizations",
-      features: [
-        "Unlimited horses",
-        "White-label options",
-        "API access",
-        "Unlimited storage",
-        "24/7 phone support",
-        "Custom integrations",
-        "Multi-location support",
-        "Dedicated account manager",
-      ],
-      highlighted: false,
-    },
-  ];
-
   const faqs = [
     {
-      question: "How does the 14-day free trial work?",
+      question: "How does the 7-day free trial work?",
       answer:
-        "Start using EquiProfile immediately with full access to all features. No credit card required. After 14 days, choose a plan that fits your needs or continue with our free tier for up to 1 horse.",
+        "Start using EquiProfile immediately with full access to all features. No credit card required. After 7 days, choose a plan that fits your needs or continue with our free tier for up to 1 horse.",
     },
     {
       question: "Can I manage multiple horses?",
@@ -310,7 +249,7 @@ export default function Home() {
                 >
                   <Badge className="mb-6 inline-flex items-center gap-2 px-6 py-2 text-base bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/20">
                     <Sparkles className="w-5 h-5" />
-                    14-Day Free Trial • No Credit Card Required
+                    7-Day Free Trial • No Credit Card Required
                   </Badge>
 
                   <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight mb-6 text-white drop-shadow-2xl">
@@ -323,9 +262,10 @@ export default function Home() {
                   </h1>
 
                   <p className="text-lg md:text-xl lg:text-2xl text-white/90 mb-10 leading-relaxed max-w-4xl mx-auto drop-shadow-lg">
-                    The ultimate digital platform for horse owners, trainers,
-                    and equestrian professionals. Track health, manage training,
-                    and provide exceptional care—all in one beautiful place.
+                    Stop juggling spreadsheets and paper records. Manage
+                    everything about your horses in one powerful platform—health
+                    records, training schedules, feeding plans, and more. Start
+                    your free 7-day trial today.
                   </p>
 
                   <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
@@ -340,17 +280,6 @@ export default function Home() {
                         <ChevronRight className="w-6 h-6 ml-2 group-hover:translate-x-1 transition-transform" />
                       </Button>
                     </Link>
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="text-lg px-10 py-6 bg-white/10 text-white border-white/30 hover:bg-white/20 backdrop-blur-md shadow-xl hover:scale-105 transition-transform group"
-                      asChild
-                    >
-                      <Link href="/features">
-                        <PlayCircle className="w-6 h-6 mr-2" />
-                        Watch Demo
-                      </Link>
-                    </Button>
                   </div>
                 </motion.div>
               </div>
@@ -552,146 +481,6 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Pricing Comparison */}
-          <section className="py-24 bg-black relative">
-            <div className="container px-4">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                viewport={{ once: true }}
-                className="text-center mb-16"
-              >
-                <Badge className="mb-4 inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md border-white/20 text-white">
-                  <TrendingUp className="w-4 h-4" />
-                  Simple Pricing
-                </Badge>
-                <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-white">
-                  Choose Your Perfect Plan
-                </h2>
-                <p className="text-xl text-white/70 max-w-3xl mx-auto">
-                  Start with a 14-day free trial. No credit card required.
-                  Cancel anytime.
-                </p>
-              </motion.div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
-                {pricingTiers.map((tier, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    viewport={{ once: true }}
-                  >
-                    <Card
-                      className={`h-full relative overflow-hidden ${
-                        tier.highlighted
-                          ? "bg-white/10 backdrop-blur-md border-2 border-indigo-500 shadow-2xl shadow-indigo-500/20 scale-105"
-                          : "bg-white/5 backdrop-blur-md border-white/10"
-                      } hover:scale-105 transition-all duration-300`}
-                    >
-                      {tier.highlighted && (
-                        <div className="absolute top-0 right-0 bg-gradient-to-r from-indigo-600 to-cyan-600 text-white px-4 py-1 text-sm font-bold rounded-bl-lg">
-                          POPULAR
-                        </div>
-                      )}
-                      <CardHeader className="pb-8">
-                        <CardTitle className="text-2xl mb-2 text-white">
-                          {tier.name}
-                        </CardTitle>
-                        <div className="mb-4">
-                          <span className="text-5xl font-bold text-white">
-                            {tier.price}
-                          </span>
-                          <span className="text-white/70">{tier.period}</span>
-                        </div>
-                        <CardDescription className="text-base text-white/70">
-                          {tier.description}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <ul className="space-y-4 mb-8">
-                          {tier.features.map((feature, i) => (
-                            <li key={i} className="flex items-start gap-3">
-                              <Check className="w-5 h-5 text-indigo-400 mt-0.5 flex-shrink-0" />
-                              <span className="text-sm text-white/90">
-                                {feature}
-                              </span>
-                            </li>
-                          ))}
-                        </ul>
-                        <Button
-                          className={`w-full ${
-                            tier.highlighted
-                              ? "bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 text-white border-0"
-                              : "bg-white/10 hover:bg-white/20 text-white border-white/30"
-                          }`}
-                          size="lg"
-                          asChild
-                        >
-                          <Link href="/register">
-                            Get Started
-                            <ArrowRight className="w-4 h-4 ml-2" />
-                          </Link>
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* FAQ Section */}
-          <section className="py-24 bg-gray-900">
-            <div className="container px-4">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                viewport={{ once: true }}
-                className="text-center mb-16"
-              >
-                <Badge className="mb-4 inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md border-white/20 text-white">
-                  <Shield className="w-4 h-4" />
-                  FAQ
-                </Badge>
-                <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-white">
-                  Frequently Asked Questions
-                </h2>
-                <p className="text-xl text-white/70 max-w-3xl mx-auto">
-                  Everything you need to know about EquiProfile.
-                </p>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                transition={{ duration: 0.6 }}
-                viewport={{ once: true }}
-                className="max-w-4xl mx-auto"
-              >
-                <Accordion type="single" collapsible className="space-y-4">
-                  {faqs.map((faq, index) => (
-                    <AccordionItem
-                      key={index}
-                      value={`item-${index}`}
-                      className="bg-white/5 backdrop-blur-md border-white/10 rounded-lg px-6 py-2 hover:bg-white/10 transition-all"
-                    >
-                      <AccordionTrigger className="text-lg font-semibold text-left hover:no-underline text-white">
-                        {faq.question}
-                      </AccordionTrigger>
-                      <AccordionContent className="text-base text-white/70 leading-relaxed">
-                        {faq.answer}
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
-              </motion.div>
-            </div>
-          </section>
-
           {/* Final CTA Section */}
           <section className="py-32 relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-purple-600 to-cyan-600" />
@@ -712,7 +501,7 @@ export default function Home() {
                 </h2>
                 <p className="text-xl md:text-2xl text-white/90 mb-12 leading-relaxed">
                   Join thousands of equestrians who trust EquiProfile to care
-                  for their horses. Start your free 14-day trial today—no credit
+                  for their horses. Start your free 7-day trial today—no credit
                   card required.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-6 justify-center">
@@ -742,7 +531,7 @@ export default function Home() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Check className="w-5 h-5" />
-                    <span>14-day trial</span>
+                    <span>7-day trial</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Check className="w-5 h-5" />
@@ -754,6 +543,7 @@ export default function Home() {
           </section>
         </div>
       </PageTransition>
+      <Footer />
     </>
   );
 }
