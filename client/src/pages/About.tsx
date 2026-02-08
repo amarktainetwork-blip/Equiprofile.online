@@ -50,7 +50,13 @@ const staggerContainer = {
   },
 };
 
-function AnimatedSection({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+function AnimatedSection({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
@@ -85,7 +91,10 @@ export default function About() {
               <AnimatedSection>
                 <div className="text-center max-w-3xl mx-auto">
                   <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-serif mb-6 text-white">
-                    About <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">EquiProfile</span>
+                    About{" "}
+                    <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+                      EquiProfile
+                    </span>
                   </h1>
                   <p className="text-lg md:text-xl text-gray-300">
                     We're on a mission to revolutionize horse management with
@@ -108,22 +117,24 @@ export default function About() {
                           Our Mission
                         </h2>
                         <p className="text-lg text-gray-300 mb-6">
-                          To provide horse owners and equestrian professionals with a
-                          comprehensive, easy-to-use platform that centralizes horse
-                          management, improves care quality, and enhances the bond
-                          between horses and their caretakers.
+                          To provide horse owners and equestrian professionals
+                          with a comprehensive, easy-to-use platform that
+                          centralizes horse management, improves care quality,
+                          and enhances the bond between horses and their
+                          caretakers.
                         </p>
                         <p className="text-lg text-gray-300">
-                          We believe that better data leads to better decisions, and
-                          better decisions lead to happier, healthier horses. That's
-                          why we've built EquiProfile—to give you the tools and
-                          insights you need to provide exceptional care.
+                          We believe that better data leads to better decisions,
+                          and better decisions lead to happier, healthier
+                          horses. That's why we've built EquiProfile—to give you
+                          the tools and insights you need to provide exceptional
+                          care.
                         </p>
                       </div>
                       <div className="relative aspect-square rounded-2xl overflow-hidden backdrop-blur-md bg-white/5 border border-white/10 p-4 hover:border-white/20 transition-all duration-300">
                         <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-cyan-500/20" />
-                        <img 
-                          src={marketingAssets.about.mission} 
+                        <img
+                          src={marketingAssets.about.mission}
                           alt="Our Mission"
                           className="relative z-10 w-full h-full object-contain"
                         />
@@ -140,8 +151,8 @@ export default function About() {
                 <AnimatedSection>
                   <div className="relative aspect-square rounded-2xl overflow-hidden backdrop-blur-md bg-white/5 border border-white/10 p-4 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_40px_rgba(6,182,212,0.3)]">
                     <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-indigo-500/20" />
-                    <img 
-                      src={marketingAssets.about.team} 
+                    <img
+                      src={marketingAssets.about.team}
                       alt="Our Team"
                       className="relative z-10 w-full h-full object-contain"
                     />
@@ -169,8 +180,8 @@ export default function About() {
                       </p>
                       <p>
                         Today, EquiProfile serves thousands of horse owners,
-                        trainers, and stable managers worldwide. We're proud to be
-                        part of the equestrian community and committed to
+                        trainers, and stable managers worldwide. We're proud to
+                        be part of the equestrian community and committed to
                         continuously improving our platform based on your
                         feedback.
                       </p>
@@ -190,8 +201,8 @@ export default function About() {
                   <div className="flex justify-center">
                     <div className="relative w-64 h-64 rounded-2xl overflow-hidden backdrop-blur-md bg-white/5 border border-white/10 p-4">
                       <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-cyan-500/20" />
-                      <img 
-                        src={marketingAssets.about.values} 
+                      <img
+                        src={marketingAssets.about.values}
                         alt="Our Values"
                         className="relative z-10 w-full h-full object-contain"
                       />
@@ -241,22 +252,23 @@ export default function About() {
                         Join Our Community
                       </h2>
                       <p className="text-lg text-gray-300 mb-8">
-                        Be part of a growing community of horse enthusiasts who are
-                        transforming the way they manage their equine companions.
+                        Be part of a growing community of horse enthusiasts who
+                        are transforming the way they manage their equine
+                        companions.
                       </p>
                       <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <Link href="/register">
-                          <Button 
-                            size="lg" 
+                          <Button
+                            size="lg"
                             className="text-lg bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 border-0 shadow-lg shadow-indigo-500/50 hover:shadow-indigo-500/70 transition-all duration-300 w-full sm:w-auto"
                           >
                             Get Started Free
                           </Button>
                         </Link>
                         <Link href="/contact">
-                          <Button 
-                            size="lg" 
-                            variant="outline" 
+                          <Button
+                            size="lg"
+                            variant="outline"
                             className="text-lg border-white/20 text-white hover:bg-white/10 hover:border-white/40 backdrop-blur-sm transition-all duration-300 w-full sm:w-auto"
                           >
                             Contact Us

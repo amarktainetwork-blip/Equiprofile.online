@@ -88,13 +88,13 @@ export default function Login() {
         {/* Full screen background with gradient and image overlay */}
         <div className="fixed inset-0 bg-gradient-to-br from-black via-gray-900 to-black">
           {/* Background image with overlay */}
-          <div 
+          <div
             className="absolute inset-0 opacity-20"
             style={{
               backgroundImage: `url(${marketingAssets.auth.background})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat'
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
             }}
           />
           {/* Dark overlay */}
@@ -103,7 +103,7 @@ export default function Login() {
 
         {/* Content */}
         <div className="relative min-h-screen flex items-center justify-center px-4 py-20">
-          <motion.div 
+          <motion.div
             className="w-full max-w-md"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -139,22 +139,29 @@ export default function Login() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3 }}
                     >
-                      <Alert variant="destructive" className="bg-red-950/50 border-red-500/50 backdrop-blur-sm">
+                      <Alert
+                        variant="destructive"
+                        className="bg-red-950/50 border-red-500/50 backdrop-blur-sm"
+                      >
                         <AlertCircle className="h-4 w-4" />
-                        <AlertDescription className="text-red-200">{error}</AlertDescription>
+                        <AlertDescription className="text-red-200">
+                          {error}
+                        </AlertDescription>
                       </Alert>
                     </motion.div>
                   )}
 
                   <form onSubmit={handleEmailLogin} className="space-y-4">
                     {/* Email field */}
-                    <motion.div 
+                    <motion.div
                       className="space-y-2"
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ duration: 0.4, delay: 0.2 }}
                     >
-                      <Label htmlFor="email" className="text-white">Email</Label>
+                      <Label htmlFor="email" className="text-white">
+                        Email
+                      </Label>
                       <Input
                         id="email"
                         type="email"
@@ -168,13 +175,15 @@ export default function Login() {
                     </motion.div>
 
                     {/* Password field */}
-                    <motion.div 
+                    <motion.div
                       className="space-y-2"
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ duration: 0.4, delay: 0.3 }}
                     >
-                      <Label htmlFor="password" className="text-white">Password</Label>
+                      <Label htmlFor="password" className="text-white">
+                        Password
+                      </Label>
                       <Input
                         id="password"
                         type="password"
@@ -188,7 +197,7 @@ export default function Login() {
                     </motion.div>
 
                     {/* Remember me & Forgot password */}
-                    <motion.div 
+                    <motion.div
                       className="flex items-center justify-between"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -280,14 +289,12 @@ export default function Login() {
                       <span className="w-full border-t border-white/10" />
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-black/40 px-2 text-gray-400">
-                        Or
-                      </span>
+                      <span className="bg-black/40 px-2 text-gray-400">Or</span>
                     </div>
                   </div>
 
                   {/* Register link */}
-                  <motion.div 
+                  <motion.div
                     className="text-center text-sm"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -307,7 +314,7 @@ export default function Login() {
             </motion.div>
 
             {/* Note */}
-            <motion.p 
+            <motion.p
               className="text-xs text-center text-gray-500 mt-4"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

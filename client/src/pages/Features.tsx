@@ -83,7 +83,8 @@ export default function Features() {
                 Powerful Features for Modern Horse Management
               </h1>
               <p className="text-lg md:text-xl text-gray-300 mb-10">
-                Everything you need to manage your horses efficiently, all in one place
+                Everything you need to manage your horses efficiently, all in
+                one place
               </p>
             </motion.div>
           </section>
@@ -106,14 +107,14 @@ export default function Features() {
                 >
                   {/* Glow Effect */}
                   <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500 rounded-2xl opacity-0 group-hover:opacity-75 blur transition duration-500"></div>
-                  
+
                   {/* Glass Card */}
                   <div className="relative h-full p-8 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/10 group-hover:border-white/20 transition-all duration-300">
                     {/* Icon */}
                     <div className="mb-6 relative w-16 h-16 flex items-center justify-center">
                       <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-xl blur-lg"></div>
-                      <img 
-                        src={feature.icon} 
+                      <img
+                        src={feature.icon}
                         alt={feature.title}
                         className="relative w-12 h-12 object-contain filter brightness-110"
                       />
@@ -146,7 +147,7 @@ export default function Features() {
             >
               {/* Glow Effect */}
               <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 rounded-3xl opacity-50 blur-2xl"></div>
-              
+
               {/* Glass Card */}
               <div className="relative p-12 rounded-3xl bg-black/60 backdrop-blur-xl border border-white/20">
                 <div className="text-center">
@@ -154,16 +155,24 @@ export default function Features() {
                     Ready to Get Started?
                   </h2>
                   <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
-                    Join thousands of horse owners who trust EquiProfile for their equine management needs.
+                    Join thousands of horse owners who trust EquiProfile for
+                    their equine management needs.
                   </p>
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                     <Link href="/register">
-                      <Button size="lg" className="text-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 border-0">
+                      <Button
+                        size="lg"
+                        className="text-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 border-0"
+                      >
                         Get Started Free
                       </Button>
                     </Link>
                     <Link href="/pricing">
-                      <Button size="lg" variant="outline" className="text-lg bg-white/5 border-white/20 hover:bg-white/10 text-white">
+                      <Button
+                        size="lg"
+                        variant="outline"
+                        className="text-lg bg-white/5 border-white/20 hover:bg-white/10 text-white"
+                      >
                         View Pricing
                       </Button>
                     </Link>

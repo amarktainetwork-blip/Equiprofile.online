@@ -27,7 +27,9 @@ export default function Pricing() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
-  const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">("monthly");
+  const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">(
+    "monthly",
+  );
 
   const { data: pricing } = trpc.billing.getPricing.useQuery();
   const { data: subscriptionStatus } = trpc.billing.getStatus.useQuery(
@@ -146,12 +148,12 @@ export default function Pricing() {
 
   const getProPlanPrice = () => {
     if (billingPeriod === "monthly") {
-      return pricing?.monthly?.amount 
-        ? (pricing.monthly.amount / 100).toFixed(2) 
+      return pricing?.monthly?.amount
+        ? (pricing.monthly.amount / 100).toFixed(2)
         : BASIC_MONTHLY_PRICE;
     }
-    return pricing?.yearly?.amount 
-      ? (pricing.yearly.amount / 100).toFixed(2) 
+    return pricing?.yearly?.amount
+      ? (pricing.yearly.amount / 100).toFixed(2)
       : BASIC_YEARLY_PRICE;
   };
 
@@ -172,7 +174,9 @@ export default function Pricing() {
       description: "For individual horse owners",
       price: getProPlanPrice(),
       period: billingPeriod === "monthly" ? "/month" : "/year",
-      yearlyPrice: pricing?.yearly?.amount ? (pricing.yearly.amount / 100).toFixed(2) : BASIC_YEARLY_PRICE,
+      yearlyPrice: pricing?.yearly?.amount
+        ? (pricing.yearly.amount / 100).toFixed(2)
+        : BASIC_YEARLY_PRICE,
       monthlySavings: true,
       features: features.pro,
       image: marketingAssets.pricing.planPro,
@@ -182,7 +186,10 @@ export default function Pricing() {
       name: "Stable",
       plan: "stable",
       description: "For professional operations",
-      price: billingPeriod === "monthly" ? STABLE_MONTHLY_PRICE : STABLE_YEARLY_PRICE,
+      price:
+        billingPeriod === "monthly"
+          ? STABLE_MONTHLY_PRICE
+          : STABLE_YEARLY_PRICE,
       period: billingPeriod === "monthly" ? "/month" : "/year",
       yearlyPrice: STABLE_YEARLY_PRICE,
       monthlySavings: true,
@@ -196,7 +203,7 @@ export default function Pricing() {
     <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black">
       <div className="container mx-auto px-4 py-16">
         {/* Header */}
-        <motion.div 
+        <motion.div
           className="text-center mb-16"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -214,7 +221,7 @@ export default function Pricing() {
           </p>
 
           {/* Billing Period Toggle */}
-          <motion.div 
+          <motion.div
             className="mt-8 inline-flex items-center gap-4 bg-black/40 backdrop-blur-md rounded-full p-2 border border-white/10"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -262,9 +269,9 @@ export default function Pricing() {
                   </strong>
                   {subscriptionStatus.status === "active" && " (Active)"}
                 </span>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={handleManageBilling}
                   className="bg-gradient-to-r from-indigo-500 to-cyan-500 text-white border-0 hover:from-indigo-600 hover:to-cyan-600"
                 >
@@ -279,7 +286,7 @@ export default function Pricing() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {pricingPlans.map((planData, index) => {
             const isCurrentPlanActive = isCurrentPlan(planData.plan);
-            
+
             return (
               <motion.div
                 key={planData.plan}
@@ -297,7 +304,7 @@ export default function Pricing() {
                   </div>
                 )}
 
-                <Card 
+                <Card
                   className={`
                     h-full bg-black/40 backdrop-blur-md border-white/10 
                     hover:border-white/30 transition-all duration-300
@@ -309,15 +316,17 @@ export default function Pricing() {
                   {/* Image */}
                   <div className="h-40 overflow-hidden bg-gradient-to-br from-indigo-900/20 to-cyan-900/20 relative">
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
-                    <img 
-                      src={planData.image} 
+                    <img
+                      src={planData.image}
                       alt={planData.name}
                       className="w-full h-full object-contain p-8 opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300"
                     />
                   </div>
 
                   <CardHeader>
-                    <CardTitle className="text-white text-2xl">{planData.name}</CardTitle>
+                    <CardTitle className="text-white text-2xl">
+                      {planData.name}
+                    </CardTitle>
                     <CardDescription className="text-gray-400">
                       {planData.description}
                     </CardDescription>
@@ -325,7 +334,9 @@ export default function Pricing() {
                       <span className="text-5xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 text-transparent bg-clip-text">
                         £{planData.price}
                       </span>
-                      <span className="text-gray-400 text-lg">{planData.period}</span>
+                      <span className="text-gray-400 text-lg">
+                        {planData.period}
+                      </span>
                     </div>
                     {planData.monthlySavings && billingPeriod === "yearly" && (
                       <p className="text-sm text-gray-400 mt-2">
@@ -341,7 +352,9 @@ export default function Pricing() {
                       {planData.features.map((feature, i) => (
                         <li key={i} className="flex items-start gap-3">
                           <Check className="h-5 w-5 text-cyan-400 shrink-0 mt-0.5" />
-                          <span className="text-sm text-gray-300">{feature}</span>
+                          <span className="text-sm text-gray-300">
+                            {feature}
+                          </span>
                         </li>
                       ))}
                     </ul>
@@ -350,8 +363,8 @@ export default function Pricing() {
                   <CardFooter className="flex-col gap-2">
                     {isCurrentPlanActive ? (
                       <>
-                        <Button 
-                          className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 text-white border-0" 
+                        <Button
+                          className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 text-white border-0"
                           disabled
                         >
                           Current Plan
@@ -384,13 +397,14 @@ export default function Pricing() {
                             Processing...
                           </>
                         ) : (
-                          <>Subscribe {billingPeriod === "monthly" ? "Monthly" : "Yearly"}</>
+                          <>
+                            Subscribe{" "}
+                            {billingPeriod === "monthly" ? "Monthly" : "Yearly"}
+                          </>
                         )}
                       </Button>
                     ) : (
-                      <Button 
-                        className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 text-white border-0 hover:from-indigo-600 hover:to-cyan-600"
-                      >
+                      <Button className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 text-white border-0 hover:from-indigo-600 hover:to-cyan-600">
                         Contact Sales
                       </Button>
                     )}
@@ -402,7 +416,7 @@ export default function Pricing() {
         </div>
 
         {/* FAQ Section */}
-        <motion.div 
+        <motion.div
           className="mt-24 text-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -418,20 +432,24 @@ export default function Pricing() {
             {[
               {
                 question: "Can I cancel anytime?",
-                answer: "Yes! You can cancel your subscription at any time. Your access continues until the end of your billing period."
+                answer:
+                  "Yes! You can cancel your subscription at any time. Your access continues until the end of your billing period.",
               },
               {
                 question: "What happens after the free trial?",
-                answer: "Your account becomes read-only. You can upgrade to a paid plan anytime to regain full access."
+                answer:
+                  "Your account becomes read-only. You can upgrade to a paid plan anytime to regain full access.",
               },
               {
                 question: "Can I switch plans?",
-                answer: "Yes! You can upgrade or downgrade your plan at any time. Changes are prorated automatically."
+                answer:
+                  "Yes! You can upgrade or downgrade your plan at any time. Changes are prorated automatically.",
               },
               {
                 question: "What payment methods do you accept?",
-                answer: "We accept all major credit cards via Stripe. Your payment information is securely processed and never stored on our servers."
-              }
+                answer:
+                  "We accept all major credit cards via Stripe. Your payment information is securely processed and never stored on our servers.",
+              },
             ].map((faq, index) => (
               <motion.div
                 key={index}
@@ -441,7 +459,9 @@ export default function Pricing() {
                 transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}
                 whileHover={{ scale: 1.02 }}
               >
-                <h3 className="font-semibold mb-2 text-white">{faq.question}</h3>
+                <h3 className="font-semibold mb-2 text-white">
+                  {faq.question}
+                </h3>
                 <p className="text-gray-400 text-sm">{faq.answer}</p>
               </motion.div>
             ))}

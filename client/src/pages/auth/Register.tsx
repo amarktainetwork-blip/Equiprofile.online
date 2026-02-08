@@ -107,13 +107,13 @@ export default function Register() {
         {/* Full screen background with gradient and image overlay */}
         <div className="fixed inset-0 bg-gradient-to-br from-black via-gray-900 to-black">
           {/* Background image with overlay */}
-          <div 
+          <div
             className="absolute inset-0 opacity-20"
             style={{
               backgroundImage: `url(${marketingAssets.auth.background})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat'
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
             }}
           />
           {/* Dark overlay */}
@@ -122,7 +122,7 @@ export default function Register() {
 
         {/* Content */}
         <div className="relative min-h-screen flex items-center justify-center px-4 py-20">
-          <motion.div 
+          <motion.div
             className="w-full max-w-md"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -158,22 +158,29 @@ export default function Register() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3 }}
                     >
-                      <Alert variant="destructive" className="bg-red-950/50 border-red-500/50 backdrop-blur-sm">
+                      <Alert
+                        variant="destructive"
+                        className="bg-red-950/50 border-red-500/50 backdrop-blur-sm"
+                      >
                         <AlertCircle className="h-4 w-4" />
-                        <AlertDescription className="text-red-200">{error}</AlertDescription>
+                        <AlertDescription className="text-red-200">
+                          {error}
+                        </AlertDescription>
                       </Alert>
                     </motion.div>
                   )}
 
                   <form onSubmit={handleEmailRegister} className="space-y-4">
                     {/* Name field */}
-                    <motion.div 
+                    <motion.div
                       className="space-y-2"
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ duration: 0.4, delay: 0.2 }}
                     >
-                      <Label htmlFor="name" className="text-white">Full Name</Label>
+                      <Label htmlFor="name" className="text-white">
+                        Full Name
+                      </Label>
                       <Input
                         id="name"
                         type="text"
@@ -186,13 +193,15 @@ export default function Register() {
                     </motion.div>
 
                     {/* Email field */}
-                    <motion.div 
+                    <motion.div
                       className="space-y-2"
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ duration: 0.4, delay: 0.3 }}
                     >
-                      <Label htmlFor="email" className="text-white">Email</Label>
+                      <Label htmlFor="email" className="text-white">
+                        Email
+                      </Label>
                       <Input
                         id="email"
                         type="email"
@@ -206,13 +215,15 @@ export default function Register() {
                     </motion.div>
 
                     {/* Password field */}
-                    <motion.div 
+                    <motion.div
                       className="space-y-2"
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ duration: 0.4, delay: 0.4 }}
                     >
-                      <Label htmlFor="password" className="text-white">Password</Label>
+                      <Label htmlFor="password" className="text-white">
+                        Password
+                      </Label>
                       <Input
                         id="password"
                         type="password"
@@ -229,13 +240,15 @@ export default function Register() {
                     </motion.div>
 
                     {/* Confirm Password field */}
-                    <motion.div 
+                    <motion.div
                       className="space-y-2"
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ duration: 0.4, delay: 0.5 }}
                     >
-                      <Label htmlFor="confirm-password" className="text-white">Confirm Password</Label>
+                      <Label htmlFor="confirm-password" className="text-white">
+                        Confirm Password
+                      </Label>
                       <Input
                         id="confirm-password"
                         type="password"
@@ -249,7 +262,7 @@ export default function Register() {
                     </motion.div>
 
                     {/* Terms acceptance */}
-                    <motion.div 
+                    <motion.div
                       className="flex items-start gap-2"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -345,14 +358,12 @@ export default function Register() {
                       <span className="w-full border-t border-white/10" />
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-black/40 px-2 text-gray-400">
-                        Or
-                      </span>
+                      <span className="bg-black/40 px-2 text-gray-400">Or</span>
                     </div>
                   </div>
 
                   {/* Login link */}
-                  <motion.div 
+                  <motion.div
                     className="text-center text-sm"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -383,8 +394,9 @@ export default function Register() {
                   : "Secure email/password authentication"}
               </p>
               <p className="text-xs text-center text-gray-500 mt-2">
-                Start your <strong className="text-gray-400">7-day free trial</strong> - no credit card
-                required
+                Start your{" "}
+                <strong className="text-gray-400">7-day free trial</strong> - no
+                credit card required
               </p>
             </motion.div>
           </motion.div>

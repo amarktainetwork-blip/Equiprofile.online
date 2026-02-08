@@ -129,9 +129,7 @@ const moduleCategories = [
     name: "Breeding",
     icon: Baby,
     color: "from-pink-500 to-rose-600",
-    modules: [
-      { name: "Breeding Manager", href: "/breeding", icon: Baby },
-    ],
+    modules: [{ name: "Breeding Manager", href: "/breeding", icon: Baby }],
   },
   {
     id: "stable",
@@ -179,7 +177,7 @@ function ModuleCard({
   category,
   index,
 }: {
-  category: typeof moduleCategories[0];
+  category: (typeof moduleCategories)[0];
   index: number;
 }) {
   const Icon = category.icon;
@@ -203,7 +201,8 @@ function ModuleCard({
                 {category.name}
               </CardTitle>
               <CardDescription className="text-xs">
-                {category.modules.length} module{category.modules.length > 1 ? "s" : ""}
+                {category.modules.length} module
+                {category.modules.length > 1 ? "s" : ""}
               </CardDescription>
             </div>
           </div>
@@ -246,13 +245,19 @@ function DashboardContent() {
             )
           : 0;
         return (
-          <Badge variant="secondary" className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+          <Badge
+            variant="secondary"
+            className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+          >
             {trialDays} days left in trial
           </Badge>
         );
       case "active":
         return (
-          <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300">
+          <Badge
+            variant="secondary"
+            className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
+          >
             Active Subscription
           </Badge>
         );
@@ -310,9 +315,7 @@ function DashboardContent() {
             Your comprehensive equestrian management hub
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          {getSubscriptionBadge()}
-        </div>
+        <div className="flex items-center gap-3">{getSubscriptionBadge()}</div>
       </motion.div>
 
       {/* Stats Overview */}

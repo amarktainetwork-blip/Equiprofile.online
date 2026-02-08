@@ -5,6 +5,7 @@
 ---
 
 ## 📋 Table of Contents
+
 - [Asset Inventory](#asset-inventory)
 - [Page Structure](#page-structure)
 - [Routes & Navigation](#routes--navigation)
@@ -18,13 +19,16 @@
 ## 🎨 Asset Inventory
 
 ### Total Assets
+
 - **26 Images** (15 original + 11 created placeholders)
 - **1 Video** (hero.mp4)
 
 ### Asset Locations
+
 All assets are canonicalized in: **`client/public/assets/marketing/`**
 
 #### Brand Assets (6 images)
+
 ```
 /assets/marketing/brand/
 ├── logo-full.svg          # Full EquiProfile logo with text
@@ -36,6 +40,7 @@ All assets are canonicalized in: **`client/public/assets/marketing/`**
 ```
 
 #### Hero Section (2 images + 1 video)
+
 ```
 /assets/marketing/hero/
 ├── hero.mp4               # Hero background video (10-15s loop)
@@ -44,6 +49,7 @@ All assets are canonicalized in: **`client/public/assets/marketing/`**
 ```
 
 #### Landing Page (3 images)
+
 ```
 /assets/marketing/landing/
 ├── training.jpg           # Training session photo (199KB)
@@ -52,6 +58,7 @@ All assets are canonicalized in: **`client/public/assets/marketing/`**
 ```
 
 #### About Page (3 images)
+
 ```
 /assets/marketing/about/
 ├── mission.svg            # Our mission illustration
@@ -60,6 +67,7 @@ All assets are canonicalized in: **`client/public/assets/marketing/`**
 ```
 
 #### Features (6 icons)
+
 ```
 /assets/marketing/features/
 ├── icon-analytics.svg     # Analytics feature icon
@@ -71,6 +79,7 @@ All assets are canonicalized in: **`client/public/assets/marketing/`**
 ```
 
 #### Pricing (3 images)
+
 ```
 /assets/marketing/pricing/
 ├── plan-basic.svg         # Basic plan illustration
@@ -79,27 +88,32 @@ All assets are canonicalized in: **`client/public/assets/marketing/`**
 ```
 
 #### Contact Page (1 image)
+
 ```
 /assets/marketing/contact/
 └── contact-hero.svg       # Contact page hero image
 ```
 
 #### Auth Pages (1 image)
+
 ```
 /assets/marketing/auth/
 └── auth-bg.svg            # Login/Register background gradient
 ```
 
 #### Dashboard (1 image)
+
 ```
 /assets/marketing/dashboard/
 └── dashboard-preview.svg  # Dashboard preview/screenshot
 ```
 
 ### Asset Configuration File
+
 **Location**: `client/src/config/marketingAssets.ts`
 
 This is the **single source of truth** for all asset paths. All components import from this file:
+
 ```typescript
 import { marketingAssets } from '@/config/marketingAssets';
 
@@ -116,6 +130,7 @@ import { marketingAssets } from '@/config/marketingAssets';
 ### Marketing Pages (Public - Dark Glass Design)
 
 #### 1. Landing Page (`/`)
+
 - **File**: `client/src/pages/Home.tsx`
 - **Assets Used**:
   - Video: `hero.video` (full-screen background with black overlay)
@@ -131,6 +146,7 @@ import { marketingAssets } from '@/config/marketingAssets';
 - **Animations**: Framer Motion fade/slide-in, hover effects
 
 #### 2. Features Page (`/features`)
+
 - **File**: `client/src/pages/Features.tsx`
 - **Assets Used**: All 6 feature icons
 - **Features**:
@@ -140,6 +156,7 @@ import { marketingAssets } from '@/config/marketingAssets';
   - Dark glass cards with backdrop-blur
 
 #### 3. Pricing Page (`/pricing`)
+
 - **File**: `client/src/pages/Pricing.tsx`
 - **Assets Used**: `pricing.*` (all 3 plan images)
 - **Pricing**:
@@ -152,6 +169,7 @@ import { marketingAssets } from '@/config/marketingAssets';
   - Stripe integration ready
 
 #### 4. About Page (`/about`)
+
 - **File**: `client/src/pages/About.tsx`
 - **Assets Used**: `about.*` (mission, team, values)
 - **Features**:
@@ -161,6 +179,7 @@ import { marketingAssets } from '@/config/marketingAssets';
   - Team showcase
 
 #### 5. Contact Page (`/contact`)
+
 - **File**: `client/src/pages/Contact.tsx`
 - **Assets Used**: `contact.hero`
 - **Features**:
@@ -170,6 +189,7 @@ import { marketingAssets } from '@/config/marketingAssets';
   - Email integration ready
 
 #### 6. Login Page (`/login`)
+
 - **File**: `client/src/pages/auth/Login.tsx`
 - **Assets Used**: `auth.background`
 - **Features**:
@@ -178,6 +198,7 @@ import { marketingAssets } from '@/config/marketingAssets';
   - OAuth + email/password support
 
 #### 7. Register Page (`/register`)
+
 - **File**: `client/src/pages/auth/Register.tsx`
 - **Assets Used**: `auth.background`
 - **Features**:
@@ -188,6 +209,7 @@ import { marketingAssets } from '@/config/marketingAssets';
 ### Dashboard Pages (Protected - 31 Pages)
 
 #### Core Dashboard (`/dashboard`)
+
 - **File**: `client/src/pages/Dashboard.tsx`
 - **Features**: 12 module categories with 31+ total pages
   1. **Horses** (3): All Horses, Add Horse, Pedigree
@@ -208,6 +230,7 @@ import { marketingAssets } from '@/config/marketingAssets';
 ## 🗺️ Routes & Navigation
 
 ### Public Routes
+
 ```
 /                    → Home (Landing)
 /features            → Features
@@ -223,6 +246,7 @@ import { marketingAssets } from '@/config/marketingAssets';
 ```
 
 ### Protected Routes (Require Authentication)
+
 ```
 /dashboard           → Dashboard Hub
 /horses              → Horse List
@@ -263,6 +287,7 @@ import { marketingAssets } from '@/config/marketingAssets';
 ```
 
 ### API Routes
+
 ```
 GET  /api/health              → Health check
 GET  /api/health/ping         → Simple ping
@@ -280,6 +305,7 @@ GET  /api/realtime/subscribe  → SSE real-time updates
 ## 🚀 Build & Deployment
 
 ### Prerequisites
+
 - Node.js 20+
 - pnpm 10+
 - MySQL 8+
@@ -288,6 +314,7 @@ GET  /api/realtime/subscribe  → SSE real-time updates
 ### Build Steps (Ubuntu VPS)
 
 #### 1. Install Dependencies
+
 ```bash
 # Install Node.js 22 LTS
 curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
@@ -305,6 +332,7 @@ pnpm install --frozen-lockfile
 ```
 
 #### 2. Configure Environment
+
 ```bash
 # Copy environment template
 cp .env.example .env
@@ -319,6 +347,7 @@ nano .env
 ```
 
 #### 3. Build Application
+
 ```bash
 # Clean previous build
 pnpm clean
@@ -333,6 +362,7 @@ pnpm build
 ```
 
 #### 4. Setup Systemd Service
+
 ```bash
 # Create service file
 sudo nano /etc/systemd/system/equiprofile.service
@@ -370,6 +400,7 @@ sudo systemctl status equiprofile
 ```
 
 #### 5. Setup Nginx Reverse Proxy
+
 ```bash
 sudo nano /etc/nginx/sites-available/equiprofile
 ```
@@ -378,7 +409,7 @@ sudo nano /etc/nginx/sites-available/equiprofile
 server {
     listen 80;
     server_name equiprofile.online www.equiprofile.online;
-    
+
     # Redirect HTTP to HTTPS (after SSL setup)
     return 301 https://$server_name$request_uri;
 }
@@ -434,6 +465,7 @@ sudo certbot --nginx -d equiprofile.online -d www.equiprofile.online
 ```
 
 #### 6. Health Checks
+
 ```bash
 # Check application health
 curl http://localhost:3000/api/health
@@ -450,6 +482,7 @@ curl https://equiprofile.online/api/health
 ## 🔐 Environment Variables
 
 ### Required (Core Functionality)
+
 ```bash
 # Database
 DATABASE_URL=mysql://user:password@localhost:3306/equiprofile
@@ -466,6 +499,7 @@ BASE_URL=https://equiprofile.online
 ```
 
 ### Optional (Enhanced Features)
+
 ```bash
 # Feature Flags
 ENABLE_STRIPE=false        # Set to 'true' to enable billing
@@ -510,7 +544,9 @@ COOKIE_SECURE=true
 ## 🔍 Version Verification
 
 ### Build Fingerprint
+
 Every build creates a fingerprint with:
+
 - **BUILD_SHA**: Git commit short hash
 - **BUILD_TIME**: ISO 8601 timestamp
 - **VERSION**: From package.json
@@ -518,10 +554,13 @@ Every build creates a fingerprint with:
 ### Verification Methods
 
 #### 1. Check build.txt File
+
 ```bash
 curl https://equipprofile.online/build.txt
 ```
+
 Output:
+
 ```
 BUILD_SHA=7f67b8b
 BUILD_TIME=2026-02-08T10:15:23Z
@@ -529,10 +568,13 @@ VERSION=1.0.0
 ```
 
 #### 2. Check API Endpoint
+
 ```bash
 curl https://equiprofile.online/api/version
 ```
+
 Output:
+
 ```json
 {
   "version": "1.0.0",
@@ -542,16 +584,21 @@ Output:
 ```
 
 #### 3. Check HTML Meta Tag
+
 ```bash
 curl -s https://equiprofile.online | grep x-build-sha
 ```
+
 Output:
+
 ```html
-<meta name="x-build-sha" content="7f67b8b">
+<meta name="x-build-sha" content="7f67b8b" />
 ```
 
 #### 4. Check Footer (Visible on Website)
+
 The footer displays build info automatically:
+
 ```
 v1.0.0 • Build 7f67b8b • 2/8/2026
 ```
@@ -561,23 +608,19 @@ v1.0.0 • Build 7f67b8b • 2/8/2026
 ## 🎨 Design System
 
 ### Color Palette
+
 ```css
 /* Primary Colors */
---primary: Indigo-500 to Cyan-500 gradient
---accent: Blue-400 to Cyan-400
-
-/* Backgrounds */
---bg-dark: #000000 (black)
---bg-glass: rgba(255, 255, 255, 0.05) with backdrop-blur-md
---bg-gradient: from-indigo-950/30 via-black to-cyan-950/30
-
-/* Text */
---text-primary: White (#ffffff)
---text-secondary: Gray-300
---text-muted: Gray-400
+--primary: Indigo-500 to Cyan-500 gradient --accent: Blue-400 to Cyan-400
+  /* Backgrounds */ --bg-dark: #000000 (black)
+  --bg-glass: rgba(255, 255, 255, 0.05) with backdrop-blur-md
+  --bg-gradient: from-indigo-950/30 via-black to-cyan-950/30 /* Text */
+  --text-primary: White (#ffffff) --text-secondary: Gray-300
+  --text-muted: Gray-400;
 ```
 
 ### Design Principles
+
 1. **Dark Glass Morphism**: Semi-transparent cards with backdrop blur
 2. **Smooth Animations**: Framer Motion for all transitions
 3. **Gradient Accents**: Indigo-to-cyan gradients for CTAs and highlights
@@ -589,6 +632,7 @@ v1.0.0 • Build 7f67b8b • 2/8/2026
 ## 📝 Maintenance
 
 ### Update Deployment
+
 ```bash
 # Pull latest changes
 cd /var/www/equiprofile
@@ -609,6 +653,7 @@ curl http://localhost:3000/build.txt
 ```
 
 ### Monitor Logs
+
 ```bash
 # Application logs
 sudo journalctl -u equiprofile -f
@@ -619,6 +664,7 @@ sudo tail -f /var/log/nginx/error.log
 ```
 
 ### Database Backups
+
 ```bash
 # Backup
 mysqldump -u equiprofile -p equiprofile > backup_$(date +%Y%m%d).sql
@@ -632,6 +678,7 @@ mysql -u equiprofile -p equiprofile < backup_20260208.sql
 ## 🆘 Troubleshooting
 
 ### Build Fails
+
 ```bash
 # Clean and rebuild
 pnpm clean
@@ -641,6 +688,7 @@ pnpm build
 ```
 
 ### Service Won't Start
+
 ```bash
 # Check logs
 sudo journalctl -u equiprofile -n 50
@@ -657,6 +705,7 @@ sudo nano /etc/systemd/system/equiprofile.service
 ```
 
 ### Assets Not Loading
+
 ```bash
 # Check permissions
 sudo chown -R www-data:www-data /var/www/equiprofile/dist

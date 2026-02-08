@@ -1,7 +1,7 @@
 /**
  * Marketing Assets Configuration
  * Single source of truth for all marketing site asset paths
- * 
+ *
  * All assets are stored in /assets/marketing/ with organized subfolders:
  * - brand/: Logos and brand assets
  * - hero/: Hero section images and video
@@ -20,7 +20,7 @@ const MARKETING_BASE = "/assets/marketing";
 /**
  * Marketing Assets Object
  * Import this object in any component that needs marketing assets
- * 
+ *
  * Example usage:
  *   import { marketingAssets } from '@/config/marketingAssets';
  *   <img src={marketingAssets.heroVideo} />
@@ -114,17 +114,17 @@ export const marketingAssets = {
  */
 export function getAllAssetPaths(): string[] {
   const paths: string[] = [];
-  
+
   function extractPaths(obj: Record<string, any>) {
     for (const value of Object.values(obj)) {
-      if (typeof value === 'string') {
+      if (typeof value === "string") {
         paths.push(value);
-      } else if (typeof value === 'object' && value !== null) {
+      } else if (typeof value === "object" && value !== null) {
         extractPaths(value);
       }
     }
   }
-  
+
   extractPaths(marketingAssets);
   return paths;
 }

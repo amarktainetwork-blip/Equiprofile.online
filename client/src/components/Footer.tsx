@@ -2,7 +2,11 @@ import { Link } from "wouter";
 import { useState, useEffect } from "react";
 
 export function Footer() {
-  const [buildInfo, setBuildInfo] = useState<{ sha?: string; time?: string; version?: string } | null>(null);
+  const [buildInfo, setBuildInfo] = useState<{
+    sha?: string;
+    time?: string;
+    version?: string;
+  } | null>(null);
 
   useEffect(() => {
     // Try to fetch build info from /build.txt
@@ -129,7 +133,8 @@ export function Footer() {
             <p className="mt-2 text-xs opacity-70">
               {buildInfo.version && `v${buildInfo.version}`}
               {buildInfo.sha && ` • Build ${buildInfo.sha}`}
-              {buildInfo.time && ` • ${new Date(buildInfo.time).toLocaleDateString()}`}
+              {buildInfo.time &&
+                ` • ${new Date(buildInfo.time).toLocaleDateString()}`}
             </p>
           )}
         </div>

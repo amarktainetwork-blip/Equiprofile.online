@@ -312,7 +312,7 @@ export default function Home() {
                     <Sparkles className="w-5 h-5" />
                     14-Day Free Trial • No Credit Card Required
                   </Badge>
-                  
+
                   <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight mb-6 text-white drop-shadow-2xl">
                     Professional Horse
                     <br />
@@ -321,14 +321,13 @@ export default function Home() {
                       Simple
                     </span>
                   </h1>
-                  
+
                   <p className="text-lg md:text-xl lg:text-2xl text-white/90 mb-10 leading-relaxed max-w-4xl mx-auto drop-shadow-lg">
                     The ultimate digital platform for horse owners, trainers,
-                    and equestrian professionals. Track health, manage
-                    training, and provide exceptional care—all in one
-                    beautiful place.
+                    and equestrian professionals. Track health, manage training,
+                    and provide exceptional care—all in one beautiful place.
                   </p>
-                  
+
                   <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
                     <Link href={isAuthenticated ? "/dashboard" : "/register"}>
                       <Button
@@ -425,7 +424,7 @@ export default function Home() {
                   comprehensive tools for modern horse management.
                 </p>
               </motion.div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
                 {features.map((feature, index) => (
                   <motion.div
@@ -480,7 +479,7 @@ export default function Home() {
                   </span>
                 </h2>
               </motion.div>
-              
+
               <div className="max-w-4xl mx-auto relative">
                 <Card className="bg-white/5 backdrop-blur-md border-white/10 p-8 md:p-12">
                   <CardContent className="p-0">
@@ -575,7 +574,7 @@ export default function Home() {
                   Cancel anytime.
                 </p>
               </motion.div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
                 {pricingTiers.map((tier, index) => (
                   <motion.div
@@ -605,9 +604,7 @@ export default function Home() {
                           <span className="text-5xl font-bold text-white">
                             {tier.price}
                           </span>
-                          <span className="text-white/70">
-                            {tier.period}
-                          </span>
+                          <span className="text-white/70">{tier.period}</span>
                         </div>
                         <CardDescription className="text-base text-white/70">
                           {tier.description}
@@ -618,7 +615,9 @@ export default function Home() {
                           {tier.features.map((feature, i) => (
                             <li key={i} className="flex items-start gap-3">
                               <Check className="w-5 h-5 text-indigo-400 mt-0.5 flex-shrink-0" />
-                              <span className="text-sm text-white/90">{feature}</span>
+                              <span className="text-sm text-white/90">
+                                {feature}
+                              </span>
                             </li>
                           ))}
                         </ul>
@@ -665,7 +664,7 @@ export default function Home() {
                   Everything you need to know about EquiProfile.
                 </p>
               </motion.div>
-              
+
               <motion.div
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
@@ -713,8 +712,8 @@ export default function Home() {
                 </h2>
                 <p className="text-xl md:text-2xl text-white/90 mb-12 leading-relaxed">
                   Join thousands of equestrians who trust EquiProfile to care
-                  for their horses. Start your free 14-day trial today—no
-                  credit card required.
+                  for their horses. Start your free 14-day trial today—no credit
+                  card required.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-6 justify-center">
                   <Button

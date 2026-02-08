@@ -66,7 +66,7 @@ export default function Contact() {
           {/* Hero Section with Glass Frame */}
           <section className="relative pt-24 pb-16 overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/10 via-transparent to-transparent pointer-events-none" />
-            
+
             <div className="container mx-auto px-4 mb-16">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -323,9 +323,9 @@ export default function Contact() {
                       Response Time
                     </h3>
                     <p className="text-sm text-gray-400">
-                      We typically respond to all inquiries within 24 hours during
-                      business days. For urgent matters, please call our support
-                      line.
+                      We typically respond to all inquiries within 24 hours
+                      during business days. For urgent matters, please call our
+                      support line.
                     </p>
                   </div>
                 </motion.div>
