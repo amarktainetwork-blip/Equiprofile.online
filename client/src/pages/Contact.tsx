@@ -14,7 +14,7 @@ import { Footer } from "@/components/Footer";
 import { PageTransition } from "@/components/PageTransition";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { marketingAssets } from "@/config/marketingAssets";
-import { Mail, MapPin, Phone } from "lucide-react";
+import { Mail, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -265,24 +265,26 @@ export default function Contact() {
                   transition={{ duration: 0.6, delay: 0.5 }}
                   className="relative rounded-xl overflow-hidden border border-white/10 bg-black/40 backdrop-blur-md p-6 hover:border-indigo-500/50 transition-colors duration-300 group"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                   <div className="relative flex items-start gap-4">
-                    <div className="p-3 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30">
-                      <Phone className="w-6 h-6 text-purple-400" />
+                    <div className="p-3 rounded-lg bg-gradient-to-br from-green-500/20 to-emerald-500/20 border border-green-500/30">
+                      <MessageCircle className="w-6 h-6 text-green-400" />
                     </div>
                     <div>
-                      <h3 className="font-semibold mb-1 text-white">Phone</h3>
+                      <h3 className="font-semibold mb-1 text-white">WhatsApp</h3>
                       <p className="text-sm text-gray-400 mb-2">
-                        Call us during business hours
+                        Chat with us anytime
                       </p>
                       <a
-                        href="tel:+1234567890"
+                        href="https://wa.me/447347258089"
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
                       >
-                        +1 (234) 567-890
+                        +44 7347 258089
                       </a>
                       <p className="text-xs text-gray-500 mt-1">
-                        Mon-Fri: 9am - 6pm EST
+                        Quick response via WhatsApp
                       </p>
                     </div>
                   </div>
@@ -292,30 +294,6 @@ export default function Contact() {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.6, delay: 0.6 }}
-                  className="relative rounded-xl overflow-hidden border border-white/10 bg-black/40 backdrop-blur-md p-6 hover:border-indigo-500/50 transition-colors duration-300 group"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-                  <div className="relative flex items-start gap-4">
-                    <div className="p-3 rounded-lg bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-500/30">
-                      <MapPin className="w-6 h-6 text-cyan-400" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold mb-1 text-white">Office</h3>
-                      <p className="text-sm text-gray-400">
-                        123 Equestrian Way
-                        <br />
-                        Horse Country, HC 12345
-                        <br />
-                        United States
-                      </p>
-                    </div>
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.6, delay: 0.7 }}
                   className="relative rounded-xl overflow-hidden border border-white/10 bg-black/40 backdrop-blur-md p-6"
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 via-purple-500/10 to-cyan-500/20 pointer-events-none" />
