@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Check, Loader2 } from "lucide-react";
+import { Check, Loader2, Shield, Clock, XCircle } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
@@ -19,6 +19,7 @@ import { marketingAssets } from "@/config/marketingAssets";
 import { MarketingNav } from "@/components/MarketingNav";
 import { Footer } from "@/components/Footer";
 import { PageTransition } from "@/components/PageTransition";
+import { PageBanner } from "@/components/PageBanner";
 
 const YEARLY_SAVINGS_PERCENTAGE = 17;
 const BASIC_MONTHLY_PRICE = "10.00";
@@ -206,25 +207,69 @@ export default function Pricing() {
     <>
       <MarketingNav />
       <PageTransition>
-        <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black pt-16">
+        <PageBanner
+          title="Pricing"
+          subtitle="Professional equine management for every need"
+          imageSrc="/images/riding-lesson.jpg"
+          imagePosition="center"
+        />
+        <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black">
           <div className="container mx-auto px-4 py-16">
-            {/* Header */}
+            {/* Top 3 Blocks - What's included, Free trial, Cancel anytime */}
             <motion.div
-              className="text-center mb-16"
+              className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 max-w-5xl mx-auto"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <h1 className="text-5xl font-bold tracking-tight mb-4 text-white">
+              <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-lg p-6 hover:border-white/30 transition-all duration-300">
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 flex items-center justify-center mb-4">
+                    <Check className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-2">What's Included</h3>
+                  <p className="text-gray-400 text-sm">
+                    All plans include unlimited updates, priority support, and access to all core features
+                  </p>
+                </div>
+              </div>
+              <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-lg p-6 hover:border-white/30 transition-all duration-300">
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 flex items-center justify-center mb-4">
+                    <Clock className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-2">7-Day Free Trial</h3>
+                  <p className="text-gray-400 text-sm">
+                    Try EquiProfile risk-free with full access to Pro features for 7 days
+                  </p>
+                </div>
+              </div>
+              <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-lg p-6 hover:border-white/30 transition-all duration-300">
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 flex items-center justify-center mb-4">
+                    <XCircle className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-2">Cancel Anytime</h3>
+                  <p className="text-gray-400 text-sm">
+                    No long-term contracts. Cancel or change your plan anytime with no hidden fees
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Billing Period Header */}
+            <motion.div
+              className="text-center mb-12"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <h2 className="text-3xl font-bold tracking-tight mb-4 text-white">
                 Choose Your{" "}
                 <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 text-transparent bg-clip-text">
                   Perfect Plan
                 </span>
-              </h1>
-              <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-                Professional equine management for every need. Start with a free
-                trial, upgrade anytime.
-              </p>
+              </h2>
 
               {/* Billing Period Toggle */}
               <motion.div
@@ -300,7 +345,7 @@ export default function Pricing() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: index * 0.1 }}
                     whileHover={{ scale: 1.05, y: -10 }}
-                    className="relative"
+                    className="relative flex"
                   >
                     {planData.popular && (
                       <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
@@ -312,7 +357,7 @@ export default function Pricing() {
 
                     <Card
                       className={`
-                    h-full bg-black/40 backdrop-blur-md border-white/10 
+                    flex flex-col w-full bg-black/40 backdrop-blur-md border-white/10 
                     hover:border-white/30 transition-all duration-300
                     ${planData.popular ? "border-2 border-indigo-500/50 shadow-xl shadow-indigo-500/20" : ""}
                     ${isCurrentPlanActive ? "ring-2 ring-cyan-400/50" : ""}
@@ -355,7 +400,7 @@ export default function Pricing() {
                           )}
                       </CardHeader>
 
-                      <CardContent>
+                      <CardContent className="flex-grow">
                         <ul className="space-y-3">
                           {planData.features.map((feature, i) => (
                             <li key={i} className="flex items-start gap-3">
@@ -368,7 +413,7 @@ export default function Pricing() {
                         </ul>
                       </CardContent>
 
-                      <CardFooter className="flex-col gap-2">
+                      <CardFooter className="flex-col gap-2 mt-auto">
                         {isCurrentPlanActive ? (
                           <>
                             <Button
@@ -414,8 +459,24 @@ export default function Pricing() {
                             )}
                           </Button>
                         ) : (
-                          <Button className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 text-white border-0 hover:from-indigo-600 hover:to-cyan-600">
-                            Contact Sales
+                          <Button 
+                            className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 text-white border-0 hover:from-indigo-600 hover:to-cyan-600 shadow-lg hover:shadow-indigo-500/50 transition-all duration-300"
+                            onClick={() => handleSubscribe(billingPeriod === "monthly" ? "stable_monthly" as any : "stable_yearly" as any)}
+                            disabled={loadingPlan === `stable_${billingPeriod}`}
+                          >
+                            {loadingPlan === `stable_${billingPeriod}` ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Processing...
+                              </>
+                            ) : (
+                              <>
+                                Subscribe{" "}
+                                {billingPeriod === "monthly"
+                                  ? "Monthly"
+                                  : "Yearly"}
+                              </>
+                            )}
                           </Button>
                         )}
                       </CardFooter>
