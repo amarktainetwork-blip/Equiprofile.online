@@ -355,6 +355,10 @@ export default function Pricing() {
                       </div>
                     )}
 
+                    {/* Card uses flex column for equal-height layout:
+                        - Card and CardContent use flex-grow to expand
+                        - CardFooter uses mt-auto to stick to bottom
+                        This ensures all cards have same height with footer aligned */}
                     <Card
                       className={`
                     flex flex-col w-full bg-black/40 backdrop-blur-md border-white/10 

@@ -53,7 +53,7 @@ export async function setupVite(app: Express, server: Server) {
         // Inject CSP nonce if available
         const nonce = res.locals.cspNonce;
         if (nonce) {
-          // Add nonce to any inline scripts (for manus-runtime or other plugins)
+          // Add nonce to any inline scripts (for vite-plugin-manus-runtime or other plugins)
           template = template.replace(
             /<script(?!\s+src=)([^>]*)>/gi,
             `<script$1 nonce="${nonce}">`

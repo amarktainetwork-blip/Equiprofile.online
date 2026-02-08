@@ -20,6 +20,7 @@ import { getStripe } from "../stripe";
 import * as email from "./email";
 import { ENV } from "./env";
 import { resolve } from "path";
+import fs from "fs";
 
 // Port checking functions removed - now using deterministic port binding
 // If port is in use, server will fail with clear error message instead of auto-switching
@@ -329,7 +330,7 @@ async function startServer() {
   try {
     const packageJsonPath = resolve(process.cwd(), "package.json");
     const packageJson = JSON.parse(
-      require("fs").readFileSync(packageJsonPath, "utf-8"),
+      fs.readFileSync(packageJsonPath, "utf-8"),
     );
 
     // Try to get git commit (only once at startup)
@@ -403,7 +404,6 @@ async function startServer() {
 
   // Version endpoint with build fingerprint
   app.get("/api/version", (req, res) => {
-    const fs = require("fs");
     const path = require("path");
 
     // Try to read build.txt for build fingerprint
@@ -451,7 +451,7 @@ async function startServer() {
         ? resolve(process.cwd(), "client/public/favicon.svg")
         : resolve(import.meta.dirname, "public/favicon.svg");
     
-    if (require("fs").existsSync(faviconPath)) {
+    if (fs.existsSync(faviconPath)) {
       res.setHeader("Content-Type", "image/svg+xml");
       res.setHeader("Cache-Control", "public, max-age=86400"); // 1 day
       res.sendFile(faviconPath);
