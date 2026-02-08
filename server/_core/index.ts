@@ -62,25 +62,29 @@ async function startServer() {
   );
   console.log("✅ CORS configured with allowed origins:", allowedOrigins);
 
-  // Security middleware with strict CSP
-  // NOTE: scriptSrc does NOT include 'unsafe-inline' - all scripts must be external
-  // client/index.html contains NO inline scripts, only <script type="module" src="/src/main.tsx">
-  // This prevents XSS attacks via inline script injection
-  app.use(
+  // CSP nonce middleware - generate unique nonce per request
+  app.use((req, res, next) => {
+    res.locals.cspNonce = nanoid();
+    next();
+  });
+
+  // Security middleware with strict CSP including nonce support
+  app.use((req, res, next) => {
+    const nonce = res.locals.cspNonce;
     helmet({
       contentSecurityPolicy: {
         directives: {
           defaultSrc: ["'self'"],
-          scriptSrc: ["'self'"], // NO 'unsafe-inline' - all scripts must be external
+          scriptSrc: ["'self'", `'nonce-${nonce}'`],
           styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles (Tailwind)
           imgSrc: ["'self'", "data:", "https:"],
           connectSrc: ["'self'"],
-          fontSrc: ["'self'"],
+          fontSrc: ["'self'", "data:"], // Allow data: for embedded fonts
         },
       },
       crossOriginEmbedderPolicy: false,
-    }),
-  );
+    })(req, res, next);
+  });
 
   // Request ID middleware for logging
   app.use((req, res, next) => {
@@ -438,6 +442,22 @@ async function startServer() {
       baseUrl: ENV.baseUrl,
       oauthServerUrl: configured ? ENV.oAuthServerUrl : null,
     });
+  });
+
+  // Favicon handler - serve favicon.svg as favicon.ico with correct headers
+  app.get("/favicon.ico", (req, res) => {
+    const faviconPath =
+      process.env.NODE_ENV === "development"
+        ? resolve(process.cwd(), "client/public/favicon.svg")
+        : resolve(import.meta.dirname, "public/favicon.svg");
+    
+    if (require("fs").existsSync(faviconPath)) {
+      res.setHeader("Content-Type", "image/svg+xml");
+      res.setHeader("Cache-Control", "public, max-age=86400"); // 1 day
+      res.sendFile(faviconPath);
+    } else {
+      res.status(404).send("Favicon not found");
+    }
   });
 
   // OAuth callback under /api/oauth/callback

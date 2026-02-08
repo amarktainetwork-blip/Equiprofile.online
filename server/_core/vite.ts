@@ -49,6 +49,17 @@ export async function setupVite(app: Express, server: Server) {
           `src="/src/main.tsx"`,
           `src="/src/main.tsx?v=${nanoid()}"`,
         );
+        
+        // Inject CSP nonce if available
+        const nonce = res.locals.cspNonce;
+        if (nonce) {
+          // Add nonce to any inline scripts (for manus-runtime or other plugins)
+          template = template.replace(
+            /<script(?!\s+src=)([^>]*)>/gi,
+            `<script$1 nonce="${nonce}">`
+          );
+        }
+        
         const page = await vite.transformIndexHtml(url, template);
         res.status(200).set({ "Content-Type": "text/html" }).end(page);
       } catch (e) {
@@ -147,6 +158,27 @@ export function serveStatic(app: Express) {
     }
 
     // Serve index.html for all other routes (SPA navigation)
-    res.sendFile(path.resolve(distPath, "index.html"));
+    // Inject CSP nonce into inline scripts if present
+    const indexPath = path.resolve(distPath, "index.html");
+    const nonce = res.locals.cspNonce;
+    
+    if (nonce && fs.existsSync(indexPath)) {
+      fs.readFile(indexPath, "utf-8", (err, html) => {
+        if (err) {
+          return res.status(500).send("Internal Server Error");
+        }
+        
+        // Add nonce to any inline scripts (for manus-runtime or other plugins)
+        const modifiedHtml = html.replace(
+          /<script(?!\s+src=)([^>]*)>/gi,
+          `<script$1 nonce="${nonce}">`
+        );
+        
+        res.setHeader("Content-Type", "text/html");
+        res.send(modifiedHtml);
+      });
+    } else {
+      res.sendFile(indexPath);
+    }
   });
 }
