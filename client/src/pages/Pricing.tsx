@@ -461,10 +461,10 @@ export default function Pricing() {
                         ) : (
                           <Button 
                             className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 text-white border-0 hover:from-indigo-600 hover:to-cyan-600 shadow-lg hover:shadow-indigo-500/50 transition-all duration-300"
-                            onClick={() => handleSubscribe(billingPeriod === "monthly" ? "stable_monthly" as any : "stable_yearly" as any)}
-                            disabled={loadingPlan === `stable_${billingPeriod}`}
+                            onClick={() => handleSubscribe(billingPeriod)}
+                            disabled={loadingPlan === billingPeriod}
                           >
-                            {loadingPlan === `stable_${billingPeriod}` ? (
+                            {loadingPlan === billingPeriod ? (
                               <>
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                 Processing...
