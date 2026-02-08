@@ -91,7 +91,7 @@ EquiProfile is a production-ready, comprehensive horse management platform desig
 - **Trainers**: Manage client horses, track training sessions, share progress
 - **Stable Managers**: Multi-horse management, staff scheduling, facility management
 - **Veterinarians**: Access patient records, update medical records, schedule appointments
-EquiProfile is a production-ready, feature-rich equestrian management platform designed for horse owners, trainers, stable managers, and veterinary professionals. Built with modern web technologies, it provides comprehensive tools for managing every aspect of horse care, from health records to training schedules, breeding management to competition tracking.
+  EquiProfile is a production-ready, feature-rich equestrian management platform designed for horse owners, trainers, stable managers, and veterinary professionals. Built with modern web technologies, it provides comprehensive tools for managing every aspect of horse care, from health records to training schedules, breeding management to competition tracking.
 
 ### Why EquiProfile?
 
@@ -138,6 +138,7 @@ EquiProfile is a production-ready, feature-rich equestrian management platform d
 - **Advanced animations** - floating particles, 3D hover effects, animated statistics
 - **Auto-rotating testimonials** carousel
 - **Mobile-responsive** design with accessibility improvements
+
 1. **User Management & Authentication** - Multi-user RBAC, JWT, OAuth, 2FA, password reset
 2. **Horse Profile Management** - Complete profiles, photos, documents, search, export
 3. **Health Records** - Vaccinations, vet visits, medications, dental, hoof care, deworming
@@ -461,6 +462,7 @@ sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
 ```
 
 Follow the prompts:
+
 - Enter email address (for renewal notifications)
 - Agree to terms of service
 - Choose whether to redirect HTTP to HTTPS (recommended: yes)
@@ -533,6 +535,7 @@ ADMIN_UNLOCK_PASSWORD=your_secure_admin_password
 These enable additional functionality:
 
 <a name="stripe-setup"></a>
+
 #### Stripe Payment Setup
 
 ```env
@@ -548,6 +551,7 @@ STRIPE_YEARLY_PRICE_ID=price_xxxxxxxxxxxxx
 **Where to get it**: https://dashboard.stripe.com/apikeys
 
 **Setup Steps**:
+
 1. Create Stripe account at https://stripe.com
 2. Navigate to Developers → API keys
 3. Copy both Publishable and Secret keys
@@ -561,6 +565,7 @@ STRIPE_YEARLY_PRICE_ID=price_xxxxxxxxxxxxx
 **Cost**: Free to start, 2.9% + $0.30 per transaction
 
 <a name="aws-s3-setup"></a>
+
 #### AWS S3 Storage Setup
 
 ```env
@@ -575,6 +580,7 @@ AWS_S3_BUCKET=equiprofile-uploads
 **Where to get it**: https://aws.amazon.com/s3/
 
 **Setup Steps**:
+
 1. Create AWS account
 2. Navigate to IAM → Users → Create user
 3. Attach policy: `AmazonS3FullAccess`
@@ -583,11 +589,13 @@ AWS_S3_BUCKET=equiprofile-uploads
 6. Configure bucket CORS if needed
 
 **Cost**:
+
 - First 50 TB: $0.023 per GB/month
 - First 50,000 GET requests: Free
 - PUT requests: $0.005 per 1,000 requests
 
 <a name="openai-integration"></a>
+
 #### OpenAI Integration
 
 ```env
@@ -595,6 +603,7 @@ OPENAI_API_KEY=sk-xxxxxxxxxxxxx
 ```
 
 **Purpose**:
+
 - AI-powered chat assistant
 - Intelligent insights and recommendations
 - Natural language processing
@@ -603,17 +612,20 @@ OPENAI_API_KEY=sk-xxxxxxxxxxxxx
 **Where to get it**: https://platform.openai.com/api-keys
 
 **Setup Steps**:
+
 1. Create account at https://openai.com
 2. Navigate to API keys section
 3. Create new secret key
 4. Copy and save immediately (only shown once)
 
 **Cost**:
+
 - Pay-as-you-go pricing
 - GPT-4: ~$0.03 per 1K input tokens, ~$0.06 per 1K output tokens
 - GPT-3.5-turbo: ~$0.0005 per 1K input tokens, ~$0.0015 per 1K output tokens
 
 <a name="weather-api"></a>
+
 #### Weather API
 
 ```env
@@ -625,21 +637,25 @@ WEATHER_API_PROVIDER=openweathermap
 **Where to get it**: https://openweathermap.org/api
 
 **Alternative providers**:
+
 - WeatherAPI.com
 - Weatherstack
 - Tomorrow.io
 
 **Setup Steps**:
+
 1. Sign up at https://openweathermap.org/api
 2. Subscribe to API plan (free tier available)
 3. Generate API key from dashboard
 4. Copy API key
 
 **Cost**:
+
 - Free tier: 1,000 calls/day
 - Paid plans: Start at $40/month for 100,000 calls/day
 
 <a name="email-smtp"></a>
+
 #### Email SMTP
 
 ```env
@@ -651,23 +667,27 @@ SMTP_FROM=noreply@equiprofile.online
 ```
 
 **Purpose**:
+
 - Send appointment reminders
 - Vaccination alerts
 - System notifications
 - Password resets
 
 **Recommended providers**:
+
 - Gmail (with App Password)
 - SendGrid (https://sendgrid.com)
 - Mailgun (https://mailgun.com)
 - Amazon SES (https://aws.amazon.com/ses/)
 
 **Gmail Setup**:
+
 1. Enable 2-factor authentication
 2. Generate App Password at https://myaccount.google.com/apppasswords
 3. Use app password in SMTP_PASSWORD
 
 **Cost**:
+
 - Gmail: Free (limited)
 - SendGrid: Free tier 100 emails/day, paid from $15/month
 - Mailgun: First 5,000 emails free/month
@@ -749,19 +769,26 @@ VITE_PWA_ENABLED=false
 - AWS S3: $5-20/month
 - Email (SendGrid): $0-15/month
 - **Total: $25-195/month** (plus transaction fees)
+
 # 4. Generate secure JWT secret
+
 openssl rand -base64 32
+
 # Add to .env as JWT_SECRET
 
 # 5. Set admin password
+
 # Add to .env as ADMIN_UNLOCK_PASSWORD=your_secure_password
 
 # 6. Initialize database
+
 pnpm db:push
 
 # 7. Start development server
+
 pnpm dev
-```
+
+````
 
 The application will be available at http://localhost:3000
 
@@ -781,7 +808,7 @@ docker-compose logs -f
 
 # Stop
 docker-compose down
-```
+````
 
 ---
 
@@ -812,6 +839,7 @@ bash scripts/smoke_prod.sh https://equiprofile.online
 ```
 
 The deployment script handles:
+
 - ✅ Node.js and dependencies installation
 - ✅ Production build
 - ✅ Systemd service setup
@@ -960,13 +988,13 @@ server {
     location / {
         root /var/equiprofile/app/dist/public;
         try_files $uri $uri/ /index.html;
-        
+
         # Cache headers for immutable assets
         location ~* ^/assets/ {
             add_header Cache-Control "public, max-age=31536000, immutable";
             access_log off;
         }
-        
+
         # No cache for HTML
         location = /index.html {
             add_header Cache-Control "no-cache, no-store, must-revalidate";
@@ -977,7 +1005,7 @@ server {
     location = /service-worker.js {
         return 404;
     }
-    
+
     location = /manifest.json {
         return 404;
     }
@@ -1113,6 +1141,7 @@ STRIPE_YEARLY_PRICE_ID=price_xxxxx
 ```
 
 **Setup Steps:**
+
 1. Create account at https://stripe.com
 2. Navigate to Developers → API Keys
 3. Copy Secret Key and Publishable Key
@@ -1136,6 +1165,7 @@ AWS_S3_BUCKET=equiprofile-uploads
 ```
 
 **Setup Steps:**
+
 1. Create AWS account at https://aws.amazon.com
 2. Navigate to IAM → Users → Create User
 3. Attach policy: `AmazonS3FullAccess` (or custom restricted policy)
@@ -1154,12 +1184,14 @@ OPENAI_API_KEY=sk-xxxxx
 ```
 
 **Setup Steps:**
+
 1. Create account at https://platform.openai.com
 2. Navigate to API Keys
 3. Create new secret key
 4. Copy and save securely
 
-**Cost**: 
+**Cost**:
+
 - GPT-4: ~$0.03 per 1,000 input tokens
 - GPT-3.5-Turbo: ~$0.0005 per 1,000 input tokens
 
@@ -1173,6 +1205,7 @@ WEATHER_API_PROVIDER=openweathermap
 ```
 
 **Setup Steps:**
+
 1. Create account at https://openweathermap.org/api
 2. Subscribe to plan (free tier available)
 3. Copy API key from account dashboard
@@ -1192,11 +1225,13 @@ SMTP_FROM=noreply@equiprofile.online
 ```
 
 **Setup Steps (Gmail):**
+
 1. Enable 2-Factor Authentication on Google account
 2. Generate App Password: Account → Security → App Passwords
 3. Use app password (not your regular password)
 
 **Alternative Providers:**
+
 - **SendGrid**: Free tier 100 emails/day, paid from $15/month
 - **Mailgun**: 5,000 free emails/month, then paid
 - **Amazon SES**: $0.10 per 1,000 emails
@@ -1216,6 +1251,7 @@ SMTP_FROM=noreply@equiprofile.online
 ### Tech Stack
 
 #### Frontend
+
 - **React 18** - UI library
 - **TypeScript** - Type-safe JavaScript
 - **TailwindCSS** - Utility-first CSS framework
@@ -1224,6 +1260,7 @@ SMTP_FROM=noreply@equiprofile.online
 - **Vite** - Build tool and dev server
 
 #### Backend
+
 - **Node.js** - JavaScript runtime
 - **Express** - Web framework
 - **tRPC** - Type-safe API layer
@@ -1232,6 +1269,7 @@ SMTP_FROM=noreply@equiprofile.online
 - **JWT + bcrypt** - Authentication and encryption
 
 #### Infrastructure
+
 - **Nginx** - Reverse proxy and static file server
 - **Systemd** - Process management
 - **Let's Encrypt** - SSL certificates
@@ -1272,6 +1310,7 @@ Equiprofile.online/
 EquiProfile uses MySQL with Drizzle ORM for type-safe database operations.
 
 **Main Tables**:
+
 - `users` - User accounts and authentication
 - `horses` - Horse profiles and basic information
 - `health_records` - Vaccinations, vet visits, medications
@@ -1289,6 +1328,7 @@ EquiProfile uses MySQL with Drizzle ORM for type-safe database operations.
 ### Tech Stack
 
 **Frontend:**
+
 - React 19 with TypeScript
 - TailwindCSS 4 for styling
 - Wouter for routing
@@ -1299,6 +1339,7 @@ EquiProfile uses MySQL with Drizzle ORM for type-safe database operations.
 - Chart.js / Recharts for visualizations
 
 **Backend:**
+
 - Node.js with Express
 - TypeScript
 - tRPC for API layer
@@ -1308,17 +1349,20 @@ EquiProfile uses MySQL with Drizzle ORM for type-safe database operations.
 - Server-Sent Events (SSE) for real-time updates
 
 **Database:**
+
 - MySQL 8.0+ (production)
 - SQLite (development)
 - Drizzle ORM for migrations
 
 **Infrastructure:**
+
 - Nginx for reverse proxy and static file serving
 - Systemd for process management
 - Certbot for SSL certificates
 - PM2 optional for advanced process management
 
 **Integrations:**
+
 - Stripe for payments
 - AWS S3 for file storage
 - OpenAI for AI features
@@ -1391,6 +1435,7 @@ Key tables:
 EquiProfile uses Server-Sent Events for real-time synchronization:
 
 **Why SSE?**
+
 - Simpler than WebSockets
 - Automatic reconnection
 - Works through proxies and firewalls
@@ -1420,23 +1465,28 @@ EquiProfile uses Server-Sent Events for real-time synchronization:
    - Module channels for grouped events
 
 **Implementation Pattern:**
+
 ```typescript
 // Server publishes event after CRUD operations
-eventManager.publish('horses:created', {
-  horseId: newHorse.id,
-  name: newHorse.name
-}, ['global', `user:${userId}`]);
+eventManager.publish(
+  "horses:created",
+  {
+    horseId: newHorse.id,
+    name: newHorse.name,
+  },
+  ["global", `user:${userId}`],
+);
 
 // Client subscribes to module events
-const { data } = useRealtimeModule('horses');
+const { data } = useRealtimeModule("horses");
 
 // Optimistic UI updates immediately
 const mutation = useMutation({
   onMutate: async (newData) => {
     // Update UI immediately
-    await queryClient.cancelQueries(['horses']);
-    const previous = queryClient.getQueryData(['horses']);
-    queryClient.setQueryData(['horses'], (old) => [...old, newData]);
+    await queryClient.cancelQueries(["horses"]);
+    const previous = queryClient.getQueryData(["horses"]);
+    queryClient.setQueryData(["horses"], (old) => [...old, newData]);
     return { previous };
   },
   // Real-time sync happens automatically via SSE
@@ -1444,12 +1494,14 @@ const mutation = useMutation({
 ```
 
 **Fallback Strategy:**
+
 - Polling if SSE not supported
 - Connection lost warning
 - Event history replay on reconnection
 - Missed events recovery
 
 **Monitoring:**
+
 - `/api/realtime/stats` endpoint
 - Browser DevTools inspection
 - Server logs tracking
@@ -1500,6 +1552,7 @@ pnpm test --coverage
 ```
 
 **Test Coverage Goals:**
+
 - 70%+ code coverage
 - All critical paths tested
 - Edge cases handled
@@ -1533,6 +1586,7 @@ We follow Conventional Commits:
 - `chore`: Maintenance tasks
 
 **Examples:**
+
 ```bash
 # Push schema changes to database
 npm run db:push
@@ -1545,6 +1599,7 @@ npm run db:migrate
 ```
 
 <a name="realtime-sse"></a>
+
 ### Real-time Updates (SSE)
 
 EquiProfile supports Server-Sent Events (SSE) for real-time notifications:
@@ -1560,12 +1615,15 @@ EquiProfile supports Server-Sent Events (SSE) for real-time notifications:
 ## Features Breakdown
 
 <a name="core-modules"></a>
+
 ### Core Modules (20+)
 
 <a name="health-vet"></a>
+
 #### 1. Health & Vet Management
 
 **Vaccinations**
+
 - Track all vaccination records with automatic reminders
 - Vaccination history timeline
 - Veterinarian information
@@ -1574,6 +1632,7 @@ EquiProfile supports Server-Sent Events (SSE) for real-time notifications:
 - Export vaccination certificates
 
 **Veterinary Visits**
+
 - Complete vet visit logging
 - Diagnosis and treatment tracking
 - Cost management
@@ -1581,30 +1640,35 @@ EquiProfile supports Server-Sent Events (SSE) for real-time notifications:
 - Visit history and emergency contacts
 
 **Medications**
+
 - Active medications list with dosage schedules
 - Medication reminders and side effects monitoring
 - Cost tracking and prescription management
 - Inventory tracking with refill reminders
 
 **Dental Care**
+
 - Dental exam history
 - Dentist information and procedure tracking
 - Cost management
 - Next appointment reminders
 
 **Hoof Care**
+
 - Farrier visit tracking and shoeing schedule
 - Hoof condition monitoring
 - Farrier contact management
 - Cost tracking and photo uploads
 
 **Deworming**
+
 - Deworming schedule with product tracking
 - Rotation planning
 - Weight-based dosage calculations
 - Next due date reminders
 
 <a name="training"></a>
+
 #### 2. Training & Performance
 
 - **Training session planning** with custom programs
@@ -1616,15 +1680,18 @@ EquiProfile supports Server-Sent Events (SSE) for real-time notifications:
 - **Metrics tracked**: Duration, intensity, exercises, behavior, progress notes
 
 <a name="nutrition"></a>
+
 #### 3. Nutrition & Feeding
 
 **Feeding Schedules**
+
 - Custom feeding plans with meal scheduling
 - Portion control and multiple feeds per day
 - Special dietary requirements
 - Cost tracking and inventory management
 
 **Nutrition Logs**
+
 - Daily feed tracking
 - Weight monitoring
 - Body condition scoring
@@ -1632,12 +1699,14 @@ EquiProfile supports Server-Sent Events (SSE) for real-time notifications:
 - Nutritional analysis
 
 **Nutrition Plans**
+
 - Custom diet plans with nutritionist recommendations
 - Seasonal adjustments
 - Performance-based nutrition
 - Weight management programs
 
 <a name="breeding"></a>
+
 #### 4. Breeding Management
 
 - **Mare heat cycle tracking**
@@ -1648,9 +1717,11 @@ EquiProfile supports Server-Sent Events (SSE) for real-time notifications:
 - **Breeding analytics**
 
 <a name="admin"></a>
+
 #### 5. Administrative Tools
 
 **Admin Panel** (accessible at `/admin`)
+
 - System-wide control
 - User management (add/remove users)
 - Database operations
@@ -1661,6 +1732,7 @@ EquiProfile supports Server-Sent Events (SSE) for real-time notifications:
 - Configuration management
 
 **Financial Management**
+
 - Expense tracking by category
 - Budget management
 - Cost per horse calculations
@@ -1669,18 +1741,21 @@ EquiProfile supports Server-Sent Events (SSE) for real-time notifications:
 - Financial reports and exports
 
 **Contacts Database**
+
 - Comprehensive contact management
 - Categories: Veterinarians, Farriers, Trainers, Dentists, Emergency contacts, Suppliers
 - Quick dial/email functionality
 - Communication history tracking
 
 **Document Management**
+
 - Secure document storage with cloud integration
 - Multiple file formats (PDF, images, videos)
 - Folder organization and search functionality
 - Version control and sharing capabilities
 
 **Calendar & Scheduling**
+
 - Integrated calendar with all events
 - Color-coded event types
 - Multiple views (day, week, month)
@@ -1688,6 +1763,7 @@ EquiProfile supports Server-Sent Events (SSE) for real-time notifications:
 - iCal export and sync
 
 **Reports & Analytics**
+
 - Health summary reports
 - Training progress reports
 - Financial reports
@@ -1698,12 +1774,14 @@ EquiProfile supports Server-Sent Events (SSE) for real-time notifications:
 #### 6. AI & Weather Features
 
 **AI Chat Assistant** (requires OpenAI API key)
+
 - Natural language interaction
 - Horse care advice and data insights
 - Training recommendations
 - Health analysis and quick information lookup
 
 **Weather Analysis** (requires Weather API key)
+
 - Real-time weather data
 - Riding condition recommendations
 - Weather-based scheduling
@@ -1713,6 +1791,7 @@ EquiProfile supports Server-Sent Events (SSE) for real-time notifications:
 #### 7. Payment & Subscriptions
 
 **Stripe Integration** (requires Stripe API keys)
+
 - Multiple subscription tiers (monthly/yearly)
 - Secure payment processing
 - Automatic billing
@@ -1786,11 +1865,13 @@ npm run test:coverage
 ### Code Style
 
 The project uses:
+
 - **ESLint** for code linting
 - **Prettier** for code formatting
 - **TypeScript** for type safety
 
 Configuration files:
+
 - `.eslintrc.js` - ESLint configuration
 - `.prettierrc` - Prettier configuration
 - `tsconfig.json` - TypeScript configuration
@@ -1802,11 +1883,13 @@ Configuration files:
 ### Common Issues
 
 <a name="nginx-issues"></a>
+
 #### Nginx Configuration Issues
 
 **Problem**: Nginx returns 502 Bad Gateway
 
 **Solution**:
+
 ```bash
 # Check if service is running
 sudo systemctl status equiprofile
@@ -1826,11 +1909,13 @@ sudo systemctl reload nginx
 ```
 
 <a name="database-problems"></a>
+
 #### Database Problems
 
 **Problem**: Database connection fails
 
 **Solution**:
+
 ```bash
 # Verify MySQL is running
 systemctl status mysql
@@ -1849,11 +1934,13 @@ FLUSH PRIVILEGES;
 ```
 
 <a name="build-errors"></a>
+
 #### Build Errors
 
 **Problem**: Build fails during `npm run build`
 
 **Solution**:
+
 ```bash
 # Check Node.js version (must be v20.x or higher)
 node --version
@@ -1883,6 +1970,7 @@ sudo apt-get clean
 **Problem**: `systemctl start equiprofile` fails
 
 **Solution**:
+
 ```bash
 # Check logs
 sudo journalctl -u equiprofile -n 50 --no-pager
@@ -1907,6 +1995,7 @@ sudo -u www-data node dist/index.js
 **Problem**: SSL certificate errors or HTTPS not working
 
 **Solution**:
+
 ```bash
 # Check certificate status
 sudo certbot certificates
@@ -1933,6 +2022,7 @@ style(ui): improve button component styling
 refactor(database): optimize query performance
 test(health): add vaccination reminder tests
 chore: update dependencies
+
 ```
 
 #### Pull Request Process
@@ -1989,23 +2079,25 @@ chore: update dependencies
 #### File Organization
 
 ```
+
 components/
-  ├── ui/              # Reusable UI components
-  ├── [Feature]/       # Feature-specific components
-  └── layouts/         # Layout components
+├── ui/ # Reusable UI components
+├── [Feature]/ # Feature-specific components
+└── layouts/ # Layout components
 
 pages/
-  └── [PageName].tsx   # Page components
+└── [PageName].tsx # Page components
 
 hooks/
-  └── use[HookName].ts # Custom hooks
+└── use[HookName].ts # Custom hooks
 
 lib/
-  └── [utility].ts     # Utility functions
+└── [utility].ts # Utility functions
 
 contexts/
-  └── [Context]Context.tsx # React contexts
-```
+└── [Context]Context.tsx # React contexts
+
+````
 
 ---
 
@@ -2215,7 +2307,7 @@ curl -I https://yourdomain.com/
 # 3. Check build version
 curl https://yourdomain.com/ | grep "assets/index-"
 # Should show hashed assets like: /assets/index-abc123.js
-```
+````
 
 ### Recovery Procedures
 
@@ -2326,24 +2418,32 @@ ls -lt /var/equiprofile/_ops/deploy_*.log | head -1
 ## Maintenance
 
 <a name="updates"></a>
+
 ### Updates & Upgrades
 
 #### Update Application
+
 # Check application status
+
 systemctl status equiprofile
 
 # Check Nginx status
+
 systemctl status nginx
 
 # Test application health
+
 curl -s http://127.0.0.1:3000/api/health
 
 # View application logs
+
 journalctl -u equiprofile -n 50 --no-pager
 
 # View Nginx error logs
+
 tail -50 /var/log/nginx/error.log
-```
+
+````
 
 ### Recovery Procedures
 
@@ -2364,9 +2464,10 @@ mysql -u equiprofile -p -h localhost equiprofile
 
 # Check if port 3000 is available
 sudo lsof -i :3000
-```
+````
 
 **Solutions:**
+
 - Verify `.env` file exists and has correct values
 - Test MySQL connection manually
 - Kill any process using port 3000
@@ -2378,6 +2479,7 @@ sudo lsof -i :3000
 **Symptoms**: Nginx returns 502 error
 
 **Diagnosis:**
+
 ```bash
 # Verify application is running
 systemctl status equiprofile
@@ -2390,6 +2492,7 @@ sudo nginx -t
 ```
 
 **Solutions:**
+
 ```bash
 # Start application if not running
 sudo systemctl start equiprofile
@@ -2409,6 +2512,7 @@ cat /etc/nginx/sites-available/equiprofile | grep proxy_pass
 **Symptoms**: Deployment script errors or incomplete deployment
 
 **Diagnosis:**
+
 ```bash
 # Check deployment logs
 cat /var/equiprofile/app/deployment.log
@@ -2418,6 +2522,7 @@ ls -la /var/equiprofile/app/dist/
 ```
 
 **Solutions:**
+
 ```bash
 # Clean and rebuild
 cd /var/equiprofile/app
@@ -2440,6 +2545,7 @@ sudo bash deployment/deploy.sh --domain your-domain.com
 **Symptoms**: Cached old version after deployment
 
 **Diagnosis:**
+
 ```bash
 # Check if PWA is properly blocked
 curl -I https://equiprofile.online/service-worker.js
@@ -2454,6 +2560,7 @@ curl -I https://equiprofile.online/index.html
 ```
 
 **Solutions:**
+
 ```bash
 cd /var/equiprofile/app
 
@@ -2498,6 +2605,7 @@ sudo systemctl reload nginx
 **Symptoms**: Application can't connect to database
 
 **Diagnosis:**
+
 ```bash
 # Check if MySQL is running
 systemctl status mysql
@@ -2510,6 +2618,7 @@ cat /var/equiprofile/app/.env | grep DATABASE_URL
 ```
 
 **Solutions:**
+
 ```bash
 # Start MySQL if not running
 sudo systemctl start mysql
@@ -2523,11 +2632,13 @@ sudo systemctl restart equiprofile
 ```
 
 <a name="backups"></a>
+
 ### Backup Procedures
 
 #### Database Backup
 
 **For MySQL**:
+
 ```bash
 # Manual backup
 mysqldump -u equiprofile -p equiprofile > backup-$(date +%Y%m%d).sql
@@ -2537,6 +2648,7 @@ mysql -u equiprofile -p equiprofile < backup-20260109.sql
 ```
 
 **For SQLite**:
+
 ```bash
 # Backup
 cp /var/equiprofile/app/data/equiprofile.db backup-$(date +%Y%m%d).db
@@ -2580,11 +2692,12 @@ sudo crontab -e
 ```
 
 <a name="monitoring"></a>
+
 ### Monitoring
 
 #### Application Monitoring
 
-```bash
+````bash
 # Check application health
 watch -n 5 'curl -s http://127.0.0.1:3000/api/health | jq'
 
@@ -2606,7 +2719,7 @@ sudo certbot renew
 
 # Test auto-renewal
 sudo certbot renew --dry-run
-```
+````
 
 #### Configuration Syntax Errors
 
@@ -2721,6 +2834,7 @@ sudo logrotate -f /etc/logrotate.d/equiprofile
 For high-traffic deployments:
 
 **1. Increase worker processes in nginx**:
+
 ```nginx
 # /etc/nginx/nginx.conf
 worker_processes auto;
@@ -2728,20 +2842,26 @@ worker_connections 1024;
 ```
 
 **2. Enable connection pooling for MySQL**:
+
 ```env
 # .env
 DATABASE_POOL_SIZE=10
 ```
+
 # Check for type errors
+
 pnpm check
 
 # View detailed errors
+
 pnpm tsc --noEmit
 
 # Clean and reinstall
+
 rm -rf node_modules pnpm-lock.yaml
 pnpm install --frozen-lockfile
-```
+
+````
 
 ### Emergency Rollback
 
@@ -2772,7 +2892,7 @@ sudo cp ../app.backup/.env .env  # Restore environment
 pnpm install --frozen-lockfile
 pnpm build
 sudo systemctl restart equiprofile
-```
+````
 
 ---
 
@@ -2826,6 +2946,7 @@ npm install -g pnpm@latest
 #### Database Backup
 
 **3. Increase Node.js memory**:
+
 ```bash
 # Edit /etc/systemd/system/equiprofile.service
 Environment="NODE_OPTIONS=--max_old_space_size=4096"
@@ -2945,17 +3066,24 @@ bash scripts/smoke_prod.sh https://yourdomain.com
 ## Next Steps
 
 After successful deployment:
+
 # Create backup directory
+
 sudo mkdir -p /var/backups/equiprofile
 
 # Backup database
+
 mysqldump -u equiprofile -p equiprofile > /var/backups/equiprofile/db-$(date +%Y%m%d-%H%M%S).sql
 
 # Automated daily backup (cron)
+
 sudo crontab -e
+
 # Add line:
-# 0 2 * * * mysqldump -u equiprofile -pYOUR_PASSWORD equiprofile > /var/backups/equiprofile/db-$(date +\%Y\%m\%d).sql
-```
+
+# 0 2 \* \* \* mysqldump -u equiprofile -pYOUR_PASSWORD equiprofile > /var/backups/equiprofile/db-$(date +\%Y\%m\%d).sql
+
+````
 
 #### File Backup
 
@@ -2965,7 +3093,7 @@ sudo tar -czf /var/backups/equiprofile/uploads-$(date +%Y%m%d).tar.gz /var/equip
 
 # Backup .env file
 sudo cp /var/equiprofile/app/.env /var/backups/equiprofile/.env.backup
-```
+````
 
 #### Restore from Backup
 
@@ -3151,6 +3279,7 @@ Copyright © 2026 Amarktai Network
 ---
 
 _EquiProfile - Professional Horse Management Made Simple_
+
 ## Support
 
 ### Getting Help
@@ -3162,6 +3291,7 @@ _EquiProfile - Professional Horse Management Made Simple_
 ### Commercial Support
 
 For commercial support, custom development, or enterprise deployments:
+
 - Email: support@amarktai.network
 - Website: https://amarktai.network
 
@@ -3176,6 +3306,7 @@ We welcome contributions! See the [Contributing](#contributing) section for guid
 ### Version 2.0.0 (January 7, 2026)
 
 #### Added
+
 - Ubuntu 24.04 deployment system with automated setup
 - Health check endpoints (`/api/health`)
 - PWA disable control via Nginx (production ready)
@@ -3189,6 +3320,7 @@ We welcome contributions! See the [Contributing](#contributing) section for guid
 - Multi-stable support
 
 #### Changed
+
 - Migrated to pnpm for package management
 - Improved build process with memory optimization
 - Enhanced security with proper environment variable handling
@@ -3197,6 +3329,7 @@ We welcome contributions! See the [Contributing](#contributing) section for guid
 - Improved TypeScript strict mode compliance
 
 #### Fixed
+
 - JWT expiration handling
 - File upload security
 - Nginx caching issues
@@ -3204,6 +3337,7 @@ We welcome contributions! See the [Contributing](#contributing) section for guid
 - Memory leaks in long-running processes
 
 #### Security
+
 - Implemented proper RBAC
 - Added audit logging
 - Enhanced password security

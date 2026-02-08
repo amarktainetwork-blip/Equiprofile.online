@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type compatibility issues
 import { useState } from "react";
 import { trpc } from "../_core/trpc";
 import { useRealtimeModule } from "../hooks/useRealtime";
@@ -100,17 +99,40 @@ function TreatmentsContent() {
 
     try {
       const payload = {
-        ...formData,
         horseId: parseInt(formData.horseId),
-        costInPence: formData.cost
+        treatmentType: formData.type,
+        treatmentName: formData.name,
+        dosage: formData.dosage || undefined,
+        frequency: formData.frequency || undefined,
+        startDate: formData.startDate,
+        endDate: formData.endDate || undefined,
+        vetName: formData.vet || undefined,
+        vetClinic: formData.vetClinic || undefined,
+        cost: formData.cost
           ? Math.round(parseFloat(formData.cost) * 100)
-          : null,
+          : undefined,
+        status: formData.status as
+          | "active"
+          | "completed"
+          | "discontinued"
+          | undefined,
+        notes: formData.notes || undefined,
       };
 
       if (editingTreatment) {
         await updateMutation.mutateAsync({
           id: editingTreatment.id,
-          ...payload,
+          treatmentType: payload.treatmentType,
+          treatmentName: payload.treatmentName,
+          dosage: payload.dosage,
+          frequency: payload.frequency,
+          startDate: payload.startDate,
+          endDate: payload.endDate,
+          vetName: payload.vetName,
+          vetClinic: payload.vetClinic,
+          cost: payload.cost,
+          status: payload.status,
+          notes: payload.notes,
         });
         toast({ title: "Treatment updated successfully" });
       } else {
@@ -134,8 +156,8 @@ function TreatmentsContent() {
     setEditingTreatment(treatment);
     setFormData({
       horseId: treatment.horseId?.toString() || "",
-      type: treatment.type,
-      name: treatment.name,
+      type: treatment.treatmentType || treatment.type || "",
+      name: treatment.treatmentName || treatment.name || "",
       dosage: treatment.dosage || "",
       frequency: treatment.frequency || "",
       startDate: treatment.startDate
@@ -144,11 +166,9 @@ function TreatmentsContent() {
       endDate: treatment.endDate
         ? new Date(treatment.endDate).toISOString().split("T")[0]
         : "",
-      vet: treatment.vet || "",
+      vet: treatment.vetName || treatment.vet || "",
       vetClinic: treatment.vetClinic || "",
-      cost: treatment.costInPence
-        ? (treatment.costInPence / 100).toFixed(2)
-        : "",
+      cost: treatment.cost ? (treatment.cost / 100).toFixed(2) : "",
       status: treatment.status,
       notes: treatment.notes || "",
     });
@@ -421,7 +441,7 @@ function TreatmentsContent() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="font-semibold text-lg">
-                        {treatment.name}
+                        {treatment.treatmentName || treatment.name}
                       </h3>
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadge(treatment.status)}`}
@@ -429,7 +449,7 @@ function TreatmentsContent() {
                         {treatment.status}
                       </span>
                       <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                        {treatment.type}
+                        {treatment.treatmentType || treatment.type}
                       </span>
                     </div>
                     <p className="text-sm text-gray-600 mb-2">
@@ -457,15 +477,15 @@ function TreatmentsContent() {
                         {new Date(treatment.endDate).toLocaleDateString()}
                       </p>
                     )}
-                    {treatment.vet && (
+                    {treatment.vetName && (
                       <p className="text-sm">
-                        <strong>Vet:</strong> {treatment.vet}
+                        <strong>Vet:</strong> {treatment.vetName}
                       </p>
                     )}
-                    {treatment.costInPence && (
+                    {treatment.cost && (
                       <p className="text-sm">
                         <strong>Cost:</strong> £
-                        {(treatment.costInPence / 100).toFixed(2)}
+                        {(treatment.cost / 100).toFixed(2)}
                       </p>
                     )}
                     {treatment.notes && (
@@ -511,7 +531,9 @@ function TreatmentsContent() {
               <div className="flex justify-between items-start">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <h3 className="font-semibold">{treatment.name}</h3>
+                    <h3 className="font-semibold">
+                      {treatment.treatmentName || treatment.name}
+                    </h3>
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadge(treatment.status)}`}
                     >

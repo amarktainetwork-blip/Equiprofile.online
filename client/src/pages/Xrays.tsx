@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type compatibility issues
 import { useState } from "react";
 import { trpc } from "../_core/trpc";
 import { DashboardLayout } from "../components/DashboardLayout";
@@ -47,7 +46,7 @@ function XraysContent() {
   const [editingXray, setEditingXray] = useState<any>(null);
 
   const [formData, setFormData] = useState({
-    horseId: "",
+    horseId: 0,
     date: new Date().toISOString().split("T")[0],
     bodyPart: "",
     vetName: "",
@@ -58,7 +57,7 @@ function XraysContent() {
     fileName: "",
     fileSize: 0,
     fileMimeType: "",
-    costPence: 0,
+    cost: 0,
     notes: "",
   });
 
@@ -134,7 +133,7 @@ function XraysContent() {
 
   const resetForm = () => {
     setFormData({
-      horseId: "",
+      horseId: 0,
       date: new Date().toISOString().split("T")[0],
       bodyPart: "",
       vetName: "",
@@ -145,35 +144,45 @@ function XraysContent() {
       fileName: "",
       fileSize: 0,
       fileMimeType: "",
-      costPence: 0,
+      cost: 0,
       notes: "",
     });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const costInPence = Math.round(
-      parseFloat(formData.costPence.toString()) * 100,
-    );
+    const costInPence = Math.round(parseFloat(formData.cost.toString()) * 100);
+
+    const payload = {
+      horseId: formData.horseId,
+      xrayDate: formData.date,
+      bodyPart: formData.bodyPart,
+      vetName: formData.vetName,
+      vetClinic: formData.vetClinic,
+      findings: formData.findings,
+      diagnosis: formData.diagnosis,
+      fileUrl: formData.fileUrl,
+      fileName: formData.fileName,
+      fileSize: formData.fileSize,
+      mimeType: formData.fileMimeType,
+      cost: costInPence,
+      notes: formData.notes,
+    };
 
     if (editingXray) {
       updateMutation.mutate({
         id: editingXray.id,
-        ...formData,
-        costPence: costInPence,
+        ...payload,
       });
     } else {
-      createMutation.mutate({
-        ...formData,
-        costPence: costInPence,
-      });
+      createMutation.mutate(payload);
     }
   };
 
   const handleEdit = (xray: any) => {
     setEditingXray(xray);
     setFormData({
-      horseId: xray.horseId || "",
+      horseId: xray.horseId || 0,
       date: xray.date?.split("T")[0] || new Date().toISOString().split("T")[0],
       bodyPart: xray.bodyPart || "",
       vetName: xray.vetName || "",
@@ -184,7 +193,7 @@ function XraysContent() {
       fileName: xray.fileName || "",
       fileSize: xray.fileSize || 0,
       fileMimeType: xray.fileMimeType || "",
-      costPence: (xray.costPence || 0) / 100,
+      cost: (xray.cost || 0) / 100,
       notes: xray.notes || "",
     });
     setIsDialogOpen(true);
@@ -196,7 +205,7 @@ function XraysContent() {
     }
   };
 
-  const getHorseName = (horseId: string) => {
+  const getHorseName = (horseId: number) => {
     const horse = horses?.find((h) => h.id === horseId);
     return horse ? horse.name : "Unknown Horse";
   };
@@ -238,9 +247,9 @@ function XraysContent() {
                 <div className="grid gap-2">
                   <Label htmlFor="horseId">Horse *</Label>
                   <Select
-                    value={formData.horseId}
+                    value={formData.horseId.toString()}
                     onValueChange={(value) =>
-                      setFormData({ ...formData, horseId: value })
+                      setFormData({ ...formData, horseId: parseInt(value, 10) })
                     }
                     required
                   >
@@ -249,7 +258,7 @@ function XraysContent() {
                     </SelectTrigger>
                     <SelectContent>
                       {horses?.map((horse) => (
-                        <SelectItem key={horse.id} value={horse.id}>
+                        <SelectItem key={horse.id} value={horse.id.toString()}>
                           {horse.name}
                         </SelectItem>
                       ))}
@@ -358,11 +367,11 @@ function XraysContent() {
                       type="number"
                       step="0.01"
                       placeholder="0.00"
-                      value={formData.costPence}
+                      value={formData.cost}
                       onChange={(e) =>
                         setFormData({
                           ...formData,
-                          costPence: parseFloat(e.target.value) || 0,
+                          cost: parseFloat(e.target.value) || 0,
                         })
                       }
                     />
@@ -453,10 +462,10 @@ function XraysContent() {
                       {xray.diagnosis}
                     </div>
                   )}
-                  {xray.costPence > 0 && (
+                  {xray.cost > 0 && (
                     <div>
                       <span className="font-medium">Cost:</span> £
-                      {(xray.costPence / 100).toFixed(2)}
+                      {(xray.cost / 100).toFixed(2)}
                     </div>
                   )}
                   {xray.notes && (

@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix type compatibility issues
 import { useState } from "react";
 import { DashboardLayout } from "../components/DashboardLayout";
 import { trpc } from "../lib/trpc";
@@ -82,13 +81,13 @@ export default function Dewormings() {
       const payload = {
         horseId: parseInt(formData.horseId),
         productName: formData.product,
-        activeIngredient: formData.activeIngredient,
-        dosage: formData.dosage,
+        activeIngredient: formData.activeIngredient || undefined,
+        dosage: formData.dosage || undefined,
         weight: formData.weight ? parseFloat(formData.weight) : undefined,
-        nextDueDate: formData.nextDueDate || undefined,
-        dateAdministered: formData.dateAdministered,
-        vet: formData.vet || undefined,
-        clinic: formData.clinic || undefined,
+        nextDueDate: formData.nextDueDate
+          ? new Date(formData.nextDueDate)
+          : undefined,
+        dateAdministered: new Date(formData.dateAdministered),
         cost: formData.cost
           ? Math.round(parseFloat(formData.cost) * 100)
           : undefined,
@@ -112,14 +111,18 @@ export default function Dewormings() {
     setEditingId(deworming.id);
     setFormData({
       horseId: deworming.horseId.toString(),
-      product: deworming.product,
-      activeIngredient: deworming.activeIngredient,
-      dosage: deworming.dosage,
+      product: deworming.productName || deworming.product || "",
+      activeIngredient: deworming.activeIngredient || "",
+      dosage: deworming.dosage || "",
       weight: deworming.weight?.toString() || "",
-      nextDueDate: deworming.nextDueDate || "",
-      dateAdministered: deworming.dateAdministered,
-      vet: deworming.vet || "",
-      clinic: deworming.clinic || "",
+      nextDueDate: deworming.nextDueDate
+        ? new Date(deworming.nextDueDate).toISOString().split("T")[0]
+        : "",
+      dateAdministered: deworming.dateAdministered
+        ? new Date(deworming.dateAdministered).toISOString().split("T")[0]
+        : new Date().toISOString().split("T")[0],
+      vet: "",
+      clinic: "",
       cost: deworming.cost ? (deworming.cost / 100).toString() : "",
       notes: deworming.notes || "",
     });

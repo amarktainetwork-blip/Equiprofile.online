@@ -220,7 +220,7 @@ export default function Home() {
   ];
 
   const [animatedStats, setAnimatedStats] = useState(
-    stats.map(() => ({ current: 0, hasAnimated: false }))
+    stats.map(() => ({ current: 0, hasAnimated: false })),
   );
   const statsRef = useRef<HTMLDivElement>(null);
 
@@ -258,7 +258,7 @@ export default function Home() {
           }
         });
       },
-      { threshold: 0.3 }
+      { threshold: 0.3 },
     );
 
     if (statsRef.current) {
@@ -339,7 +339,9 @@ export default function Home() {
                         size="lg"
                         className="text-lg px-10 py-6 bg-white text-primary hover:bg-white/90 shadow-2xl hover-lift group"
                       >
-                        {isAuthenticated ? "Go to Dashboard" : "Start Free Trial"}
+                        {isAuthenticated
+                          ? "Go to Dashboard"
+                          : "Start Free Trial"}
                         <ChevronRight className="w-6 h-6 ml-2 group-hover:translate-x-1 transition-transform" />
                       </Button>
                     </Link>
@@ -375,7 +377,10 @@ export default function Home() {
                     >
                       <CardContent className="p-0">
                         <div className="text-5xl md:text-6xl font-bold text-primary mb-2">
-                          {formatStatValue(animatedStats[index].current, stat.suffix)}
+                          {formatStatValue(
+                            animatedStats[index].current,
+                            stat.suffix,
+                          )}
                           {stat.suffix}
                         </div>
                         <div className="text-sm md:text-base text-muted-foreground font-medium">
@@ -454,9 +459,14 @@ export default function Home() {
                 <Card className="glass-strong p-8 md:p-12 border-none">
                   <CardContent className="p-0">
                     <div className="mb-6 flex gap-1">
-                      {[...Array(testimonials[activeTestimonial].rating)].map((_, i) => (
-                        <Star key={i} className="w-6 h-6 fill-yellow-400 text-yellow-400" />
-                      ))}
+                      {[...Array(testimonials[activeTestimonial].rating)].map(
+                        (_, i) => (
+                          <Star
+                            key={i}
+                            className="w-6 h-6 fill-yellow-400 text-yellow-400"
+                          />
+                        ),
+                      )}
                     </div>
                     <blockquote className="text-xl md:text-2xl leading-relaxed mb-8 text-foreground">
                       "{testimonials[activeTestimonial].content}"
@@ -493,7 +503,8 @@ export default function Home() {
                 <button
                   onClick={() =>
                     setActiveTestimonial(
-                      (prev) => (prev - 1 + testimonials.length) % testimonials.length
+                      (prev) =>
+                        (prev - 1 + testimonials.length) % testimonials.length,
                     )
                   }
                   className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-16 w-12 h-12 rounded-full glass-strong hover:bg-primary/20 flex items-center justify-center transition-all duration-300 hover:scale-110"
@@ -503,7 +514,9 @@ export default function Home() {
                 </button>
                 <button
                   onClick={() =>
-                    setActiveTestimonial((prev) => (prev + 1) % testimonials.length)
+                    setActiveTestimonial(
+                      (prev) => (prev + 1) % testimonials.length,
+                    )
                   }
                   className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-16 w-12 h-12 rounded-full glass-strong hover:bg-primary/20 flex items-center justify-center transition-all duration-300 hover:scale-110"
                   aria-label="Next testimonial"
@@ -526,7 +539,8 @@ export default function Home() {
                   Choose Your Perfect Plan
                 </h2>
                 <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-                  Start with a 14-day free trial. No credit card required. Cancel anytime.
+                  Start with a 14-day free trial. No credit card required.
+                  Cancel anytime.
                 </p>
               </ScrollReveal>
               <Stagger className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
@@ -545,10 +559,16 @@ export default function Home() {
                         </div>
                       )}
                       <CardHeader className="pb-8">
-                        <CardTitle className="text-2xl mb-2">{tier.name}</CardTitle>
+                        <CardTitle className="text-2xl mb-2">
+                          {tier.name}
+                        </CardTitle>
                         <div className="mb-4">
-                          <span className="text-5xl font-bold">{tier.price}</span>
-                          <span className="text-muted-foreground">{tier.period}</span>
+                          <span className="text-5xl font-bold">
+                            {tier.price}
+                          </span>
+                          <span className="text-muted-foreground">
+                            {tier.period}
+                          </span>
                         </div>
                         <CardDescription className="text-base">
                           {tier.description}
@@ -565,7 +585,9 @@ export default function Home() {
                         </ul>
                         <Button
                           className={`w-full ${
-                            tier.highlighted ? "bg-primary hover:bg-primary/90" : ""
+                            tier.highlighted
+                              ? "bg-primary hover:bg-primary/90"
+                              : ""
                           }`}
                           variant={tier.highlighted ? "default" : "outline"}
                           size="lg"
@@ -645,8 +667,8 @@ export default function Home() {
                   </h2>
                   <p className="text-xl md:text-2xl text-white/90 mb-12 leading-relaxed">
                     Join thousands of equestrians who trust EquiProfile to care
-                    for their horses. Start your free 14-day trial today—no credit
-                    card required.
+                    for their horses. Start your free 14-day trial today—no
+                    credit card required.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-6 justify-center">
                     <Button

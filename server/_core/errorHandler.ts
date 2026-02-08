@@ -146,7 +146,8 @@ export function logError(
   // In production, send to monitoring service (e.g., Sentry, DataDog)
   if (process.env.NODE_ENV === "production") {
     console.error("[Production Error]", JSON.stringify(logData));
-    // TODO: Send to monitoring service
+    // TODO: Integrate error monitoring service (Sentry/DataDog)
+    // When ready, add: if (process.env.SENTRY_DSN) { Sentry.captureException(error, { contexts: { context } }); }
   } else {
     console.error("[Development Error]", logData);
   }
