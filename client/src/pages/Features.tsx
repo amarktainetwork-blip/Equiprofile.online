@@ -2,49 +2,112 @@ import { Button } from "@/components/ui/button";
 import { MarketingNav } from "@/components/MarketingNav";
 import { Footer } from "@/components/Footer";
 import { PageTransition } from "@/components/PageTransition";
-import { featuresRegistry } from "@/config/featuresRegistry";
+import { PageBanner } from "@/components/PageBanner";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
-import * as Icons from "lucide-react";
+import {
+  Heart,
+  Activity,
+  Calendar,
+  Utensils,
+  BarChart,
+  Bot,
+  ArrowRight,
+  CheckCircle2,
+} from "lucide-react";
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.05,
-    },
-  },
-};
-
-const itemVariants = {
+const fadeInUpVariants = {
   hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.5,
-    },
-  },
+  visible: { opacity: 1, y: 0 },
 };
 
-const categoryVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.6,
-    },
+// Feature sections with alternating image layouts
+const featureSections = [
+  {
+    title: "Complete Health Management",
+    description: "Keep detailed health records for all your horses in one place",
+    image: "/images/gallery/1.jpg",
+    imagePosition: "right",
+    features: [
+      "Track vaccinations, dewormings, and treatments",
+      "Store veterinary records and prescriptions",
+      "Set automatic reminders for upcoming care",
+      "Monitor health trends and vital signs",
+    ],
+    icon: Heart,
+    gradient: "from-rose-500 to-pink-500",
   },
-};
-
-// Helper function to get icon component
-const getIcon = (iconName?: string) => {
-  if (!iconName) return Icons.Sparkles;
-  const IconComponent = (Icons as any)[iconName];
-  return IconComponent || Icons.Sparkles;
-};
+  {
+    title: "Advanced Analytics & Insights",
+    description: "Data-driven decisions for optimal horse care and performance",
+    image: "/images/gallery/2.jpg",
+    imagePosition: "left",
+    features: [
+      "Track training progress and performance metrics",
+      "Visualize health patterns over time",
+      "Compare performance across multiple horses",
+      "Export detailed reports for vets and trainers",
+    ],
+    icon: BarChart,
+    gradient: "from-cyan-500 to-blue-500",
+  },
+  {
+    title: "Training & Performance Tracking",
+    description: "Monitor and optimize every training session",
+    image: "/images/gallery/10.jpg",
+    imagePosition: "right",
+    features: [
+      "Log training sessions with detailed notes",
+      "Track progress towards competition goals",
+      "Record performance videos and photos",
+      "Share achievements with your team",
+    ],
+    icon: Activity,
+    gradient: "from-green-500 to-emerald-500",
+  },
+  {
+    title: "Smart Feeding & Nutrition",
+    description: "Optimize nutrition plans for peak performance",
+    image: "/images/gallery/12.jpg",
+    imagePosition: "left",
+    features: [
+      "Create custom feeding schedules",
+      "Track feed inventory and costs",
+      "Monitor weight and body condition",
+      "Get nutrition recommendations",
+    ],
+    icon: Utensils,
+    gradient: "from-amber-500 to-orange-500",
+  },
+  {
+    title: "Scheduling & Calendar",
+    description: "Never miss important appointments or events",
+    image: "/images/gallery/15.jpg",
+    imagePosition: "right",
+    features: [
+      "Unified calendar for all horses and events",
+      "Automatic reminders for farrier, vet visits",
+      "Schedule training sessions and competitions",
+      "Sync with your personal calendar",
+    ],
+    icon: Calendar,
+    gradient: "from-violet-500 to-purple-500",
+  },
+  {
+    title: "AI-Powered Automation",
+    description: "Let artificial intelligence help manage your stable",
+    image: "/images/gallery/18.jpg",
+    imagePosition: "left",
+    features: [
+      "Smart health alerts and anomaly detection",
+      "Predictive maintenance reminders",
+      "Automated record keeping suggestions",
+      "Intelligent insights and recommendations",
+    ],
+    icon: Bot,
+    gradient: "from-indigo-500 to-blue-500",
+  },
+];
 
 export default function Features() {
   return (
@@ -52,149 +115,144 @@ export default function Features() {
       <MarketingNav />
       <PageTransition>
         <div className="min-h-screen bg-black text-white">
-          {/* Hero Section */}
-          <section className="container mx-auto px-4 pt-32 pb-16 min-[320px]:px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center max-w-4xl mx-auto"
-            >
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-indigo-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">
-                Powerful Features for Modern Horse Management
-              </h1>
-              <p className="text-lg md:text-xl text-gray-300 mb-10">
-                Everything you need to manage your horses efficiently, all in
-                one place
-              </p>
-              <div className="flex items-center justify-center gap-4 text-sm text-gray-400">
-                <span className="flex items-center gap-2">
-                  <Icons.CheckCircle2 className="w-5 h-5 text-green-400" />
-                  {featuresRegistry.length} Feature Categories
-                </span>
-                <span className="flex items-center gap-2">
-                  <Icons.Sparkles className="w-5 h-5 text-purple-400" />
-                  {featuresRegistry.reduce(
-                    (acc, cat) => acc + cat.features.length,
-                    0,
-                  )}
-                  + Features
-                </span>
-              </div>
-            </motion.div>
-          </section>
+          {/* Page Banner */}
+          <PageBanner
+            title="Powerful Features for Modern Horse Management"
+            subtitle="Everything you need to manage your horses efficiently, all in one place"
+            imageSrc="/images/training.jpg"
+          />
 
-          {/* Features by Category */}
-          <section className="container mx-auto px-4 pb-20 min-[320px]:px-4 space-y-24">
-            {featuresRegistry.map((category, categoryIndex) => (
-              <motion.div
-                key={categoryIndex}
-                variants={categoryVariants}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-100px" }}
-              >
-                {/* Category Header */}
-                <div className="text-center mb-12">
-                  <h2 className="text-3xl md:text-4xl font-bold mb-3 bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
-                    {category.category}
-                  </h2>
-                  <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-                    {category.description}
-                  </p>
-                </div>
+          {/* Feature Sections with Alternating Layout */}
+          <div className="py-20">
+            {featureSections.map((section, index) => {
+              const Icon = section.icon;
+              const isImageRight = section.imagePosition === "right";
 
-                {/* Features Grid */}
-                <motion.div
-                  variants={containerVariants}
+              return (
+                <motion.section
+                  key={index}
                   initial="hidden"
                   whileInView="visible"
-                  viewport={{ once: true, margin: "-50px" }}
-                  className="grid grid-cols-1 min-[640px]:grid-cols-2 lg:grid-cols-3 gap-6"
+                  viewport={{ once: true, margin: "-100px" }}
+                  variants={fadeInUpVariants}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  className={`py-16 ${
+                    index % 2 === 1 ? "bg-gray-900/30" : ""
+                  }`}
                 >
-                  {category.features.map((feature, featureIndex) => {
-                    const Icon = getIcon(feature.icon);
-                    return (
-                      <motion.div
-                        key={featureIndex}
-                        variants={itemVariants}
-                        whileHover={{ scale: 1.03, y: -5 }}
-                        className="group relative"
+                  <div className="container mx-auto px-4">
+                    <div
+                      className={`max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${
+                        isImageRight ? "" : "lg:grid-flow-dense"
+                      }`}
+                    >
+                      {/* Content */}
+                      <div
+                        className={`${isImageRight ? "" : "lg:col-start-2"}`}
                       >
-                        {/* Glow Effect */}
-                        <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500 rounded-xl opacity-0 group-hover:opacity-75 blur transition duration-500"></div>
-
-                        {/* Glass Card */}
-                        <div className="relative h-full p-6 rounded-xl bg-black/40 backdrop-blur-xl border border-white/10 group-hover:border-white/20 transition-all duration-300">
-                          {/* Icon */}
-                          <div className="mb-4 relative w-12 h-12 flex items-center justify-center">
-                            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-lg blur-lg group-hover:blur-xl transition-all"></div>
-                            <Icon className="relative w-6 h-6 text-indigo-400 group-hover:text-purple-400 transition-colors" />
-                          </div>
-
-                          {/* Content */}
-                          <h3 className="text-lg font-bold mb-2 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                            {feature.title}
-                          </h3>
-                          <p className="text-sm text-gray-400 leading-relaxed">
-                            {feature.description}
-                          </p>
-
-                          {/* Accent Line */}
-                          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-b-xl"></div>
+                        <div
+                          className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r ${section.gradient} bg-opacity-20 border border-white/20 mb-6`}
+                        >
+                          <Icon className="w-5 h-5" />
+                          <span className="font-medium">Featured</span>
                         </div>
-                      </motion.div>
-                    );
-                  })}
-                </motion.div>
-              </motion.div>
-            ))}
-          </section>
+
+                        <h2 className="text-3xl md:text-4xl font-bold font-serif mb-4 bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                          {section.title}
+                        </h2>
+                        <p className="text-lg text-gray-300 mb-8">
+                          {section.description}
+                        </p>
+
+                        <ul className="space-y-4 mb-8">
+                          {section.features.map((feature, featureIndex) => (
+                            <li
+                              key={featureIndex}
+                              className="flex items-start gap-3"
+                            >
+                              <CheckCircle2 className="w-6 h-6 text-green-400 flex-shrink-0 mt-0.5" />
+                              <span className="text-gray-300">{feature}</span>
+                            </li>
+                          ))}
+                        </ul>
+
+                        {index === 1 && (
+                          <Link href="/pricing">
+                            <Button
+                              size="lg"
+                              className="bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 text-white group"
+                            >
+                              Get Started
+                              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                            </Button>
+                          </Link>
+                        )}
+                      </div>
+
+                      {/* Image */}
+                      <div
+                        className={`relative ${isImageRight ? "" : "lg:col-start-1 lg:row-start-1"}`}
+                      >
+                        <div className="relative rounded-2xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_40px_rgba(99,102,241,0.3)] group">
+                          <img
+                            src={section.image}
+                            alt={section.title}
+                            className="w-full h-full object-cover aspect-[4/3]"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.section>
+              );
+            })}
+          </div>
 
           {/* CTA Section */}
-          <section className="container mx-auto px-4 pb-20 min-[320px]:px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="relative max-w-4xl mx-auto"
-            >
-              {/* Glow Effect */}
-              <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 rounded-3xl opacity-50 blur-2xl"></div>
-
-              {/* Glass Card */}
-              <div className="relative p-12 rounded-3xl bg-black/60 backdrop-blur-xl border border-white/20">
-                <div className="text-center">
-                  <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
-                    Ready to Get Started?
-                  </h2>
-                  <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
-                    Join thousands of horse owners who trust EquiProfile for
-                    their equine management needs.
-                  </p>
-                  <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <Link href="/register">
-                      <Button
-                        size="lg"
-                        className="text-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 border-0"
-                      >
-                        Get Started Free
-                      </Button>
-                    </Link>
-                    <Link href="/pricing">
-                      <Button
-                        size="lg"
-                        variant="outline"
-                        className="text-lg bg-white/5 border-white/20 hover:bg-white/10 text-white"
-                      >
-                        View Pricing
-                      </Button>
-                    </Link>
-                  </div>
+          <section className="py-24 bg-gradient-to-b from-black to-gray-900">
+            <div className="container mx-auto px-4">
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeInUpVariants}
+                transition={{ duration: 0.6 }}
+                className="max-w-4xl mx-auto text-center"
+              >
+                <h2 className="text-4xl md:text-5xl font-bold font-serif mb-6 text-white">
+                  Ready to Transform Your
+                  <br />
+                  <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                    Horse Management?
+                  </span>
+                </h2>
+                <p className="text-xl text-gray-300 mb-10">
+                  Join thousands of equestrians who trust EquiProfile. Start
+                  your free 7-day trial today—no credit card required.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Link href="/register">
+                    <Button
+                      size="lg"
+                      className="text-lg px-10 py-6 bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 text-white group"
+                    >
+                      Start Free Trial
+                      <ArrowRight className="w-6 h-6 ml-2 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                  </Link>
+                  <Link href="/pricing">
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="text-lg px-10 py-6 border-white/20 text-white hover:bg-white/10"
+                    >
+                      View Pricing
+                    </Button>
+                  </Link>
                 </div>
-              </div>
-            </motion.div>
+              </motion.div>
+            </div>
           </section>
         </div>
       </PageTransition>
