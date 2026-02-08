@@ -111,11 +111,11 @@ export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
       const fixedUrl = fixDatabaseUrl(process.env.DATABASE_URL);
-      
+
       // Log database connection info (redacting password)
-      const urlWithoutPassword = fixedUrl.replace(/:([^@]+)@/, ':****@');
+      const urlWithoutPassword = fixedUrl.replace(/:([^@]+)@/, ":****@");
       console.log("[Database] Connecting to:", urlWithoutPassword);
-      
+
       _db = drizzle(fixedUrl);
       console.log("[Database] Connection established");
     } catch (error) {

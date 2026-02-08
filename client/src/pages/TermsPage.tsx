@@ -223,7 +223,11 @@ export default function TermsPage() {
                   </CardHeader>
                   <CardContent className="prose prose-slate dark:prose-invert max-w-none">
                     <p>
-                      These Terms shall be governed by and construed in accordance with the laws of England and Wales. Any disputes arising under or in connection with these Terms shall be subject to the exclusive jurisdiction of the courts of England and Wales.
+                      These Terms shall be governed by and construed in
+                      accordance with the laws of England and Wales. Any
+                      disputes arising under or in connection with these Terms
+                      shall be subject to the exclusive jurisdiction of the
+                      courts of England and Wales.
                     </p>
                   </CardContent>
                 </Card>

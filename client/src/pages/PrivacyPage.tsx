@@ -298,12 +298,14 @@ export default function PrivacyPage() {
                   </CardHeader>
                   <CardContent className="prose prose-slate dark:prose-invert max-w-none">
                     <p>
-                      We comply with the UK General Data Protection Regulation (UK GDPR) and the Data Protection Act 2018. These Terms are governed by the laws of England and Wales.
+                      We comply with the UK General Data Protection Regulation
+                      (UK GDPR) and the Data Protection Act 2018. These Terms
+                      are governed by the laws of England and Wales.
                     </p>
                     <p>
-                      If you are located in the European Economic Area (EEA) or UK, we
-                      process your personal data based on the following legal
-                      grounds:
+                      If you are located in the European Economic Area (EEA) or
+                      UK, we process your personal data based on the following
+                      legal grounds:
                     </p>
                     <ul>
                       <li>

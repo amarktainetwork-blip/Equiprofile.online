@@ -20,6 +20,7 @@ import { Footer } from "@/components/Footer";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AuthSplitLayout } from "@/components/AuthSplitLayout";
 import { motion } from "framer-motion";
+import { marketingAssets } from "@/config/marketingAssets";
 
 /**
  * Register page

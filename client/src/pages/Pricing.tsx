@@ -208,273 +208,277 @@ export default function Pricing() {
       <PageTransition>
         <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black pt-16">
           <div className="container mx-auto px-4 py-16">
-        {/* Header */}
-        <motion.div
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <h1 className="text-5xl font-bold tracking-tight mb-4 text-white">
-            Choose Your{" "}
-            <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 text-transparent bg-clip-text">
-              Perfect Plan
-            </span>
-          </h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Professional equine management for every need. Start with a free
-            trial, upgrade anytime.
-          </p>
-
-          {/* Billing Period Toggle */}
-          <motion.div
-            className="mt-8 inline-flex items-center gap-4 bg-black/40 backdrop-blur-md rounded-full p-2 border border-white/10"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <button
-              onClick={() => setBillingPeriod("monthly")}
-              className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
-                billingPeriod === "monthly"
-                  ? "bg-gradient-to-r from-indigo-500 to-cyan-500 text-white shadow-lg"
-                  : "text-gray-400 hover:text-white"
-              }`}
+            {/* Header */}
+            <motion.div
+              className="text-center mb-16"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
             >
-              Monthly
-            </button>
-            <button
-              onClick={() => setBillingPeriod("yearly")}
-              className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
-                billingPeriod === "yearly"
-                  ? "bg-gradient-to-r from-indigo-500 to-cyan-500 text-white shadow-lg"
-                  : "text-gray-400 hover:text-white"
-              }`}
-            >
-              Yearly
-              <span className="ml-2 text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">
-                Save {YEARLY_SAVINGS_PERCENTAGE}%
-              </span>
-            </button>
-          </motion.div>
-        </motion.div>
-
-        {/* Current Subscription Alert */}
-        {hasActiveSubscription && subscriptionStatus && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-          >
-            <Alert className="mb-8 max-w-3xl mx-auto bg-black/40 backdrop-blur-md border-white/10 text-white">
-              <AlertDescription className="flex items-center justify-between">
-                <span>
-                  Your current plan:{" "}
-                  <strong className="capitalize text-cyan-400">
-                    {subscriptionStatus.plan}
-                  </strong>
-                  {subscriptionStatus.status === "active" && " (Active)"}
+              <h1 className="text-5xl font-bold tracking-tight mb-4 text-white">
+                Choose Your{" "}
+                <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 text-transparent bg-clip-text">
+                  Perfect Plan
                 </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleManageBilling}
-                  className="bg-gradient-to-r from-indigo-500 to-cyan-500 text-white border-0 hover:from-indigo-600 hover:to-cyan-600"
-                >
-                  Manage Billing
-                </Button>
-              </AlertDescription>
-            </Alert>
-          </motion.div>
-        )}
+              </h1>
+              <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+                Professional equine management for every need. Start with a free
+                trial, upgrade anytime.
+              </p>
 
-        {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {pricingPlans.map((planData, index) => {
-            const isCurrentPlanActive = isCurrentPlan(planData.plan);
-
-            return (
+              {/* Billing Period Toggle */}
               <motion.div
-                key={planData.plan}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                whileHover={{ scale: 1.05, y: -10 }}
-                className="relative"
+                className="mt-8 inline-flex items-center gap-4 bg-black/40 backdrop-blur-md rounded-full p-2 border border-white/10"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
               >
-                {planData.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
-                    <span className="bg-gradient-to-r from-indigo-500 to-cyan-500 text-white px-4 py-1 rounded-full text-sm font-semibold shadow-lg">
-                      Most Popular
-                    </span>
-                  </div>
-                )}
+                <button
+                  onClick={() => setBillingPeriod("monthly")}
+                  className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
+                    billingPeriod === "monthly"
+                      ? "bg-gradient-to-r from-indigo-500 to-cyan-500 text-white shadow-lg"
+                      : "text-gray-400 hover:text-white"
+                  }`}
+                >
+                  Monthly
+                </button>
+                <button
+                  onClick={() => setBillingPeriod("yearly")}
+                  className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
+                    billingPeriod === "yearly"
+                      ? "bg-gradient-to-r from-indigo-500 to-cyan-500 text-white shadow-lg"
+                      : "text-gray-400 hover:text-white"
+                  }`}
+                >
+                  Yearly
+                  <span className="ml-2 text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">
+                    Save {YEARLY_SAVINGS_PERCENTAGE}%
+                  </span>
+                </button>
+              </motion.div>
+            </motion.div>
 
-                <Card
-                  className={`
+            {/* Current Subscription Alert */}
+            {hasActiveSubscription && subscriptionStatus && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+              >
+                <Alert className="mb-8 max-w-3xl mx-auto bg-black/40 backdrop-blur-md border-white/10 text-white">
+                  <AlertDescription className="flex items-center justify-between">
+                    <span>
+                      Your current plan:{" "}
+                      <strong className="capitalize text-cyan-400">
+                        {subscriptionStatus.plan}
+                      </strong>
+                      {subscriptionStatus.status === "active" && " (Active)"}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleManageBilling}
+                      className="bg-gradient-to-r from-indigo-500 to-cyan-500 text-white border-0 hover:from-indigo-600 hover:to-cyan-600"
+                    >
+                      Manage Billing
+                    </Button>
+                  </AlertDescription>
+                </Alert>
+              </motion.div>
+            )}
+
+            {/* Pricing Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+              {pricingPlans.map((planData, index) => {
+                const isCurrentPlanActive = isCurrentPlan(planData.plan);
+
+                return (
+                  <motion.div
+                    key={planData.plan}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    whileHover={{ scale: 1.05, y: -10 }}
+                    className="relative"
+                  >
+                    {planData.popular && (
+                      <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                        <span className="bg-gradient-to-r from-indigo-500 to-cyan-500 text-white px-4 py-1 rounded-full text-sm font-semibold shadow-lg">
+                          Most Popular
+                        </span>
+                      </div>
+                    )}
+
+                    <Card
+                      className={`
                     h-full bg-black/40 backdrop-blur-md border-white/10 
                     hover:border-white/30 transition-all duration-300
                     ${planData.popular ? "border-2 border-indigo-500/50 shadow-xl shadow-indigo-500/20" : ""}
                     ${isCurrentPlanActive ? "ring-2 ring-cyan-400/50" : ""}
                     overflow-hidden group
                   `}
-                >
-                  {/* Image */}
-                  <div className="h-40 overflow-hidden bg-gradient-to-br from-indigo-900/20 to-cyan-900/20 relative">
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
-                    <img
-                      src={planData.image}
-                      alt={planData.name}
-                      className="w-full h-full object-contain p-8 opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300"
-                    />
-                  </div>
+                    >
+                      {/* Image */}
+                      <div className="h-40 overflow-hidden bg-gradient-to-br from-indigo-900/20 to-cyan-900/20 relative">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
+                        <img
+                          src={planData.image}
+                          alt={planData.name}
+                          className="w-full h-full object-contain p-8 opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300"
+                        />
+                      </div>
 
-                  <CardHeader>
-                    <CardTitle className="text-white text-2xl">
-                      {planData.name}
-                    </CardTitle>
-                    <CardDescription className="text-gray-400">
-                      {planData.description}
-                    </CardDescription>
-                    <div className="mt-4">
-                      <span className="text-5xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 text-transparent bg-clip-text">
-                        £{planData.price}
-                      </span>
-                      <span className="text-gray-400 text-lg">
-                        {planData.period}
-                      </span>
-                    </div>
-                    {planData.monthlySavings && billingPeriod === "yearly" && (
-                      <p className="text-sm text-gray-400 mt-2">
-                        <span className="text-green-400 font-semibold">
-                          Save {YEARLY_SAVINGS_PERCENTAGE}% with yearly billing
-                        </span>
-                      </p>
-                    )}
-                  </CardHeader>
-
-                  <CardContent>
-                    <ul className="space-y-3">
-                      {planData.features.map((feature, i) => (
-                        <li key={i} className="flex items-start gap-3">
-                          <Check className="h-5 w-5 text-cyan-400 shrink-0 mt-0.5" />
-                          <span className="text-sm text-gray-300">
-                            {feature}
+                      <CardHeader>
+                        <CardTitle className="text-white text-2xl">
+                          {planData.name}
+                        </CardTitle>
+                        <CardDescription className="text-gray-400">
+                          {planData.description}
+                        </CardDescription>
+                        <div className="mt-4">
+                          <span className="text-5xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 text-transparent bg-clip-text">
+                            £{planData.price}
                           </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
+                          <span className="text-gray-400 text-lg">
+                            {planData.period}
+                          </span>
+                        </div>
+                        {planData.monthlySavings &&
+                          billingPeriod === "yearly" && (
+                            <p className="text-sm text-gray-400 mt-2">
+                              <span className="text-green-400 font-semibold">
+                                Save {YEARLY_SAVINGS_PERCENTAGE}% with yearly
+                                billing
+                              </span>
+                            </p>
+                          )}
+                      </CardHeader>
 
-                  <CardFooter className="flex-col gap-2">
-                    {isCurrentPlanActive ? (
-                      <>
-                        <Button
-                          className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 text-white border-0"
-                          disabled
-                        >
-                          Current Plan
-                        </Button>
-                        {planData.plan === "pro" && (
+                      <CardContent>
+                        <ul className="space-y-3">
+                          {planData.features.map((feature, i) => (
+                            <li key={i} className="flex items-start gap-3">
+                              <Check className="h-5 w-5 text-cyan-400 shrink-0 mt-0.5" />
+                              <span className="text-sm text-gray-300">
+                                {feature}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </CardContent>
+
+                      <CardFooter className="flex-col gap-2">
+                        {isCurrentPlanActive ? (
+                          <>
+                            <Button
+                              className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 text-white border-0"
+                              disabled
+                            >
+                              Current Plan
+                            </Button>
+                            {planData.plan === "pro" && (
+                              <Button
+                                className="w-full bg-black/60 backdrop-blur-sm border border-white/20 text-white hover:bg-white/10"
+                                onClick={handleManageBilling}
+                              >
+                                Manage Subscription
+                              </Button>
+                            )}
+                          </>
+                        ) : planData.plan === "trial" ? (
                           <Button
                             className="w-full bg-black/60 backdrop-blur-sm border border-white/20 text-white hover:bg-white/10"
-                            onClick={handleManageBilling}
+                            onClick={() => setLocation("/dashboard")}
                           >
-                            Manage Subscription
+                            Get Started
+                          </Button>
+                        ) : planData.plan === "pro" ? (
+                          <Button
+                            className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 text-white border-0 hover:from-indigo-600 hover:to-cyan-600 shadow-lg hover:shadow-indigo-500/50 transition-all duration-300"
+                            onClick={() => handleSubscribe(billingPeriod)}
+                            disabled={loadingPlan === billingPeriod}
+                          >
+                            {loadingPlan === billingPeriod ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Processing...
+                              </>
+                            ) : (
+                              <>
+                                Subscribe{" "}
+                                {billingPeriod === "monthly"
+                                  ? "Monthly"
+                                  : "Yearly"}
+                              </>
+                            )}
+                          </Button>
+                        ) : (
+                          <Button className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 text-white border-0 hover:from-indigo-600 hover:to-cyan-600">
+                            Contact Sales
                           </Button>
                         )}
-                      </>
-                    ) : planData.plan === "trial" ? (
-                      <Button
-                        className="w-full bg-black/60 backdrop-blur-sm border border-white/20 text-white hover:bg-white/10"
-                        onClick={() => setLocation("/dashboard")}
-                      >
-                        Get Started
-                      </Button>
-                    ) : planData.plan === "pro" ? (
-                      <Button
-                        className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 text-white border-0 hover:from-indigo-600 hover:to-cyan-600 shadow-lg hover:shadow-indigo-500/50 transition-all duration-300"
-                        onClick={() => handleSubscribe(billingPeriod)}
-                        disabled={loadingPlan === billingPeriod}
-                      >
-                        {loadingPlan === billingPeriod ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Processing...
-                          </>
-                        ) : (
-                          <>
-                            Subscribe{" "}
-                            {billingPeriod === "monthly" ? "Monthly" : "Yearly"}
-                          </>
-                        )}
-                      </Button>
-                    ) : (
-                      <Button className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 text-white border-0 hover:from-indigo-600 hover:to-cyan-600">
-                        Contact Sales
-                      </Button>
-                    )}
-                  </CardFooter>
-                </Card>
-              </motion.div>
-            );
-          })}
-        </div>
+                      </CardFooter>
+                    </Card>
+                  </motion.div>
+                );
+              })}
+            </div>
 
-        {/* FAQ Section */}
-        <motion.div
-          className="mt-24 text-center"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-        >
-          <h2 className="text-3xl font-bold mb-8 text-white">
-            Frequently Asked{" "}
-            <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 text-transparent bg-clip-text">
-              Questions
-            </span>
-          </h2>
-          <div className="max-w-3xl mx-auto text-left grid md:grid-cols-2 gap-6">
-            {[
-              {
-                question: "Can I cancel anytime?",
-                answer:
-                  "Yes! You can cancel your subscription at any time. Your access continues until the end of your billing period.",
-              },
-              {
-                question: "What happens after the free trial?",
-                answer:
-                  "Your account becomes read-only. You can upgrade to a paid plan anytime to regain full access.",
-              },
-              {
-                question: "Can I switch plans?",
-                answer:
-                  "Yes! You can upgrade or downgrade your plan at any time. Changes are prorated automatically.",
-              },
-              {
-                question: "What payment methods do you accept?",
-                answer:
-                  "We accept all major credit cards via Stripe. Your payment information is securely processed and never stored on our servers.",
-              },
-            ].map((faq, index) => (
-              <motion.div
-                key={index}
-                className="bg-black/40 backdrop-blur-md border border-white/10 rounded-lg p-6 hover:border-white/30 transition-all duration-300"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}
-                whileHover={{ scale: 1.02 }}
-              >
-                <h3 className="font-semibold mb-2 text-white">
-                  {faq.question}
-                </h3>
-                <p className="text-gray-400 text-sm">{faq.answer}</p>
-              </motion.div>
-            ))}
+            {/* FAQ Section */}
+            <motion.div
+              className="mt-24 text-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
+              <h2 className="text-3xl font-bold mb-8 text-white">
+                Frequently Asked{" "}
+                <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 text-transparent bg-clip-text">
+                  Questions
+                </span>
+              </h2>
+              <div className="max-w-3xl mx-auto text-left grid md:grid-cols-2 gap-6">
+                {[
+                  {
+                    question: "Can I cancel anytime?",
+                    answer:
+                      "Yes! You can cancel your subscription at any time. Your access continues until the end of your billing period.",
+                  },
+                  {
+                    question: "What happens after the free trial?",
+                    answer:
+                      "Your account becomes read-only. You can upgrade to a paid plan anytime to regain full access.",
+                  },
+                  {
+                    question: "Can I switch plans?",
+                    answer:
+                      "Yes! You can upgrade or downgrade your plan at any time. Changes are prorated automatically.",
+                  },
+                  {
+                    question: "What payment methods do you accept?",
+                    answer:
+                      "We accept all major credit cards via Stripe. Your payment information is securely processed and never stored on our servers.",
+                  },
+                ].map((faq, index) => (
+                  <motion.div
+                    key={index}
+                    className="bg-black/40 backdrop-blur-md border border-white/10 rounded-lg p-6 hover:border-white/30 transition-all duration-300"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}
+                    whileHover={{ scale: 1.02 }}
+                  >
+                    <h3 className="font-semibold mb-2 text-white">
+                      {faq.question}
+                    </h3>
+                    <p className="text-gray-400 text-sm">{faq.answer}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
           </div>
-        </motion.div>
-      </div>
-    </div>
+        </div>
       </PageTransition>
       <Footer />
     </>

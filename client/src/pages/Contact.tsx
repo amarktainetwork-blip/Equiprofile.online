@@ -271,7 +271,9 @@ export default function Contact() {
                       <MessageCircle className="w-6 h-6 text-green-400" />
                     </div>
                     <div>
-                      <h3 className="font-semibold mb-1 text-white">WhatsApp</h3>
+                      <h3 className="font-semibold mb-1 text-white">
+                        WhatsApp
+                      </h3>
                       <p className="text-sm text-gray-400 mb-2">
                         Chat with us anytime
                       </p>
