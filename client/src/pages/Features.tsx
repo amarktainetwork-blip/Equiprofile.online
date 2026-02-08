@@ -1,261 +1,176 @@
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { MarketingNav } from "@/components/MarketingNav";
 import { PageTransition } from "@/components/PageTransition";
-import { ScrollReveal, Stagger, StaggerItem } from "@/components/ScrollReveal";
-import {
-  Heart,
-  Activity,
-  Utensils,
-  Calendar,
-  FileText,
-  Cloud,
-  BarChart3,
-  Users,
-  Shield,
-  Smartphone,
-  Bell,
-  Download,
-} from "lucide-react";
+import { marketingAssets } from "@/config/marketingAssets";
+import { motion } from "framer-motion";
 import { Link } from "wouter";
 
 const features = [
   {
-    icon: Heart,
-    title: "Health Records",
+    icon: marketingAssets.features.iconSpeed,
+    title: "Lightning Fast Performance",
     description:
-      "Comprehensive health tracking with vaccination schedules, vet visits, medications, and medical history. Upload documents and set automatic reminders for important health checkups.",
-    points: [
-      "Vaccination tracking with auto-reminders",
-      "Medical document storage",
-      "Vet visit history and notes",
-      "Medication schedules",
-    ],
+      "Experience blazing-fast load times and instant synchronization across all your devices. Built for speed and reliability.",
   },
   {
-    icon: Activity,
-    title: "Training Management",
+    icon: marketingAssets.features.iconAnalytics,
+    title: "Advanced Analytics & Insights",
     description:
-      "Plan, log, and track training sessions with detailed notes, performance ratings, and progress analytics. Monitor improvement over time with visual charts and insights.",
-    points: [
-      "Session planning and logging",
-      "Performance tracking",
-      "Progress analytics",
-      "Trainer collaboration",
-    ],
+      "Get deep insights into your horse's health, training progress, and performance with powerful analytics tools.",
   },
   {
-    icon: Utensils,
-    title: "Feeding Schedules",
+    icon: marketingAssets.features.iconAutomation,
+    title: "Smart Automation & Reminders",
     description:
-      "Create detailed feeding plans with meal timing, quantities, supplements, and special instructions. Track costs and monitor dietary changes with ease.",
-    points: [
-      "Custom feeding plans",
-      "Supplement tracking",
-      "Cost management",
-      "Dietary notes and allergies",
-    ],
+      "Never miss important tasks with intelligent automation. Set up custom reminders for vet visits, training, and more.",
   },
   {
-    icon: Calendar,
-    title: "Calendar & Reminders",
+    icon: marketingAssets.features.iconSecurity,
+    title: "Bank-Level Security",
     description:
-      "Never miss an appointment with integrated calendar for all horse-related events. Set reminders for farrier visits, competitions, vet appointments, and training sessions.",
-    points: [
-      "Unified event calendar",
-      "Customizable reminders",
-      "Recurring appointments",
-      "Mobile notifications",
-    ],
+      "Your data is protected with enterprise-grade encryption and security protocols. Your information stays safe and private.",
   },
   {
-    icon: FileText,
-    title: "Document Storage",
+    icon: marketingAssets.features.iconIntegrations,
+    title: "Seamless Integrations",
     description:
-      "Securely store all horse-related documents in one place. Registration papers, insurance documents, competition records, and more with organized categorization and search.",
-    points: [
-      "Cloud storage for documents",
-      "Category organization",
-      "Full-text search",
-      "Secure access controls",
-    ],
+      "Connect with your favorite tools and services. Export data, sync calendars, and integrate with third-party apps effortlessly.",
   },
   {
-    icon: BarChart3,
-    title: "Reports & Analytics",
+    icon: marketingAssets.features.iconSupport,
+    title: "24/7 Premium Support",
     description:
-      "Generate detailed reports on health trends, training progress, expenses, and more. Export data for sharing with trainers, vets, or for personal records.",
-    points: [
-      "Health trend analysis",
-      "Expense reports",
-      "Training progress charts",
-      "Export to PDF/Excel",
-    ],
-  },
-  {
-    icon: Cloud,
-    title: "AI Weather Analysis",
-    description:
-      "Get intelligent riding condition recommendations based on real-time weather data. Safety alerts for extreme conditions and optimal training times.",
-    points: [
-      "Real-time weather data",
-      "AI-powered recommendations",
-      "Safety alerts",
-      "Historical weather tracking",
-    ],
-  },
-  {
-    icon: Users,
-    title: "Team Collaboration",
-    description:
-      "Invite trainers, stable staff, and vets to collaborate. Role-based permissions ensure everyone has the right level of access to horse information.",
-    points: [
-      "Multi-user accounts",
-      "Role-based access",
-      "Team messaging",
-      "Activity logs",
-    ],
-  },
-  {
-    icon: Shield,
-    title: "Data Security",
-    description:
-      "Your data is protected with enterprise-grade encryption and security. Regular backups ensure your horse information is never lost.",
-    points: [
-      "End-to-end encryption",
-      "Automatic backups",
-      "GDPR compliant",
-      "Secure cloud storage",
-    ],
-  },
-  {
-    icon: Smartphone,
-    title: "Mobile-Friendly",
-    description:
-      "Access your horse information anywhere, anytime. Responsive design works perfectly on desktop, tablet, and mobile devices.",
-    points: [
-      "Responsive design",
-      "Progressive Web App",
-      "Offline access",
-      "Touch-optimized interface",
-    ],
-  },
-  {
-    icon: Bell,
-    title: "Smart Notifications",
-    description:
-      "Stay informed with intelligent notifications for upcoming events, health reminders, and important updates. Customize notification preferences to your needs.",
-    points: [
-      "Customizable alerts",
-      "Email & push notifications",
-      "Important event reminders",
-      "Digest summaries",
-    ],
-  },
-  {
-    icon: Download,
-    title: "Data Export",
-    description:
-      "Own your data. Export all horse information, records, and documents at any time. Generate reports in multiple formats for sharing or archiving.",
-    points: [
-      "Full data export",
-      "Multiple file formats",
-      "Shareable profiles",
-      "Backup downloads",
-    ],
+      "Get help whenever you need it with our dedicated support team. Available around the clock to assist you.",
   },
 ];
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+    },
+  },
+};
 
 export default function Features() {
   return (
     <>
       <MarketingNav />
       <PageTransition>
-        <div className="min-h-screen pt-24 pb-16">
+        <div className="min-h-screen bg-black text-white">
           {/* Hero Section */}
-          <section className="container mx-auto px-4 mb-20">
-            <ScrollReveal>
-              <div className="text-center max-w-3xl mx-auto">
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-serif mb-6">
-                  Everything You Need for{" "}
-                  <span className="text-gradient">Horse Management</span>
-                </h1>
-                <p className="text-lg md:text-xl text-muted-foreground mb-8">
-                  EquiProfile combines powerful features with an intuitive
-                  interface to provide the ultimate equine management platform.
-                </p>
-                <div className="flex items-center justify-center gap-4">
-                  <Link href="/register">
-                    <Button size="lg" className="text-lg">
-                      Get Started Free
-                    </Button>
-                  </Link>
-                  <Link href="/pricing">
-                    <Button size="lg" variant="outline" className="text-lg">
-                      View Pricing
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </ScrollReveal>
+          <section className="container mx-auto px-4 pt-32 pb-16 min-[320px]:px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center max-w-4xl mx-auto"
+            >
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-indigo-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">
+                Powerful Features for Modern Horse Management
+              </h1>
+              <p className="text-lg md:text-xl text-gray-300 mb-10">
+                Everything you need to manage your horses efficiently, all in one place
+              </p>
+            </motion.div>
           </section>
 
           {/* Features Grid */}
-          <section className="container mx-auto px-4">
-            <Stagger className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <section className="container mx-auto px-4 pb-20 min-[320px]:px-4">
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              className="grid grid-cols-1 min-[640px]:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
+            >
               {features.map((feature, index) => (
-                <StaggerItem key={index}>
-                  <Card className="p-6 h-full hover:shadow-lg transition-all duration-300 card-hover">
-                    <div className="flex items-start gap-4 mb-4">
-                      <div className="p-3 rounded-lg bg-primary/10 text-primary">
-                        <feature.icon className="w-6 h-6" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-xl font-semibold mb-2">
-                          {feature.title}
-                        </h3>
-                      </div>
+                <motion.div
+                  key={index}
+                  variants={itemVariants}
+                  whileHover={{ scale: 1.05 }}
+                  className="group relative"
+                >
+                  {/* Glow Effect */}
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500 rounded-2xl opacity-0 group-hover:opacity-75 blur transition duration-500"></div>
+                  
+                  {/* Glass Card */}
+                  <div className="relative h-full p-8 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/10 group-hover:border-white/20 transition-all duration-300">
+                    {/* Icon */}
+                    <div className="mb-6 relative w-16 h-16 flex items-center justify-center">
+                      <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-xl blur-lg"></div>
+                      <img 
+                        src={feature.icon} 
+                        alt={feature.title}
+                        className="relative w-12 h-12 object-contain filter brightness-110"
+                      />
                     </div>
-                    <p className="text-muted-foreground mb-4">
+
+                    {/* Content */}
+                    <h3 className="text-xl font-bold mb-3 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                      {feature.title}
+                    </h3>
+                    <p className="text-gray-400 leading-relaxed">
                       {feature.description}
                     </p>
-                    <ul className="space-y-2">
-                      {feature.points.map((point, idx) => (
-                        <li
-                          key={idx}
-                          className="flex items-center gap-2 text-sm"
-                        >
-                          <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                          <span>{point}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </Card>
-                </StaggerItem>
+
+                    {/* Accent Line */}
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-b-2xl"></div>
+                  </div>
+                </motion.div>
               ))}
-            </Stagger>
+            </motion.div>
           </section>
 
           {/* CTA Section */}
-          <section className="container mx-auto px-4 mt-20">
-            <ScrollReveal>
-              <Card className="p-8 md:p-12 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-2">
-                <div className="text-center max-w-2xl mx-auto">
-                  <h2 className="text-3xl md:text-4xl font-bold font-serif mb-4">
-                    Ready to Transform Your Horse Management?
+          <section className="container mx-auto px-4 pb-20 min-[320px]:px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="relative max-w-4xl mx-auto"
+            >
+              {/* Glow Effect */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 rounded-3xl opacity-50 blur-2xl"></div>
+              
+              {/* Glass Card */}
+              <div className="relative p-12 rounded-3xl bg-black/60 backdrop-blur-xl border border-white/20">
+                <div className="text-center">
+                  <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                    Ready to Get Started?
                   </h2>
-                  <p className="text-lg text-muted-foreground mb-8">
-                    Join thousands of horse owners who trust EquiProfile for
-                    their equine management needs.
+                  <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
+                    Join thousands of horse owners who trust EquiProfile for their equine management needs.
                   </p>
-                  <Link href="/register">
-                    <Button size="lg" className="text-lg">
-                      Start Your Free Trial
-                    </Button>
-                  </Link>
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <Link href="/register">
+                      <Button size="lg" className="text-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 border-0">
+                        Get Started Free
+                      </Button>
+                    </Link>
+                    <Link href="/pricing">
+                      <Button size="lg" variant="outline" className="text-lg bg-white/5 border-white/20 hover:bg-white/10 text-white">
+                        View Pricing
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
-              </Card>
-            </ScrollReveal>
+              </div>
+            </motion.div>
           </section>
         </div>
       </PageTransition>
