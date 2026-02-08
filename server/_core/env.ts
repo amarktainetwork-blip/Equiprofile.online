@@ -88,37 +88,59 @@ function validateEnvironment() {
     process.exit(1);
   }
 
-  // Validate no hardcoded fallbacks in production
+  // Validate admin password is not weak or default in production
+  const hasWeakAdminPassword = (password: string) => {
+    // Check for common weak patterns without hardcoding actual defaults
+    const weakPatterns = [
+      /^admin/i,
+      /^password/i,
+      /^12345/,
+      /^ashmor/i,
+      /^equiprofile/i,
+    ];
+    return (
+      password.length < 8 ||
+      weakPatterns.some((pattern) => pattern.test(password))
+    );
+  };
+
   if (
     isProduction &&
-    (process.env.ADMIN_UNLOCK_PASSWORD === "ashmor12@" ||
-      process.env.ADMIN_UNLOCK_PASSWORD === "EquiProfile2026!Admin")
+    process.env.ADMIN_UNLOCK_PASSWORD &&
+    hasWeakAdminPassword(process.env.ADMIN_UNLOCK_PASSWORD)
   ) {
     console.error(
-      "❌ PRODUCTION ERROR: ADMIN_UNLOCK_PASSWORD is still set to default value!",
+      "❌ PRODUCTION ERROR: ADMIN_UNLOCK_PASSWORD is weak or set to a default value!",
     );
     console.error(
-      "You MUST change this to a secure password before running in production.",
+      "You MUST set a strong, secure password before running in production.",
     );
-    console.error("Generate a secure password and update your .env file.\n");
+    console.error(
+      "Use a password with at least 8 characters, including letters, numbers, and symbols.\n",
+    );
     process.exit(1);
   }
 
   // Validate JWT_SECRET is not set to default values in production
-  // NOTE: These are known default values from .env.default and common examples
-  // If you're seeing this in code review, these are intentionally hardcoded as a security check
-  const DEFAULT_JWT_SECRETS = [
-    "FHnuavgCmZtlXQ2AAxgq+bmpt6D4Iqfl", // From .env.default
-    "your_secure_jwt_secret_here", // Common placeholder
-    "your_super_secret_jwt_key_change_this_in_production", // From old docs
-  ];
+  // Check for common patterns in JWT secrets that indicate they haven't been changed
+  const hasDefaultPattern = (secret: string) => {
+    const patterns = [
+      /your.*secret/i,
+      /change.*this/i,
+      /placeholder/i,
+      /example/i,
+      /default/i,
+    ];
+    return patterns.some((pattern) => pattern.test(secret));
+  };
 
   if (
     isProduction &&
-    DEFAULT_JWT_SECRETS.includes(process.env.JWT_SECRET || "")
+    process.env.JWT_SECRET &&
+    hasDefaultPattern(process.env.JWT_SECRET)
   ) {
     console.error(
-      "❌ PRODUCTION ERROR: JWT_SECRET is still set to a default value!",
+      "❌ PRODUCTION ERROR: JWT_SECRET appears to be a default/placeholder value!",
     );
     console.error("Generate a secure secret with: openssl rand -base64 32");
     console.error("Update your .env file before running in production.\n");
@@ -184,8 +206,8 @@ export const ENV = {
   forgeApiUrl: process.env.BUILT_IN_FORGE_API_URL ?? "",
   forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
 
-  // Admin unlock
-  adminUnlockPassword: process.env.ADMIN_UNLOCK_PASSWORD ?? "ashmor12@",
+  // Admin unlock (no default - must be set via env var)
+  adminUnlockPassword: process.env.ADMIN_UNLOCK_PASSWORD ?? "",
 
   // Security
   baseUrl: process.env.BASE_URL ?? "http://localhost:3000",
