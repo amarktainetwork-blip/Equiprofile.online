@@ -16,6 +16,9 @@ import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { marketingAssets } from "@/config/marketingAssets";
+import { MarketingNav } from "@/components/MarketingNav";
+import { Footer } from "@/components/Footer";
+import { PageTransition } from "@/components/PageTransition";
 
 const YEARLY_SAVINGS_PERCENTAGE = 17;
 const BASIC_MONTHLY_PRICE = "10.00";
@@ -200,8 +203,11 @@ export default function Pricing() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black">
-      <div className="container mx-auto px-4 py-16">
+    <>
+      <MarketingNav />
+      <PageTransition>
+        <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black pt-16">
+          <div className="container mx-auto px-4 py-16">
         {/* Header */}
         <motion.div
           className="text-center mb-16"
@@ -469,5 +475,8 @@ export default function Pricing() {
         </motion.div>
       </div>
     </div>
+      </PageTransition>
+      <Footer />
+    </>
   );
 }
