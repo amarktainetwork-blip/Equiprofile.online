@@ -2,55 +2,17 @@ import { Button } from "@/components/ui/button";
 import { MarketingNav } from "@/components/MarketingNav";
 import { Footer } from "@/components/Footer";
 import { PageTransition } from "@/components/PageTransition";
-import { marketingAssets } from "@/config/marketingAssets";
+import { featuresRegistry } from "@/config/featuresRegistry";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
-
-const features = [
-  {
-    icon: marketingAssets.features.iconSpeed,
-    title: "Lightning Fast Performance",
-    description:
-      "Experience blazing-fast load times and instant synchronization across all your devices. Built for speed and reliability.",
-  },
-  {
-    icon: marketingAssets.features.iconAnalytics,
-    title: "Advanced Analytics & Insights",
-    description:
-      "Get deep insights into your horse's health, training progress, and performance with powerful analytics tools.",
-  },
-  {
-    icon: marketingAssets.features.iconAutomation,
-    title: "Smart Automation & Reminders",
-    description:
-      "Never miss important tasks with intelligent automation. Set up custom reminders for vet visits, training, and more.",
-  },
-  {
-    icon: marketingAssets.features.iconSecurity,
-    title: "Bank-Level Security",
-    description:
-      "Your data is protected with enterprise-grade encryption and security protocols. Your information stays safe and private.",
-  },
-  {
-    icon: marketingAssets.features.iconIntegrations,
-    title: "Seamless Integrations",
-    description:
-      "Connect with your favorite tools and services. Export data, sync calendars, and integrate with third-party apps effortlessly.",
-  },
-  {
-    icon: marketingAssets.features.iconSupport,
-    title: "24/7 Premium Support",
-    description:
-      "Get help whenever you need it with our dedicated support team. Available around the clock to assist you.",
-  },
-];
+import * as Icons from "lucide-react";
 
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1,
+      staggerChildren: 0.05,
     },
   },
 };
@@ -64,6 +26,24 @@ const itemVariants = {
       duration: 0.5,
     },
   },
+};
+
+const categoryVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+    },
+  },
+};
+
+// Helper function to get icon component
+const getIcon = (iconName?: string) => {
+  if (!iconName) return Icons.Sparkles;
+  const IconComponent = (Icons as any)[iconName];
+  return IconComponent || Icons.Sparkles;
 };
 
 export default function Features() {
@@ -87,54 +67,84 @@ export default function Features() {
                 Everything you need to manage your horses efficiently, all in
                 one place
               </p>
+              <div className="flex items-center justify-center gap-4 text-sm text-gray-400">
+                <span className="flex items-center gap-2">
+                  <Icons.CheckCircle2 className="w-5 h-5 text-green-400" />
+                  {featuresRegistry.length} Feature Categories
+                </span>
+                <span className="flex items-center gap-2">
+                  <Icons.Sparkles className="w-5 h-5 text-purple-400" />
+                  {featuresRegistry.reduce((acc, cat) => acc + cat.features.length, 0)}+ Features
+                </span>
+              </div>
             </motion.div>
           </section>
 
-          {/* Features Grid */}
-          <section className="container mx-auto px-4 pb-20 min-[320px]:px-4">
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              className="grid grid-cols-1 min-[640px]:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
-            >
-              {features.map((feature, index) => (
+          {/* Features by Category */}
+          <section className="container mx-auto px-4 pb-20 min-[320px]:px-4 space-y-24">
+            {featuresRegistry.map((category, categoryIndex) => (
+              <motion.div
+                key={categoryIndex}
+                variants={categoryVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-100px" }}
+              >
+                {/* Category Header */}
+                <div className="text-center mb-12">
+                  <h2 className="text-3xl md:text-4xl font-bold mb-3 bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                    {category.category}
+                  </h2>
+                  <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+                    {category.description}
+                  </p>
+                </div>
+
+                {/* Features Grid */}
                 <motion.div
-                  key={index}
-                  variants={itemVariants}
-                  whileHover={{ scale: 1.05 }}
-                  className="group relative"
+                  variants={containerVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: "-50px" }}
+                  className="grid grid-cols-1 min-[640px]:grid-cols-2 lg:grid-cols-3 gap-6"
                 >
-                  {/* Glow Effect */}
-                  <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500 rounded-2xl opacity-0 group-hover:opacity-75 blur transition duration-500"></div>
+                  {category.features.map((feature, featureIndex) => {
+                    const Icon = getIcon(feature.icon);
+                    return (
+                      <motion.div
+                        key={featureIndex}
+                        variants={itemVariants}
+                        whileHover={{ scale: 1.03, y: -5 }}
+                        className="group relative"
+                      >
+                        {/* Glow Effect */}
+                        <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500 rounded-xl opacity-0 group-hover:opacity-75 blur transition duration-500"></div>
 
-                  {/* Glass Card */}
-                  <div className="relative h-full p-8 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/10 group-hover:border-white/20 transition-all duration-300">
-                    {/* Icon */}
-                    <div className="mb-6 relative w-16 h-16 flex items-center justify-center">
-                      <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-xl blur-lg"></div>
-                      <img
-                        src={feature.icon}
-                        alt={feature.title}
-                        className="relative w-12 h-12 object-contain filter brightness-110"
-                      />
-                    </div>
+                        {/* Glass Card */}
+                        <div className="relative h-full p-6 rounded-xl bg-black/40 backdrop-blur-xl border border-white/10 group-hover:border-white/20 transition-all duration-300">
+                          {/* Icon */}
+                          <div className="mb-4 relative w-12 h-12 flex items-center justify-center">
+                            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-lg blur-lg group-hover:blur-xl transition-all"></div>
+                            <Icon className="relative w-6 h-6 text-indigo-400 group-hover:text-purple-400 transition-colors" />
+                          </div>
 
-                    {/* Content */}
-                    <h3 className="text-xl font-bold mb-3 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                      {feature.title}
-                    </h3>
-                    <p className="text-gray-400 leading-relaxed">
-                      {feature.description}
-                    </p>
+                          {/* Content */}
+                          <h3 className="text-lg font-bold mb-2 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                            {feature.title}
+                          </h3>
+                          <p className="text-sm text-gray-400 leading-relaxed">
+                            {feature.description}
+                          </p>
 
-                    {/* Accent Line */}
-                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-b-2xl"></div>
-                  </div>
+                          {/* Accent Line */}
+                          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-b-xl"></div>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
                 </motion.div>
-              ))}
-            </motion.div>
+              </motion.div>
+            ))}
           </section>
 
           {/* CTA Section */}
