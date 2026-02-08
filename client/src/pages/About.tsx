@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { MarketingNav } from "@/components/MarketingNav";
+import { Footer } from "@/components/Footer";
 import { PageTransition } from "@/components/PageTransition";
 import { marketingAssets } from "@/config/marketingAssets";
 import { Heart, Target, Users, Sparkles } from "lucide-react";
@@ -283,6 +284,7 @@ export default function About() {
           </div>
         </div>
       </PageTransition>
+      <Footer />
     </>
   );
 }

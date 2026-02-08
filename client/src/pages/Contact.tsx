@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MarketingNav } from "@/components/MarketingNav";
+import { Footer } from "@/components/Footer";
 import { PageTransition } from "@/components/PageTransition";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { marketingAssets } from "@/config/marketingAssets";
@@ -334,6 +335,7 @@ export default function Contact() {
           </div>
         </div>
       </PageTransition>
+      <Footer />
     </>
   );
 }

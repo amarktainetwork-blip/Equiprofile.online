@@ -16,6 +16,7 @@ import { Loader2, ArrowLeft, AlertCircle } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { PageTransition } from "@/components/PageTransition";
 import { MarketingNav } from "@/components/MarketingNav";
+import { Footer } from "@/components/Footer";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { marketingAssets } from "@/config/marketingAssets";
 import { motion } from "framer-motion";
@@ -402,6 +403,7 @@ export default function Register() {
           </motion.div>
         </div>
       </PageTransition>
+      <Footer />
     </>
   );
 }

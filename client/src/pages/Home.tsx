@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MarketingNav } from "@/components/MarketingNav";
+import { Footer } from "@/components/Footer";
 import { PageTransition } from "@/components/PageTransition";
 import { ScrollReveal, Stagger, StaggerItem } from "@/components/ScrollReveal";
 import { Link } from "wouter";
@@ -546,6 +547,7 @@ export default function Home() {
           </section>
         </div>
       </PageTransition>
+      <Footer />
     </>
   );
 }

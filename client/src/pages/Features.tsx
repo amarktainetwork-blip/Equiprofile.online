@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { MarketingNav } from "@/components/MarketingNav";
+import { Footer } from "@/components/Footer";
 import { PageTransition } from "@/components/PageTransition";
 import { marketingAssets } from "@/config/marketingAssets";
 import { motion } from "framer-motion";
@@ -183,6 +184,7 @@ export default function Features() {
           </section>
         </div>
       </PageTransition>
+      <Footer />
     </>
   );
 }
