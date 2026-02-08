@@ -35,15 +35,6 @@ import { motion } from "framer-motion";
 
 const TESTIMONIAL_ROTATION_INTERVAL = 6000;
 
-function formatStatValue(value: number, suffix: string): string {
-  if (suffix === "★" || suffix === "%") {
-    return value.toFixed(1);
-  }
-  return Math.floor(value)
-    .toString()
-    .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
-
 export default function Home() {
   const { isAuthenticated } = useAuth();
   const [activeTestimonial, setActiveTestimonial] = useState(0);
@@ -120,11 +111,28 @@ export default function Home() {
     },
   ];
 
-  const stats = [
-    { value: 2500, label: "Active Users", suffix: "+" },
-    { value: 8000, label: "Horses", suffix: "+" },
-    { value: 99.9, label: "Uptime", suffix: "%" },
-    { value: 4.8, label: "Rating", suffix: "★" },
+  const featuresHighlight = [
+    {
+      icon: marketingAssets.features.iconAnalytics,
+      title: "Advanced Analytics",
+      description:
+        "Gain deep insights into your horse's performance, health trends, and training progress with powerful analytics and visual reports.",
+      gradient: "from-cyan-500 to-blue-500",
+    },
+    {
+      icon: marketingAssets.features.iconAutomation,
+      title: "AI Training Insights",
+      description:
+        "Smart AI-powered recommendations analyze training patterns to suggest optimal schedules and identify areas for improvement.",
+      gradient: "from-green-500 to-emerald-500",
+    },
+    {
+      icon: marketingAssets.features.iconSpeed,
+      title: "Smart Reminders",
+      description:
+        "Never miss important appointments, vaccinations, or farrier visits with intelligent automated reminders and notifications.",
+      gradient: "from-purple-500 to-violet-500",
+    },
   ];
 
   const faqs = [
@@ -159,55 +167,6 @@ export default function Home() {
         "Yes! All new users get access to our comprehensive video tutorials and help center. Professional and Enterprise plans include personalized onboarding sessions with our team.",
     },
   ];
-
-  const [animatedStats, setAnimatedStats] = useState(
-    stats.map(() => ({ current: 0, hasAnimated: false })),
-  );
-  const statsRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            stats.forEach((stat, index) => {
-              setAnimatedStats((prev) => {
-                if (prev[index].hasAnimated) return prev;
-
-                const duration = 2000;
-                const steps = 60;
-                const increment = stat.value / steps;
-                let current = 0;
-
-                const interval = setInterval(() => {
-                  current += increment;
-                  if (current >= stat.value) {
-                    current = stat.value;
-                    clearInterval(interval);
-                  }
-                  setAnimatedStats((prevStats) => {
-                    const newStats = [...prevStats];
-                    newStats[index] = { current, hasAnimated: true };
-                    return newStats;
-                  });
-                }, duration / steps);
-
-                return prev;
-              });
-            });
-            observer.disconnect();
-          }
-        });
-      },
-      { threshold: 0.3 },
-    );
-
-    if (statsRef.current) {
-      observer.observe(statsRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -286,20 +245,29 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Animated Stats Section */}
-          <section
-            ref={statsRef}
-            className="py-20 bg-gray-900 relative overflow-hidden"
-          >
+          {/* Features Highlight Section */}
+          <section className="py-20 bg-gray-900 relative overflow-hidden">
             <div className="container px-4">
               <motion.div
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
                 viewport={{ once: true }}
-                className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-6xl mx-auto"
+                className="text-center mb-12"
               >
-                {stats.map((stat, index) => (
+                <h2 className="font-serif text-4xl md:text-5xl font-bold mb-4 text-white">
+                  Powerful Features Built for{" "}
+                  <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+                    Modern Stables
+                  </span>
+                </h2>
+                <p className="text-xl text-white/70 max-w-2xl mx-auto">
+                  Discover the tools that make horse management effortless
+                </p>
+              </motion.div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-12">
+                {featuresHighlight.map((feature, index) => (
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, y: 20 }}
@@ -307,23 +275,38 @@ export default function Home() {
                     transition={{ duration: 0.5, delay: index * 0.1 }}
                     viewport={{ once: true }}
                   >
-                    <Card className="text-center p-8 bg-white/5 backdrop-blur-md border-white/10 hover:bg-white/10 hover:scale-105 transition-all duration-300">
-                      <CardContent className="p-0">
-                        <div className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent mb-2">
-                          {formatStatValue(
-                            animatedStats[index].current,
-                            stat.suffix,
-                          )}
-                          {stat.suffix}
+                    <Card className="h-full bg-white/5 backdrop-blur-md border-white/10 hover:bg-white/10 hover:scale-105 transition-all duration-300 group">
+                      <CardHeader>
+                        <div
+                          className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.gradient} p-4 mb-4 group-hover:scale-110 transition-transform duration-300 flex items-center justify-center`}
+                        >
+                          <img src={feature.icon} alt="" className="w-8 h-8" />
                         </div>
-                        <div className="text-sm md:text-base text-white/70 font-medium">
-                          {stat.label}
-                        </div>
+                        <CardTitle className="text-2xl mb-2 text-white">
+                          {feature.title}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <CardDescription className="text-base leading-relaxed text-white/70">
+                          {feature.description}
+                        </CardDescription>
                       </CardContent>
                     </Card>
                   </motion.div>
                 ))}
-              </motion.div>
+              </div>
+
+              <div className="text-center">
+                <Link href="/features">
+                  <Button
+                    size="lg"
+                    className="text-lg px-8 py-6 bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 text-white shadow-xl hover:scale-105 transition-transform group border-0"
+                  >
+                    View All Features
+                    <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+              </div>
             </div>
           </section>
 

@@ -1,40 +1,6 @@
 import { Link } from "wouter";
-import { useState, useEffect } from "react";
 
 export function Footer() {
-  const [buildInfo, setBuildInfo] = useState<{
-    sha?: string;
-    time?: string;
-    version?: string;
-  } | null>(null);
-
-  useEffect(() => {
-    // Try to fetch build info from /build.txt
-    fetch("/build.txt")
-      .then((res) => res.text())
-      .then((text) => {
-        const info: Record<string, string> = {};
-        text.split("\n").forEach((line) => {
-          const [key, value] = line.split("=");
-          if (key && value) {
-            info[key.trim()] = value.trim();
-          }
-        });
-        setBuildInfo({
-          sha: info.BUILD_SHA,
-          time: info.BUILD_TIME,
-          version: info.VERSION,
-        });
-      })
-      .catch(() => {
-        // Fallback to reading from meta tag
-        const metaTag = document.querySelector('meta[name="x-build-sha"]');
-        if (metaTag) {
-          setBuildInfo({ sha: metaTag.getAttribute("content") || undefined });
-        }
-      });
-  }, []);
-
   return (
     <footer className="py-12 lg:py-16 border-t bg-card">
       <div className="container">
@@ -120,14 +86,6 @@ export function Footer() {
           <p>
             © 2026 EquiProfile — Part of Amarktai Network. All rights reserved.
           </p>
-          {buildInfo && (
-            <p className="mt-2 text-xs opacity-70">
-              {buildInfo.version && `v${buildInfo.version}`}
-              {buildInfo.sha && ` • Build ${buildInfo.sha}`}
-              {buildInfo.time &&
-                ` • ${new Date(buildInfo.time).toLocaleDateString()}`}
-            </p>
-          )}
         </div>
       </div>
     </footer>
