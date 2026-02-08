@@ -18,6 +18,10 @@ import { motion } from "framer-motion";
 import { marketingAssets } from "@/config/marketingAssets";
 
 const YEARLY_SAVINGS_PERCENTAGE = 17;
+const DEFAULT_MONTHLY_PRICE = "7.99";
+const DEFAULT_YEARLY_PRICE = "79.90";
+const STABLE_MONTHLY_PRICE = "24.99";
+const STABLE_YEARLY_PRICE = "249.90";
 
 export default function Pricing() {
   const { user } = useAuth();
@@ -144,11 +148,11 @@ export default function Pricing() {
     if (billingPeriod === "monthly") {
       return pricing?.monthly?.amount 
         ? (pricing.monthly.amount / 100).toFixed(2) 
-        : "7.99";
+        : DEFAULT_MONTHLY_PRICE;
     }
     return pricing?.yearly?.amount 
       ? (pricing.yearly.amount / 100).toFixed(2) 
-      : "79.90";
+      : DEFAULT_YEARLY_PRICE;
   };
 
   const pricingPlans = [
@@ -168,7 +172,7 @@ export default function Pricing() {
       description: "For individual horse owners",
       price: getProPlanPrice(),
       period: billingPeriod === "monthly" ? "/month" : "/year",
-      yearlyPrice: pricing?.yearly?.amount ? (pricing.yearly.amount / 100).toFixed(2) : "79.90",
+      yearlyPrice: pricing?.yearly?.amount ? (pricing.yearly.amount / 100).toFixed(2) : DEFAULT_YEARLY_PRICE,
       monthlySavings: true,
       features: features.pro,
       image: marketingAssets.pricing.planPro,
@@ -178,9 +182,9 @@ export default function Pricing() {
       name: "Stable",
       plan: "stable",
       description: "For professional operations",
-      price: billingPeriod === "monthly" ? "24.99" : "249.90",
+      price: billingPeriod === "monthly" ? STABLE_MONTHLY_PRICE : STABLE_YEARLY_PRICE,
       period: billingPeriod === "monthly" ? "/month" : "/year",
-      yearlyPrice: "249.90",
+      yearlyPrice: STABLE_YEARLY_PRICE,
       monthlySavings: true,
       features: features.stable,
       image: marketingAssets.pricing.planEnterprise,
