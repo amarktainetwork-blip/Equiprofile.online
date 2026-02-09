@@ -15,7 +15,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
-    "db:push": "drizzle-kit generate && drizzle-kit migrate"
+    "db:push": "drizzle-kit generate && drizzle-kit migrate",
+    "seed:templates": "tsx server/seeds/trainingTemplates.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.984.0",
