@@ -42,14 +42,18 @@ export function MarketingNav() {
           : "bg-transparent"
       }`}
     >
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 h-[72px]">
         <div className="flex items-center justify-between h-full">
           {/* Logo */}
           <Link href="/">
             <a className="flex items-center gap-2 hover:opacity-80 transition-opacity">
               <div className="text-2xl font-bold font-serif">
                 <span
-                  className={`${isScrolled ? "text-gradient" : "text-white"}`}
+                  className={`${
+                    isScrolled
+                      ? "bg-gradient-to-r from-indigo-600 to-cyan-600 bg-clip-text text-transparent"
+                      : "text-white"
+                  }`}
                 >
                   EquiProfile
                 </span>
@@ -65,10 +69,10 @@ export function MarketingNav() {
                   className={`text-sm font-medium transition-colors ${
                     isScrolled
                       ? location === link.path
-                        ? "text-black hover:text-gray-700"
-                        : "text-gray-700 hover:text-black"
+                        ? "text-black font-semibold"
+                        : "text-gray-900 hover:text-black"
                       : location === link.path
-                        ? "text-white hover:text-white/90"
+                        ? "text-white font-semibold"
                         : "text-white/90 hover:text-white"
                   }`}
                 >

@@ -532,6 +532,105 @@ async function startServer() {
     }
   });
 
+  // SSE health endpoint (public, for monitoring)
+  app.get("/api/realtime/health", (req, res) => {
+    try {
+      const stats = realtimeManager.getStats();
+      res.json({
+        status: "healthy",
+        connectedClients: stats.connectedClients || 0,
+        activeChannels: stats.channels ? Object.keys(stats.channels).length : 0,
+        uptime: process.uptime(),
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error("[SSE] Health check error:", error);
+      res.status(500).json({
+        status: "unhealthy",
+        error: "Failed to get realtime stats",
+      });
+    }
+  });
+
+  // WhatsApp webhook verification (GET) - required by Meta
+  // This endpoint must be publicly accessible for Meta to verify the webhook
+  app.get("/api/webhooks/whatsapp", (req, res) => {
+    const mode = req.query["hub.mode"];
+    const token = req.query["hub.verify_token"];
+    const challenge = req.query["hub.challenge"];
+
+    // Check if this is a webhook verification request
+    if (
+      mode === "subscribe" &&
+      token === process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN
+    ) {
+      console.log("[WhatsApp] Webhook verified successfully");
+      res.status(200).send(challenge);
+    } else {
+      console.warn("[WhatsApp] Webhook verification failed - incorrect token");
+      res.sendStatus(403);
+    }
+  });
+
+  // WhatsApp webhook events (POST) - receives message status updates
+  // This endpoint receives delivery status, read receipts, and user replies
+  app.post("/api/webhooks/whatsapp", express.json(), async (req, res) => {
+    try {
+      const { entry } = req.body;
+
+      if (!entry || !Array.isArray(entry)) {
+        console.warn("[WhatsApp] Invalid webhook payload");
+        return res.sendStatus(400);
+      }
+
+      // Process each entry (usually just one)
+      for (const item of entry) {
+        const changes = item.changes || [];
+
+        for (const change of changes) {
+          const value = change.value;
+
+          // Handle message status updates
+          if (value?.statuses) {
+            for (const status of value.statuses) {
+              console.log(
+                `[WhatsApp] Status update: ${status.id} -> ${status.status}`,
+              );
+              // TODO: Update message status in database
+              // Possible statuses: sent, delivered, read, failed
+            }
+          }
+
+          // Handle incoming messages (user replies)
+          if (value?.messages) {
+            for (const message of value.messages) {
+              console.log(
+                `[WhatsApp] Received message from ${message.from}: ${message.type}`,
+              );
+              // TODO: Handle user replies (e.g., "STOP" for opt-out)
+              // TODO: Process message content based on type (text, image, etc.)
+            }
+          }
+        }
+      }
+
+      // Always respond with 200 to acknowledge receipt
+      res.sendStatus(200);
+    } catch (error) {
+      console.error("[WhatsApp] Webhook error:", error);
+      // Still return 200 to prevent Meta from retrying
+      res.sendStatus(200);
+    }
+  });
+
+  // Import trial lock middleware
+  const { trialLockMiddleware } = await import("./trialLock");
+
+  // Apply trial lock middleware to ALL API routes (except exempt paths)
+  // This enforces hard 7-day trial lock server-side
+  app.use("/api", trialLockMiddleware);
+  app.use("/trpc", trialLockMiddleware);
+
   // tRPC API
   app.use(
     "/api/trpc",
@@ -561,6 +660,15 @@ async function startServer() {
     console.log(`✓ Server running on http://${host}:${port}/`);
     console.log(`✓ Environment: ${process.env.NODE_ENV || "development"}`);
     console.log(`✓ Health check: http://${host}:${port}/api/health`);
+
+    // Start reminder scheduler
+    import("./reminderScheduler")
+      .then((module) => {
+        module.startReminderScheduler();
+      })
+      .catch((err) => {
+        console.error("[Server] Failed to start reminder scheduler:", err);
+      });
   });
 
   // Handle port binding errors

@@ -1,12 +1,27 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { AIChatBox, Message } from "@/components/AIChatBox";
 import { trpc } from "@/lib/trpc";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, Lock, AlertCircle } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import {
+  ShieldCheck,
+  Lock,
+  AlertCircle,
+  Mic,
+  MicOff,
+  Save,
+  Trash2,
+  Plus,
+  MessageSquare,
+  FileText,
+} from "lucide-react";
 import { toast } from "sonner";
 
 export default function AIChat() {
@@ -23,6 +38,109 @@ export default function AIChat() {
     isUnlocked: boolean;
     expiresAt?: Date;
   }>({ isUnlocked: false });
+
+  // Notes functionality
+  const [isListening, setIsListening] = useState(false);
+  const [noteContent, setNoteContent] = useState("");
+  const [noteTitle, setNoteTitle] = useState("");
+  const recognitionRef = useRef<any>(null);
+
+  const { data: notes, refetch: refetchNotes } = trpc.notes.list.useQuery({
+    limit: 50,
+  });
+
+  const createNote = trpc.notes.create.useMutation({
+    onSuccess: () => {
+      toast.success("Note saved successfully!");
+      setNoteContent("");
+      setNoteTitle("");
+      refetchNotes();
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to save note");
+    },
+  });
+
+  const deleteNote = trpc.notes.delete.useMutation({
+    onSuccess: () => {
+      toast.success("Note deleted");
+      refetchNotes();
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to delete note");
+    },
+  });
+
+  // Initialize Web Speech API
+  useEffect(() => {
+    if (typeof window !== "undefined" && "webkitSpeechRecognition" in window) {
+      const recognition = new (window as any).webkitSpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = "en-US";
+
+      recognition.onresult = (event: any) => {
+        let finalTranscript = "";
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript + " ";
+          }
+        }
+        if (finalTranscript) {
+          setNoteContent((prev) => prev + finalTranscript);
+        }
+      };
+
+      recognition.onerror = (event: any) => {
+        console.error("Speech recognition error:", event.error);
+        setIsListening(false);
+        if (event.error !== "no-speech") {
+          toast.error(`Voice recognition error: ${event.error}`);
+        }
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+    }
+
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, []);
+
+  const toggleListening = () => {
+    if (!recognitionRef.current) {
+      toast.error("Voice recognition not supported in your browser");
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      recognitionRef.current.start();
+      setIsListening(true);
+    }
+  };
+
+  const handleSaveNote = () => {
+    if (!noteContent.trim()) {
+      toast.error("Note content is required");
+      return;
+    }
+
+    createNote.mutate({
+      title: noteTitle.trim() || undefined,
+      content: noteContent.trim(),
+      transcribed: isListening || noteContent.includes("[Voice]"),
+    });
+  };
 
   const chatMutation = trpc.ai.chat.useMutation({
     onSuccess: (response: any) => {
@@ -89,9 +207,9 @@ export default function AIChat() {
 
   return (
     <DashboardLayout>
-      <div className="container mx-auto p-6 max-w-4xl">
+      <div className="container mx-auto p-6 max-w-6xl">
         <div className="mb-4 flex items-center justify-between">
-          <h1 className="text-3xl font-bold">AI Assistant</h1>
+          <h1 className="text-3xl font-bold">AI Assistant & Notes</h1>
           {adminStatus.isUnlocked && (
             <Alert className="w-auto">
               <ShieldCheck className="h-4 w-4" />
@@ -104,49 +222,195 @@ export default function AIChat() {
           )}
         </div>
 
-        <Card>
-          <CardContent className="p-6">
-            <AIChatBox
-              messages={messages}
-              onSendMessage={handleSend}
-              isLoading={chatMutation.isPending}
-              placeholder="Type your message... (Try 'show admin')"
-              height="600px"
-              suggestedPrompts={[
-                "What can you help me with?",
-                "Show me horse care tips",
-                "show admin",
-              ]}
-            />
+        <Tabs defaultValue="chat" className="space-y-4">
+          <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsTrigger value="chat">
+              <MessageSquare className="w-4 h-4 mr-2" />
+              AI Chat
+            </TabsTrigger>
+            <TabsTrigger value="notes">
+              <FileText className="w-4 h-4 mr-2" />
+              Voice Notes
+            </TabsTrigger>
+          </TabsList>
 
-            {showPasswordInput && (
-              <div className="mt-4 p-4 border rounded-lg bg-muted">
-                <div className="flex items-center gap-2 mb-2">
-                  <Lock className="h-4 w-4" />
-                  <span className="font-semibold">Admin Password Required</span>
-                </div>
-                <div className="flex gap-2">
+          <TabsContent value="chat">
+            <Card>
+              <CardContent className="p-6">
+                <AIChatBox
+                  messages={messages}
+                  onSendMessage={handleSend}
+                  isLoading={chatMutation.isPending}
+                  placeholder="Type your message... (Try 'show admin')"
+                  height="600px"
+                  suggestedPrompts={[
+                    "What can you help me with?",
+                    "Show me horse care tips",
+                    "show admin",
+                  ]}
+                />
+
+                {showPasswordInput && (
+                  <div className="mt-4 p-4 border rounded-lg bg-muted">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Lock className="h-4 w-4" />
+                      <span className="font-semibold">
+                        Admin Password Required
+                      </span>
+                    </div>
+                    <div className="flex gap-2">
+                      <Input
+                        type="password"
+                        placeholder="Enter admin password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        onKeyDown={(e) =>
+                          e.key === "Enter" && handlePasswordSubmit()
+                        }
+                        disabled={unlockMutation.isPending}
+                      />
+                      <Button
+                        onClick={handlePasswordSubmit}
+                        disabled={unlockMutation.isPending || !password.trim()}
+                      >
+                        Unlock
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="notes" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Create Voice Note</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="note-title">Title (optional)</Label>
                   <Input
-                    type="password"
-                    placeholder="Enter admin password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    onKeyDown={(e) =>
-                      e.key === "Enter" && handlePasswordSubmit()
-                    }
-                    disabled={unlockMutation.isPending}
+                    id="note-title"
+                    placeholder="Note title..."
+                    value={noteTitle}
+                    onChange={(e) => setNoteTitle(e.target.value)}
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="note-content">Content</Label>
+                  <Textarea
+                    id="note-content"
+                    placeholder="Start dictating or type here..."
+                    value={noteContent}
+                    onChange={(e) => setNoteContent(e.target.value)}
+                    rows={8}
+                  />
+                </div>
+
+                <div className="flex gap-2">
                   <Button
-                    onClick={handlePasswordSubmit}
-                    disabled={unlockMutation.isPending || !password.trim()}
+                    onClick={toggleListening}
+                    variant={isListening ? "destructive" : "default"}
+                    disabled={!recognitionRef.current}
                   >
-                    Unlock
+                    {isListening ? (
+                      <>
+                        <MicOff className="mr-2 h-4 w-4" />
+                        Stop Recording
+                      </>
+                    ) : (
+                      <>
+                        <Mic className="mr-2 h-4 w-4" />
+                        Start Voice Dictation
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    onClick={handleSaveNote}
+                    disabled={createNote.isPending || !noteContent.trim()}
+                  >
+                    <Save className="mr-2 h-4 w-4" />
+                    Save Note
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setNoteContent("");
+                      setNoteTitle("");
+                    }}
+                  >
+                    Clear
                   </Button>
                 </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+
+                {!recognitionRef.current && (
+                  <Alert>
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      Voice recognition is not supported in your browser. You
+                      can still type notes manually.
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Saved Notes</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {notes && notes.length > 0 ? (
+                  <div className="space-y-3">
+                    {notes.map((note) => (
+                      <Card key={note.id} className="p-4">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1">
+                            {note.title && (
+                              <div className="font-semibold text-sm mb-1 flex items-center gap-2">
+                                {note.transcribed && (
+                                  <Badge
+                                    variant="secondary"
+                                    className="text-xs"
+                                  >
+                                    <Mic className="w-3 h-3 mr-1" />
+                                    Voice
+                                  </Badge>
+                                )}
+                                {note.title}
+                              </div>
+                            )}
+                            <p className="text-sm text-muted-foreground line-clamp-3">
+                              {note.content}
+                            </p>
+                            <div className="text-xs text-muted-foreground mt-2">
+                              {new Date(note.createdAt).toLocaleString()}
+                            </div>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => deleteNote.mutate({ id: note.id })}
+                            disabled={deleteNote.isPending}
+                          >
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                    <p>No notes yet. Create your first note above!</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </DashboardLayout>
   );

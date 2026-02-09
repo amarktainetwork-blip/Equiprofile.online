@@ -15,7 +15,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
-    "db:push": "drizzle-kit generate && drizzle-kit migrate"
+    "db:push": "drizzle-kit generate && drizzle-kit migrate",
+    "seed:templates": "tsx server/seeds/trainingTemplates.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.984.0",
@@ -55,6 +56,7 @@
     "@tsparticles/slim": "^3.9.1",
     "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.19",
+    "@types/node-cron": "^3.0.11",
     "@types/nodemailer": "^7.0.4",
     "aos": "^3.0.0-beta.6",
     "axios": "^1.13.4",
@@ -83,6 +85,7 @@
     "mysql2": "^3.16.3",
     "nanoid": "^5.1.5",
     "next-themes": "^0.4.6",
+    "node-cron": "^4.2.1",
     "nodemailer": "^7.0.12",
     "qrcode": "^1.5.4",
     "react": "^19.2.1",
@@ -103,7 +106,8 @@
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^1.1.2",
     "wouter": "^3.3.5",
-    "zod": "^4.1.12"
+    "zod": "^4.1.12",
+    "zustand": "^5.0.11"
   },
   "devDependencies": {
     "@builder.io/vite-plugin-jsx-loc": "^0.1.1",

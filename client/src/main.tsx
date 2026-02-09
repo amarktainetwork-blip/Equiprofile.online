@@ -16,6 +16,9 @@ import { initializeAnalytics } from "./analytics";
 // This must be imported to register showAdmin() and hideAdmin() functions
 import "@/lib/adminToggle";
 
+// Import upgrade modal state
+import { useUpgradeModal } from "./hooks/useUpgradeModal";
+
 // Initialize service worker and analytics
 registerServiceWorker();
 initializeAnalytics();
@@ -54,10 +57,35 @@ const redirectToLoginIfUnauthorized = (error: unknown) => {
   window.location.href = getLoginUrl();
 };
 
+const handleTrialLockError = (error: unknown) => {
+  if (!(error instanceof TRPCClientError)) return;
+
+  // Check for 402 Payment Required or trial/subscription error messages
+  const isPaymentRequired =
+    error.data?.code === "PAYMENT_REQUIRED" ||
+    error.message?.toLowerCase().includes("trial") ||
+    error.message?.toLowerCase().includes("subscription") ||
+    error.message?.toLowerCase().includes("upgrade");
+
+  if (isPaymentRequired) {
+    // Open upgrade modal
+    const { open } = useUpgradeModal.getState();
+
+    if (error.message?.toLowerCase().includes("trial")) {
+      open("trial_expired", error.message);
+    } else if (error.message?.toLowerCase().includes("subscription")) {
+      open("subscription_expired", error.message);
+    } else {
+      open("payment_required", error.message);
+    }
+  }
+};
+
 queryClient.getQueryCache().subscribe((event) => {
   if (event.type === "updated" && event.action.type === "error") {
     const error = event.query.state.error;
     redirectToLoginIfUnauthorized(error);
+    handleTrialLockError(error);
     console.error("[API Query Error]", error);
   }
 });
@@ -66,6 +94,7 @@ queryClient.getMutationCache().subscribe((event) => {
   if (event.type === "updated" && event.action.type === "error") {
     const error = event.mutation.state.error;
     redirectToLoginIfUnauthorized(error);
+    handleTrialLockError(error);
     console.error("[API Mutation Error]", error);
   }
 });

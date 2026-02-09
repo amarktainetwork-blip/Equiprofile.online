@@ -356,6 +356,73 @@ export async function sendTestEmail(to: string): Promise<boolean> {
 }
 
 /**
+ * Send reminder email for events
+ */
+export async function sendReminderEmail(
+  to: string,
+  userName: string,
+  eventTitle: string,
+  eventDescription: string,
+  eventDate: Date,
+  horseName?: string,
+): Promise<void> {
+  const formattedDate = eventDate.toLocaleDateString("en-GB", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+  const formattedTime = eventDate.toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  const subject = `Reminder: ${eventTitle}`;
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <h2 style="color: #1e40af; border-bottom: 2px solid #1e40af; padding-bottom: 10px;">
+        Event Reminder
+      </h2>
+      
+      <p style="font-size: 16px; color: #374151;">
+        Hi ${userName},
+      </p>
+      
+      <p style="font-size: 16px; color: #374151;">
+        This is a friendly reminder about your upcoming event:
+      </p>
+      
+      <div style="background: #f3f4f6; padding: 20px; margin: 20px 0; border-left: 4px solid #3b82f6; border-radius: 4px;">
+        <h3 style="margin-top: 0; color: #1e40af;">${eventTitle}</h3>
+        ${horseName ? `<p style="margin: 5px 0;"><strong>Horse:</strong> ${horseName}</p>` : ""}
+        <p style="margin: 5px 0;"><strong>Date:</strong> ${formattedDate}</p>
+        <p style="margin: 5px 0;"><strong>Time:</strong> ${formattedTime}</p>
+        ${eventDescription ? `<p style="margin: 10px 0 0 0;">${eventDescription}</p>` : ""}
+      </div>
+      
+      <p style="font-size: 16px; color: #374151;">
+        <a href="${process.env.BASE_URL || "https://equiprofile.online"}/calendar" 
+           style="display: inline-block; padding: 12px 24px; background: #3b82f6; color: white; text-decoration: none; border-radius: 6px; font-weight: 500;">
+          View in Calendar
+        </a>
+      </p>
+      
+      <p style="color: #6b7280; margin-top: 30px; font-size: 14px;">
+        Best regards,<br/>
+        The EquiProfile Team
+      </p>
+      
+      <p style="color: #9ca3af; font-size: 12px; margin-top: 20px;">
+        You received this email because you have an event scheduled in EquiProfile.
+      </p>
+    </div>
+  `;
+
+  await sendEmail(to, subject, html);
+}
+
+/**
  * Simple HTML strip utility for plain text fallback
  */
 function stripHtml(html: string): string {

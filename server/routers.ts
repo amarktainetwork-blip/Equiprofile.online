@@ -17,6 +17,7 @@ import {
   createCheckoutSession,
   createPortalSession,
   STRIPE_PRICING,
+  PRICING_PLANS,
 } from "./stripe";
 import {
   exportHorsesCSV,
@@ -277,22 +278,52 @@ export const appRouter = router({
         return {
           enabled: false,
           message: "Billing is disabled",
-          monthly: null,
-          yearly: null,
+          trial: null,
+          pro: null,
+          stable: null,
         };
       }
 
       return {
         enabled: true,
-        monthly: {
-          amount: STRIPE_PRICING.monthly.amount,
-          currency: STRIPE_PRICING.monthly.currency,
-          interval: STRIPE_PRICING.monthly.interval,
+        trial: {
+          name: PRICING_PLANS.trial.name,
+          horses: PRICING_PLANS.trial.horses,
+          price: PRICING_PLANS.trial.price,
+          currency: PRICING_PLANS.trial.currency,
+          interval: PRICING_PLANS.trial.interval,
+          duration: PRICING_PLANS.trial.duration,
+          features: PRICING_PLANS.trial.features,
         },
-        yearly: {
-          amount: STRIPE_PRICING.yearly.amount,
-          currency: STRIPE_PRICING.yearly.currency,
-          interval: STRIPE_PRICING.yearly.interval,
+        pro: {
+          name: PRICING_PLANS.pro.name,
+          horses: PRICING_PLANS.pro.horses,
+          monthly: {
+            amount: PRICING_PLANS.pro.monthly.amount,
+            currency: PRICING_PLANS.pro.monthly.currency,
+            interval: PRICING_PLANS.pro.monthly.interval,
+          },
+          yearly: {
+            amount: PRICING_PLANS.pro.yearly.amount,
+            currency: PRICING_PLANS.pro.yearly.currency,
+            interval: PRICING_PLANS.pro.yearly.interval,
+          },
+          features: PRICING_PLANS.pro.features,
+        },
+        stable: {
+          name: PRICING_PLANS.stable.name,
+          horses: PRICING_PLANS.stable.horses,
+          monthly: {
+            amount: PRICING_PLANS.stable.monthly.amount,
+            currency: PRICING_PLANS.stable.monthly.currency,
+            interval: PRICING_PLANS.stable.monthly.interval,
+          },
+          yearly: {
+            amount: PRICING_PLANS.stable.yearly.amount,
+            currency: PRICING_PLANS.stable.yearly.currency,
+            interval: PRICING_PLANS.stable.yearly.interval,
+          },
+          features: PRICING_PLANS.stable.features,
         },
       };
     }),
@@ -1819,6 +1850,159 @@ Format your response as JSON with keys: recommendation, explanation, precautions
       .input(z.object({ limit: z.number().default(7) }))
       .query(async ({ ctx, input }) => {
         return db.getWeatherHistory(ctx.user.id, input.limit);
+      }),
+
+    // New Open-Meteo endpoints
+    getCurrent: protectedProcedure.query(async ({ ctx }) => {
+      const user = await db.getUserById(ctx.user.id);
+      if (!user || !user.latitude || !user.longitude) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "Please set your location in settings first",
+        });
+      }
+
+      const weather = await import("./_core/weather");
+      const current = await weather.getCurrentWeather(
+        user.latitude,
+        user.longitude,
+      );
+      const advice = weather.getRidingAdvice(current);
+
+      return {
+        weather: current,
+        advice,
+      };
+    }),
+
+    getForecast: protectedProcedure.query(async ({ ctx }) => {
+      const user = await db.getUserById(ctx.user.id);
+      if (!user || !user.latitude || !user.longitude) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "Please set your location in settings first",
+        });
+      }
+
+      const weather = await import("./_core/weather");
+      return weather.getWeatherForecast(user.latitude, user.longitude);
+    }),
+
+    getHourly: protectedProcedure.query(async ({ ctx }) => {
+      const user = await db.getUserById(ctx.user.id);
+      if (!user || !user.latitude || !user.longitude) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "Please set your location in settings first",
+        });
+      }
+
+      const weather = await import("./_core/weather");
+      return weather.getHourlyForecast(user.latitude, user.longitude);
+    }),
+
+    updateLocation: protectedProcedure
+      .input(
+        z.object({
+          latitude: z.string(),
+          longitude: z.string(),
+          location: z.string().optional(),
+        }),
+      )
+      .mutation(async ({ ctx, input }) => {
+        await db.updateUser(ctx.user.id, {
+          latitude: input.latitude,
+          longitude: input.longitude,
+          location: input.location || null,
+        });
+        return { success: true };
+      }),
+  }),
+
+  // Notes with voice dictation
+  notes: router({
+    list: protectedProcedure
+      .input(
+        z.object({
+          horseId: z.number().optional(),
+          limit: z.number().default(50),
+        }),
+      )
+      .query(async ({ ctx, input }) => {
+        return db.getNotesByUserId(ctx.user.id, input.horseId, input.limit);
+      }),
+
+    create: protectedProcedure
+      .input(
+        z.object({
+          title: z.string().optional(),
+          content: z.string(),
+          horseId: z.number().optional(),
+          transcribed: z.boolean().default(false),
+          tags: z.string().optional(),
+        }),
+      )
+      .mutation(async ({ ctx, input }) => {
+        const noteId = await db.createNote({
+          userId: ctx.user.id,
+          ...input,
+        });
+
+        // Publish real-time event
+        const { publishModuleEvent } = await import("./_core/realtime");
+        const note = await db.getNoteById(noteId);
+        publishModuleEvent("notes", "created", note, ctx.user.id);
+
+        return { id: noteId };
+      }),
+
+    update: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          title: z.string().optional(),
+          content: z.string().optional(),
+          tags: z.string().optional(),
+        }),
+      )
+      .mutation(async ({ ctx, input }) => {
+        // Verify ownership
+        const note = await db.getNoteById(input.id);
+        if (!note || note.userId !== ctx.user.id) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Note not found or access denied",
+          });
+        }
+        const { id, ...updateData } = input;
+        await db.updateNote(id, ctx.user.id, updateData);
+
+        // Publish real-time event
+        const { publishModuleEvent } = await import("./_core/realtime");
+        const updatedNote = await db.getNoteById(id);
+        publishModuleEvent("notes", "updated", updatedNote, ctx.user.id);
+
+        return { success: true };
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        // Verify ownership
+        const note = await db.getNoteById(input.id);
+        if (!note || note.userId !== ctx.user.id) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Note not found or access denied",
+          });
+        }
+        await db.deleteNote(input.id, ctx.user.id);
+
+        // Publish real-time event
+        const { publishModuleEvent } = await import("./_core/realtime");
+        publishModuleEvent("notes", "deleted", { id: input.id }, ctx.user.id);
+
+        return { success: true };
       }),
   }),
 

@@ -96,6 +96,8 @@ import {
   InsertNutritionLog,
   nutritionPlans,
   InsertNutritionPlan,
+  notes,
+  InsertNote,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -2227,4 +2229,98 @@ export async function deleteNutritionPlan(id: number, userId: number) {
   await db
     .delete(nutritionPlans)
     .where(and(eq(nutritionPlans.id, id), eq(nutritionPlans.userId, userId)));
+}
+
+// ============ NOTES ============
+export async function createNote(data: InsertNote) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(notes).values(data);
+  return (result[0] as ResultSetHeader).insertId as number;
+}
+
+export async function getNotesByUserId(
+  userId: number,
+  horseId?: number,
+  limit: number = 50,
+) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const conditions = [eq(notes.userId, userId)];
+
+  if (horseId) {
+    conditions.push(eq(notes.horseId, horseId));
+  }
+
+  return await db
+    .select()
+    .from(notes)
+    .where(and(...conditions))
+    .orderBy(desc(notes.createdAt))
+    .limit(limit);
+}
+
+export async function getNoteById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const results = await db.select().from(notes).where(eq(notes.id, id));
+  return results[0] || null;
+}
+
+export async function updateNote(
+  id: number,
+  userId: number,
+  data: Partial<InsertNote>,
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(notes)
+    .set(data)
+    .where(and(eq(notes.id, id), eq(notes.userId, userId)));
+}
+
+export async function deleteNote(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.delete(notes).where(and(eq(notes.id, id), eq(notes.userId, userId)));
+}
+
+// ============ EVENT REMINDERS ============
+export async function getDueEventReminders(beforeDate: Date) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(eventReminders)
+    .where(
+      and(
+        lte(eventReminders.reminderTime, beforeDate),
+        eq(eventReminders.isSent, false),
+      ),
+    );
+}
+
+export async function markEventReminderSent(reminderId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(eventReminders)
+    .set({ isSent: true, sentAt: new Date() })
+    .where(eq(eventReminders.id, reminderId));
+}
+
+export async function getEventById(eventId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const results = await db.select().from(events).where(eq(events.id, eventId));
+  return results[0] || null;
 }

@@ -46,8 +46,13 @@ export const users = mysqlTable("users", {
   suspendedReason: text("suspendedReason"),
   // Profile
   phone: varchar("phone", { length: 20 }),
-  location: varchar("location", { length: 255 }),
+  location: varchar("location", { length: 255 }), // City/region text
+  latitude: varchar("latitude", { length: 20 }), // Geographic coordinates
+  longitude: varchar("longitude", { length: 20 }), // Geographic coordinates
   profileImageUrl: text("profileImageUrl"),
+  // Storage tracking
+  storageUsedBytes: int("storageUsedBytes").default(0).notNull(),
+  storageQuotaBytes: int("storageQuotaBytes").default(104857600).notNull(), // 100MB default
   // User preferences and settings
   preferences: text("preferences"), // JSON: theme, language, dashboard layout
   language: varchar("language", { length: 10 }).default("en"),
@@ -1145,3 +1150,19 @@ export const nutritionPlans = mysqlTable("nutritionPlans", {
 
 export type NutritionPlan = typeof nutritionPlans.$inferSelect;
 export type InsertNutritionPlan = typeof nutritionPlans.$inferInsert;
+
+// Notes module - voice dictation and general notes
+export const notes = mysqlTable("notes", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  horseId: int("horseId"), // optional, can be general note
+  title: varchar("title", { length: 200 }),
+  content: text("content").notNull(),
+  transcribed: boolean("transcribed").default(false).notNull(), // true if from voice
+  tags: text("tags"), // JSON array of tags
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Note = typeof notes.$inferSelect;
+export type InsertNote = typeof notes.$inferInsert;

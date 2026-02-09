@@ -23,7 +23,8 @@ export default function Features() {
           <PageBanner
             title="Powerful Features for Modern Horse Management"
             subtitle="Everything you need to manage your horses efficiently, all in one place"
-            imageSrc="/images/training.jpg"
+            imageSrc="/images/hero-horse.jpg"
+            imagePosition="center"
           />
 
           {/* Feature Sections with Alternating Layout */}
