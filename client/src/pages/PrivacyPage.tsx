@@ -24,7 +24,8 @@ export default function PrivacyPage() {
                   EquiProfile Privacy Policy
                 </h2>
                 <p className="text-gray-400">
-                  Last updated: <span className="text-white">January 5, 2026</span>
+                  Last updated:{" "}
+                  <span className="text-white">January 5, 2026</span>
                 </p>
               </div>
 
@@ -51,24 +52,36 @@ export default function PrivacyPage() {
                       access the Service.
                     </p>
 
-                    <h4 className="text-white mt-4 mb-2 font-semibold">Data Protection Summary</h4>
-                    <p className="text-gray-300">As a data controller under UK GDPR, we:</p>
+                    <h4 className="text-white mt-4 mb-2 font-semibold">
+                      Data Protection Summary
+                    </h4>
+                    <p className="text-gray-300">
+                      As a data controller under UK GDPR, we:
+                    </p>
                     <ul>
                       <li className="text-gray-300">
                         Only collect data necessary for providing our services
                       </li>
-                      <li className="text-gray-300">Process data lawfully, fairly, and transparently</li>
+                      <li className="text-gray-300">
+                        Process data lawfully, fairly, and transparently
+                      </li>
                       <li className="text-gray-300">
                         Keep your data secure using industry-standard encryption
                       </li>
-                      <li className="text-gray-300">Respect your data protection rights</li>
+                      <li className="text-gray-300">
+                        Respect your data protection rights
+                      </li>
                       <li className="text-gray-300">
                         Do not sell your personal information to third parties
                       </li>
-                      <li className="text-gray-300">Retain data only as long as necessary</li>
+                      <li className="text-gray-300">
+                        Retain data only as long as necessary
+                      </li>
                     </ul>
 
-                    <h4 className="text-white mt-4 mb-2 font-semibold">Data Controller</h4>
+                    <h4 className="text-white mt-4 mb-2 font-semibold">
+                      Data Controller
+                    </h4>
                     <p className="text-gray-300">
                       EquiProfile is the data controller responsible for your
                       personal data. For data protection queries, contact us at:
@@ -79,10 +92,14 @@ export default function PrivacyPage() {
 
                 <Card className="bg-white/5 backdrop-blur-md border-white/10">
                   <CardHeader>
-                    <CardTitle className="text-white">2. Information We Collect</CardTitle>
+                    <CardTitle className="text-white">
+                      2. Information We Collect
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="prose prose-invert max-w-none">
-                    <h4 className="text-white mt-4 mb-2 font-semibold">Personal Information</h4>
+                    <h4 className="text-white mt-4 mb-2 font-semibold">
+                      Personal Information
+                    </h4>
                     <p className="text-gray-300">
                       We collect information that you voluntarily provide when
                       using the Service, including:
@@ -93,12 +110,18 @@ export default function PrivacyPage() {
                       <li className="text-gray-300">
                         Payment information (processed securely through Stripe)
                       </li>
-                      <li className="text-gray-300">Horse profiles and related data</li>
-                      <li className="text-gray-300">Health records and training information</li>
+                      <li className="text-gray-300">
+                        Horse profiles and related data
+                      </li>
+                      <li className="text-gray-300">
+                        Health records and training information
+                      </li>
                       <li className="text-gray-300">Documents you upload</li>
                     </ul>
 
-                    <h4 className="text-white mt-4 mb-2 font-semibold">Automatically Collected Information</h4>
+                    <h4 className="text-white mt-4 mb-2 font-semibold">
+                      Automatically Collected Information
+                    </h4>
                     <p className="text-gray-300">
                       When you access the Service, we automatically collect
                       certain information, including:
@@ -107,21 +130,33 @@ export default function PrivacyPage() {
                       <li className="text-gray-300">
                         Device information (browser type, operating system)
                       </li>
-                      <li className="text-gray-300">IP address and location data</li>
-                      <li className="text-gray-300">Usage data (pages viewed, features used)</li>
-                      <li className="text-gray-300">Cookies and similar tracking technologies</li>
+                      <li className="text-gray-300">
+                        IP address and location data
+                      </li>
+                      <li className="text-gray-300">
+                        Usage data (pages viewed, features used)
+                      </li>
+                      <li className="text-gray-300">
+                        Cookies and similar tracking technologies
+                      </li>
                     </ul>
                   </CardContent>
                 </Card>
 
                 <Card className="bg-white/5 backdrop-blur-md border-white/10">
                   <CardHeader>
-                    <CardTitle className="text-white">3. How We Use Your Information</CardTitle>
+                    <CardTitle className="text-white">
+                      3. How We Use Your Information
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="prose prose-invert max-w-none">
-                    <p className="text-gray-300">We use the information we collect to:</p>
+                    <p className="text-gray-300">
+                      We use the information we collect to:
+                    </p>
                     <ul>
-                      <li className="text-gray-300">Provide, maintain, and improve the Service</li>
+                      <li className="text-gray-300">
+                        Provide, maintain, and improve the Service
+                      </li>
                       <li className="text-gray-300">
                         Process your transactions and manage subscriptions
                       </li>
@@ -129,17 +164,27 @@ export default function PrivacyPage() {
                         Send you transactional emails (account updates,
                         reminders)
                       </li>
-                      <li className="text-gray-300">Respond to your comments and questions</li>
-                      <li className="text-gray-300">Monitor and analyze usage patterns</li>
-                      <li className="text-gray-300">Detect and prevent fraud or abuse</li>
-                      <li className="text-gray-300">Comply with legal obligations</li>
+                      <li className="text-gray-300">
+                        Respond to your comments and questions
+                      </li>
+                      <li className="text-gray-300">
+                        Monitor and analyze usage patterns
+                      </li>
+                      <li className="text-gray-300">
+                        Detect and prevent fraud or abuse
+                      </li>
+                      <li className="text-gray-300">
+                        Comply with legal obligations
+                      </li>
                     </ul>
                   </CardContent>
                 </Card>
 
                 <Card className="bg-white/5 backdrop-blur-md border-white/10">
                   <CardHeader>
-                    <CardTitle className="text-white">4. Information Sharing and Disclosure</CardTitle>
+                    <CardTitle className="text-white">
+                      4. Information Sharing and Disclosure
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="prose prose-invert max-w-none">
                     <p className="text-gray-300">
@@ -172,7 +217,9 @@ export default function PrivacyPage() {
 
                 <Card className="bg-white/5 backdrop-blur-md border-white/10">
                   <CardHeader>
-                    <CardTitle className="text-white">5. Data Security</CardTitle>
+                    <CardTitle className="text-white">
+                      5. Data Security
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="prose prose-invert max-w-none">
                     <p className="text-gray-300">
@@ -180,11 +227,19 @@ export default function PrivacyPage() {
                       measures to protect your personal information, including:
                     </p>
                     <ul>
-                      <li className="text-gray-300">Encryption of data in transit and at rest</li>
+                      <li className="text-gray-300">
+                        Encryption of data in transit and at rest
+                      </li>
                       <li className="text-gray-300">Secure password hashing</li>
-                      <li className="text-gray-300">Regular security assessments</li>
-                      <li className="text-gray-300">Access controls and authentication</li>
-                      <li className="text-gray-300">Secure backup procedures</li>
+                      <li className="text-gray-300">
+                        Regular security assessments
+                      </li>
+                      <li className="text-gray-300">
+                        Access controls and authentication
+                      </li>
+                      <li className="text-gray-300">
+                        Secure backup procedures
+                      </li>
                     </ul>
                     <p className="text-gray-300">
                       However, no method of transmission over the Internet is
@@ -196,7 +251,9 @@ export default function PrivacyPage() {
 
                 <Card className="bg-white/5 backdrop-blur-md border-white/10">
                   <CardHeader>
-                    <CardTitle className="text-white">6. Data Retention</CardTitle>
+                    <CardTitle className="text-white">
+                      6. Data Retention
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="prose prose-invert max-w-none">
                     <p className="text-gray-300">
@@ -220,21 +277,27 @@ export default function PrivacyPage() {
                       your personal data:
                     </p>
 
-                    <h4 className="text-white mt-4 mb-2 font-semibold">Right of Access (Subject Access Request)</h4>
+                    <h4 className="text-white mt-4 mb-2 font-semibold">
+                      Right of Access (Subject Access Request)
+                    </h4>
                     <p className="text-gray-300">
                       You have the right to request a copy of the personal
                       information we hold about you. We will provide this within
                       one month of your request, free of charge.
                     </p>
 
-                    <h4 className="text-white mt-4 mb-2 font-semibold">Right to Rectification</h4>
+                    <h4 className="text-white mt-4 mb-2 font-semibold">
+                      Right to Rectification
+                    </h4>
                     <p className="text-gray-300">
                       You have the right to request correction of inaccurate or
                       incomplete personal information. You can update most
                       information directly through your account settings.
                     </p>
 
-                    <h4 className="text-white mt-4 mb-2 font-semibold">Right to Erasure ("Right to be Forgotten")</h4>
+                    <h4 className="text-white mt-4 mb-2 font-semibold">
+                      Right to Erasure ("Right to be Forgotten")
+                    </h4>
                     <p className="text-gray-300">
                       You have the right to request deletion of your personal
                       information in certain circumstances, including when:
@@ -252,37 +315,49 @@ export default function PrivacyPage() {
                         You object to processing and there are no overriding
                         legitimate grounds
                       </li>
-                      <li className="text-gray-300">The data has been unlawfully processed</li>
+                      <li className="text-gray-300">
+                        The data has been unlawfully processed
+                      </li>
                     </ul>
 
-                    <h4 className="text-white mt-4 mb-2 font-semibold">Right to Restriction of Processing</h4>
+                    <h4 className="text-white mt-4 mb-2 font-semibold">
+                      Right to Restriction of Processing
+                    </h4>
                     <p className="text-gray-300">
                       You have the right to request that we restrict processing
                       of your personal data in certain circumstances, such as
                       when you contest the accuracy of the data.
                     </p>
 
-                    <h4 className="text-white mt-4 mb-2 font-semibold">Right to Data Portability</h4>
+                    <h4 className="text-white mt-4 mb-2 font-semibold">
+                      Right to Data Portability
+                    </h4>
                     <p className="text-gray-300">
                       You have the right to receive your personal data in a
                       structured, commonly used, machine-readable format and
                       transmit it to another controller.
                     </p>
 
-                    <h4 className="text-white mt-4 mb-2 font-semibold">Right to Object</h4>
+                    <h4 className="text-white mt-4 mb-2 font-semibold">
+                      Right to Object
+                    </h4>
                     <p className="text-gray-300">
                       You have the right to object to processing of your
                       personal data based on legitimate interests or for direct
                       marketing purposes at any time.
                     </p>
 
-                    <h4 className="text-white mt-4 mb-2 font-semibold">Right to Withdraw Consent</h4>
+                    <h4 className="text-white mt-4 mb-2 font-semibold">
+                      Right to Withdraw Consent
+                    </h4>
                     <p className="text-gray-300">
                       Where we process your data based on consent, you have the
                       right to withdraw that consent at any time.
                     </p>
 
-                    <h4 className="text-white mt-4 mb-2 font-semibold">Right to Lodge a Complaint</h4>
+                    <h4 className="text-white mt-4 mb-2 font-semibold">
+                      Right to Lodge a Complaint
+                    </h4>
                     <p className="text-gray-300">
                       You have the right to lodge a complaint with the
                       Information Commissioner's Office (ICO), the UK's data
@@ -303,7 +378,9 @@ export default function PrivacyPage() {
                       <li className="text-gray-300">Helpline: 0303 123 1113</li>
                     </ul>
 
-                    <h4 className="text-white mt-4 mb-2 font-semibold">Exercising Your Rights</h4>
+                    <h4 className="text-white mt-4 mb-2 font-semibold">
+                      Exercising Your Rights
+                    </h4>
                     <p className="text-gray-300">
                       To exercise any of these rights, please contact us at:
                       <br />
@@ -321,10 +398,14 @@ export default function PrivacyPage() {
 
                 <Card className="bg-white/5 backdrop-blur-md border-white/10">
                   <CardHeader>
-                    <CardTitle className="text-white">8. Cookies Policy</CardTitle>
+                    <CardTitle className="text-white">
+                      8. Cookies Policy
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="prose prose-invert max-w-none">
-                    <h4 className="text-white mt-4 mb-2 font-semibold">What Are Cookies?</h4>
+                    <h4 className="text-white mt-4 mb-2 font-semibold">
+                      What Are Cookies?
+                    </h4>
                     <p className="text-gray-300">
                       Cookies are small text files stored on your device when
                       you visit our Service. They help us provide you with a
@@ -332,7 +413,9 @@ export default function PrivacyPage() {
                       settings.
                     </p>
 
-                    <h4 className="text-white mt-4 mb-2 font-semibold">Types of Cookies We Use</h4>
+                    <h4 className="text-white mt-4 mb-2 font-semibold">
+                      Types of Cookies We Use
+                    </h4>
 
                     <p className="text-gray-300">
                       <strong>Essential Cookies (Strictly Necessary)</strong>
@@ -342,19 +425,27 @@ export default function PrivacyPage() {
                       and cannot be disabled. They include:
                     </p>
                     <ul>
-                      <li className="text-gray-300">Session cookies to maintain your login state</li>
+                      <li className="text-gray-300">
+                        Session cookies to maintain your login state
+                      </li>
                       <li className="text-gray-300">
                         Security cookies to prevent fraud and secure access
                       </li>
-                      <li className="text-gray-300">Load balancing cookies for optimal performance</li>
+                      <li className="text-gray-300">
+                        Load balancing cookies for optimal performance
+                      </li>
                     </ul>
 
                     <p className="text-gray-300">
                       <strong>Functional Cookies</strong>
                     </p>
-                    <p className="text-gray-300">These cookies remember your preferences and choices:</p>
+                    <p className="text-gray-300">
+                      These cookies remember your preferences and choices:
+                    </p>
                     <ul>
-                      <li className="text-gray-300">Theme preferences (light/dark mode)</li>
+                      <li className="text-gray-300">
+                        Theme preferences (light/dark mode)
+                      </li>
                       <li className="text-gray-300">Language settings</li>
                       <li className="text-gray-300">Display preferences</li>
                     </ul>
@@ -367,21 +458,33 @@ export default function PrivacyPage() {
                       Service:
                     </p>
                     <ul>
-                      <li className="text-gray-300">Usage patterns and popular features</li>
+                      <li className="text-gray-300">
+                        Usage patterns and popular features
+                      </li>
                       <li className="text-gray-300">Performance monitoring</li>
-                      <li className="text-gray-300">Error tracking and diagnostics</li>
+                      <li className="text-gray-300">
+                        Error tracking and diagnostics
+                      </li>
                     </ul>
 
-                    <h4 className="text-white mt-4 mb-2 font-semibold">Managing Cookies</h4>
+                    <h4 className="text-white mt-4 mb-2 font-semibold">
+                      Managing Cookies
+                    </h4>
                     <p className="text-gray-300">
                       You can control and manage cookies through your browser
                       settings. Most browsers allow you to:
                     </p>
                     <ul>
                       <li className="text-gray-300">View and delete cookies</li>
-                      <li className="text-gray-300">Block third-party cookies</li>
-                      <li className="text-gray-300">Block cookies from specific sites</li>
-                      <li className="text-gray-300">Clear all cookies when you close your browser</li>
+                      <li className="text-gray-300">
+                        Block third-party cookies
+                      </li>
+                      <li className="text-gray-300">
+                        Block cookies from specific sites
+                      </li>
+                      <li className="text-gray-300">
+                        Clear all cookies when you close your browser
+                      </li>
                     </ul>
 
                     <p className="font-semibold mt-4">
@@ -390,13 +493,19 @@ export default function PrivacyPage() {
                       disabled as they are required for the Service to work.
                     </p>
 
-                    <h4 className="text-white mt-4 mb-2 font-semibold">Third-Party Cookies</h4>
+                    <h4 className="text-white mt-4 mb-2 font-semibold">
+                      Third-Party Cookies
+                    </h4>
                     <p className="text-gray-300">
                       We use limited third-party services that may set cookies:
                     </p>
                     <ul>
-                      <li className="text-gray-300">Stripe for payment processing</li>
-                      <li className="text-gray-300">Cloud hosting providers for infrastructure</li>
+                      <li className="text-gray-300">
+                        Stripe for payment processing
+                      </li>
+                      <li className="text-gray-300">
+                        Cloud hosting providers for infrastructure
+                      </li>
                     </ul>
                     <p className="text-gray-300">
                       These third parties have their own privacy policies and
@@ -407,7 +516,9 @@ export default function PrivacyPage() {
 
                 <Card className="bg-white/5 backdrop-blur-md border-white/10">
                   <CardHeader>
-                    <CardTitle className="text-white">9. Children's Privacy</CardTitle>
+                    <CardTitle className="text-white">
+                      9. Children's Privacy
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="prose prose-invert max-w-none">
                     <p className="text-gray-300">
@@ -422,7 +533,9 @@ export default function PrivacyPage() {
 
                 <Card className="bg-white/5 backdrop-blur-md border-white/10">
                   <CardHeader>
-                    <CardTitle className="text-white">10. International Data Transfers</CardTitle>
+                    <CardTitle className="text-white">
+                      10. International Data Transfers
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="prose prose-invert max-w-none">
                     <p className="text-gray-300">
@@ -436,7 +549,9 @@ export default function PrivacyPage() {
 
                 <Card className="bg-white/5 backdrop-blur-md border-white/10">
                   <CardHeader>
-                    <CardTitle className="text-white">11. Changes to This Privacy Policy</CardTitle>
+                    <CardTitle className="text-white">
+                      11. Changes to This Privacy Policy
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="prose prose-invert max-w-none">
                     <p className="text-gray-300">
@@ -472,7 +587,9 @@ export default function PrivacyPage() {
                       GDPR.
                     </p>
 
-                    <h4 className="text-white mt-4 mb-2 font-semibold">Supervisory Authority</h4>
+                    <h4 className="text-white mt-4 mb-2 font-semibold">
+                      Supervisory Authority
+                    </h4>
                     <p className="text-gray-300">
                       If you are not satisfied with our response or believe we
                       are processing your data unlawfully, you have the right to
@@ -514,7 +631,9 @@ export default function PrivacyPage() {
                       Policy is governed by the laws of England and Wales.
                     </p>
 
-                    <h4 className="text-white mt-4 mb-2 font-semibold">Legal Basis for Processing Your Personal Data</h4>
+                    <h4 className="text-white mt-4 mb-2 font-semibold">
+                      Legal Basis for Processing Your Personal Data
+                    </h4>
                     <p className="text-gray-300">
                       Under UK GDPR, we must have a legal basis to process your
                       personal data. We process your data based on:
@@ -528,9 +647,15 @@ export default function PrivacyPage() {
                       requested, including:
                     </p>
                     <ul>
-                      <li className="text-gray-300">Creating and managing your account</li>
-                      <li className="text-gray-300">Providing horse management features</li>
-                      <li className="text-gray-300">Processing payments and managing subscriptions</li>
+                      <li className="text-gray-300">
+                        Creating and managing your account
+                      </li>
+                      <li className="text-gray-300">
+                        Providing horse management features
+                      </li>
+                      <li className="text-gray-300">
+                        Processing payments and managing subscriptions
+                      </li>
                       <li className="text-gray-300">
                         Communicating about your account and service updates
                       </li>
@@ -539,10 +664,16 @@ export default function PrivacyPage() {
                     <p className="text-gray-300">
                       <strong>2. Consent</strong>
                     </p>
-                    <p className="text-gray-300">Where you have given explicit consent, such as:</p>
+                    <p className="text-gray-300">
+                      Where you have given explicit consent, such as:
+                    </p>
                     <ul>
-                      <li className="text-gray-300">Marketing communications</li>
-                      <li className="text-gray-300">Optional analytics and tracking</li>
+                      <li className="text-gray-300">
+                        Marketing communications
+                      </li>
+                      <li className="text-gray-300">
+                        Optional analytics and tracking
+                      </li>
                       <li className="text-gray-300">
                         Specific data processing activities requiring consent
                       </li>
@@ -560,12 +691,18 @@ export default function PrivacyPage() {
                       interests, including:
                     </p>
                     <ul>
-                      <li className="text-gray-300">Improving and developing the Service</li>
+                      <li className="text-gray-300">
+                        Improving and developing the Service
+                      </li>
                       <li className="text-gray-300">
                         Detecting and preventing fraud and security threats
                       </li>
-                      <li className="text-gray-300">Understanding how users interact with our Service</li>
-                      <li className="text-gray-300">Internal analytics and business intelligence</li>
+                      <li className="text-gray-300">
+                        Understanding how users interact with our Service
+                      </li>
+                      <li className="text-gray-300">
+                        Internal analytics and business intelligence
+                      </li>
                     </ul>
                     <p className="text-gray-300">
                       We only rely on legitimate interests when they are not
@@ -580,13 +717,23 @@ export default function PrivacyPage() {
                       including:
                     </p>
                     <ul>
-                      <li className="text-gray-300">Complying with tax and accounting requirements</li>
-                      <li className="text-gray-300">Responding to legal requests and court orders</li>
-                      <li className="text-gray-300">Preventing money laundering and fraud</li>
-                      <li className="text-gray-300">Maintaining records required by law</li>
+                      <li className="text-gray-300">
+                        Complying with tax and accounting requirements
+                      </li>
+                      <li className="text-gray-300">
+                        Responding to legal requests and court orders
+                      </li>
+                      <li className="text-gray-300">
+                        Preventing money laundering and fraud
+                      </li>
+                      <li className="text-gray-300">
+                        Maintaining records required by law
+                      </li>
                     </ul>
 
-                    <h4 className="text-white mt-4 mb-2 font-semibold">International Data Transfers</h4>
+                    <h4 className="text-white mt-4 mb-2 font-semibold">
+                      International Data Transfers
+                    </h4>
                     <p className="text-gray-300">
                       Your data is primarily stored and processed in the UK.
                       Where we transfer data outside the UK, we ensure
@@ -601,10 +748,14 @@ export default function PrivacyPage() {
                         Adequacy decisions recognizing equivalent data
                         protection
                       </li>
-                      <li className="text-gray-300">Other approved transfer mechanisms under UK GDPR</li>
+                      <li className="text-gray-300">
+                        Other approved transfer mechanisms under UK GDPR
+                      </li>
                     </ul>
 
-                    <h4 className="text-white mt-4 mb-2 font-semibold">Data Protection Officer</h4>
+                    <h4 className="text-white mt-4 mb-2 font-semibold">
+                      Data Protection Officer
+                    </h4>
                     <p className="text-gray-300">
                       For data protection queries, contact our team at:
                       support@equiprofile.online

@@ -48,7 +48,9 @@ export function MarketingNav() {
           <Link href="/">
             <a className="flex items-center gap-2 hover:opacity-80 transition-opacity">
               <div className="text-2xl font-bold font-serif">
-                <span className={`${isScrolled ? "text-gradient" : "text-white"}`}>
+                <span
+                  className={`${isScrolled ? "text-gradient" : "text-white"}`}
+                >
                   EquiProfile
                 </span>
               </div>
@@ -80,22 +82,38 @@ export function MarketingNav() {
           <div className="hidden md:flex items-center gap-3">
             {isAuthenticated ? (
               <Link href="/dashboard">
-                <Button className={isScrolled ? "" : "bg-white/10 text-white border-white/20 hover:bg-white/20"}>
+                <Button
+                  className={
+                    isScrolled
+                      ? ""
+                      : "bg-white/10 text-white border-white/20 hover:bg-white/20"
+                  }
+                >
                   Go to Dashboard
                 </Button>
               </Link>
             ) : (
               <>
                 <Link href="/login">
-                  <Button 
+                  <Button
                     variant="ghost"
-                    className={isScrolled ? "" : "text-white hover:bg-white/10 hover:text-white"}
+                    className={
+                      isScrolled
+                        ? ""
+                        : "text-white hover:bg-white/10 hover:text-white"
+                    }
                   >
                     Log In
                   </Button>
                 </Link>
                 <Link href="/register">
-                  <Button className={isScrolled ? "" : "bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 text-white border-0"}>
+                  <Button
+                    className={
+                      isScrolled
+                        ? ""
+                        : "bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 text-white border-0"
+                    }
+                  >
                     Get Started
                   </Button>
                 </Link>

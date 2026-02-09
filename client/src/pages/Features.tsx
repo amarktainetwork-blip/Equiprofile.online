@@ -5,10 +5,7 @@ import { PageTransition } from "@/components/PageTransition";
 import { PageBanner } from "@/components/PageBanner";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
-import {
-  ArrowRight,
-  CheckCircle2,
-} from "lucide-react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { detailedFeatures } from "@/content/features";
 
 const fadeInUpVariants = {

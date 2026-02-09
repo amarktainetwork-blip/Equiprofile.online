@@ -24,14 +24,17 @@ export default function TermsPage() {
                   EquiProfile Terms of Service
                 </h2>
                 <p className="text-gray-400">
-                  Last updated: <span className="text-white">January 5, 2026</span>
+                  Last updated:{" "}
+                  <span className="text-white">January 5, 2026</span>
                 </p>
               </div>
 
               <div className="space-y-8">
                 <Card className="bg-white/5 backdrop-blur-md border-white/10">
                   <CardHeader>
-                    <CardTitle className="text-white">1. Acceptance of Terms</CardTitle>
+                    <CardTitle className="text-white">
+                      1. Acceptance of Terms
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="prose prose-invert max-w-none">
                     <p className="text-gray-300">
@@ -45,7 +48,9 @@ export default function TermsPage() {
 
                 <Card className="bg-white/5 backdrop-blur-md border-white/10">
                   <CardHeader>
-                    <CardTitle className="text-white">2. Description of Service</CardTitle>
+                    <CardTitle className="text-white">
+                      2. Description of Service
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="prose prose-invert max-w-none">
                     <p className="text-gray-300">
@@ -53,12 +58,24 @@ export default function TermsPage() {
                       platform that includes features for:
                     </p>
                     <ul>
-                      <li className="text-gray-300">Horse profile management and tracking</li>
-                      <li className="text-gray-300">Health records and vaccination tracking</li>
-                      <li className="text-gray-300">Training session management</li>
-                      <li className="text-gray-300">Feeding schedules and nutrition plans</li>
-                      <li className="text-gray-300">Document storage and organization</li>
-                      <li className="text-gray-300">Calendar and event management</li>
+                      <li className="text-gray-300">
+                        Horse profile management and tracking
+                      </li>
+                      <li className="text-gray-300">
+                        Health records and vaccination tracking
+                      </li>
+                      <li className="text-gray-300">
+                        Training session management
+                      </li>
+                      <li className="text-gray-300">
+                        Feeding schedules and nutrition plans
+                      </li>
+                      <li className="text-gray-300">
+                        Document storage and organization
+                      </li>
+                      <li className="text-gray-300">
+                        Calendar and event management
+                      </li>
                     </ul>
                   </CardContent>
                 </Card>
@@ -116,14 +133,18 @@ export default function TermsPage() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="prose prose-invert max-w-none">
-                    <h4 className="text-white mt-4 mb-2 font-semibold">Trial Period</h4>
+                    <h4 className="text-white mt-4 mb-2 font-semibold">
+                      Trial Period
+                    </h4>
                     <p className="text-gray-300">
                       EquiProfile offers a 7-day free trial period for new
                       users. You may cancel at any time during the trial without
                       being charged.
                     </p>
 
-                    <h4 className="text-white mt-4 mb-2 font-semibold">Subscription Plans</h4>
+                    <h4 className="text-white mt-4 mb-2 font-semibold">
+                      Subscription Plans
+                    </h4>
                     <ul>
                       <li className="text-gray-300">
                         An active subscription is required to continue using
@@ -137,13 +158,17 @@ export default function TermsPage() {
                         All fees are quoted in GBP and are inclusive of UK VAT
                         where applicable
                       </li>
-                      <li className="text-gray-300">Payment is due at the start of each billing cycle</li>
+                      <li className="text-gray-300">
+                        Payment is due at the start of each billing cycle
+                      </li>
                       <li className="text-gray-300">
                         Subscriptions automatically renew unless cancelled
                       </li>
                     </ul>
 
-                    <h4 className="text-white mt-4 mb-2 font-semibold">Payment Processing</h4>
+                    <h4 className="text-white mt-4 mb-2 font-semibold">
+                      Payment Processing
+                    </h4>
                     <p className="text-gray-300">
                       All payments are processed securely through Stripe. We do
                       not store your complete payment card details. By providing
@@ -151,7 +176,9 @@ export default function TermsPage() {
                       payment method for all subscription fees.
                     </p>
 
-                    <h4 className="text-white mt-4 mb-2 font-semibold">Cancellation & Refunds</h4>
+                    <h4 className="text-white mt-4 mb-2 font-semibold">
+                      Cancellation & Refunds
+                    </h4>
                     <ul>
                       <li className="text-gray-300">
                         You can cancel your subscription at any time through
@@ -174,7 +201,9 @@ export default function TermsPage() {
                       </li>
                     </ul>
 
-                    <h4 className="text-white mt-4 mb-2 font-semibold">Price Changes</h4>
+                    <h4 className="text-white mt-4 mb-2 font-semibold">
+                      Price Changes
+                    </h4>
                     <p className="text-gray-300">
                       We reserve the right to modify subscription pricing with
                       at least 30 days' notice. Changes will take effect at your
@@ -185,7 +214,9 @@ export default function TermsPage() {
 
                 <Card className="bg-white/5 backdrop-blur-md border-white/10">
                   <CardHeader>
-                    <CardTitle className="text-white">5. User Content and Data</CardTitle>
+                    <CardTitle className="text-white">
+                      5. User Content and Data
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="prose prose-invert max-w-none">
                     <p className="text-gray-300">
@@ -210,10 +241,14 @@ export default function TermsPage() {
 
                 <Card className="bg-white/5 backdrop-blur-md border-white/10">
                   <CardHeader>
-                    <CardTitle className="text-white">6. Acceptable Use Policy</CardTitle>
+                    <CardTitle className="text-white">
+                      6. Acceptable Use Policy
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="prose prose-invert max-w-none">
-                    <p className="text-gray-300">You agree not to use the Service to:</p>
+                    <p className="text-gray-300">
+                      You agree not to use the Service to:
+                    </p>
                     <ul>
                       <li className="text-gray-300">
                         Violate any applicable UK or international laws or
@@ -273,7 +308,9 @@ export default function TermsPage() {
 
                 <Card className="bg-white/5 backdrop-blur-md border-white/10">
                   <CardHeader>
-                    <CardTitle className="text-white">7. Intellectual Property</CardTitle>
+                    <CardTitle className="text-white">
+                      7. Intellectual Property
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="prose prose-invert max-w-none">
                     <p className="text-gray-300">
@@ -287,7 +324,9 @@ export default function TermsPage() {
 
                 <Card className="bg-white/5 backdrop-blur-md border-white/10">
                   <CardHeader>
-                    <CardTitle className="text-white">8. Disclaimer of Warranties</CardTitle>
+                    <CardTitle className="text-white">
+                      8. Disclaimer of Warranties
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="prose prose-invert max-w-none">
                     <p className="text-gray-300">
@@ -302,10 +341,18 @@ export default function TermsPage() {
                       <li className="text-gray-300">
                         The Service will be uninterrupted, secure, or error-free
                       </li>
-                      <li className="text-gray-300">The Service will meet your specific requirements</li>
-                      <li className="text-gray-300">Any errors or defects will be corrected</li>
-                      <li className="text-gray-300">The Service will be available at all times</li>
-                      <li className="text-gray-300">Data stored will not be lost or corrupted</li>
+                      <li className="text-gray-300">
+                        The Service will meet your specific requirements
+                      </li>
+                      <li className="text-gray-300">
+                        Any errors or defects will be corrected
+                      </li>
+                      <li className="text-gray-300">
+                        The Service will be available at all times
+                      </li>
+                      <li className="text-gray-300">
+                        Data stored will not be lost or corrupted
+                      </li>
                     </ul>
                     <p className="text-gray-300">
                       Your use of the Service is entirely at your own risk. We
@@ -324,7 +371,9 @@ export default function TermsPage() {
 
                 <Card className="bg-white/5 backdrop-blur-md border-white/10">
                   <CardHeader>
-                    <CardTitle className="text-white">9. Limitation of Liability</CardTitle>
+                    <CardTitle className="text-white">
+                      9. Limitation of Liability
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="prose prose-invert max-w-none">
                     <p className="font-semibold">
@@ -353,8 +402,12 @@ export default function TermsPage() {
                       liability for:
                     </p>
                     <ul>
-                      <li className="text-gray-300">Death or personal injury caused by our negligence</li>
-                      <li className="text-gray-300">Fraud or fraudulent misrepresentation</li>
+                      <li className="text-gray-300">
+                        Death or personal injury caused by our negligence
+                      </li>
+                      <li className="text-gray-300">
+                        Fraud or fraudulent misrepresentation
+                      </li>
                       <li className="text-gray-300">
                         Any liability that cannot be excluded or limited under
                         English law
@@ -370,11 +423,17 @@ export default function TermsPage() {
 
                 <Card className="bg-white/5 backdrop-blur-md border-white/10">
                   <CardHeader>
-                    <CardTitle className="text-white">10. Termination</CardTitle>
+                    <CardTitle className="text-white">
+                      10. Termination
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="prose prose-invert max-w-none">
-                    <h4 className="text-white mt-4 mb-2 font-semibold">Termination by You</h4>
-                    <p className="text-gray-300">You may terminate your account at any time by:</p>
+                    <h4 className="text-white mt-4 mb-2 font-semibold">
+                      Termination by You
+                    </h4>
+                    <p className="text-gray-300">
+                      You may terminate your account at any time by:
+                    </p>
                     <ul>
                       <li className="text-gray-300">
                         Cancelling your subscription through account settings
@@ -390,18 +449,26 @@ export default function TermsPage() {
                       data before terminating your account.
                     </p>
 
-                    <h4 className="text-white mt-4 mb-2 font-semibold">Termination by Us</h4>
+                    <h4 className="text-white mt-4 mb-2 font-semibold">
+                      Termination by Us
+                    </h4>
                     <p className="text-gray-300">
                       We may suspend or terminate your account and access to the
                       Service immediately, with or without prior notice, if:
                     </p>
                     <ul>
-                      <li className="text-gray-300">You breach these Terms of Service</li>
-                      <li className="text-gray-300">You violate our Acceptable Use Policy</li>
+                      <li className="text-gray-300">
+                        You breach these Terms of Service
+                      </li>
+                      <li className="text-gray-300">
+                        You violate our Acceptable Use Policy
+                      </li>
                       <li className="text-gray-300">
                         Your account remains inactive for an extended period
                       </li>
-                      <li className="text-gray-300">We are required to do so by law</li>
+                      <li className="text-gray-300">
+                        We are required to do so by law
+                      </li>
                       <li className="text-gray-300">
                         We believe your actions may harm us, other users, or
                         third parties
@@ -411,10 +478,14 @@ export default function TermsPage() {
                       </li>
                     </ul>
 
-                    <h4 className="text-white mt-4 mb-2 font-semibold">Effect of Termination</h4>
+                    <h4 className="text-white mt-4 mb-2 font-semibold">
+                      Effect of Termination
+                    </h4>
                     <p className="text-gray-300">Upon termination:</p>
                     <ul>
-                      <li className="text-gray-300">Your right to use the Service immediately ceases</li>
+                      <li className="text-gray-300">
+                        Your right to use the Service immediately ceases
+                      </li>
                       <li className="text-gray-300">
                         We may delete your account and data after a reasonable
                         retention period
@@ -434,7 +505,9 @@ export default function TermsPage() {
 
                 <Card className="bg-white/5 backdrop-blur-md border-white/10">
                   <CardHeader>
-                    <CardTitle className="text-white">11. Changes to Terms</CardTitle>
+                    <CardTitle className="text-white">
+                      11. Changes to Terms
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="prose prose-invert max-w-none">
                     <p className="text-gray-300">
@@ -449,7 +522,9 @@ export default function TermsPage() {
 
                 <Card className="bg-white/5 backdrop-blur-md border-white/10">
                   <CardHeader>
-                    <CardTitle className="text-white">12. Governing Law and Jurisdiction</CardTitle>
+                    <CardTitle className="text-white">
+                      12. Governing Law and Jurisdiction
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="prose prose-invert max-w-none">
                     <p className="text-gray-300">
@@ -464,7 +539,9 @@ export default function TermsPage() {
 
                 <Card className="bg-white/5 backdrop-blur-md border-white/10">
                   <CardHeader>
-                    <CardTitle className="text-white">13. Contact Information</CardTitle>
+                    <CardTitle className="text-white">
+                      13. Contact Information
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="prose prose-invert max-w-none">
                     <p className="text-gray-300">

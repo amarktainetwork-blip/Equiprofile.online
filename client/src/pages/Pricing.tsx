@@ -10,7 +10,7 @@ import {
 import { Check, Loader2, Clock, XCircle } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
@@ -589,7 +589,8 @@ export default function Pricing() {
                       </span>
                     </h2>
                     <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-                      Start your free 7-day trial today. No credit card required. Experience all features with 1 horse.
+                      Start your free 7-day trial today. No credit card
+                      required. Experience all features with 1 horse.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                       <Link href="/register">

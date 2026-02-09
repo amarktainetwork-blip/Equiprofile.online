@@ -1,11 +1,18 @@
 /**
  * EquiProfile Features Content
- * 
+ *
  * Single source of truth for all feature content across the marketing site.
  * Used by Home page and Features page to ensure consistency.
  */
 
-import { Heart, Activity, Calendar, Utensils, BarChart, Users } from "lucide-react";
+import {
+  Heart,
+  Activity,
+  Calendar,
+  Utensils,
+  BarChart,
+  Users,
+} from "lucide-react";
 import { marketingAssets } from "@/config/marketingAssets";
 
 export interface Feature {
@@ -71,7 +78,8 @@ export const coreFeatures: Feature[] = [
 export const detailedFeatures = [
   {
     title: "Complete Health Management",
-    description: "Keep detailed health records for all your horses in one place",
+    description:
+      "Keep detailed health records for all your horses in one place",
     image: "/images/gallery/1.jpg",
     imagePosition: "right" as const,
     features: [
