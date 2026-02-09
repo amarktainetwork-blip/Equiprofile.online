@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import DashboardLayout from "@/components/DashboardLayout";
 import {
   Calendar as CalendarIcon,
   Plus,
@@ -46,7 +47,8 @@ export default function CalendarPage() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <DashboardLayout>
+      <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">{t("nav.calendar")}</h1>
@@ -226,5 +228,6 @@ export default function CalendarPage() {
         </CardContent>
       </Card>
     </div>
+    </DashboardLayout>
   );
 }

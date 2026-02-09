@@ -532,6 +532,26 @@ async function startServer() {
     }
   });
 
+  // SSE health endpoint (public, for monitoring)
+  app.get("/api/realtime/health", (req, res) => {
+    try {
+      const stats = realtimeManager.getStats();
+      res.json({
+        status: "healthy",
+        connectedClients: stats.connectedClients || 0,
+        activeChannels: stats.channels ? Object.keys(stats.channels).length : 0,
+        uptime: process.uptime(),
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error("[SSE] Health check error:", error);
+      res.status(500).json({
+        status: "unhealthy",
+        error: "Failed to get realtime stats",
+      });
+    }
+  });
+
   // Import trial lock middleware
   const { trialLockMiddleware } = await import("./trialLock");
   

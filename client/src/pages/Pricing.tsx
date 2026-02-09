@@ -22,10 +22,6 @@ import { PageTransition } from "@/components/PageTransition";
 import { PageBanner } from "@/components/PageBanner";
 
 const YEARLY_SAVINGS_PERCENTAGE = 17;
-const BASIC_MONTHLY_PRICE = "10.00";
-const BASIC_YEARLY_PRICE = "100.00";
-const STABLE_MONTHLY_PRICE = "30.00";
-const STABLE_YEARLY_PRICE = "300.00";
 
 export default function Pricing() {
   const { user } = useAuth();
@@ -35,7 +31,7 @@ export default function Pricing() {
     "monthly",
   );
 
-  const { data: pricing } = trpc.billing.getPricing.useQuery();
+  const { data: pricing, isLoading: pricingLoading } = trpc.billing.getPricing.useQuery();
   const { data: subscriptionStatus } = trpc.billing.getStatus.useQuery(
     undefined,
     {
@@ -149,61 +145,89 @@ export default function Pricing() {
 
   const hasActiveSubscription = subscriptionStatus?.status === "active";
 
+  // Helper function to format price from API (pence to pounds)
+  const formatPrice = (amountInPence: number | undefined): string => {
+    if (!amountInPence) return "0.00";
+    return (amountInPence / 100).toFixed(2);
+  };
+
   const getProPlanPrice = () => {
     if (billingPeriod === "monthly") {
-      return pricing?.monthly?.amount
-        ? (pricing.monthly.amount / 100).toFixed(2)
-        : BASIC_MONTHLY_PRICE;
+      return formatPrice(pricing?.pro?.monthly?.amount);
     }
-    return pricing?.yearly?.amount
-      ? (pricing.yearly.amount / 100).toFixed(2)
-      : BASIC_YEARLY_PRICE;
+    return formatPrice(pricing?.pro?.yearly?.amount);
+  };
+
+  const getStablePlanPrice = () => {
+    if (billingPeriod === "monthly") {
+      return formatPrice(pricing?.stable?.monthly?.amount);
+    }
+    return formatPrice(pricing?.stable?.yearly?.amount);
   };
 
   const pricingPlans = [
     {
-      name: "Free Trial",
+      name: pricing?.trial?.name || "Free Trial",
       plan: "trial",
       description: "Try all features with 1 horse",
       price: "0",
-      period: "/7 days",
-      features: features.free,
+      period: `/${pricing?.trial?.duration || 7} days`,
+      features: pricing?.trial?.features || features.free,
       icon: Sparkles,
       iconColor: "from-blue-400 to-cyan-400",
       popular: false,
     },
     {
-      name: "Pro",
+      name: pricing?.pro?.name || "Pro",
       plan: "pro",
       description: "For individual horse owners",
       price: getProPlanPrice(),
       period: billingPeriod === "monthly" ? "/month" : "/year",
-      yearlyPrice: pricing?.yearly?.amount
-        ? (pricing.yearly.amount / 100).toFixed(2)
-        : BASIC_YEARLY_PRICE,
+      yearlyPrice: formatPrice(pricing?.pro?.yearly?.amount),
       monthlySavings: true,
-      features: features.pro,
+      features: pricing?.pro?.features || features.pro,
       icon: Crown,
       iconColor: "from-indigo-400 to-purple-400",
       popular: true,
     },
     {
-      name: "Stable",
+      name: pricing?.stable?.name || "Stable",
       plan: "stable",
       description: "For professional operations",
-      price:
-        billingPeriod === "monthly"
-          ? STABLE_MONTHLY_PRICE
-          : STABLE_YEARLY_PRICE,
+      price: getStablePlanPrice(),
       period: billingPeriod === "monthly" ? "/month" : "/year",
-      yearlyPrice: STABLE_YEARLY_PRICE,
+      yearlyPrice: formatPrice(pricing?.stable?.yearly?.amount),
       monthlySavings: true,
-      features: features.stable,
+      features: pricing?.stable?.features || features.stable,
       icon: Building2,
       iconColor: "from-purple-400 to-pink-400",
       popular: false,
     },
   ];
+
+  // Show loading state while pricing data is being fetched
+  if (pricingLoading) {
+    return (
+      <>
+        <MarketingNav />
+        <PageTransition>
+          <PageBanner
+            title="Pricing"
+            subtitle="Professional equine management for every need"
+            imageSrc="/images/riding-lesson.jpg"
+            imagePosition="center"
+          />
+          <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black flex items-center justify-center">
+            <div className="text-center">
+              <Loader2 className="w-12 h-12 animate-spin text-cyan-400 mx-auto mb-4" />
+              <p className="text-gray-400">Loading pricing information...</p>
+            </div>
+          </div>
+        </PageTransition>
+        <Footer />
+      </>
+    );
+  }
 
   return (
     <>

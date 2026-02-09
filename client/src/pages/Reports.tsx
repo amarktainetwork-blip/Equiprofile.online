@@ -1,4 +1,5 @@
 import { useState } from "react";
+import DashboardLayout from "@/components/DashboardLayout";
 import {
   Plus,
   FileText,
@@ -190,6 +191,7 @@ export default function Reports() {
   };
 
   return (
+    <DashboardLayout>
     <div className="container mx-auto p-4 space-y-6">
       <div className="flex justify-between items-center">
         <div>
@@ -527,5 +529,6 @@ export default function Reports() {
         </DialogContent>
       </Dialog>
     </div>
+    </DashboardLayout>
   );
 }
