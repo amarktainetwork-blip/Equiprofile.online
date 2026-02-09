@@ -36,7 +36,9 @@ export function AuthSplitLayout({
         </div>
 
         {/* Form content */}
-        <div className="w-full max-w-md relative z-10 my-auto max-h-[calc(100vh-2rem)] overflow-y-auto">{children}</div>
+        <div className="w-full max-w-md relative z-10 my-auto max-h-[calc(100vh-2rem)] overflow-y-auto">
+          {children}
+        </div>
       </div>
 
       {/* Desktop: Right side - Image panel (hidden on mobile) */}
