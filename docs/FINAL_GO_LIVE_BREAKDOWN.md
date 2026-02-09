@@ -424,6 +424,7 @@
   - Create endpoint returning: connected clients, active channels, uptime
 - **Complexity:** Trivial (XS)
 - **Next step:**
+
   ```typescript
   app.get("/api/realtime/health", (req, res) => {
     res.json({
@@ -487,6 +488,7 @@
   - Run `npm run format` (Prettier)
 - **Complexity:** Trivial (XS)
 - **Next step:**
+
   ```bash
   npm run check
   npm run build
