@@ -15,12 +15,9 @@ import { useState, FormEvent } from "react";
 import { Loader2, ArrowLeft, AlertCircle } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { PageTransition } from "@/components/PageTransition";
-import { MarketingNav } from "@/components/MarketingNav";
-import { Footer } from "@/components/Footer";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AuthSplitLayout } from "@/components/AuthSplitLayout";
 import { motion } from "framer-motion";
-import { marketingAssets } from "@/config/marketingAssets";
 
 /**
  * Register page
@@ -104,9 +101,8 @@ export default function Register() {
 
   return (
     <>
-      <MarketingNav />
       <PageTransition>
-        <AuthSplitLayout imageUrl={marketingAssets.landing.stable}>
+        <AuthSplitLayout imageUrl="/images/stable.jpg">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -114,9 +110,9 @@ export default function Register() {
           >
             {/* Back button */}
             <Link href="/">
-              <a className="inline-flex items-center gap-2 text-sm text-white/60 hover:text-white transition-colors mb-6">
+              <a className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors mb-4">
                 <ArrowLeft className="w-4 h-4" />
-                Back to home
+                <span>Back to home</span>
               </a>
             </Link>
 
@@ -374,7 +370,6 @@ export default function Register() {
           </motion.div>
         </AuthSplitLayout>
       </PageTransition>
-      <Footer />
     </>
   );
 }

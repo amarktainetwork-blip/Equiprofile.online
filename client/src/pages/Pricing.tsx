@@ -100,35 +100,34 @@ export default function Pricing() {
   const features = {
     free: [
       "7-day free trial",
-      "Up to 3 horses",
+      "1 horse only",
+      "ALL features enabled",
       "Basic health records",
       "Training session logging",
-      "1GB document storage",
+      "Secure storage",
       "Email support",
     ],
     pro: [
-      "Unlimited horses",
+      "Up to 5 horses",
       "Complete health tracking",
       "Advanced training logs",
       "Competition results",
-      "10GB document storage",
+      "Secure storage",
       "AI weather analysis (50/day)",
       "Email reminders",
-      "Mobile app access",
       "Export to CSV/PDF",
     ],
     stable: [
       "Everything in Pro, plus:",
-      "Unlimited horses",
+      "Up to 20 horses",
       "Unlimited team members",
       "Role-based permissions",
       "Stable management",
-      "100GB document storage",
+      "Secure storage",
       "Unlimited AI weather",
       "Advanced analytics",
       "Priority email support",
-      "Phone support",
-      "Dedicated account manager (yearly)",
+      "WhatsApp support",
     ],
   };
 
@@ -165,7 +164,7 @@ export default function Pricing() {
     {
       name: "Free Trial",
       plan: "trial",
-      description: "Perfect for getting started",
+      description: "Try all features with 1 horse",
       price: "0",
       period: "/7 days",
       features: features.free,
@@ -245,8 +244,8 @@ export default function Pricing() {
                     7-Day Free Trial
                   </h3>
                   <p className="text-gray-400 text-sm">
-                    Try EquiProfile risk-free with full access to Pro features
-                    for 7 days
+                    Try EquiProfile risk-free with full access to ALL features
+                    for 1 horse for 7 days
                   </p>
                 </div>
               </div>
@@ -522,7 +521,7 @@ export default function Pricing() {
                   {
                     question: "What happens after the free trial?",
                     answer:
-                      "Your account becomes read-only. You can upgrade to a paid plan anytime to regain full access.",
+                      "Your account becomes read-only. You can upgrade to a paid plan anytime to regain full access to all features.",
                   },
                   {
                     question: "Can I switch plans?",
@@ -533,6 +532,26 @@ export default function Pricing() {
                     question: "What payment methods do you accept?",
                     answer:
                       "We accept all major credit cards via Stripe. Your payment information is securely processed and never stored on our servers.",
+                  },
+                  {
+                    question: "How many horses can I manage?",
+                    answer:
+                      "Free trial: 1 horse. Pro plan: up to 5 horses. Stable plan: up to 20 horses. Choose the plan that fits your needs.",
+                  },
+                  {
+                    question: "Is there a discount for yearly billing?",
+                    answer:
+                      "Yes! Save 17% when you choose yearly billing. Plus, you only need to renew once per year.",
+                  },
+                  {
+                    question: "Do I need a credit card for the trial?",
+                    answer:
+                      "No! Start your 7-day free trial without entering any credit card information. No hidden charges.",
+                  },
+                  {
+                    question: "Can I export my data?",
+                    answer:
+                      "Yes! All paid plans include the ability to export your data to CSV and PDF formats for backup or sharing.",
                   },
                 ].map((faq, index) => (
                   <motion.div
