@@ -4,10 +4,68 @@ import {
   createCheckoutSession,
   createPortalSession,
   STRIPE_PRICING,
+  PRICING_PLANS,
 } from "../stripe";
 import { ENV } from "./env";
 
 const router: Router = express.Router();
+
+/**
+ * GET /api/billing/plans
+ * Return ALL pricing plans as single source of truth
+ * Used by both marketing and dashboard
+ */
+router.get("/plans", (req, res) => {
+  try {
+    // Return pricing structure
+    const plans = {
+      trial: {
+        name: PRICING_PLANS.trial.name,
+        horses: PRICING_PLANS.trial.horses,
+        price: PRICING_PLANS.trial.price,
+        currency: PRICING_PLANS.trial.currency,
+        interval: PRICING_PLANS.trial.interval,
+        duration: PRICING_PLANS.trial.duration,
+        features: PRICING_PLANS.trial.features,
+      },
+      pro: {
+        name: PRICING_PLANS.pro.name,
+        horses: PRICING_PLANS.pro.horses,
+        monthly: {
+          amount: PRICING_PLANS.pro.monthly.amount,
+          currency: PRICING_PLANS.pro.monthly.currency,
+          interval: PRICING_PLANS.pro.monthly.interval,
+        },
+        yearly: {
+          amount: PRICING_PLANS.pro.yearly.amount,
+          currency: PRICING_PLANS.pro.yearly.currency,
+          interval: PRICING_PLANS.pro.yearly.interval,
+        },
+        features: PRICING_PLANS.pro.features,
+      },
+      stable: {
+        name: PRICING_PLANS.stable.name,
+        horses: PRICING_PLANS.stable.horses,
+        monthly: {
+          amount: PRICING_PLANS.stable.monthly.amount,
+          currency: PRICING_PLANS.stable.monthly.currency,
+          interval: PRICING_PLANS.stable.monthly.interval,
+        },
+        yearly: {
+          amount: PRICING_PLANS.stable.yearly.amount,
+          currency: PRICING_PLANS.stable.yearly.currency,
+          interval: PRICING_PLANS.stable.yearly.interval,
+        },
+        features: PRICING_PLANS.stable.features,
+      },
+    };
+
+    res.json(plans);
+  } catch (error) {
+    console.error("[Billing] Plans error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 /**
  * GET /api/billing/checkout

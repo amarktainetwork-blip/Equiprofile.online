@@ -17,6 +17,7 @@ import {
   createCheckoutSession,
   createPortalSession,
   STRIPE_PRICING,
+  PRICING_PLANS,
 } from "./stripe";
 import {
   exportHorsesCSV,
@@ -277,22 +278,52 @@ export const appRouter = router({
         return {
           enabled: false,
           message: "Billing is disabled",
-          monthly: null,
-          yearly: null,
+          trial: null,
+          pro: null,
+          stable: null,
         };
       }
 
       return {
         enabled: true,
-        monthly: {
-          amount: STRIPE_PRICING.monthly.amount,
-          currency: STRIPE_PRICING.monthly.currency,
-          interval: STRIPE_PRICING.monthly.interval,
+        trial: {
+          name: PRICING_PLANS.trial.name,
+          horses: PRICING_PLANS.trial.horses,
+          price: PRICING_PLANS.trial.price,
+          currency: PRICING_PLANS.trial.currency,
+          interval: PRICING_PLANS.trial.interval,
+          duration: PRICING_PLANS.trial.duration,
+          features: PRICING_PLANS.trial.features,
         },
-        yearly: {
-          amount: STRIPE_PRICING.yearly.amount,
-          currency: STRIPE_PRICING.yearly.currency,
-          interval: STRIPE_PRICING.yearly.interval,
+        pro: {
+          name: PRICING_PLANS.pro.name,
+          horses: PRICING_PLANS.pro.horses,
+          monthly: {
+            amount: PRICING_PLANS.pro.monthly.amount,
+            currency: PRICING_PLANS.pro.monthly.currency,
+            interval: PRICING_PLANS.pro.monthly.interval,
+          },
+          yearly: {
+            amount: PRICING_PLANS.pro.yearly.amount,
+            currency: PRICING_PLANS.pro.yearly.currency,
+            interval: PRICING_PLANS.pro.yearly.interval,
+          },
+          features: PRICING_PLANS.pro.features,
+        },
+        stable: {
+          name: PRICING_PLANS.stable.name,
+          horses: PRICING_PLANS.stable.horses,
+          monthly: {
+            amount: PRICING_PLANS.stable.monthly.amount,
+            currency: PRICING_PLANS.stable.monthly.currency,
+            interval: PRICING_PLANS.stable.monthly.interval,
+          },
+          yearly: {
+            amount: PRICING_PLANS.stable.yearly.amount,
+            currency: PRICING_PLANS.stable.yearly.currency,
+            interval: PRICING_PLANS.stable.yearly.interval,
+          },
+          features: PRICING_PLANS.stable.features,
         },
       };
     }),
