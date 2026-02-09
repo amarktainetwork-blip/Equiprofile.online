@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Check, Loader2, Clock, XCircle } from "lucide-react";
+import { Check, Loader2, Clock, XCircle, Sparkles, Crown, Building2 } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { Link, useLocation } from "wouter";
@@ -168,7 +168,8 @@ export default function Pricing() {
       price: "0",
       period: "/7 days",
       features: features.free,
-      image: marketingAssets.pricing.planBasic,
+      icon: Sparkles,
+      iconColor: "from-blue-400 to-cyan-400",
       popular: false,
     },
     {
@@ -182,7 +183,8 @@ export default function Pricing() {
         : BASIC_YEARLY_PRICE,
       monthlySavings: true,
       features: features.pro,
-      image: marketingAssets.pricing.planPro,
+      icon: Crown,
+      iconColor: "from-indigo-400 to-purple-400",
       popular: true,
     },
     {
@@ -197,7 +199,8 @@ export default function Pricing() {
       yearlyPrice: STABLE_YEARLY_PRICE,
       monthlySavings: true,
       features: features.stable,
-      image: marketingAssets.pricing.planEnterprise,
+      icon: Building2,
+      iconColor: "from-purple-400 to-pink-400",
       popular: false,
     },
   ];
@@ -376,14 +379,12 @@ export default function Pricing() {
                     overflow-hidden group
                   `}
                     >
-                      {/* Image */}
-                      <div className="h-40 overflow-hidden bg-gradient-to-br from-indigo-900/20 to-cyan-900/20 relative">
+                      {/* Icon Header */}
+                      <div className="h-40 overflow-hidden bg-gradient-to-br from-indigo-900/20 to-cyan-900/20 relative flex items-center justify-center">
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
-                        <img
-                          src={planData.image}
-                          alt={planData.name}
-                          className="w-full h-full object-contain p-8 opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300"
-                        />
+                        <div className={`relative z-20 w-24 h-24 rounded-full bg-gradient-to-r ${planData.iconColor} flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-2xl`}>
+                          <planData.icon className="w-12 h-12 text-white" />
+                        </div>
                       </div>
 
                       <CardHeader>
