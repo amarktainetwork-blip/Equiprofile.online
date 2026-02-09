@@ -48,6 +48,9 @@ export const users = mysqlTable("users", {
   phone: varchar("phone", { length: 20 }),
   location: varchar("location", { length: 255 }),
   profileImageUrl: text("profileImageUrl"),
+  // Storage tracking
+  storageUsedBytes: int("storageUsedBytes").default(0).notNull(),
+  storageQuotaBytes: int("storageQuotaBytes").default(104857600).notNull(), // 100MB default
   // User preferences and settings
   preferences: text("preferences"), // JSON: theme, language, dashboard layout
   language: varchar("language", { length: 10 }).default("en"),

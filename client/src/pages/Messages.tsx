@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import DashboardLayout from "@/components/DashboardLayout";
 import { Send, Paperclip, MessageSquare } from "lucide-react";
 import {
   Card,
@@ -23,6 +24,7 @@ export default function MessagesPage() {
   };
 
   return (
+    <DashboardLayout>
     <div className="container mx-auto p-6">
       <div className="grid md:grid-cols-[300px_1fr] gap-4 h-[calc(100vh-8rem)]">
         {/* Threads List */}
@@ -80,5 +82,6 @@ export default function MessagesPage() {
         </Card>
       </div>
     </div>
+    </DashboardLayout>
   );
 }

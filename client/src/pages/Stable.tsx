@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import DashboardLayout from "@/components/DashboardLayout";
 import { Users, Settings, Plus, Mail } from "lucide-react";
 import {
   Card,
@@ -21,6 +22,7 @@ export default function StablePage() {
   const [activeTab, setActiveTab] = useState("overview");
 
   return (
+    <DashboardLayout>
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
         <div>
@@ -166,5 +168,6 @@ export default function StablePage() {
         </TabsContent>
       </Tabs>
     </div>
+    </DashboardLayout>
   );
 }

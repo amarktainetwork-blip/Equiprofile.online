@@ -110,3 +110,87 @@ export async function storageGet(
     url: await buildDownloadUrl(baseUrl, key, apiKey),
   };
 }
+
+/**
+ * Storage Quota Management
+ * Tracks and enforces storage limits per user
+ */
+
+// Storage quotas in bytes
+export const STORAGE_QUOTAS = {
+  trial: 104857600,      // 100MB
+  pro: 1073741824,       // 1GB
+  stable: 5368709120,    // 5GB
+} as const;
+
+export function getStorageQuotaForPlan(subscriptionPlan: string | null, subscriptionStatus: string): number {
+  if (subscriptionStatus === "trial") {
+    return STORAGE_QUOTAS.trial;
+  }
+  if (subscriptionPlan === "monthly" || subscriptionPlan === "yearly") {
+    return STORAGE_QUOTAS.pro;
+  }
+  if (subscriptionPlan === "stable_monthly" || subscriptionPlan === "stable_yearly") {
+    return STORAGE_QUOTAS.stable;
+  }
+  // Default to trial quota
+  return STORAGE_QUOTAS.trial;
+}
+
+export function formatBytes(bytes: number): string {
+  if (bytes === 0) return "0 B";
+  const k = 1024;
+  const sizes = ["B", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${(bytes / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`;
+}
+
+export async function checkStorageQuota(userId: number, fileSize: number): Promise<{ allowed: boolean; reason?: string }> {
+  const db = await import("./db");
+  const user = await db.getUserById(userId);
+  
+  if (!user) {
+    return { allowed: false, reason: "User not found" };
+  }
+
+  const quota = user.storageQuotaBytes || getStorageQuotaForPlan(user.subscriptionPlan, user.subscriptionStatus);
+  const used = user.storageUsedBytes || 0;
+  const willUse = used + fileSize;
+
+  if (willUse > quota) {
+    return {
+      allowed: false,
+      reason: `Storage quota exceeded. Used: ${formatBytes(used)}, Quota: ${formatBytes(quota)}. Upgrade your plan for more storage.`
+    };
+  }
+
+  return { allowed: true };
+}
+
+export async function trackStorageUsage(userId: number, bytesAdded: number): Promise<void> {
+  const db = await import("./db");
+  const user = await db.getUserById(userId);
+  
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  const newUsage = (user.storageUsedBytes || 0) + bytesAdded;
+  await db.updateUser(userId, {
+    storageUsedBytes: newUsage,
+  });
+}
+
+export async function releaseStorageUsage(userId: number, bytesReleased: number): Promise<void> {
+  const db = await import("./db");
+  const user = await db.getUserById(userId);
+  
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  const newUsage = Math.max(0, (user.storageUsedBytes || 0) - bytesReleased);
+  await db.updateUser(userId, {
+    storageUsedBytes: newUsage,
+  });
+}
