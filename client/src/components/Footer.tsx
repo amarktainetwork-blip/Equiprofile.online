@@ -83,9 +83,7 @@ export function Footer() {
         </div>
 
         <div className="border-t pt-8 text-center text-sm text-muted-foreground">
-          <p>
-            © 2026 EquiProfile — Part of Amarktai Network. All rights reserved.
-          </p>
+          <p>© {new Date().getFullYear()} EquiProfile. All rights reserved.</p>
         </div>
       </div>
     </footer>

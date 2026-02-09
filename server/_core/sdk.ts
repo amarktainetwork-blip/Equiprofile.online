@@ -28,13 +28,16 @@ const EXCHANGE_TOKEN_PATH = `/webdev.v1.WebDevAuthPublicService/ExchangeToken`;
 const GET_USER_INFO_PATH = `/webdev.v1.WebDevAuthPublicService/GetUserInfo`;
 const GET_USER_INFO_WITH_JWT_PATH = `/webdev.v1.WebDevAuthPublicService/GetUserInfoWithJwt`;
 
+// Track if OAuth error has been logged (server-side only)
+let oauthErrorLogged = false;
+
 class OAuthService {
   constructor(private client: ReturnType<typeof axios.create>) {
-    console.log("[OAuth] Initialized with baseURL:", ENV.oAuthServerUrl);
-    if (!ENV.oAuthServerUrl) {
-      console.error(
-        "[OAuth] ERROR: OAUTH_SERVER_URL is not configured! Set OAUTH_SERVER_URL environment variable.",
+    if (!ENV.oAuthServerUrl && !oauthErrorLogged) {
+      console.warn(
+        "[OAuth] OAuth not configured - OAUTH_SERVER_URL environment variable is missing. OAuth login will be disabled.",
       );
+      oauthErrorLogged = true;
     }
   }
 

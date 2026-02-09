@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { MarketingNav } from "@/components/MarketingNav";
 import { Footer } from "@/components/Footer";
 import { PageTransition } from "@/components/PageTransition";
+import { PageBanner } from "@/components/PageBanner";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { marketingAssets } from "@/config/marketingAssets";
 import { Mail, MessageCircle } from "lucide-react";
@@ -63,50 +64,15 @@ export default function Contact() {
     <>
       <MarketingNav />
       <PageTransition>
-        <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black">
-          {/* Hero Section with Glass Frame */}
-          <section className="relative pt-24 pb-16 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/10 via-transparent to-transparent pointer-events-none" />
+        <div className="min-h-screen bg-black">
+          {/* Page Banner */}
+          <PageBanner
+            title="Get in Touch"
+            subtitle="Have a question or need help? We're here for you. Send us a message and we'll respond as soon as possible."
+            imageSrc="/images/gallery/21.jpg"
+          />
 
-            <div className="container mx-auto px-4 mb-16">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className="text-center max-w-4xl mx-auto mb-12"
-              >
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-serif mb-6 text-white">
-                  Get in{" "}
-                  <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
-                    Touch
-                  </span>
-                </h1>
-                <p className="text-lg md:text-xl text-gray-300">
-                  Have a question or need help? We're here for you. Send us a
-                  message and we'll respond as soon as possible.
-                </p>
-              </motion.div>
-
-              {/* Hero Image with Dark Glass Frame */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-                className="max-w-2xl mx-auto"
-              >
-                <div className="relative rounded-2xl overflow-hidden border border-white/10 bg-black/40 backdrop-blur-md p-4">
-                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 via-purple-500/10 to-cyan-500/20 pointer-events-none" />
-                  <img
-                    src={marketingAssets.contact.hero}
-                    alt="Contact Us"
-                    className="w-full h-auto rounded-xl shadow-2xl"
-                  />
-                </div>
-              </motion.div>
-            </div>
-          </section>
-
-          <div className="container mx-auto px-4 pb-16">
+          <div className="container mx-auto px-4 py-16">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
               {/* Contact Form with Dark Glass */}
               <motion.div
@@ -214,8 +180,6 @@ export default function Contact() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4, delay: 0.8 }}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
                       >
                         <Button
                           type="submit"
@@ -263,7 +227,7 @@ export default function Contact() {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.6, delay: 0.5 }}
-                  className="relative rounded-xl overflow-hidden border border-white/10 bg-black/40 backdrop-blur-md p-6 hover:border-indigo-500/50 transition-colors duration-300 group"
+                  className="relative rounded-xl overflow-hidden border border-white/10 bg-black/40 backdrop-blur-md p-6 hover:border-green-500/50 transition-colors duration-300 group"
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                   <div className="relative flex items-start gap-4">
@@ -275,17 +239,18 @@ export default function Contact() {
                         WhatsApp
                       </h3>
                       <p className="text-sm text-gray-400 mb-2">
-                        Chat with us anytime
+                        Chat with us instantly
                       </p>
                       <a
                         href="https://wa.me/447347258089"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-green-500/20 border border-green-500/30 text-green-400 hover:bg-green-500/30 transition-colors text-sm font-medium"
                       >
+                        <MessageCircle className="w-4 h-4" />
                         +44 7347 258089
                       </a>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-gray-500 mt-2">
                         Quick response via WhatsApp
                       </p>
                     </div>
@@ -305,8 +270,8 @@ export default function Contact() {
                     </h3>
                     <p className="text-sm text-gray-400">
                       We typically respond to all inquiries within 24 hours
-                      during business days. For urgent matters, please call our
-                      support line.
+                      during business days. For urgent matters, contact us via
+                      WhatsApp for faster support.
                     </p>
                   </div>
                 </motion.div>

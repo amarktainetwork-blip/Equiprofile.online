@@ -20,6 +20,7 @@ import { getStripe } from "../stripe";
 import * as email from "./email";
 import { ENV } from "./env";
 import { resolve } from "path";
+import fs from "fs";
 
 // Port checking functions removed - now using deterministic port binding
 // If port is in use, server will fail with clear error message instead of auto-switching
@@ -62,25 +63,29 @@ async function startServer() {
   );
   console.log("✅ CORS configured with allowed origins:", allowedOrigins);
 
-  // Security middleware with strict CSP
-  // NOTE: scriptSrc does NOT include 'unsafe-inline' - all scripts must be external
-  // client/index.html contains NO inline scripts, only <script type="module" src="/src/main.tsx">
-  // This prevents XSS attacks via inline script injection
-  app.use(
+  // CSP nonce middleware - generate unique nonce per request
+  app.use((req, res, next) => {
+    res.locals.cspNonce = nanoid();
+    next();
+  });
+
+  // Security middleware with strict CSP including nonce support
+  app.use((req, res, next) => {
+    const nonce = res.locals.cspNonce;
     helmet({
       contentSecurityPolicy: {
         directives: {
           defaultSrc: ["'self'"],
-          scriptSrc: ["'self'"], // NO 'unsafe-inline' - all scripts must be external
+          scriptSrc: ["'self'", `'nonce-${nonce}'`],
           styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles (Tailwind)
           imgSrc: ["'self'", "data:", "https:"],
           connectSrc: ["'self'"],
-          fontSrc: ["'self'"],
+          fontSrc: ["'self'", "data:"], // Allow data: for embedded fonts
         },
       },
       crossOriginEmbedderPolicy: false,
-    }),
-  );
+    })(req, res, next);
+  });
 
   // Request ID middleware for logging
   app.use((req, res, next) => {
@@ -324,9 +329,7 @@ async function startServer() {
   let cachedBuildInfo: any = null;
   try {
     const packageJsonPath = resolve(process.cwd(), "package.json");
-    const packageJson = JSON.parse(
-      require("fs").readFileSync(packageJsonPath, "utf-8"),
-    );
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
 
     // Try to get git commit (only once at startup)
     let commit = "unknown";
@@ -397,9 +400,8 @@ async function startServer() {
     res.json({ status: "ok", timestamp: new Date().toISOString() });
   });
 
-  // Version endpoint with build fingerprint
-  app.get("/api/version", (req, res) => {
-    const fs = require("fs");
+  // Version endpoint with build fingerprint (rate limited like other info endpoints)
+  app.get("/api/version", healthLimiter, (req, res) => {
     const path = require("path");
 
     // Try to read build.txt for build fingerprint
@@ -438,6 +440,22 @@ async function startServer() {
       baseUrl: ENV.baseUrl,
       oauthServerUrl: configured ? ENV.oAuthServerUrl : null,
     });
+  });
+
+  // Favicon handler - serve favicon.svg as favicon.ico with correct headers (rate limited)
+  app.get("/favicon.ico", healthLimiter, (req, res) => {
+    const faviconPath =
+      process.env.NODE_ENV === "development"
+        ? resolve(process.cwd(), "client/public/favicon.svg")
+        : resolve(import.meta.dirname, "public/favicon.svg");
+
+    if (fs.existsSync(faviconPath)) {
+      res.setHeader("Content-Type", "image/svg+xml");
+      res.setHeader("Cache-Control", "public, max-age=86400"); // 1 day
+      res.sendFile(faviconPath);
+    } else {
+      res.status(404).send("Favicon not found");
+    }
   });
 
   // OAuth callback under /api/oauth/callback
