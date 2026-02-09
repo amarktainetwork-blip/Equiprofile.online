@@ -49,7 +49,7 @@ export async function trialLockMiddleware(
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<void> {
+): Promise<Response | void> {
   // Skip exempt paths (auth, billing, health checks)
   if (isExemptPath(req.path)) {
     return next();
