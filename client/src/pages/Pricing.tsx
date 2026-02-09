@@ -164,7 +164,7 @@ export default function Pricing() {
     {
       name: "Free Trial",
       plan: "trial",
-      description: "Perfect for getting started",
+      description: "Try all features with 1 horse",
       price: "0",
       period: "/7 days",
       features: features.free,
@@ -244,8 +244,8 @@ export default function Pricing() {
                     7-Day Free Trial
                   </h3>
                   <p className="text-gray-400 text-sm">
-                    Try EquiProfile risk-free with full access to Pro features
-                    for 7 days
+                    Try EquiProfile risk-free with full access to ALL features
+                    for 1 horse for 7 days
                   </p>
                 </div>
               </div>
