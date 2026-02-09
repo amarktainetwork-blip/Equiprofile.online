@@ -2295,3 +2295,40 @@ export async function deleteNote(id: number, userId: number) {
     .delete(notes)
     .where(and(eq(notes.id, id), eq(notes.userId, userId)));
 }
+
+// ============ EVENT REMINDERS ============
+export async function getDueEventReminders(beforeDate: Date) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(eventReminders)
+    .where(
+      and(
+        lte(eventReminders.reminderTime, beforeDate),
+        eq(eventReminders.sent, false)
+      )
+    );
+}
+
+export async function markEventReminderSent(reminderId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(eventReminders)
+    .set({ sent: true, sentAt: new Date() })
+    .where(eq(eventReminders.id, reminderId));
+}
+
+export async function getEventById(eventId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const results = await db
+    .select()
+    .from(events)
+    .where(eq(events.id, eventId));
+  return results[0] || null;
+}

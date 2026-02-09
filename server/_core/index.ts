@@ -589,6 +589,13 @@ async function startServer() {
     console.log(`✓ Server running on http://${host}:${port}/`);
     console.log(`✓ Environment: ${process.env.NODE_ENV || "development"}`);
     console.log(`✓ Health check: http://${host}:${port}/api/health`);
+    
+    // Start reminder scheduler
+    import("./reminderScheduler").then((module) => {
+      module.startReminderScheduler();
+    }).catch((err) => {
+      console.error("[Server] Failed to start reminder scheduler:", err);
+    });
   });
 
   // Handle port binding errors
