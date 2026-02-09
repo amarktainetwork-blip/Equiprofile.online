@@ -9,6 +9,8 @@ import {
   useKeyboardNavigation,
 } from "./components/AccessibilityHelpers";
 import { useScrollToTop } from "./hooks/useScrollToTop";
+import { UpgradeModal } from "./components/UpgradeModal";
+import { useUpgradeModal } from "./hooks/useUpgradeModal";
 import "./i18n/config";
 
 // Marketing Pages (Public)
@@ -68,10 +70,17 @@ import Tags from "./pages/Tags";
 function Router() {
   useKeyboardNavigation();
   useScrollToTop();
+  const upgradeModal = useUpgradeModal();
 
   return (
     <>
       <SkipToContent />
+      <UpgradeModal 
+        open={upgradeModal.isOpen}
+        onClose={upgradeModal.close}
+        reason={upgradeModal.reason}
+        message={upgradeModal.message}
+      />
       <main id="main-content">
         <Switch>
           {/* Marketing Pages (Public) */}
