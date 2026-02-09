@@ -1916,6 +1916,76 @@ Format your response as JSON with keys: recommendation, explanation, precautions
       }),
   }),
 
+  // Notes with voice dictation
+  notes: router({
+    list: protectedProcedure
+      .input(
+        z.object({
+          horseId: z.number().optional(),
+          limit: z.number().default(50),
+        }),
+      )
+      .query(async ({ ctx, input }) => {
+        return db.getNotesByUserId(ctx.user.id, input.horseId, input.limit);
+      }),
+
+    create: protectedProcedure
+      .input(
+        z.object({
+          title: z.string().optional(),
+          content: z.string(),
+          horseId: z.number().optional(),
+          transcribed: z.boolean().default(false),
+          tags: z.string().optional(),
+        }),
+      )
+      .mutation(async ({ ctx, input }) => {
+        const noteId = await db.createNote({
+          userId: ctx.user.id,
+          ...input,
+        });
+        return { id: noteId };
+      }),
+
+    update: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          title: z.string().optional(),
+          content: z.string().optional(),
+          tags: z.string().optional(),
+        }),
+      )
+      .mutation(async ({ ctx, input }) => {
+        // Verify ownership
+        const note = await db.getNoteById(input.id);
+        if (!note || note.userId !== ctx.user.id) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Note not found or access denied",
+          });
+        }
+        const { id, ...updateData } = input;
+        await db.updateNote(id, ctx.user.id, updateData);
+        return { success: true };
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        // Verify ownership
+        const note = await db.getNoteById(input.id);
+        if (!note || note.userId !== ctx.user.id) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Note not found or access denied",
+          });
+        }
+        await db.deleteNote(input.id, ctx.user.id);
+        return { success: true };
+      }),
+  }),
+
   // Admin routes
   admin: router({
     // User management

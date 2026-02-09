@@ -1150,3 +1150,19 @@ export const nutritionPlans = mysqlTable("nutritionPlans", {
 
 export type NutritionPlan = typeof nutritionPlans.$inferSelect;
 export type InsertNutritionPlan = typeof nutritionPlans.$inferInsert;
+
+// Notes module - voice dictation and general notes
+export const notes = mysqlTable("notes", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  horseId: int("horseId"), // optional, can be general note
+  title: varchar("title", { length: 200 }),
+  content: text("content").notNull(),
+  transcribed: boolean("transcribed").default(false).notNull(), // true if from voice
+  tags: text("tags"), // JSON array of tags
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Note = typeof notes.$inferSelect;
+export type InsertNote = typeof notes.$inferInsert;
