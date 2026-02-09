@@ -98,8 +98,7 @@ export default function About() {
                     <img
                       src="/images/gallery/19.jpg"
                       alt="Our Story"
-                      className="relative z-10 w-full h-full object-cover"
-                      style={{ objectPosition: "center 30%" }}
+                      className="relative z-10 w-full h-full object-cover object-[center_30%]"
                     />
                   </div>
                 </AnimatedSection>
@@ -167,8 +166,7 @@ export default function About() {
                         <img
                           src="/images/gallery/17.jpg"
                           alt="Our Mission"
-                          className="relative z-10 w-full h-full object-cover rounded-xl"
-                          style={{ objectPosition: "center 40%" }}
+                          className="relative z-10 w-full h-full object-cover rounded-xl object-[center_40%]"
                         />
                       </div>
                     </div>
@@ -244,8 +242,7 @@ export default function About() {
                     <img
                       src="/images/gallery/21.jpg"
                       alt="Our Team"
-                      className="w-full h-full object-cover"
-                      style={{ objectPosition: "center 30%" }}
+                      className="w-full h-full object-cover object-[center_30%]"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                   </div>

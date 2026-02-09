@@ -36,12 +36,11 @@ export function MarketingNav() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 h-[72px] transition-all duration-300 ${
         isScrolled
           ? "bg-white/95 backdrop-blur-md shadow-md border-b border-gray-200"
           : "bg-transparent"
       }`}
-      style={{ height: "72px" }}
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-full">

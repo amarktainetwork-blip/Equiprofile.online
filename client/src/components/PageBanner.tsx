@@ -36,7 +36,7 @@ export function PageBanner({
   }[imagePosition];
 
   return (
-    <div className={`relative ${minHeight} overflow-hidden`} style={{ marginTop: "72px" }}>
+    <div className={`relative ${minHeight} overflow-hidden mt-[72px]`}>
       {/* Background Image */}
       <img
         src={imageSrc}

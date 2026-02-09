@@ -123,7 +123,7 @@ export default function Home() {
       <PageTransition>
         <div className="min-h-screen overflow-hidden bg-black">
           {/* Hero Section with Video Background */}
-          <section className="relative min-h-screen flex items-center justify-center overflow-hidden" style={{ paddingTop: "72px" }}>
+          <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-[72px]">
             {/* Video Background */}
             <div className="absolute inset-0 z-0">
               <video

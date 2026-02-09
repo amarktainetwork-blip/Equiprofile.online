@@ -5,7 +5,7 @@
  * Used by Home page and Features page to ensure consistency.
  */
 
-import { Heart, Activity, Calendar, Utensils, FileText, Bell, Camera, BarChart, Users, Shield } from "lucide-react";
+import { Heart, Activity, Calendar, Utensils, BarChart, Users } from "lucide-react";
 import { marketingAssets } from "@/config/marketingAssets";
 
 export interface Feature {
