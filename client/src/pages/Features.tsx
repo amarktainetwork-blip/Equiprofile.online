@@ -6,109 +6,15 @@ import { PageBanner } from "@/components/PageBanner";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import {
-  Heart,
-  Activity,
-  Calendar,
-  Utensils,
-  BarChart,
-  Bot,
   ArrowRight,
   CheckCircle2,
 } from "lucide-react";
+import { detailedFeatures } from "@/content/features";
 
 const fadeInUpVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0 },
 };
-
-// Feature sections with alternating image layouts
-const featureSections = [
-  {
-    title: "Complete Health Management",
-    description:
-      "Keep detailed health records for all your horses in one place",
-    image: "/images/gallery/1.jpg",
-    imagePosition: "right",
-    features: [
-      "Track vaccinations, dewormings, and treatments",
-      "Store veterinary records and prescriptions",
-      "Set automatic reminders for upcoming care",
-      "Monitor health trends and vital signs",
-    ],
-    icon: Heart,
-    gradient: "from-rose-500 to-pink-500",
-  },
-  {
-    title: "Advanced Analytics & Insights",
-    description: "Data-driven decisions for optimal horse care and performance",
-    image: "/images/gallery/2.jpg",
-    imagePosition: "left",
-    features: [
-      "Track training progress and performance metrics",
-      "Visualize health patterns over time",
-      "Compare performance across multiple horses",
-      "Export detailed reports for vets and trainers",
-    ],
-    icon: BarChart,
-    gradient: "from-cyan-500 to-blue-500",
-  },
-  {
-    title: "Training & Performance Tracking",
-    description: "Monitor and optimize every training session",
-    image: "/images/gallery/10.jpg",
-    imagePosition: "right",
-    features: [
-      "Log training sessions with detailed notes",
-      "Track progress towards competition goals",
-      "Record performance videos and photos",
-      "Share achievements with your team",
-    ],
-    icon: Activity,
-    gradient: "from-green-500 to-emerald-500",
-  },
-  {
-    title: "Smart Feeding & Nutrition",
-    description: "Optimize nutrition plans for peak performance",
-    image: "/images/gallery/12.jpg",
-    imagePosition: "left",
-    features: [
-      "Create custom feeding schedules",
-      "Track feed inventory and costs",
-      "Monitor weight and body condition",
-      "Get nutrition recommendations",
-    ],
-    icon: Utensils,
-    gradient: "from-amber-500 to-orange-500",
-  },
-  {
-    title: "Scheduling & Calendar",
-    description: "Never miss important appointments or events",
-    image: "/images/gallery/15.jpg",
-    imagePosition: "right",
-    features: [
-      "Unified calendar for all horses and events",
-      "Automatic reminders for farrier, vet visits",
-      "Schedule training sessions and competitions",
-      "Sync with your personal calendar",
-    ],
-    icon: Calendar,
-    gradient: "from-violet-500 to-purple-500",
-  },
-  {
-    title: "AI-Powered Automation",
-    description: "Let artificial intelligence help manage your stable",
-    image: "/images/gallery/18.jpg",
-    imagePosition: "left",
-    features: [
-      "Smart health alerts and anomaly detection",
-      "Predictive maintenance reminders",
-      "Automated record keeping suggestions",
-      "Intelligent insights and recommendations",
-    ],
-    icon: Bot,
-    gradient: "from-indigo-500 to-blue-500",
-  },
-];
 
 export default function Features() {
   return (
@@ -125,7 +31,7 @@ export default function Features() {
 
           {/* Feature Sections with Alternating Layout */}
           <div className="py-20">
-            {featureSections.map((section, index) => {
+            {detailedFeatures.map((section, index) => {
               const Icon = section.icon;
               const isImageRight = section.imagePosition === "right";
 

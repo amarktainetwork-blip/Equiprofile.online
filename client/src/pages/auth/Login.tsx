@@ -17,6 +17,8 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { PageTransition } from "@/components/PageTransition";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AuthSplitLayout } from "@/components/AuthSplitLayout";
+import { MarketingNav } from "@/components/MarketingNav";
+import { Footer } from "@/components/Footer";
 import { motion } from "framer-motion";
 
 /**
@@ -84,6 +86,7 @@ export default function Login() {
 
   return (
     <>
+      <MarketingNav />
       <PageTransition>
         <AuthSplitLayout imageUrl="/images/training.jpg">
           <motion.div
@@ -102,7 +105,7 @@ export default function Login() {
             {/* Login Form Card */}
             <Card className="bg-black/40 backdrop-blur-xl border border-white/10 shadow-2xl">
               <CardHeader className="space-y-1">
-                <CardTitle className="text-3xl font-bold text-center bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                <CardTitle className="text-3xl font-bold text-center bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
                   Welcome back
                 </CardTitle>
                 <CardDescription className="text-center text-gray-400">
@@ -197,7 +200,7 @@ export default function Login() {
                       </Label>
                     </div>
                     <Link href="/forgot-password">
-                      <a className="text-sm bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent hover:from-blue-300 hover:to-purple-300 transition-all duration-200">
+                      <a className="text-sm bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent hover:from-indigo-300 hover:to-cyan-300 transition-all duration-200">
                         Forgot password?
                       </a>
                     </Link>
@@ -213,7 +216,7 @@ export default function Login() {
                   >
                     <Button
                       type="submit"
-                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white border-0 shadow-lg shadow-blue-500/20 transition-all duration-200"
+                      className="w-full bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white border-0 shadow-lg shadow-indigo-500/20 transition-all duration-200"
                       size="lg"
                       disabled={isLoading}
                     >
@@ -279,7 +282,7 @@ export default function Login() {
                 >
                   <span className="text-gray-400">Don't have an account? </span>
                   <Link href="/register">
-                    <a className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent font-medium hover:from-blue-300 hover:to-purple-300 transition-all duration-200">
+                    <a className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent font-medium hover:from-indigo-300 hover:to-cyan-300 transition-all duration-200">
                       Create account
                     </a>
                   </Link>
@@ -296,6 +299,7 @@ export default function Login() {
           </motion.div>
         </AuthSplitLayout>
       </PageTransition>
+      <Footer />
     </>
   );
 }

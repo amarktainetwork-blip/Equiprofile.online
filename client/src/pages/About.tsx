@@ -3,8 +3,7 @@ import { MarketingNav } from "@/components/MarketingNav";
 import { Footer } from "@/components/Footer";
 import { PageTransition } from "@/components/PageTransition";
 import { PageBanner } from "@/components/PageBanner";
-import { marketingAssets } from "@/config/marketingAssets";
-import { Heart, Target, Sparkles, ArrowRight } from "lucide-react";
+import { Heart, Target, Users, Award, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
@@ -40,6 +39,37 @@ function AnimatedSection({
 }
 
 export default function About() {
+  const values = [
+    {
+      icon: Heart,
+      title: "Horse Welfare First",
+      description:
+        "Every feature we build is designed with the health and well-being of horses as our top priority.",
+      gradient: "from-rose-500 to-pink-500",
+    },
+    {
+      icon: Target,
+      title: "Simplicity & Clarity",
+      description:
+        "Horse management should be easy, not complicated. We create intuitive tools that anyone can use.",
+      gradient: "from-cyan-500 to-blue-500",
+    },
+    {
+      icon: Users,
+      title: "Community-Driven",
+      description:
+        "We listen to our users and continuously improve based on your feedback and needs.",
+      gradient: "from-green-500 to-emerald-500",
+    },
+    {
+      icon: Award,
+      title: "Excellence in Everything",
+      description:
+        "From security to support, we're committed to delivering the highest quality service.",
+      gradient: "from-violet-500 to-purple-500",
+    },
+  ];
+
   return (
     <>
       <MarketingNav />
@@ -54,7 +84,8 @@ export default function About() {
           <PageBanner
             title="About EquiProfile"
             subtitle="We're on a mission to revolutionize horse management with technology that empowers horse owners, trainers, and equestrian professionals."
-            imageSrc="/images/hero-horse.jpg"
+            imageSrc="/images/gallery/11.jpg"
+            imagePosition="center"
           />
 
           <div className="relative z-10 py-16">
@@ -65,9 +96,10 @@ export default function About() {
                   <div className="relative aspect-[4/3] rounded-2xl overflow-hidden backdrop-blur-md bg-white/5 border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_40px_rgba(6,182,212,0.3)]">
                     <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-indigo-500/20" />
                     <img
-                      src="/images/gallery/11.jpg"
+                      src="/images/gallery/19.jpg"
                       alt="Our Story"
                       className="relative z-10 w-full h-full object-cover"
+                      style={{ objectPosition: "center 30%" }}
                     />
                   </div>
                 </AnimatedSection>
@@ -133,9 +165,10 @@ export default function About() {
                       <div className="relative aspect-square rounded-2xl overflow-hidden backdrop-blur-md bg-white/5 border border-white/10 p-4 hover:border-white/20 transition-all duration-300">
                         <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-cyan-500/20" />
                         <img
-                          src="/images/gallery/19.jpg"
+                          src="/images/gallery/17.jpg"
                           alt="Our Mission"
                           className="relative z-10 w-full h-full object-cover rounded-xl"
+                          style={{ objectPosition: "center 40%" }}
                         />
                       </div>
                     </div>
@@ -144,47 +177,77 @@ export default function About() {
               </AnimatedSection>
             </section>
 
-            {/* Feature CTA Block - Replace Values */}
+            {/* Values Section */}
             <section className="container mx-auto px-4 mb-20">
               <AnimatedSection>
-                <div className="relative max-w-4xl mx-auto">
-                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/30 to-cyan-600/30 rounded-3xl blur-3xl" />
-                  <div className="relative backdrop-blur-md bg-white/5 border-2 border-white/20 rounded-3xl p-8 md:p-12 hover:bg-white/10 hover:border-white/30 transition-all duration-500 hover:shadow-[0_0_60px_rgba(99,102,241,0.4)]">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                      <div className="relative aspect-[4/3] rounded-xl overflow-hidden">
-                        <img
-                          src="/images/gallery/17.jpg"
-                          alt="AI-Powered Analytics"
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="text-center mb-12">
+                  <h2 className="text-3xl md:text-4xl font-bold font-serif mb-4 text-white">
+                    Our{" "}
+                    <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+                      Core Values
+                    </span>
+                  </h2>
+                  <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+                    The principles that guide everything we do at EquiProfile
+                  </p>
+                </div>
+              </AnimatedSection>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+                {values.map((value, index) => {
+                  const Icon = value.icon;
+                  return (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                      viewport={{ once: true }}
+                      className="relative backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_30px_rgba(99,102,241,0.2)]"
+                    >
+                      <div
+                        className={`w-14 h-14 rounded-xl bg-gradient-to-br ${value.gradient} p-3 mb-4 flex items-center justify-center`}
+                      >
+                        <Icon className="w-7 h-7 text-white" />
                       </div>
-                      <div className="text-center lg:text-left">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-indigo-500/20 to-cyan-500/20 border border-indigo-500/30 mb-4">
-                          <Sparkles className="w-5 h-5 text-indigo-400" />
-                          <span className="text-indigo-300 font-medium">
-                            Powered by AI
-                          </span>
-                        </div>
-                        <h3 className="text-3xl md:text-4xl font-bold font-serif mb-4 text-white">
-                          Smart Training Insights
-                        </h3>
-                        <p className="text-lg text-gray-300 mb-6">
-                          Get AI-powered analytics on your horse's training
-                          progress, health patterns, and performance trends.
-                          Make data-driven decisions for optimal care.
-                        </p>
-                        <Link href="/features">
-                          <Button
-                            size="lg"
-                            className="bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 text-white group"
-                          >
-                            Explore Features
-                            <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                          </Button>
-                        </Link>
-                      </div>
-                    </div>
+                      <h3 className="text-xl font-semibold mb-3 text-white">
+                        {value.title}
+                      </h3>
+                      <p className="text-gray-400 text-sm leading-relaxed">
+                        {value.description}
+                      </p>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </section>
+
+            {/* Team Section */}
+            <section className="container mx-auto px-4 mb-20">
+              <AnimatedSection>
+                <div className="max-w-4xl mx-auto text-center">
+                  <h2 className="text-3xl md:text-4xl font-bold font-serif mb-6 text-white">
+                    Built by{" "}
+                    <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+                      Equestrians
+                    </span>
+                    , for Equestrians
+                  </h2>
+                  <p className="text-lg text-gray-300 mb-8">
+                    Our team combines deep equestrian expertise with world-class
+                    software engineering. We understand the challenges you face
+                    because we've faced them too. From professional trainers to
+                    stable managers to competitive riders, our diverse team
+                    brings real-world experience to every feature we build.
+                  </p>
+                  <div className="relative aspect-video rounded-2xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-300">
+                    <img
+                      src="/images/gallery/21.jpg"
+                      alt="Our Team"
+                      className="w-full h-full object-cover"
+                      style={{ objectPosition: "center 30%" }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                   </div>
                 </div>
               </AnimatedSection>
@@ -210,9 +273,10 @@ export default function About() {
                         <Link href="/register">
                           <Button
                             size="lg"
-                            className="bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 text-white"
+                            className="bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 text-white group"
                           >
                             Start Free Trial
+                            <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                           </Button>
                         </Link>
                         <Link href="/contact">
