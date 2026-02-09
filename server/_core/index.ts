@@ -532,6 +532,14 @@ async function startServer() {
     }
   });
 
+  // Import trial lock middleware
+  const { trialLockMiddleware } = await import("./trialLock");
+  
+  // Apply trial lock middleware to ALL API routes (except exempt paths)
+  // This enforces hard 7-day trial lock server-side
+  app.use("/api", trialLockMiddleware);
+  app.use("/trpc", trialLockMiddleware);
+
   // tRPC API
   app.use(
     "/api/trpc",
