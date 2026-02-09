@@ -10,7 +10,7 @@ import {
 import { Check, Loader2, Clock, XCircle } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
@@ -568,6 +568,51 @@ export default function Pricing() {
                     <p className="text-gray-400 text-sm">{faq.answer}</p>
                   </motion.div>
                 ))}
+              </div>
+            </motion.div>
+
+            {/* CTA Section */}
+            <motion.div
+              className="mt-24 max-w-4xl mx-auto"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+            >
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-cyan-500/20 rounded-3xl blur-3xl" />
+                <div className="relative backdrop-blur-md bg-white/5 border-2 border-white/20 rounded-3xl p-8 md:p-12 hover:bg-white/10 hover:border-white/30 transition-all duration-500">
+                  <div className="text-center">
+                    <h2 className="text-3xl md:text-4xl font-bold font-serif mb-4 text-white">
+                      Ready to Get{" "}
+                      <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+                        Started?
+                      </span>
+                    </h2>
+                    <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+                      Start your free 7-day trial today. No credit card
+                      required. Experience all features with 1 horse.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                      <Link href="/register">
+                        <Button
+                          size="lg"
+                          className="text-lg px-10 py-6 bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 text-white border-0 shadow-xl"
+                        >
+                          Start Free Trial
+                        </Button>
+                      </Link>
+                      <Link href="/contact">
+                        <Button
+                          size="lg"
+                          variant="outline"
+                          className="text-lg px-10 py-6 border-white/20 text-white hover:bg-white/10"
+                        >
+                          Contact Sales
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
               </div>
             </motion.div>
           </div>

@@ -15,17 +15,18 @@ interface PageBannerProps {
  * A reusable banner component for marketing pages.
  * Features:
  * - Responsive design with proper image scaling
- * - Customizable min-height (default ~280-360px desktop)
+ * - Proper heights: 420-520px desktop, 280-360px mobile
  * - Object-fit cover with configurable positioning
  * - Optional gradient overlay for better text readability
  * - Animated entrance
+ * - Accounts for fixed navbar (72px)
  */
 export function PageBanner({
   title,
   subtitle,
   imageSrc,
   imagePosition = "center",
-  minHeight = "min-h-[280px] md:min-h-[360px]",
+  minHeight = "min-h-[360px] md:min-h-[480px]",
   overlay = true,
 }: PageBannerProps) {
   const objectPosition = {
@@ -35,7 +36,7 @@ export function PageBanner({
   }[imagePosition];
 
   return (
-    <div className={`relative ${minHeight} overflow-hidden`}>
+    <div className={`relative ${minHeight} overflow-hidden mt-[72px]`}>
       {/* Background Image */}
       <img
         src={imageSrc}
@@ -56,11 +57,11 @@ export function PageBanner({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-serif mb-4 text-white">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-serif mb-4 text-white drop-shadow-2xl">
               {title}
             </h1>
             {subtitle && (
-              <p className="text-lg md:text-xl text-gray-200 max-w-3xl mx-auto">
+              <p className="text-lg md:text-xl text-gray-200 max-w-3xl mx-auto drop-shadow-lg">
                 {subtitle}
               </p>
             )}

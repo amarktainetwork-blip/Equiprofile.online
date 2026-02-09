@@ -17,6 +17,8 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { PageTransition } from "@/components/PageTransition";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AuthSplitLayout } from "@/components/AuthSplitLayout";
+import { MarketingNav } from "@/components/MarketingNav";
+import { Footer } from "@/components/Footer";
 import { motion } from "framer-motion";
 
 /**
@@ -101,6 +103,7 @@ export default function Register() {
 
   return (
     <>
+      <MarketingNav />
       <PageTransition>
         <AuthSplitLayout imageUrl="/images/stable.jpg">
           <motion.div
@@ -119,7 +122,7 @@ export default function Register() {
             {/* Dark Glass Form Card */}
             <Card className="bg-black/40 backdrop-blur-xl border border-white/10 shadow-2xl">
               <CardHeader className="space-y-1">
-                <CardTitle className="text-3xl font-bold text-center bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                <CardTitle className="text-3xl font-bold text-center bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
                   Create an account
                 </CardTitle>
                 <CardDescription className="text-center text-gray-400">
@@ -370,6 +373,7 @@ export default function Register() {
           </motion.div>
         </AuthSplitLayout>
       </PageTransition>
+      <Footer />
     </>
   );
 }

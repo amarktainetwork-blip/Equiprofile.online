@@ -36,19 +36,23 @@ export function MarketingNav() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 h-[72px] transition-all duration-300 ${
         isScrolled
-          ? "bg-background/95 backdrop-blur-md shadow-sm border-b"
+          ? "bg-white/95 backdrop-blur-md shadow-md border-b border-gray-200"
           : "bg-transparent"
       }`}
     >
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16 md:h-20">
+        <div className="flex items-center justify-between h-full">
           {/* Logo */}
           <Link href="/">
             <a className="flex items-center gap-2 hover:opacity-80 transition-opacity">
               <div className="text-2xl font-bold font-serif">
-                <span className="text-gradient">EquiProfile</span>
+                <span
+                  className={`${isScrolled ? "text-gradient" : "text-white"}`}
+                >
+                  EquiProfile
+                </span>
               </div>
             </a>
           </Link>
@@ -59,9 +63,13 @@ export function MarketingNav() {
               <Link key={link.path} href={link.path}>
                 <a
                   className={`text-sm font-medium transition-colors ${
-                    location === link.path
-                      ? "text-white hover:text-white/90"
-                      : "text-white/90 hover:text-white"
+                    isScrolled
+                      ? location === link.path
+                        ? "text-black hover:text-gray-700"
+                        : "text-gray-700 hover:text-black"
+                      : location === link.path
+                        ? "text-white hover:text-white/90"
+                        : "text-white/90 hover:text-white"
                   }`}
                 >
                   {link.label}
@@ -74,15 +82,40 @@ export function MarketingNav() {
           <div className="hidden md:flex items-center gap-3">
             {isAuthenticated ? (
               <Link href="/dashboard">
-                <Button>Go to Dashboard</Button>
+                <Button
+                  className={
+                    isScrolled
+                      ? ""
+                      : "bg-white/10 text-white border-white/20 hover:bg-white/20"
+                  }
+                >
+                  Go to Dashboard
+                </Button>
               </Link>
             ) : (
               <>
                 <Link href="/login">
-                  <Button variant="ghost">Log In</Button>
+                  <Button
+                    variant="ghost"
+                    className={
+                      isScrolled
+                        ? ""
+                        : "text-white hover:bg-white/10 hover:text-white"
+                    }
+                  >
+                    Log In
+                  </Button>
                 </Link>
                 <Link href="/register">
-                  <Button>Get Started</Button>
+                  <Button
+                    className={
+                      isScrolled
+                        ? ""
+                        : "bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 text-white border-0"
+                    }
+                  >
+                    Get Started
+                  </Button>
                 </Link>
               </>
             )}
@@ -90,7 +123,9 @@ export function MarketingNav() {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 hover:bg-accent rounded-lg transition-colors"
+            className={`md:hidden p-2 hover:bg-accent rounded-lg transition-colors ${
+              isScrolled ? "text-black" : "text-white"
+            }`}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle mobile menu"
           >
@@ -122,8 +157,8 @@ export function MarketingNav() {
                   <a
                     className={`block py-2 text-base font-medium transition-colors ${
                       location === link.path
-                        ? "text-white hover:text-white/90"
-                        : "text-white/90 hover:text-white"
+                        ? "text-foreground hover:text-foreground/90"
+                        : "text-foreground/90 hover:text-foreground"
                     }`}
                     onClick={() => setMobileMenuOpen(false)}
                   >

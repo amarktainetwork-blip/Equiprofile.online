@@ -32,57 +32,13 @@ import {
 import { useState, useEffect, useRef } from "react";
 import { marketingAssets } from "@/config/marketingAssets";
 import { motion } from "framer-motion";
+import { coreFeatures, featureHighlights } from "@/content/features";
 
 const TESTIMONIAL_ROTATION_INTERVAL = 6000;
 
 export default function Home() {
   const { isAuthenticated } = useAuth();
   const [activeTestimonial, setActiveTestimonial] = useState(0);
-
-  const features = [
-    {
-      icon: marketingAssets.features.iconSpeed,
-      title: "Lightning Fast Performance",
-      description:
-        "Experience blazing-fast load times and real-time updates. Our optimized infrastructure ensures your data is always accessible instantly.",
-      gradient: "from-indigo-500 to-purple-500",
-    },
-    {
-      icon: marketingAssets.features.iconAnalytics,
-      title: "Advanced Analytics",
-      description:
-        "Gain deep insights with powerful analytics and reporting tools. Track progress, identify trends, and make data-driven decisions.",
-      gradient: "from-cyan-500 to-blue-500",
-    },
-    {
-      icon: marketingAssets.features.iconAutomation,
-      title: "Smart Automation",
-      description:
-        "Automate routine tasks and workflows. Set up intelligent reminders, notifications, and scheduled actions effortlessly.",
-      gradient: "from-green-500 to-emerald-500",
-    },
-    {
-      icon: marketingAssets.features.iconSecurity,
-      title: "Enterprise Security",
-      description:
-        "Bank-level encryption and security protocols. Your data is protected with industry-leading security measures and compliance.",
-      gradient: "from-red-500 to-pink-500",
-    },
-    {
-      icon: marketingAssets.features.iconIntegrations,
-      title: "Seamless Integrations",
-      description:
-        "Connect with your favorite tools and services. Our extensive integration library makes your workflow seamless.",
-      gradient: "from-amber-500 to-orange-500",
-    },
-    {
-      icon: marketingAssets.features.iconSupport,
-      title: "24/7 Expert Support",
-      description:
-        "Get help when you need it. Our dedicated support team is available around the clock to assist you.",
-      gradient: "from-violet-500 to-purple-500",
-    },
-  ];
 
   const testimonials = [
     {
@@ -108,30 +64,6 @@ export default function Home() {
         "The training logs and analytics are phenomenal. I can see progress clearly, identify areas for improvement, and share detailed updates with clients easily. Game-changing!",
       rating: 5,
       avatar: "ER",
-    },
-  ];
-
-  const featuresHighlight = [
-    {
-      icon: marketingAssets.features.iconAnalytics,
-      title: "Advanced Analytics",
-      description:
-        "Gain deep insights into your horse's performance, health trends, and training progress with powerful analytics and visual reports.",
-      gradient: "from-cyan-500 to-blue-500",
-    },
-    {
-      icon: marketingAssets.features.iconAutomation,
-      title: "AI Training Insights",
-      description:
-        "Smart AI-powered recommendations analyze training patterns to suggest optimal schedules and identify areas for improvement.",
-      gradient: "from-green-500 to-emerald-500",
-    },
-    {
-      icon: marketingAssets.features.iconSpeed,
-      title: "Smart Reminders",
-      description:
-        "Never miss important appointments, vaccinations, or farrier visits with intelligent automated reminders and notifications.",
-      gradient: "from-purple-500 to-violet-500",
     },
   ];
 
@@ -191,7 +123,7 @@ export default function Home() {
       <PageTransition>
         <div className="min-h-screen overflow-hidden bg-black">
           {/* Hero Section with Video Background */}
-          <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+          <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-[72px]">
             {/* Video Background */}
             <div className="absolute inset-0 z-0">
               <video
@@ -208,7 +140,7 @@ export default function Home() {
             </div>
 
             {/* Hero Content */}
-            <div className="container relative z-10 pt-24 pb-16 px-4">
+            <div className="container relative z-10 pb-16 px-4">
               <div className="max-w-6xl mx-auto">
                 <motion.div
                   initial={{ opacity: 0, y: 30 }}
@@ -277,7 +209,7 @@ export default function Home() {
               </motion.div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-12">
-                {featuresHighlight.map((feature, index) => (
+                {featureHighlights.map((feature, index) => (
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, y: 20 }}
@@ -335,20 +267,20 @@ export default function Home() {
                   Powerful Features
                 </Badge>
                 <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-white">
-                  Everything You Need to Manage
+                  Comprehensive Features for
                   <br />
                   <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
-                    Your Equestrian Life
+                    Complete Horse Care
                   </span>
                 </h2>
                 <p className="text-xl text-white/70 max-w-3xl mx-auto">
                   From health tracking to training logs, EquiProfile provides
-                  comprehensive tools for modern horse management.
+                  everything you need for professional horse management.
                 </p>
               </motion.div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-                {features.map((feature, index) => (
+                {coreFeatures.map((feature, index) => (
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, y: 20 }}
