@@ -17,13 +17,26 @@ import { PageTransition } from "@/components/PageTransition";
 import DashboardLayout from "@/components/DashboardLayout";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Bell, Lock, User, Moon } from "lucide-react";
+import { Bell, Lock, User, Moon, MapPin, Loader2 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
+import { trpc } from "@/lib/trpc";
 
 export default function Settings() {
   const { user } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
+  const [isCapturingLocation, setIsCapturingLocation] = useState(false);
+
+  const updateLocation = trpc.weather.updateLocation.useMutation({
+    onSuccess: () => {
+      toast.success("Location updated successfully");
+      setIsCapturingLocation(false);
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to update location");
+      setIsCapturingLocation(false);
+    },
+  });
 
   const [profileData, setProfileData] = useState({
     name: user?.name || "",
@@ -91,6 +104,28 @@ export default function Settings() {
 
     toast.success("Notification preferences saved");
     setIsLoading(false);
+  };
+
+  const captureLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error("Geolocation is not supported by your browser");
+      return;
+    }
+
+    setIsCapturingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        updateLocation.mutate({
+          latitude: position.coords.latitude.toString(),
+          longitude: position.coords.longitude.toString(),
+          location: "", // Optional city name
+        });
+      },
+      (error) => {
+        toast.error(`Failed to get location: ${error.message}`);
+        setIsCapturingLocation(false);
+      }
+    );
   };
 
   return (
@@ -183,6 +218,33 @@ export default function Settings() {
                           }
                           disabled={isLoading}
                         />
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div className="space-y-3">
+                        <Label>Location for Weather</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Allow EquiProfile to access your location for accurate weather forecasts and riding conditions.
+                        </p>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={captureLocation}
+                          disabled={isCapturingLocation}
+                        >
+                          {isCapturingLocation ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Getting Location...
+                            </>
+                          ) : (
+                            <>
+                              <MapPin className="mr-2 h-4 w-4" />
+                              Use My Current Location
+                            </>
+                          )}
+                        </Button>
                       </div>
                     </div>
 

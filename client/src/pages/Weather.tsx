@@ -43,6 +43,19 @@ function WeatherContent() {
     visibility: 10,
   });
 
+  // New Open-Meteo endpoints
+  const { data: currentWeather, isLoading: currentLoading, refetch: refetchCurrent } =
+    trpc.weather.getCurrent.useQuery(undefined, {
+      retry: false,
+      refetchOnWindowFocus: false,
+    });
+    
+  const { data: forecast, isLoading: forecastLoading } =
+    trpc.weather.getForecast.useQuery(undefined, {
+      retry: false,
+      refetchOnWindowFocus: false,
+    });
+
   const { data: latestWeather, isLoading: weatherLoading } =
     trpc.weather.getLatest.useQuery();
   const { data: weatherHistory } = trpc.weather.getHistory.useQuery({
@@ -106,12 +119,144 @@ function WeatherContent() {
     <div className="space-y-6">
       <div>
         <h1 className="font-serif text-3xl font-bold text-foreground">
-          Weather Analysis
+          Weather & Riding Conditions
         </h1>
         <p className="text-muted-foreground mt-1">
-          AI-powered riding condition recommendations based on current weather
+          Real-time weather data with intelligent riding recommendations
         </p>
       </div>
+
+      {/* Current Weather Card */}
+      {currentLoading ? (
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-6 w-48" />
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Skeleton className="h-20" />
+              <Skeleton className="h-20" />
+              <Skeleton className="h-20" />
+              <Skeleton className="h-20" />
+            </div>
+          </CardContent>
+        </Card>
+      ) : currentWeather ? (
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <CloudSun className="w-6 h-6" />
+                Current Conditions
+              </CardTitle>
+              <Button 
+                size="sm" 
+                variant="outline"
+                onClick={() => refetchCurrent()}
+              >
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Refresh
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Weather Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="flex flex-col items-center p-4 bg-muted rounded-lg">
+                <Thermometer className="w-6 h-6 text-orange-500 mb-2" />
+                <div className="text-2xl font-bold">{currentWeather.weather.temperature}°C</div>
+                <div className="text-sm text-muted-foreground">Temperature</div>
+              </div>
+              <div className="flex flex-col items-center p-4 bg-muted rounded-lg">
+                <Wind className="w-6 h-6 text-blue-500 mb-2" />
+                <div className="text-2xl font-bold">{currentWeather.weather.windSpeed} km/h</div>
+                <div className="text-sm text-muted-foreground">Wind Speed</div>
+              </div>
+              <div className="flex flex-col items-center p-4 bg-muted rounded-lg">
+                <CloudRain className="w-6 h-6 text-blue-500 mb-2" />
+                <div className="text-2xl font-bold">{currentWeather.weather.precipitation} mm</div>
+                <div className="text-sm text-muted-foreground">Precipitation</div>
+              </div>
+              <div className="flex flex-col items-center p-4 bg-muted rounded-lg">
+                <Droplets className="w-6 h-6 text-cyan-500 mb-2" />
+                <div className="text-2xl font-bold">{currentWeather.weather.humidity}%</div>
+                <div className="text-sm text-muted-foreground">Humidity</div>
+              </div>
+            </div>
+
+            {/* Riding Advice */}
+            <div className={`p-4 rounded-lg border-2 ${getRecommendationColor(currentWeather.advice.level)}`}>
+              <div className="flex items-start gap-3">
+                {getRecommendationIcon(currentWeather.advice.level)}
+                <div className="flex-1">
+                  <div className="font-semibold text-lg capitalize mb-2">
+                    {currentWeather.advice.level} Riding Conditions
+                  </div>
+                  <p className="text-sm mb-3">
+                    {currentWeather.advice.message}
+                  </p>
+                  {currentWeather.advice.warnings.length > 0 && (
+                    <div className="space-y-1">
+                      <div className="font-medium text-sm">Warnings:</div>
+                      {currentWeather.advice.warnings.map((warning, i) => (
+                        <div key={i} className="text-sm flex items-center gap-2">
+                          <AlertTriangle className="w-4 h-4" />
+                          {warning}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            <div className="text-xs text-muted-foreground">
+              Condition: {currentWeather.weather.condition} • Last updated: {new Date(currentWeather.weather.timestamp).toLocaleString()}
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardContent className="py-8">
+            <div className="text-center space-y-3">
+              <MapPin className="w-12 h-12 mx-auto text-muted-foreground" />
+              <p className="text-muted-foreground">
+                Please set your location in Settings to see current weather conditions
+              </p>
+              <Button onClick={() => window.location.href = '/settings'}>
+                Go to Settings
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* 7-Day Forecast */}
+      {forecast && forecast.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>7-Day Forecast</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-7 gap-3">
+              {forecast.map((day, i) => (
+                <div key={i} className="text-center p-3 bg-muted rounded-lg">
+                  <div className="text-sm font-medium">
+                    {new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' })}
+                  </div>
+                  <div className="text-xs text-muted-foreground mb-2">
+                    {new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  </div>
+                  <CloudSun className="w-6 h-6 mx-auto mb-2 text-blue-500" />
+                  <div className="text-sm font-semibold">{day.tempMax}°</div>
+                  <div className="text-xs text-muted-foreground">{day.tempMin}°</div>
+                  <div className="text-xs mt-1">{day.condition}</div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Weather Input Form */}
