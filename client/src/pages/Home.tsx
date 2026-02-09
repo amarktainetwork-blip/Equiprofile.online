@@ -139,12 +139,12 @@ export default function Home() {
     {
       question: "How does the 7-day free trial work?",
       answer:
-        "Start using EquiProfile immediately with full access to all features. No credit card required. After 7 days, choose a plan that fits your needs or continue with our free tier for up to 1 horse.",
+        "Start using EquiProfile immediately with full access to ALL features for 1 horse. No credit card required. After 7 days, choose a plan that fits your needs.",
     },
     {
       question: "Can I manage multiple horses?",
       answer:
-        "Absolutely! Our plans support anywhere from 3 horses on the Hobby plan to unlimited horses on the Enterprise plan. Each horse gets its own complete profile with health records, training logs, and more.",
+        "Absolutely! The trial supports 1 horse. Pro plan supports up to 5 horses, and Stable plan supports up to 20 horses. Each horse gets its own complete profile with health records, training logs, and more.",
     },
     {
       question: "Is my data secure?",
@@ -159,12 +159,22 @@ export default function Home() {
     {
       question: "What happens if I cancel my subscription?",
       answer:
-        "You can cancel anytime. Your data remains accessible in read-only mode for 30 days, giving you time to export everything. We also offer a free tier to keep managing one horse if you'd like to continue.",
+        "You can cancel anytime. Your data remains accessible in read-only mode for 30 days, giving you time to export everything. No long-term contracts or hidden fees.",
     },
     {
       question: "Do you offer training or onboarding?",
       answer:
-        "Yes! All new users get access to our comprehensive video tutorials and help center. Professional and Enterprise plans include personalized onboarding sessions with our team.",
+        "Yes! All new users get access to our comprehensive video tutorials and help center. We also provide email support to help you get started.",
+    },
+    {
+      question: "What payment methods do you accept?",
+      answer:
+        "We accept all major credit cards via Stripe. Your payment information is securely processed and never stored on our servers.",
+    },
+    {
+      question: "Can I upgrade or downgrade my plan?",
+      answer:
+        "Yes! You can change your plan at any time. Upgrades take effect immediately, and downgrades apply at the end of your current billing period.",
     },
   ];
 
