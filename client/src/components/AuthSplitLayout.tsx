@@ -24,9 +24,9 @@ export function AuthSplitLayout({
   return (
     <div className="h-screen w-full flex overflow-hidden">
       {/* Desktop: Left side - Form */}
-      <div className="flex-1 flex items-center justify-center p-4 md:p-8 relative overflow-y-auto">
+      <div className="flex-1 flex items-center justify-center p-4 md:p-8 relative">
         {/* Mobile background image with overlay */}
-        <div className="md:hidden fixed inset-0 z-0">
+        <div className="md:hidden absolute inset-0 z-0">
           <img
             src={imageUrl}
             alt="Background"
@@ -36,7 +36,7 @@ export function AuthSplitLayout({
         </div>
 
         {/* Form content */}
-        <div className="w-full max-w-md relative z-10 my-auto">{children}</div>
+        <div className="w-full max-w-md relative z-10 my-auto max-h-[calc(100vh-2rem)] overflow-y-auto">{children}</div>
       </div>
 
       {/* Desktop: Right side - Image panel (hidden on mobile) */}
