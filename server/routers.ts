@@ -1863,7 +1863,10 @@ Format your response as JSON with keys: recommendation, explanation, precautions
       }
 
       const weather = await import("./_core/weather");
-      const current = await weather.getCurrentWeather(user.latitude, user.longitude);
+      const current = await weather.getCurrentWeather(
+        user.latitude,
+        user.longitude,
+      );
       const advice = weather.getRidingAdvice(current);
 
       return {
@@ -1944,12 +1947,12 @@ Format your response as JSON with keys: recommendation, explanation, precautions
           userId: ctx.user.id,
           ...input,
         });
-        
+
         // Publish real-time event
         const { publishModuleEvent } = await import("./_core/realtime");
         const note = await db.getNoteById(noteId);
         publishModuleEvent("notes", "created", note, ctx.user.id);
-        
+
         return { id: noteId };
       }),
 
@@ -1973,12 +1976,12 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         }
         const { id, ...updateData } = input;
         await db.updateNote(id, ctx.user.id, updateData);
-        
+
         // Publish real-time event
         const { publishModuleEvent } = await import("./_core/realtime");
         const updatedNote = await db.getNoteById(id);
         publishModuleEvent("notes", "updated", updatedNote, ctx.user.id);
-        
+
         return { success: true };
       }),
 
@@ -1994,11 +1997,11 @@ Format your response as JSON with keys: recommendation, explanation, precautions
           });
         }
         await db.deleteNote(input.id, ctx.user.id);
-        
+
         // Publish real-time event
         const { publishModuleEvent } = await import("./_core/realtime");
         publishModuleEvent("notes", "deleted", { id: input.id }, ctx.user.id);
-        
+
         return { success: true };
       }),
   }),

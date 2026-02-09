@@ -16,6 +16,7 @@ This document provides exact steps to enable WhatsApp reminders when ready.
 ## Prerequisites
 
 Before starting, you need:
+
 - [ ] Meta Business Account (already have)
 - [ ] WhatsApp Business number (already verified)
 - [ ] Access to Meta Developer Portal
@@ -71,6 +72,7 @@ WHATSAPP_WEBHOOK_VERIFY_TOKEN=generate_random_string_here
 ```
 
 **Generate webhook verify token:**
+
 ```bash
 openssl rand -base64 32
 ```
@@ -86,7 +88,10 @@ app.get("/api/webhooks/whatsapp", (req, res) => {
   const token = req.query["hub.verify_token"];
   const challenge = req.query["hub.challenge"];
 
-  if (mode === "subscribe" && token === process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN) {
+  if (
+    mode === "subscribe" &&
+    token === process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN
+  ) {
     console.log("[WhatsApp] Webhook verified");
     res.status(200).send(challenge);
   } else {
@@ -99,19 +104,19 @@ app.get("/api/webhooks/whatsapp", (req, res) => {
 app.post("/api/webhooks/whatsapp", express.json(), async (req, res) => {
   try {
     const { entry } = req.body;
-    
+
     if (entry && entry[0]?.changes[0]?.value?.messages) {
       const messages = entry[0].changes[0].value.messages;
-      
+
       for (const message of messages) {
         // Handle incoming message (delivery status, user replies, etc.)
         console.log("[WhatsApp] Received message:", message);
-        
+
         // Process message (mark as read, handle reply, etc.)
         // TODO: Implement message handling logic
       }
     }
-    
+
     res.sendStatus(200);
   } catch (error) {
     console.error("[WhatsApp] Webhook error:", error);
@@ -143,6 +148,7 @@ WhatsApp requires pre-approved templates for notifications. Create these in Meta
 **Language**: `en`
 
 **Template:**
+
 ```
 Hi {{1}},
 
@@ -155,6 +161,7 @@ EquiProfile - Horse Management
 ```
 
 **Variables:**
+
 1. User's first name
 2. Reminder title
 3. Horse name
@@ -167,6 +174,7 @@ EquiProfile - Horse Management
 **Language**: `en`
 
 **Template:**
+
 ```
 Hi {{1}},
 
@@ -179,6 +187,7 @@ EquiProfile
 ```
 
 **Variables:**
+
 1. User's first name
 2. Horse name
 3. Vaccination type
@@ -191,6 +200,7 @@ EquiProfile
 **Language**: `en`
 
 **Template:**
+
 ```
 Hi {{1}},
 
@@ -203,6 +213,7 @@ Need help? Reply to this message.
 ```
 
 **Variables:**
+
 1. User's first name
 2. Days remaining
 
@@ -224,7 +235,7 @@ interface WhatsAppMessage {
 }
 
 export async function sendWhatsAppMessage(
-  message: WhatsAppMessage
+  message: WhatsAppMessage,
 ): Promise<boolean> {
   // Check if WhatsApp is enabled
   if (!process.env.ENABLE_WHATSAPP || process.env.ENABLE_WHATSAPP !== "true") {
@@ -265,16 +276,19 @@ export async function sendWhatsAppMessage(
       },
       {
         headers: {
-          "Authorization": `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
-      }
+      },
     );
 
     console.log("[WhatsApp] Message sent:", response.data.messages[0].id);
     return true;
   } catch (error: any) {
-    console.error("[WhatsApp] Send failed:", error.response?.data || error.message);
+    console.error(
+      "[WhatsApp] Send failed:",
+      error.response?.data || error.message,
+    );
     return false;
   }
 }
@@ -285,7 +299,7 @@ export async function sendReminderNotification(
   userName: string,
   reminderTitle: string,
   horseName: string,
-  dueDate: string
+  dueDate: string,
 ): Promise<boolean> {
   return sendWhatsAppMessage({
     to: userPhone,
@@ -307,10 +321,10 @@ import { sendReminderNotification } from "./_core/whatsapp";
 async function sendReminder(reminder: Reminder, user: User) {
   // Check user's notification preferences
   const preferences = user.preferences ? JSON.parse(user.preferences) : {};
-  
+
   // Always send email
   await sendEmailReminder(reminder, user);
-  
+
   // Send WhatsApp if enabled and user has opted in
   if (
     process.env.ENABLE_WHATSAPP === "true" &&
@@ -322,7 +336,7 @@ async function sendReminder(reminder: Reminder, user: User) {
       user.name || "there",
       reminder.title,
       reminder.horseName,
-      formatDate(reminder.dueDate)
+      formatDate(reminder.dueDate),
     );
   }
 }
@@ -367,6 +381,7 @@ Add WhatsApp preference to user settings (in `client/src/pages/Settings.tsx`):
    - Add your personal phone to "Test Recipients"
 
 2. Test webhook:
+
    ```bash
    curl -X GET "https://equiprofile.online/api/webhooks/whatsapp?hub.mode=subscribe&hub.challenge=test&hub.verify_token=YOUR_TOKEN"
    ```
@@ -407,23 +422,27 @@ Add WhatsApp preference to user settings (in `client/src/pages/Settings.tsx`):
 ## Monitoring & Limits
 
 ### Rate Limits (Tier 1 - New Business)
+
 - **1,000 business-initiated conversations per day**
 - Unlimited user-initiated conversations
 - Quality rating affects limits
 
 ### Upgrade Tiers
+
 - **Tier 1**: 1,000/day (default)
 - **Tier 2**: 10,000/day (after 7 days good standing)
 - **Tier 3**: 100,000/day (after verification)
 - **Tier 4**: Unlimited (enterprise)
 
 ### Cost
+
 - **User-initiated**: FREE (first 24 hours)
 - **Business-initiated**: £0.03 - £0.10 per message (varies by country)
 - Marketing messages: Higher cost
 - Utility messages (reminders): Lower cost
 
 ### Monitoring Dashboard
+
 - Check usage: Meta Business Manager → WhatsApp → Insights
 - Monitor quality rating (must stay above 2.5/5)
 - Track message delivery rates
@@ -432,11 +451,13 @@ Add WhatsApp preference to user settings (in `client/src/pages/Settings.tsx`):
 ## Troubleshooting
 
 ### Webhook verification fails
+
 - Check `WHATSAPP_WEBHOOK_VERIFY_TOKEN` matches Meta portal
 - Ensure endpoint is publicly accessible (test with curl)
 - Check nginx configuration allows POST to /api/webhooks/whatsapp
 
 ### Messages not sending
+
 - Verify `ENABLE_WHATSAPP=true` in .env
 - Check access token not expired (permanent tokens last 60 days)
 - Verify phone number format (+447123456789, not 07123456789)
@@ -444,6 +465,7 @@ Add WhatsApp preference to user settings (in `client/src/pages/Settings.tsx`):
 - Verify user has not blocked the number
 
 ### Template rejected
+
 - Avoid promotional language
 - Keep it transactional/utility focused
 - Don't include URLs unless in button
@@ -461,6 +483,7 @@ Add WhatsApp preference to user settings (in `client/src/pages/Settings.tsx`):
 ## Support
 
 If you encounter issues:
+
 1. Check Meta Developer Portal → Support
 2. WhatsApp Business API Documentation: https://developers.facebook.com/docs/whatsapp
 3. Meta Business Help Center
@@ -469,6 +492,7 @@ If you encounter issues:
 ## Next Steps
 
 After successful setup:
+
 - [ ] Add delivery status tracking
 - [ ] Implement opt-out mechanism (user can disable)
 - [ ] Add read receipts handling
@@ -479,6 +503,7 @@ After successful setup:
 ## Summary
 
 WhatsApp reminders are **ready to enable** once:
+
 1. WhatsApp Cloud API is configured (this guide)
 2. Message templates are approved by Meta
 3. Environment variables are set
@@ -487,6 +512,7 @@ WhatsApp reminders are **ready to enable** once:
 **Estimated setup time**: 2-3 hours + 1-2 days for template approval
 
 **Cost per month** (estimated for 1000 users, 3 reminders each):
+
 - 3000 messages × £0.05 = **£150/month**
 
 **When to enable**: After MVP launch and user feedback confirms demand for WhatsApp reminders.

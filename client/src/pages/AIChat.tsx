@@ -10,7 +10,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { ShieldCheck, Lock, AlertCircle, Mic, MicOff, Save, Trash2, Plus, MessageSquare, FileText } from "lucide-react";
+import {
+  ShieldCheck,
+  Lock,
+  AlertCircle,
+  Mic,
+  MicOff,
+  Save,
+  Trash2,
+  Plus,
+  MessageSquare,
+  FileText,
+} from "lucide-react";
 import { toast } from "sonner";
 
 export default function AIChat() {
@@ -243,7 +254,9 @@ export default function AIChat() {
                   <div className="mt-4 p-4 border rounded-lg bg-muted">
                     <div className="flex items-center gap-2 mb-2">
                       <Lock className="h-4 w-4" />
-                      <span className="font-semibold">Admin Password Required</span>
+                      <span className="font-semibold">
+                        Admin Password Required
+                      </span>
                     </div>
                     <div className="flex gap-2">
                       <Input
@@ -336,7 +349,8 @@ export default function AIChat() {
                   <Alert>
                     <AlertCircle className="h-4 w-4" />
                     <AlertDescription>
-                      Voice recognition is not supported in your browser. You can still type notes manually.
+                      Voice recognition is not supported in your browser. You
+                      can still type notes manually.
                     </AlertDescription>
                   </Alert>
                 )}
@@ -357,7 +371,10 @@ export default function AIChat() {
                             {note.title && (
                               <div className="font-semibold text-sm mb-1 flex items-center gap-2">
                                 {note.transcribed && (
-                                  <Badge variant="secondary" className="text-xs">
+                                  <Badge
+                                    variant="secondary"
+                                    className="text-xs"
+                                  >
                                     <Mic className="w-3 h-3 mr-1" />
                                     Voice
                                   </Badge>

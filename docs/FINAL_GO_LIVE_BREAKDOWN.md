@@ -2,7 +2,7 @@
 
 **Date:** February 9, 2026  
 **PR Branch:** `copilot/fix-marketing-site-ui-issues`  
-**Commits:** 4 commits with surgical, minimal changes  
+**Commits:** 4 commits with surgical, minimal changes
 
 ---
 
@@ -11,6 +11,7 @@
 ### A) Marketing Site - Uniformity + Layout Fixes (COMPLETE)
 
 #### Navigation Fixes
+
 - **File:** `client/src/components/MarketingNav.tsx`
 - **Changes:**
   - Added `h-[72px]` to container div for proper vertical centering (line 45)
@@ -20,6 +21,7 @@
 - **Result:** Nav properly centered, scroll behavior uniform across all pages
 
 #### Banner Image Fixes
+
 - **File:** `client/src/pages/Features.tsx`
 - **Changes:** Replaced wrong banner `/images/training.jpg` → `/images/hero-horse.jpg` (line 26)
 - **File:** `client/src/pages/About.tsx`
@@ -27,6 +29,7 @@
 - **Result:** Appropriate, professional images on all pages. PageBanner component already had proper object-fit: cover and vertical centering.
 
 #### Pricing Page Icon Improvements
+
 - **File:** `client/src/pages/Pricing.tsx`
 - **Changes:**
   - Removed useless SVG image blocks (plan-basic.svg, plan-pro.svg, plan-enterprise.svg)
@@ -36,6 +39,7 @@
 - **Result:** Clean, professional pricing cards with recognizable icons
 
 #### Footer Consistency
+
 - **File:** `client/src/components/Footer.tsx`
 - **Changes:**
   - Changed background from `bg-black` → `bg-white` (line 5)
@@ -45,6 +49,7 @@
 - **Result:** White footer consistent across ALL pages (including login/register which already had Footer component imported)
 
 #### Login/Register Pages
+
 - **Files:** `client/src/pages/auth/Login.tsx`, `client/src/pages/auth/Register.tsx`
 - **Status:** Already correctly implemented with:
   - Dark AuthSplitLayout component (50/50 desktop, full-screen mobile)
@@ -59,6 +64,7 @@
 ### B) Backend - Pricing Single Source of Truth (COMPLETE)
 
 #### Unified Pricing Configuration
+
 - **File:** `server/stripe.ts`
 - **Changes:**
   - Created comprehensive `PRICING_PLANS` object with all three plans: trial, pro, stable (lines 34-97)
@@ -68,6 +74,7 @@
 - **Endpoints:** Data structure supports both Pro and Stable plans with monthly/yearly billing
 
 #### REST API Endpoint
+
 - **File:** `server/_core/billingRouter.ts`
 - **Changes:**
   - Added GET `/api/billing/plans` endpoint (lines 13-63)
@@ -77,6 +84,7 @@
 - **Testing:** `curl https://equiprofile.online/api/billing/plans`
 
 #### TRPC API Endpoint
+
 - **File:** `server/routers.ts`
 - **Changes:**
   - Updated `billing.getPricing` to return all three plans (lines 273-348)
@@ -86,6 +94,7 @@
 - **Usage:** `trpc.billing.getPricing.useQuery()` in React components
 
 #### Environment Configuration
+
 - **File:** `.env.example`
 - **Changes:**
   - Documented new Stripe price IDs for Stable plan (lines 87-94)
@@ -98,6 +107,7 @@
 ### C) Backend - Hard 7-Day Trial Lock (COMPLETE)
 
 #### Trial Lock Middleware
+
 - **File:** `server/_core/trialLock.ts` (NEW FILE)
 - **Implementation:**
   - Express middleware applied to all /api and /trpc routes
@@ -105,7 +115,7 @@
   - Returns 402 Payment Required if trial expired
   - Also checks for expired/overdue/cancelled subscriptions
   - Checks account suspension status (403)
-  - Exempt paths: /api/auth, /api/billing, /api/health, /trpc/billing.*
+  - Exempt paths: /api/auth, /api/billing, /api/health, /trpc/billing.\*
 - **Security:** Impossible to bypass - runs before TRPC, checks every request
 - **Error codes:**
   - 402: Trial expired / subscription expired
@@ -113,6 +123,7 @@
   - Includes helpful error messages for frontend
 
 #### Middleware Integration
+
 - **File:** `server/_core/index.ts`
 - **Changes:**
   - Imported and applied trialLockMiddleware (lines 535-542)
@@ -122,6 +133,7 @@
 - **Result:** Server-side enforcement, no client-side bypass possible
 
 #### TRPC Middleware (Alternative/Redundant)
+
 - **File:** `server/_core/trpc.ts`
 - **Changes:**
   - Added `checkTrialStatus` middleware (lines 30-77)
@@ -134,6 +146,7 @@
 ### D) Documentation (COMPLETE)
 
 #### Coverage Matrix
+
 - **File:** `docs/COVERAGE_MATRIX.md` (NEW FILE)
 - **Content:**
   - Complete mapping of all nav items → routes → endpoints
@@ -149,6 +162,7 @@
 - **Size:** 10.5 KB, comprehensive reference
 
 #### WhatsApp Setup Guide
+
 - **File:** `docs/WHATSAPP_SETUP.md` (NEW FILE)
 - **Content:**
   - Current status (number verified, API not configured)
@@ -173,18 +187,20 @@
 ### B) Dashboard Features (NOT IMPLEMENTED)
 
 #### B1) User vs Admin Separation
+
 - **Reason:** Already partially implemented in existing code
 - **What remains:**
   - Admin routes use `adminUnlockedProcedure` which requires admin role + unlocked session
   - User routes use `protectedProcedure` which just checks authentication
   - RECOMMENDATION: Update user-facing routes to use `activeUserProcedure` (created but not applied)
 - **Complexity:** Small (S)
-- **Next step:** 
+- **Next step:**
   - Search and replace `protectedProcedure` → `activeUserProcedure` in user-facing routes
   - File: `server/routers.ts` (lines 100-800+)
   - Estimate: 1 hour
 
 #### B2) Update Marketing Pricing Page to Use API
+
 - **Reason:** Time constraints - frontend pricing page already works with hardcoded values
 - **What remains:**
   - Update `client/src/pages/Pricing.tsx` to fetch from `/api/billing/plans` or `trpc.billing.getPricing`
@@ -199,6 +215,7 @@
   - Estimate: 30 minutes
 
 #### B3) Update Dashboard Billing to Use API
+
 - **Reason:** Dashboard billing already uses some API endpoints (getStatus, createCheckout)
 - **What remains:**
   - Verify `client/src/pages/BillingPage.tsx` uses API exclusively
@@ -211,6 +228,7 @@
   - Estimate: 30 minutes
 
 #### B4) Secure Horse Image Upload + Storage
+
 - **Reason:** Major feature requiring S3/storage infrastructure changes
 - **What remains:**
   - Create secure upload endpoint (auth required, per-user quota)
@@ -232,6 +250,7 @@
   - Estimate: 8-12 hours
 
 #### B5) Weather Feature with Geolocation + Open-Meteo
+
 - **Reason:** New feature requiring external API integration
 - **What remains:**
   - Browser geolocation capture (client-side)
@@ -259,10 +278,12 @@
   - Estimate: 4-6 hours
 
 #### B6) Plain-Language Riding Advice
+
 - **Reason:** Part of weather feature (B5)
 - **Covered in B5 above**
 
 #### B7) Redesign AI Chat with Proper Layout
+
 - **Reason:** UI/UX improvement requiring significant frontend work
 - **What remains:**
   - Current `client/src/pages/AIChat.tsx` needs better layout
@@ -280,6 +301,7 @@
   - Estimate: 3-4 hours
 
 #### B8) Add Notes Tab with Voice Dictation
+
 - **Reason:** New feature requiring Web Speech API integration
 - **What remains:**
   - Add Notes tab to AI Chat page or separate page
@@ -316,6 +338,7 @@
   - Estimate: 6-8 hours
 
 #### B9) Fix Calendar Nav Disappearing Issue
+
 - **Reason:** Reported bug, needs investigation
 - **What remains:**
   - Investigate why nav disappears on Calendar page
@@ -329,6 +352,7 @@
   - Estimate: 30 minutes - 1 hour
 
 #### B10) Add Preloaded Training Templates
+
 - **Reason:** Content creation + seeding logic required
 - **What remains:**
   - Create 5 curated training programs:
@@ -366,6 +390,7 @@
   - Estimate: 12-16 hours (includes content creation)
 
 #### B11) Implement Realtime Updates (SSE/WebSocket)
+
 - **Reason:** Infrastructure already exists (SSE implemented), needs expansion
 - **What exists:**
   - SSE endpoint: `/api/realtime/events` (in `server/_core/index.ts`)
@@ -382,10 +407,10 @@
   1. Audit existing SSE implementation
   2. Add event emission in TRPC mutations:
      ```typescript
-     await realtimeManager.publishToChannel(
-       `user:${userId}:horses`,
-       { type: 'horse.created', data: newHorse }
-     );
+     await realtimeManager.publishToChannel(`user:${userId}:horses`, {
+       type: "horse.created",
+       data: newHorse,
+     });
      ```
   3. Create React hook: `useRealtimeSubscription(channel, callback)`
   4. Add toast notifications when events received
@@ -393,6 +418,7 @@
   - Estimate: 4-6 hours
 
 #### B12) Add /api/realtime/health Endpoint
+
 - **Reason:** Monitoring endpoint for SSE status
 - **What remains:**
   - Create endpoint returning: connected clients, active channels, uptime
@@ -408,10 +434,12 @@
     });
   });
   ```
+
   - File: `server/_core/index.ts`
   - Estimate: 15 minutes
 
 #### B13) Implement Email Reminders
+
 - **Reason:** Core feature requiring scheduler implementation
 - **What remains:**
   - Create reminders table (may already exist - check schema)
@@ -431,6 +459,7 @@
   - Estimate: 6-8 hours
 
 #### B14) Add WhatsApp Scaffolding Behind Feature Flag
+
 - **Reason:** Requires WhatsApp Cloud API setup (already documented)
 - **Status:** Documentation complete ✅ (`docs/WHATSAPP_SETUP.md`)
 - **What remains:**
@@ -449,6 +478,7 @@
 ### C) Quality & Testing (NOT IMPLEMENTED)
 
 #### C1) Run Lint and Build Checks
+
 - **Reason:** Not run during implementation to save time
 - **What remains:**
   - Run `npm run check` (TypeScript)
@@ -462,9 +492,11 @@
   npm run build
   npm run format
   ```
+
   - Estimate: 15-30 minutes to fix any issues
 
 #### C2) Test Mobile/Desktop Responsive Behavior
+
 - **Reason:** Manual testing required, not automated
 - **What remains:**
   - Test all marketing pages on mobile (320px, 375px, 768px, 1024px)
@@ -483,6 +515,7 @@
 ## 3) KNOWN ISSUES / TECH DEBT ⚠️
 
 ### Issue 1: Hardcoded Pricing in Frontend
+
 - **Location:** `client/src/pages/Pricing.tsx` lines 24-28
 - **Problem:** Frontend has hardcoded prices that don't match backend
   - Frontend: £10/month, £100/year
@@ -492,6 +525,7 @@
 - **Priority:** HIGH
 
 ### Issue 2: Missing Stable Plan Stripe Price IDs
+
 - **Location:** `.env.example` documents them but they don't exist in Stripe
 - **Problem:** Stable plan can't be purchased even though it's in pricing structure
 - **Fix:** Create Stable plan products in Stripe dashboard
@@ -500,6 +534,7 @@
 - **Priority:** HIGH (if offering Stable plan)
 
 ### Issue 3: No User Storage Quota Enforcement
+
 - **Location:** Horse image uploads (if feature exists)
 - **Problem:** No limit on image uploads, could lead to storage abuse
 - **Risk:** Unlimited storage costs
@@ -507,16 +542,18 @@
 - **Priority:** HIGH
 
 ### Issue 4: Trial Lock Not Tested
+
 - **Location:** `server/_core/trialLock.ts`, `server/_core/index.ts`
 - **Problem:** Code is written but not tested with actual expired trial users
 - **Risk:** May not work correctly in production
-- **Fix:** 
+- **Fix:**
   1. Create test user with createdAt = 8 days ago
   2. Try to access dashboard → should get 402
   3. Try to call API directly → should get 402
 - **Priority:** HIGH (security critical)
 
 ### Issue 5: Pricing Endpoint Not Cached
+
 - **Location:** `/api/billing/plans` and `trpc.billing.getPricing`
 - **Problem:** Queries Stripe/env vars on every request
 - **Risk:** Unnecessary load, slow response
@@ -524,17 +561,19 @@
 - **Priority:** LOW
 
 ### Issue 6: No Trial Extension for Admins
+
 - **Location:** Trial lock middleware
 - **Problem:** No admin override to extend trial for specific users
 - **Fix:** Add admin endpoint: `trpc.admin.extendTrial(userId, days)`
   ```typescript
   await db.updateUser(userId, {
-    trialEndsAt: addDays(user.createdAt, currentDays + extensionDays)
+    trialEndsAt: addDays(user.createdAt, currentDays + extensionDays),
   });
   ```
 - **Priority:** MEDIUM
 
 ### Issue 7: No Frontend Trial Lock UI
+
 - **Location:** Missing upgrade overlay on 402 response
 - **Problem:** Backend returns 402 but frontend may not handle gracefully
 - **Fix:** Add global error handler in TRPC client config:
@@ -543,11 +582,12 @@
     if (error.code === 402) {
       showUpgradeModal();
     }
-  }
+  };
   ```
 - **Priority:** MEDIUM
 
 ### Issue 8: No Email Verification
+
 - **Location:** User registration flow
 - **Problem:** Users can register without verifying email
 - **Risk:** Fake accounts, spam
@@ -557,6 +597,7 @@
 - **Priority:** MEDIUM
 
 ### Issue 9: No Rate Limiting on TRPC
+
 - **Location:** TRPC routes have no rate limiting
 - **Problem:** Only Express /api routes are rate limited
 - **Risk:** TRPC abuse (DoS via mutations)
@@ -564,6 +605,7 @@
 - **Priority:** LOW (trial lock provides some protection)
 
 ### Issue 10: Inconsistent Error Messages
+
 - **Location:** Various API endpoints
 - **Problem:** Some errors return generic "Internal server error"
 - **Risk:** Hard to debug, poor UX
@@ -575,6 +617,7 @@
 ## 4) EFFORT SUMMARY
 
 ### Work Completed (This PR)
+
 - Marketing site fixes: **2 hours**
 - Pricing API implementation: **1.5 hours**
 - Trial lock implementation: **2 hours**
@@ -582,12 +625,14 @@
 - **Total:** **7.5 hours** across 4 commits
 
 ### Work Remaining (Estimated)
+
 - **Small (S) tasks**: 6 items × 1 hour = **6 hours**
 - **Medium (M) tasks**: 6 items × 5 hours = **30 hours**
 - **Large (L) tasks**: 3 items × 12 hours = **36 hours**
 - **Total:** **72 hours** (approximately 9 working days)
 
 ### Breakdown by Priority
+
 - **HIGH priority**: 18 hours (trial testing, pricing sync, storage quota)
 - **MEDIUM priority**: 30 hours (AI chat, notes, templates, reminders, realtime)
 - **LOW priority**: 24 hours (WhatsApp full implementation, weather, caching)
@@ -597,20 +642,19 @@
 ## 5) RECOMMENDATIONS
 
 ### For Immediate Go-Live
+
 **MUST DO before production:**
+
 1. ✅ Sync frontend pricing with backend (implement B2) - 30 min
 2. ✅ Test trial lock with expired test user - 30 min
 3. ✅ Run build checks and fix any errors - 30 min
 4. ✅ Test mobile responsiveness - 1 hour
 5. ✅ Create Stable plan in Stripe if offering it - 30 min
 
-**SHOULD DO within first week:**
-6. ⚠️ Implement frontend trial lock UI (upgrade modal) - 2 hours
-7. ⚠️ Add admin trial extension capability - 1 hour
-8. ⚠️ Implement storage quota tracking - 8 hours
-9. ⚠️ Basic email reminders - 6 hours
+**SHOULD DO within first week:** 6. ⚠️ Implement frontend trial lock UI (upgrade modal) - 2 hours 7. ⚠️ Add admin trial extension capability - 1 hour 8. ⚠️ Implement storage quota tracking - 8 hours 9. ⚠️ Basic email reminders - 6 hours
 
 ### For Phase 2 (Post-Launch)
+
 - Weather feature with riding advice
 - Training templates library
 - Notes with voice dictation
@@ -619,6 +663,7 @@
 - AI chat UI improvements
 
 ### For Phase 3 (Future)
+
 - Advanced analytics
 - Team collaboration features
 - Mobile app (React Native)
@@ -652,6 +697,7 @@ Before merging to main:
 ## 7) DEPLOYMENT NOTES
 
 ### Environment Variables Required
+
 ```bash
 # Existing variables (already in production)
 DATABASE_URL=...
@@ -672,9 +718,11 @@ WHATSAPP_ACCESS_TOKEN=
 ```
 
 ### Database Migrations
+
 No new migrations required for this PR. Trial lock uses existing `createdAt` and `subscriptionStatus` fields.
 
 ### Deployment Steps
+
 1. Merge PR to main
 2. Pull latest on server: `git pull origin main`
 3. Install dependencies: `npm install --legacy-peer-deps`
@@ -693,30 +741,34 @@ No new migrations required for this PR. Trial lock uses existing `createdAt` and
 ## 8) SECURITY SUMMARY
 
 ### Security Improvements in This PR
+
 ✅ Hard trial lock - prevents access after 7 days (impossible to bypass)  
 ✅ Server-side enforcement - no client-side workarounds possible  
 ✅ Subscription status checking - expired/overdue blocked  
 ✅ Account suspension checking - suspended users blocked  
-✅ Exemption list - auth/billing still accessible during trial  
+✅ Exemption list - auth/billing still accessible during trial
 
 ### Remaining Security Concerns
+
 ⚠️ No email verification on signup  
 ⚠️ No rate limiting on TRPC endpoints  
 ⚠️ No storage quota enforcement (if uploads enabled)  
 ⚠️ No audit logging for admin actions  
-⚠️ No 2FA option for users  
+⚠️ No 2FA option for users
 
 ---
 
 ## CONCLUSION
 
 This PR delivers the **core infrastructure** required for go-live:
+
 - ✅ Marketing site uniformity and polish
 - ✅ Pricing single source of truth
 - ✅ Hard trial lock (security critical)
 - ✅ Comprehensive documentation
 
 The remaining work (72 hours estimated) consists of:
+
 - Feature additions (weather, notes, templates)
 - UI/UX improvements (AI chat, realtime indicators)
 - External integrations (WhatsApp)

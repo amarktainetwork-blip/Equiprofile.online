@@ -34,11 +34,17 @@ export interface ForecastDay {
 /**
  * Get current weather for a location
  */
-export async function getCurrentWeather(latitude: string, longitude: string): Promise<WeatherData> {
+export async function getCurrentWeather(
+  latitude: string,
+  longitude: string,
+): Promise<WeatherData> {
   const url = new URL(OPEN_METEO_API);
   url.searchParams.set("latitude", latitude);
   url.searchParams.set("longitude", longitude);
-  url.searchParams.set("current", "temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,weather_code");
+  url.searchParams.set(
+    "current",
+    "temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,weather_code",
+  );
   url.searchParams.set("timezone", "auto");
 
   const response = await fetch(url.toString());
@@ -62,11 +68,17 @@ export async function getCurrentWeather(latitude: string, longitude: string): Pr
 /**
  * Get 7-day weather forecast
  */
-export async function getWeatherForecast(latitude: string, longitude: string): Promise<ForecastDay[]> {
+export async function getWeatherForecast(
+  latitude: string,
+  longitude: string,
+): Promise<ForecastDay[]> {
   const url = new URL(OPEN_METEO_API);
   url.searchParams.set("latitude", latitude);
   url.searchParams.set("longitude", longitude);
-  url.searchParams.set("daily", "temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max,weather_code");
+  url.searchParams.set(
+    "daily",
+    "temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max,weather_code",
+  );
   url.searchParams.set("timezone", "auto");
   url.searchParams.set("forecast_days", "7");
 
@@ -106,7 +118,8 @@ export function getRidingAdvice(weather: WeatherData): RidingAdvice {
     return {
       suitable: true,
       level: "excellent",
-      message: "Perfect weather for riding! Clear skies and comfortable temperatures make this an ideal time for outdoor work.",
+      message:
+        "Perfect weather for riding! Clear skies and comfortable temperatures make this an ideal time for outdoor work.",
       warnings: [],
     };
   }
@@ -135,7 +148,8 @@ export function getRidingAdvice(weather: WeatherData): RidingAdvice {
     return {
       suitable: false,
       level: "unsafe",
-      message: "Weather conditions are unsafe for riding. Consider postponing or working indoors. Horse and rider safety should come first.",
+      message:
+        "Weather conditions are unsafe for riding. Consider postponing or working indoors. Horse and rider safety should come first.",
       warnings,
     };
   }
@@ -150,7 +164,8 @@ export function getRidingAdvice(weather: WeatherData): RidingAdvice {
     return {
       suitable: false,
       level: "poor",
-      message: "Conditions are not ideal for riding. If you must ride, keep sessions short and monitor your horse closely. Indoor arena work recommended.",
+      message:
+        "Conditions are not ideal for riding. If you must ride, keep sessions short and monitor your horse closely. Indoor arena work recommended.",
       warnings,
     };
   }
@@ -165,7 +180,8 @@ export function getRidingAdvice(weather: WeatherData): RidingAdvice {
     return {
       suitable: true,
       level: "fair",
-      message: "Riding is possible but conditions aren't perfect. Take extra precautions and be prepared to cut your session short if needed.",
+      message:
+        "Riding is possible but conditions aren't perfect. Take extra precautions and be prepared to cut your session short if needed.",
       warnings,
     };
   }
@@ -174,7 +190,8 @@ export function getRidingAdvice(weather: WeatherData): RidingAdvice {
   return {
     suitable: true,
     level: "good",
-    message: "Good weather for riding. Conditions are favorable for most activities. Stay alert and adjust your plans if weather changes.",
+    message:
+      "Good weather for riding. Conditions are favorable for most activities. Stay alert and adjust your plans if weather changes.",
     warnings,
   };
 }
@@ -199,11 +216,17 @@ function getWeatherCondition(code: number): string {
 /**
  * Get hourly forecast for the next 24 hours
  */
-export async function getHourlyForecast(latitude: string, longitude: string): Promise<WeatherData[]> {
+export async function getHourlyForecast(
+  latitude: string,
+  longitude: string,
+): Promise<WeatherData[]> {
   const url = new URL(OPEN_METEO_API);
   url.searchParams.set("latitude", latitude);
   url.searchParams.set("longitude", longitude);
-  url.searchParams.set("hourly", "temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,weather_code");
+  url.searchParams.set(
+    "hourly",
+    "temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,weather_code",
+  );
   url.searchParams.set("timezone", "auto");
   url.searchParams.set("forecast_hours", "24");
 

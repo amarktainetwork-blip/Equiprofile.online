@@ -560,7 +560,10 @@ async function startServer() {
     const challenge = req.query["hub.challenge"];
 
     // Check if this is a webhook verification request
-    if (mode === "subscribe" && token === process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN) {
+    if (
+      mode === "subscribe" &&
+      token === process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN
+    ) {
       console.log("[WhatsApp] Webhook verified successfully");
       res.status(200).send(challenge);
     } else {
@@ -590,7 +593,9 @@ async function startServer() {
           // Handle message status updates
           if (value?.statuses) {
             for (const status of value.statuses) {
-              console.log(`[WhatsApp] Status update: ${status.id} -> ${status.status}`);
+              console.log(
+                `[WhatsApp] Status update: ${status.id} -> ${status.status}`,
+              );
               // TODO: Update message status in database
               // Possible statuses: sent, delivered, read, failed
             }
@@ -599,7 +604,9 @@ async function startServer() {
           // Handle incoming messages (user replies)
           if (value?.messages) {
             for (const message of value.messages) {
-              console.log(`[WhatsApp] Received message from ${message.from}: ${message.type}`);
+              console.log(
+                `[WhatsApp] Received message from ${message.from}: ${message.type}`,
+              );
               // TODO: Handle user replies (e.g., "STOP" for opt-out)
               // TODO: Process message content based on type (text, image, etc.)
             }
@@ -618,7 +625,7 @@ async function startServer() {
 
   // Import trial lock middleware
   const { trialLockMiddleware } = await import("./trialLock");
-  
+
   // Apply trial lock middleware to ALL API routes (except exempt paths)
   // This enforces hard 7-day trial lock server-side
   app.use("/api", trialLockMiddleware);
@@ -653,13 +660,15 @@ async function startServer() {
     console.log(`✓ Server running on http://${host}:${port}/`);
     console.log(`✓ Environment: ${process.env.NODE_ENV || "development"}`);
     console.log(`✓ Health check: http://${host}:${port}/api/health`);
-    
+
     // Start reminder scheduler
-    import("./reminderScheduler").then((module) => {
-      module.startReminderScheduler();
-    }).catch((err) => {
-      console.error("[Server] Failed to start reminder scheduler:", err);
-    });
+    import("./reminderScheduler")
+      .then((module) => {
+        module.startReminderScheduler();
+      })
+      .catch((err) => {
+        console.error("[Server] Failed to start reminder scheduler:", err);
+      });
   });
 
   // Handle port binding errors

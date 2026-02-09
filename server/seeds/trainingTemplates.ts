@@ -1,6 +1,6 @@
 /**
  * Training Templates Seed Data
- * 
+ *
  * This file contains 5 curated training programs that will be seeded as public templates.
  * Each template includes detailed weekly schedules with exercises, duration, and intensity.
  */
@@ -290,8 +290,7 @@ export const TRAINING_TEMPLATES = [
               day: "Tuesday",
               type: "Light Hack",
               duration: 30,
-              description:
-                "Relaxing trail ride to maintain forward thinking",
+              description: "Relaxing trail ride to maintain forward thinking",
               intensity: "low",
             },
             {
@@ -1242,8 +1241,7 @@ export const TRAINING_TEMPLATES = [
               day: "Thursday",
               type: "Hand Walking",
               duration: 20,
-              description:
-                "In-hand work as active recovery and bonding time.",
+              description: "In-hand work as active recovery and bonding time.",
               intensity: "very low",
             },
             {

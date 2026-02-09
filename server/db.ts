@@ -2248,16 +2248,16 @@ export async function getNotesByUserId(
   const db = await getDb();
   if (!db) return [];
 
-  let query = db
-    .select()
-    .from(notes)
-    .where(eq(notes.userId, userId));
+  const conditions = [eq(notes.userId, userId)];
 
   if (horseId) {
-    query = query.where(eq(notes.horseId, horseId));
+    conditions.push(eq(notes.horseId, horseId));
   }
 
-  return await query
+  return await db
+    .select()
+    .from(notes)
+    .where(and(...conditions))
     .orderBy(desc(notes.createdAt))
     .limit(limit);
 }
@@ -2266,10 +2266,7 @@ export async function getNoteById(id: number) {
   const db = await getDb();
   if (!db) return null;
 
-  const results = await db
-    .select()
-    .from(notes)
-    .where(eq(notes.id, id));
+  const results = await db.select().from(notes).where(eq(notes.id, id));
   return results[0] || null;
 }
 
@@ -2291,9 +2288,7 @@ export async function deleteNote(id: number, userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
-  await db
-    .delete(notes)
-    .where(and(eq(notes.id, id), eq(notes.userId, userId)));
+  await db.delete(notes).where(and(eq(notes.id, id), eq(notes.userId, userId)));
 }
 
 // ============ EVENT REMINDERS ============
@@ -2307,8 +2302,8 @@ export async function getDueEventReminders(beforeDate: Date) {
     .where(
       and(
         lte(eventReminders.reminderTime, beforeDate),
-        eq(eventReminders.sent, false)
-      )
+        eq(eventReminders.isSent, false),
+      ),
     );
 }
 
@@ -2318,7 +2313,7 @@ export async function markEventReminderSent(reminderId: number) {
 
   await db
     .update(eventReminders)
-    .set({ sent: true, sentAt: new Date() })
+    .set({ isSent: true, sentAt: new Date() })
     .where(eq(eventReminders.id, reminderId));
 }
 
@@ -2326,9 +2321,6 @@ export async function getEventById(eventId: number) {
   const db = await getDb();
   if (!db) return null;
 
-  const results = await db
-    .select()
-    .from(events)
-    .where(eq(events.id, eventId));
+  const results = await db.select().from(events).where(eq(events.id, eventId));
   return results[0] || null;
 }

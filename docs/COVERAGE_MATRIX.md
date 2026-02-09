@@ -4,95 +4,95 @@ This document maps every navigation item to its corresponding routes, backend en
 
 ## Marketing Site Routes
 
-| Nav Item | Route | Component | Backend Endpoints | Realtime |
-|----------|-------|-----------|-------------------|----------|
-| Home | `/` | Home.tsx | None (public) | N/A |
-| About | `/about` | About.tsx | None (public) | N/A |
-| Features | `/features` | Features.tsx | None (public) | N/A |
-| Pricing | `/pricing` | Pricing.tsx | `/api/billing/plans`, `/trpc/billing.getPricing`, `/trpc/billing.getStatus`, `/trpc/billing.createCheckout` | N/A |
-| Contact | `/contact` | Contact.tsx | `/trpc/contact.send` (if exists) | N/A |
-| Login | `/login` | auth/Login.tsx | `/api/auth/login`, `/api/oauth/callback` | N/A |
-| Register | `/register` | auth/Register.tsx | `/api/auth/signup`, `/api/oauth/callback` | N/A |
+| Nav Item | Route       | Component         | Backend Endpoints                                                                                           | Realtime |
+| -------- | ----------- | ----------------- | ----------------------------------------------------------------------------------------------------------- | -------- |
+| Home     | `/`         | Home.tsx          | None (public)                                                                                               | N/A      |
+| About    | `/about`    | About.tsx         | None (public)                                                                                               | N/A      |
+| Features | `/features` | Features.tsx      | None (public)                                                                                               | N/A      |
+| Pricing  | `/pricing`  | Pricing.tsx       | `/api/billing/plans`, `/trpc/billing.getPricing`, `/trpc/billing.getStatus`, `/trpc/billing.createCheckout` | N/A      |
+| Contact  | `/contact`  | Contact.tsx       | `/trpc/contact.send` (if exists)                                                                            | N/A      |
+| Login    | `/login`    | auth/Login.tsx    | `/api/auth/login`, `/api/oauth/callback`                                                                    | N/A      |
+| Register | `/register` | auth/Register.tsx | `/api/auth/signup`, `/api/oauth/callback`                                                                   | N/A      |
 
 ## Dashboard Routes (Protected)
 
-| Nav Item | Route | Component | Backend Endpoints | Realtime Channel |
-|----------|-------|-----------|-------------------|------------------|
-| Dashboard Home | `/dashboard` | Dashboard.tsx | `/trpc/user.getProfile`, `/trpc/horses.list`, `/trpc/health.getUpcoming` | `user:{userId}` |
-| My Horses | `/horses` | Horses.tsx | `/trpc/horses.list`, `/trpc/horses.create`, `/trpc/horses.update`, `/trpc/horses.delete` | `user:{userId}:horses` |
-| Horse Details | `/horses/:id` | HorseDetail.tsx | `/trpc/horses.get`, `/trpc/health.getAll`, `/trpc/training.getAll` | `horse:{horseId}` |
-| New Horse | `/horses/new` | HorseForm.tsx | `/trpc/horses.create` | N/A |
-| Edit Horse | `/horses/:id/edit` | HorseForm.tsx | `/trpc/horses.get`, `/trpc/horses.update` | N/A |
-| Pedigree | `/pedigree` | Pedigree.tsx | `/trpc/horses.getPedigree` | N/A |
-| Health Records | `/health` | Health.tsx | `/trpc/health.getAll`, `/trpc/health.create`, `/trpc/health.update`, `/trpc/health.delete` | `user:{userId}:health` |
-| Vaccinations | `/vaccinations` | Vaccinations.tsx | `/trpc/health.getByType`, `/trpc/health.create` | `user:{userId}:health:vaccinations` |
-| Dental Care | `/dental` | DentalCare.tsx | `/trpc/health.getByType`, `/trpc/health.create` | `user:{userId}:health:dental` |
-| Hoof Care | `/hoofcare` | Hoofcare.tsx | `/trpc/health.getByType`, `/trpc/health.create` | `user:{userId}:health:hoofcare` |
-| Dewormings | `/dewormings` | Dewormings.tsx | `/trpc/health.getByType`, `/trpc/health.create` | `user:{userId}:health:dewormings` |
-| Treatments | `/treatments` | Treatments.tsx | `/trpc/health.getByType`, `/trpc/health.create` | `user:{userId}:health:treatments` |
-| X-Rays | `/xrays` | Xrays.tsx | `/trpc/health.getByType`, `/trpc/health.create` | `user:{userId}:health:xrays` |
-| Training | `/training` | Training.tsx | `/trpc/training.getAll`, `/trpc/training.create`, `/trpc/training.update` | `user:{userId}:training` |
-| Templates | `/training-templates` | TrainingTemplates.tsx | `/trpc/training.getTemplates`, `/trpc/training.applyTemplate` | N/A |
-| Lessons | `/lessons` | LessonScheduling.tsx | `/trpc/lessons.getAll`, `/trpc/lessons.create` | `user:{userId}:lessons` |
-| Tasks | `/tasks` | Tasks.tsx | `/trpc/tasks.getAll`, `/trpc/tasks.create`, `/trpc/tasks.update`, `/trpc/tasks.delete` | `user:{userId}:tasks` |
-| Calendar | `/calendar` | Calendar.tsx | `/trpc/calendar.getEvents`, `/trpc/tasks.getAll`, `/trpc/lessons.getAll` | `user:{userId}:calendar` |
-| Appointments | `/appointments` | Appointments.tsx | `/trpc/appointments.getAll`, `/trpc/appointments.create` | `user:{userId}:appointments` |
-| Contacts | `/contacts` | Contacts.tsx | `/trpc/contacts.getAll`, `/trpc/contacts.create`, `/trpc/contacts.update` | `user:{userId}:contacts` |
-| Client Portal | `/client/:clientId` | ClientPortal.tsx | `/trpc/clients.get`, `/trpc/horses.getByClient` | N/A |
-| Messages | `/messages` | Messages.tsx | `/trpc/messages.getAll`, `/trpc/messages.send` | `user:{userId}:messages` |
-| Breeding | `/breeding` | BreedingManagement.tsx | `/trpc/breeding.getAll`, `/trpc/breeding.create` | `user:{userId}:breeding` |
-| Feeding | `/feeding` | Feeding.tsx | `/trpc/feeding.getSchedule`, `/trpc/feeding.update` | `user:{userId}:feeding` |
-| Nutrition Plans | `/nutrition-plans` | NutritionPlans.tsx | `/trpc/nutrition.getPlans`, `/trpc/nutrition.create` | N/A |
-| Nutrition Logs | `/nutrition-logs` | NutritionLogs.tsx | `/trpc/nutrition.getLogs`, `/trpc/nutrition.log` | N/A |
-| Weather | `/weather` | Weather.tsx | `/trpc/weather.getCurrent`, `/trpc/weather.getForecast` | `user:{userId}:weather` |
-| Documents | `/documents` | Documents.tsx | `/trpc/documents.getAll`, `/trpc/documents.upload`, `/trpc/documents.delete` | `user:{userId}:documents` |
-| AI Chat | `/ai-chat` | AIChat.tsx | `/trpc/ai.chat`, `/trpc/ai.getHistory` | `user:{userId}:ai` |
-| Billing | `/billing` | BillingPage.tsx | `/trpc/billing.getStatus`, `/trpc/billing.createPortal`, `/api/billing/checkout`, `/api/billing/portal` | `user:{userId}:billing` |
-| Settings | `/settings` | Settings.tsx | `/trpc/user.updateProfile`, `/trpc/user.updatePreferences` | N/A |
-| Analytics | `/analytics` | Analytics.tsx | `/trpc/analytics.get` | N/A |
-| Reports | `/reports` | Reports.tsx | `/trpc/reports.generate`, `/trpc/reports.export` | N/A |
-| Tags | `/tags` | Tags.tsx | `/trpc/tags.getAll`, `/trpc/tags.create`, `/trpc/tags.delete` | N/A |
-| Stable Management | `/stable` | Stable.tsx | `/trpc/stable.getInfo`, `/trpc/stable.update` | N/A |
+| Nav Item          | Route                 | Component              | Backend Endpoints                                                                                       | Realtime Channel                    |
+| ----------------- | --------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| Dashboard Home    | `/dashboard`          | Dashboard.tsx          | `/trpc/user.getProfile`, `/trpc/horses.list`, `/trpc/health.getUpcoming`                                | `user:{userId}`                     |
+| My Horses         | `/horses`             | Horses.tsx             | `/trpc/horses.list`, `/trpc/horses.create`, `/trpc/horses.update`, `/trpc/horses.delete`                | `user:{userId}:horses`              |
+| Horse Details     | `/horses/:id`         | HorseDetail.tsx        | `/trpc/horses.get`, `/trpc/health.getAll`, `/trpc/training.getAll`                                      | `horse:{horseId}`                   |
+| New Horse         | `/horses/new`         | HorseForm.tsx          | `/trpc/horses.create`                                                                                   | N/A                                 |
+| Edit Horse        | `/horses/:id/edit`    | HorseForm.tsx          | `/trpc/horses.get`, `/trpc/horses.update`                                                               | N/A                                 |
+| Pedigree          | `/pedigree`           | Pedigree.tsx           | `/trpc/horses.getPedigree`                                                                              | N/A                                 |
+| Health Records    | `/health`             | Health.tsx             | `/trpc/health.getAll`, `/trpc/health.create`, `/trpc/health.update`, `/trpc/health.delete`              | `user:{userId}:health`              |
+| Vaccinations      | `/vaccinations`       | Vaccinations.tsx       | `/trpc/health.getByType`, `/trpc/health.create`                                                         | `user:{userId}:health:vaccinations` |
+| Dental Care       | `/dental`             | DentalCare.tsx         | `/trpc/health.getByType`, `/trpc/health.create`                                                         | `user:{userId}:health:dental`       |
+| Hoof Care         | `/hoofcare`           | Hoofcare.tsx           | `/trpc/health.getByType`, `/trpc/health.create`                                                         | `user:{userId}:health:hoofcare`     |
+| Dewormings        | `/dewormings`         | Dewormings.tsx         | `/trpc/health.getByType`, `/trpc/health.create`                                                         | `user:{userId}:health:dewormings`   |
+| Treatments        | `/treatments`         | Treatments.tsx         | `/trpc/health.getByType`, `/trpc/health.create`                                                         | `user:{userId}:health:treatments`   |
+| X-Rays            | `/xrays`              | Xrays.tsx              | `/trpc/health.getByType`, `/trpc/health.create`                                                         | `user:{userId}:health:xrays`        |
+| Training          | `/training`           | Training.tsx           | `/trpc/training.getAll`, `/trpc/training.create`, `/trpc/training.update`                               | `user:{userId}:training`            |
+| Templates         | `/training-templates` | TrainingTemplates.tsx  | `/trpc/training.getTemplates`, `/trpc/training.applyTemplate`                                           | N/A                                 |
+| Lessons           | `/lessons`            | LessonScheduling.tsx   | `/trpc/lessons.getAll`, `/trpc/lessons.create`                                                          | `user:{userId}:lessons`             |
+| Tasks             | `/tasks`              | Tasks.tsx              | `/trpc/tasks.getAll`, `/trpc/tasks.create`, `/trpc/tasks.update`, `/trpc/tasks.delete`                  | `user:{userId}:tasks`               |
+| Calendar          | `/calendar`           | Calendar.tsx           | `/trpc/calendar.getEvents`, `/trpc/tasks.getAll`, `/trpc/lessons.getAll`                                | `user:{userId}:calendar`            |
+| Appointments      | `/appointments`       | Appointments.tsx       | `/trpc/appointments.getAll`, `/trpc/appointments.create`                                                | `user:{userId}:appointments`        |
+| Contacts          | `/contacts`           | Contacts.tsx           | `/trpc/contacts.getAll`, `/trpc/contacts.create`, `/trpc/contacts.update`                               | `user:{userId}:contacts`            |
+| Client Portal     | `/client/:clientId`   | ClientPortal.tsx       | `/trpc/clients.get`, `/trpc/horses.getByClient`                                                         | N/A                                 |
+| Messages          | `/messages`           | Messages.tsx           | `/trpc/messages.getAll`, `/trpc/messages.send`                                                          | `user:{userId}:messages`            |
+| Breeding          | `/breeding`           | BreedingManagement.tsx | `/trpc/breeding.getAll`, `/trpc/breeding.create`                                                        | `user:{userId}:breeding`            |
+| Feeding           | `/feeding`            | Feeding.tsx            | `/trpc/feeding.getSchedule`, `/trpc/feeding.update`                                                     | `user:{userId}:feeding`             |
+| Nutrition Plans   | `/nutrition-plans`    | NutritionPlans.tsx     | `/trpc/nutrition.getPlans`, `/trpc/nutrition.create`                                                    | N/A                                 |
+| Nutrition Logs    | `/nutrition-logs`     | NutritionLogs.tsx      | `/trpc/nutrition.getLogs`, `/trpc/nutrition.log`                                                        | N/A                                 |
+| Weather           | `/weather`            | Weather.tsx            | `/trpc/weather.getCurrent`, `/trpc/weather.getForecast`                                                 | `user:{userId}:weather`             |
+| Documents         | `/documents`          | Documents.tsx          | `/trpc/documents.getAll`, `/trpc/documents.upload`, `/trpc/documents.delete`                            | `user:{userId}:documents`           |
+| AI Chat           | `/ai-chat`            | AIChat.tsx             | `/trpc/ai.chat`, `/trpc/ai.getHistory`                                                                  | `user:{userId}:ai`                  |
+| Billing           | `/billing`            | BillingPage.tsx        | `/trpc/billing.getStatus`, `/trpc/billing.createPortal`, `/api/billing/checkout`, `/api/billing/portal` | `user:{userId}:billing`             |
+| Settings          | `/settings`           | Settings.tsx           | `/trpc/user.updateProfile`, `/trpc/user.updatePreferences`                                              | N/A                                 |
+| Analytics         | `/analytics`          | Analytics.tsx          | `/trpc/analytics.get`                                                                                   | N/A                                 |
+| Reports           | `/reports`            | Reports.tsx            | `/trpc/reports.generate`, `/trpc/reports.export`                                                        | N/A                                 |
+| Tags              | `/tags`               | Tags.tsx               | `/trpc/tags.getAll`, `/trpc/tags.create`, `/trpc/tags.delete`                                           | N/A                                 |
+| Stable Management | `/stable`             | Stable.tsx             | `/trpc/stable.getInfo`, `/trpc/stable.update`                                                           | N/A                                 |
 
 ## Admin Routes (Admin Only)
 
-| Nav Item | Route | Component | Backend Endpoints | Realtime Channel |
-|----------|-------|-----------|-------------------|------------------|
-| Admin Panel | `/admin` | Admin.tsx | `/trpc/admin.getAllUsers`, `/trpc/admin.updateUser`, `/trpc/admin.suspendUser`, `/trpc/admin.generateApiKey` | `admin:panel` |
+| Nav Item    | Route    | Component | Backend Endpoints                                                                                            | Realtime Channel |
+| ----------- | -------- | --------- | ------------------------------------------------------------------------------------------------------------ | ---------------- |
+| Admin Panel | `/admin` | Admin.tsx | `/trpc/admin.getAllUsers`, `/trpc/admin.updateUser`, `/trpc/admin.suspendUser`, `/trpc/admin.generateApiKey` | `admin:panel`    |
 
 ## Public API Endpoints (No Nav)
 
-| Endpoint | Purpose | Auth Required | Rate Limited |
-|----------|---------|---------------|--------------|
-| `/api/health` | Health check | No | Yes (60/min) |
-| `/api/health/ping` | Simple ping | No | Yes (60/min) |
-| `/api/version` | Build info | No | Yes (60/min) |
-| `/build` | Cached build info | No | Yes (60/min) |
-| `/api/oauth/status` | OAuth config status | No | No |
-| `/api/oauth/callback` | OAuth callback | No | No |
-| `/api/auth/login` | Email/password login | No | Yes (100/15min) |
-| `/api/auth/signup` | User registration | No | Yes (100/15min) |
-| `/api/auth/logout` | User logout | Yes | No |
-| `/api/billing/plans` | Get all pricing plans | No | Yes (100/15min) |
-| `/api/billing/checkout` | Create Stripe checkout | Yes | Yes (100/15min) |
-| `/api/billing/portal` | Stripe customer portal | Yes | Yes (100/15min) |
-| `/api/webhooks/stripe` | Stripe webhooks | No (signed) | No |
-| `/api/realtime/events` | SSE event stream | Yes | No |
-| `/api/realtime/stats` | SSE statistics | Yes (Admin) | No |
+| Endpoint                | Purpose                | Auth Required | Rate Limited    |
+| ----------------------- | ---------------------- | ------------- | --------------- |
+| `/api/health`           | Health check           | No            | Yes (60/min)    |
+| `/api/health/ping`      | Simple ping            | No            | Yes (60/min)    |
+| `/api/version`          | Build info             | No            | Yes (60/min)    |
+| `/build`                | Cached build info      | No            | Yes (60/min)    |
+| `/api/oauth/status`     | OAuth config status    | No            | No              |
+| `/api/oauth/callback`   | OAuth callback         | No            | No              |
+| `/api/auth/login`       | Email/password login   | No            | Yes (100/15min) |
+| `/api/auth/signup`      | User registration      | No            | Yes (100/15min) |
+| `/api/auth/logout`      | User logout            | Yes           | No              |
+| `/api/billing/plans`    | Get all pricing plans  | No            | Yes (100/15min) |
+| `/api/billing/checkout` | Create Stripe checkout | Yes           | Yes (100/15min) |
+| `/api/billing/portal`   | Stripe customer portal | Yes           | Yes (100/15min) |
+| `/api/webhooks/stripe`  | Stripe webhooks        | No (signed)   | No              |
+| `/api/realtime/events`  | SSE event stream       | Yes           | No              |
+| `/api/realtime/stats`   | SSE statistics         | Yes (Admin)   | No              |
 
 ## Realtime Channels (SSE)
 
-| Channel Pattern | Purpose | Subscribers |
-|----------------|---------|-------------|
-| `user:{userId}` | Global user events (reminders, notifications) | Individual user |
-| `user:{userId}:horses` | Horse CRUD operations | Individual user |
-| `user:{userId}:health` | Health record updates | Individual user |
-| `user:{userId}:training` | Training log updates | Individual user |
-| `user:{userId}:tasks` | Task updates | Individual user |
-| `user:{userId}:calendar` | Calendar event changes | Individual user |
-| `user:{userId}:billing` | Subscription status changes | Individual user |
-| `horse:{horseId}` | Specific horse updates | Horse owner + shared users |
-| `admin:panel` | Admin notifications | All admin users |
+| Channel Pattern          | Purpose                                       | Subscribers                |
+| ------------------------ | --------------------------------------------- | -------------------------- |
+| `user:{userId}`          | Global user events (reminders, notifications) | Individual user            |
+| `user:{userId}:horses`   | Horse CRUD operations                         | Individual user            |
+| `user:{userId}:health`   | Health record updates                         | Individual user            |
+| `user:{userId}:training` | Training log updates                          | Individual user            |
+| `user:{userId}:tasks`    | Task updates                                  | Individual user            |
+| `user:{userId}:calendar` | Calendar event changes                        | Individual user            |
+| `user:{userId}:billing`  | Subscription status changes                   | Individual user            |
+| `horse:{horseId}`        | Specific horse updates                        | Horse owner + shared users |
+| `admin:panel`            | Admin notifications                           | All admin users            |
 
 ## Authentication Flow
 
@@ -135,6 +135,7 @@ This document maps every navigation item to its corresponding routes, backend en
 ## Data Flow Examples
 
 ### Example 1: Creating a Horse
+
 ```
 1. User clicks "Add Horse" button in /horses
 2. Navigate to /horses/new (HorseForm.tsx)
@@ -152,6 +153,7 @@ This document maps every navigation item to its corresponding routes, backend en
 ```
 
 ### Example 2: Trial Expiration
+
 ```
 1. User's trial ends (7 days from createdAt)
 2. User tries to access /health
@@ -186,6 +188,7 @@ This document maps every navigation item to its corresponding routes, backend en
 ## Future Additions
 
 When adding new features:
+
 1. Add route to this matrix
 2. Document backend endpoints
 3. Add realtime channel if needed

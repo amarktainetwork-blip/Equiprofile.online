@@ -18,7 +18,12 @@ interface UpgradeModalProps {
   message?: string;
 }
 
-export function UpgradeModal({ open, onClose, reason = "trial_expired", message }: UpgradeModalProps) {
+export function UpgradeModal({
+  open,
+  onClose,
+  reason = "trial_expired",
+  message,
+}: UpgradeModalProps) {
   const [, setLocation] = useLocation();
 
   const handleUpgrade = () => {
@@ -50,7 +55,7 @@ export function UpgradeModal({ open, onClose, reason = "trial_expired", message 
 
   const getDescription = () => {
     if (message) return message;
-    
+
     switch (reason) {
       case "trial_expired":
         return "Your 7-day free trial has ended. Upgrade to a paid plan to continue using EquiProfile and keep all your data.";
@@ -65,9 +70,7 @@ export function UpgradeModal({ open, onClose, reason = "trial_expired", message 
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <div className="flex justify-center mb-4">
-            {getIcon()}
-          </div>
+          <div className="flex justify-center mb-4">{getIcon()}</div>
           <DialogTitle className="text-center text-2xl">
             {getTitle()}
           </DialogTitle>
@@ -75,7 +78,7 @@ export function UpgradeModal({ open, onClose, reason = "trial_expired", message 
             {getDescription()}
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="py-4 space-y-3">
           <div className="bg-muted p-4 rounded-lg space-y-2">
             <div className="font-semibold">What you're missing:</div>
@@ -105,7 +108,9 @@ export function UpgradeModal({ open, onClose, reason = "trial_expired", message 
 
           <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg">
             <div className="flex items-center gap-2 text-sm text-blue-800">
-              <Badge variant="secondary" className="bg-blue-100">💎 Pro</Badge>
+              <Badge variant="secondary" className="bg-blue-100">
+                💎 Pro
+              </Badge>
               <span className="font-medium">Starting at just £7.99/month</span>
             </div>
           </div>
@@ -115,7 +120,11 @@ export function UpgradeModal({ open, onClose, reason = "trial_expired", message 
           <Button onClick={handleUpgrade} className="w-full sm:w-auto">
             View Plans & Upgrade
           </Button>
-          <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            className="w-full sm:w-auto"
+          >
             Maybe Later
           </Button>
         </DialogFooter>

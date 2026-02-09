@@ -378,7 +378,7 @@ export async function sendReminderEmail(
   });
 
   const subject = `Reminder: ${eventTitle}`;
-  
+
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
       <h2 style="color: #1e40af; border-bottom: 2px solid #1e40af; padding-bottom: 10px;">

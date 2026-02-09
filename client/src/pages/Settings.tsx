@@ -124,7 +124,7 @@ export default function Settings() {
       (error) => {
         toast.error(`Failed to get location: ${error.message}`);
         setIsCapturingLocation(false);
-      }
+      },
     );
   };
 
@@ -219,13 +219,14 @@ export default function Settings() {
                           disabled={isLoading}
                         />
                       </div>
-                      
+
                       <Separator />
-                      
+
                       <div className="space-y-3">
                         <Label>Location for Weather</Label>
                         <p className="text-sm text-muted-foreground">
-                          Allow EquiProfile to access your location for accurate weather forecasts and riding conditions.
+                          Allow EquiProfile to access your location for accurate
+                          weather forecasts and riding conditions.
                         </p>
                         <Button
                           type="button"

@@ -59,18 +59,18 @@ const redirectToLoginIfUnauthorized = (error: unknown) => {
 
 const handleTrialLockError = (error: unknown) => {
   if (!(error instanceof TRPCClientError)) return;
-  
+
   // Check for 402 Payment Required or trial/subscription error messages
-  const isPaymentRequired = 
+  const isPaymentRequired =
     error.data?.code === "PAYMENT_REQUIRED" ||
     error.message?.toLowerCase().includes("trial") ||
     error.message?.toLowerCase().includes("subscription") ||
     error.message?.toLowerCase().includes("upgrade");
-  
+
   if (isPaymentRequired) {
     // Open upgrade modal
     const { open } = useUpgradeModal.getState();
-    
+
     if (error.message?.toLowerCase().includes("trial")) {
       open("trial_expired", error.message);
     } else if (error.message?.toLowerCase().includes("subscription")) {

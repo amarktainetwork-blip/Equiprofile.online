@@ -7,7 +7,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Check, Loader2, Clock, XCircle, Sparkles, Crown, Building2 } from "lucide-react";
+import {
+  Check,
+  Loader2,
+  Clock,
+  XCircle,
+  Sparkles,
+  Crown,
+  Building2,
+} from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { Link, useLocation } from "wouter";
@@ -31,7 +39,8 @@ export default function Pricing() {
     "monthly",
   );
 
-  const { data: pricing, isLoading: pricingLoading } = trpc.billing.getPricing.useQuery();
+  const { data: pricing, isLoading: pricingLoading } =
+    trpc.billing.getPricing.useQuery();
   const { data: subscriptionStatus } = trpc.billing.getStatus.useQuery(
     undefined,
     {
@@ -406,7 +415,9 @@ export default function Pricing() {
                       {/* Icon Header */}
                       <div className="h-40 overflow-hidden bg-gradient-to-br from-indigo-900/20 to-cyan-900/20 relative flex items-center justify-center">
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
-                        <div className={`relative z-20 w-24 h-24 rounded-full bg-gradient-to-r ${planData.iconColor} flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-2xl`}>
+                        <div
+                          className={`relative z-20 w-24 h-24 rounded-full bg-gradient-to-r ${planData.iconColor} flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-2xl`}
+                        >
                           <planData.icon className="w-12 h-12 text-white" />
                         </div>
                       </div>

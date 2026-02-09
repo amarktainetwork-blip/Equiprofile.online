@@ -1,12 +1,12 @@
 /**
  * Trial Lock Middleware
- * 
+ *
  * Enforces 7-day hard trial lock across the application.
  * - Demo/trial accounts have full access for 7 days from created_at
  * - After 7 days: HARD LOCK server-side (return 402/403)
  * - Frontend shows upgrade overlay
  * - Must be impossible to bypass by calling API directly
- * 
+ *
  * This middleware is applied at the Express level before TRPC,
  * ensuring ALL API calls are checked (except auth/billing routes).
  */
@@ -20,7 +20,7 @@ const EXEMPT_PATHS = [
   "/api/billing",
   "/api/health",
   "/api/build",
-  "/trpc/billing.",  // Allow billing-related TRPC calls
+  "/trpc/billing.", // Allow billing-related TRPC calls
   "/trpc/user.getProfile", // Allow getting profile
 ];
 
@@ -28,7 +28,7 @@ const EXEMPT_PATHS = [
  * Check if a path is exempt from trial checking
  */
 function isExemptPath(path: string): boolean {
-  return EXEMPT_PATHS.some(exempt => path.startsWith(exempt));
+  return EXEMPT_PATHS.some((exempt) => path.startsWith(exempt));
 }
 
 /**
@@ -48,7 +48,7 @@ function hasTrialExpired(createdAt: Date): boolean {
 export async function trialLockMiddleware(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<Response | void> {
   // Skip exempt paths (auth, billing, health checks)
   if (isExemptPath(req.path)) {
@@ -58,7 +58,7 @@ export async function trialLockMiddleware(
   try {
     // Authenticate user
     const user = await sdk.authenticateRequest(req);
-    
+
     // If no user, let auth middleware handle it
     if (!user) {
       return next();
@@ -78,18 +78,25 @@ export async function trialLockMiddleware(
       if (hasTrialExpired(user.createdAt)) {
         return res.status(402).json({
           error: "Trial expired",
-          message: "Your 7-day trial has ended. Please upgrade to continue using EquiProfile.",
+          message:
+            "Your 7-day trial has ended. Please upgrade to continue using EquiProfile.",
           code: "TRIAL_EXPIRED",
-          trialEndedAt: new Date(user.createdAt.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+          trialEndedAt: new Date(
+            user.createdAt.getTime() + 7 * 24 * 60 * 60 * 1000,
+          ).toISOString(),
         });
       }
     }
 
     // Check if subscription is expired or overdue
-    if (user.subscriptionStatus === "expired" || user.subscriptionStatus === "overdue") {
+    if (
+      user.subscriptionStatus === "expired" ||
+      user.subscriptionStatus === "overdue"
+    ) {
       return res.status(402).json({
         error: "Subscription expired",
-        message: "Your subscription has expired. Please renew to continue using EquiProfile.",
+        message:
+          "Your subscription has expired. Please renew to continue using EquiProfile.",
         code: "SUBSCRIPTION_EXPIRED",
       });
     }
@@ -100,7 +107,8 @@ export async function trialLockMiddleware(
       if (now > user.subscriptionEndsAt) {
         return res.status(402).json({
           error: "Subscription ended",
-          message: "Your subscription has ended. Please resubscribe to continue.",
+          message:
+            "Your subscription has ended. Please resubscribe to continue.",
           code: "SUBSCRIPTION_ENDED",
         });
       }

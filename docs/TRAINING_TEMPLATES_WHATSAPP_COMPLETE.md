@@ -11,9 +11,11 @@
 ### Templates Created
 
 #### 1. General Conditioning (4 weeks, Beginner)
+
 **Purpose:** Build overall fitness and stamina  
 **Ideal For:** Horses returning to work after break, building foundation  
 **Program Structure:**
+
 - Week 1: Gentle introduction (walk/light trot)
 - Week 2: Increase trot work with basic exercises
 - Week 3: Build stamina, introduce canter
@@ -24,9 +26,11 @@
 **Intensity:** Low to moderate-high progression
 
 #### 2. Flatwork Fundamentals (4 weeks, Intermediate, Dressage)
+
 **Purpose:** Develop correct basic dressage movements  
 **Ideal For:** Horses with basic fitness wanting to improve flatwork  
 **Program Structure:**
+
 - Week 1: Establish rhythm and relaxation
 - Week 2: Develop suppleness and bend
 - Week 3: Improve collection and self-carriage
@@ -37,9 +41,11 @@
 **Focus:** Lateral work, transitions, balance, accuracy
 
 #### 3. Jumping Basics (4 weeks, Intermediate, Jumping)
+
 **Purpose:** Introduce jumping or improve basic technique  
 **Ideal For:** Horses ready to start jumping or refine basics  
 **Program Structure:**
+
 - Week 1: Ground poles and rhythm
 - Week 2: Introduction to small fences (cross rails)
 - Week 3: Build confidence and technique
@@ -50,9 +56,11 @@
 **Progression:** Ground poles → cross rails → verticals → oxers → courses
 
 #### 4. Endurance Training (6 weeks, Advanced, Endurance)
+
 **Purpose:** Build cardiovascular fitness for long-distance riding  
 **Ideal For:** Horses preparing for competitive endurance  
 **Program Structure:**
+
 - Week 1: Base fitness assessment, LSD introduction
 - Week 2: Increase duration, introduce faster work
 - Week 3: Build endurance capacity
@@ -65,9 +73,11 @@
 **Special Features:** Heart rate monitoring, interval training, hill work, mock competitions
 
 #### 5. Rehabilitation Return-to-Work (4 weeks, All levels, General)
+
 **Purpose:** Safe return to work after injury or extended time off  
 **Ideal For:** Post-injury rehabilitation (with vet clearance)  
 **Program Structure:**
+
 - Week 1: Very gentle reintroduction (hand walking)
 - Week 2: Build confidence with walk work
 - Week 3: Gradually introduce trot work
@@ -82,6 +92,7 @@
 ### Technical Implementation
 
 #### File Structure
+
 ```
 server/
   seeds/
@@ -92,6 +103,7 @@ server/
 ```
 
 #### Template Data Structure
+
 ```typescript
 {
   name: string,
@@ -122,6 +134,7 @@ server/
 ```
 
 #### Seeding Features
+
 - **Idempotent:** Won't duplicate if run multiple times
 - **Check by Name:** Verifies template doesn't exist before inserting
 - **System User:** Assigns to userId 1 (admin/system account)
@@ -129,6 +142,7 @@ server/
 - **Console Output:** Shows created/skipped/errors with counts
 
 #### Usage Commands
+
 ```bash
 # Run directly with tsx
 tsx server/seeds/trainingTemplates.ts
@@ -143,7 +157,7 @@ npm run seed:templates
 # ✅ Created: "Jumping Basics"
 # ✅ Created: "Endurance Training"
 # ✅ Created: "Rehabilitation Return-to-Work"
-# 
+#
 # ✨ Seeding complete!
 #    Inserted: 5
 #    Skipped: 0
@@ -159,6 +173,7 @@ npm run seed:templates
 #### File: `server/_core/whatsapp.ts` (5.6KB)
 
 **Core Functions:**
+
 ```typescript
 // Configuration check
 isWhatsAppEnabled(): WhatsAppConfig
@@ -178,6 +193,7 @@ formatDateForWhatsApp(date: Date): string
 ```
 
 **Features:**
+
 - Feature flag checking (ENABLE_WHATSAPP)
 - Graceful degradation if not configured
 - Axios-based HTTP requests to Meta Graph API
@@ -187,6 +203,7 @@ formatDateForWhatsApp(date: Date): string
 - Date formatting for readable messages
 
 **Message Templates Required:**
+
 1. `reminder_notification` - General event reminders
 2. `vaccination_due` - Health-related reminders
 3. `trial_ending` - Account notifications
@@ -200,12 +217,14 @@ formatDateForWhatsApp(date: Date): string
 **Added Endpoints:**
 
 **GET /api/webhooks/whatsapp**
+
 - Purpose: Webhook verification (Meta requirement)
 - Parameters: hub.mode, hub.verify_token, hub.challenge
 - Response: Returns challenge if token matches
 - Public endpoint (no auth required)
 
 **POST /api/webhooks/whatsapp**
+
 - Purpose: Receive message status updates and user replies
 - Handles:
   - Message delivery status (sent, delivered, read, failed)
@@ -215,6 +234,7 @@ formatDateForWhatsApp(date: Date): string
 - TODO markers for database integration
 
 **Security Features:**
+
 - Webhook token verification
 - Payload validation
 - Error handling (try/catch)
@@ -227,6 +247,7 @@ formatDateForWhatsApp(date: Date): string
 #### File: `.env.example`
 
 **Added Variables:**
+
 ```bash
 # ==========================================
 # WHATSAPP CONFIGURATION (Optional)
@@ -250,6 +271,7 @@ WHATSAPP_WEBHOOK_VERIFY_TOKEN=your_random_token_here
 ```
 
 **Production Configuration:**
+
 ```bash
 # Generate webhook token
 openssl rand -base64 32
@@ -268,6 +290,7 @@ WHATSAPP_WEBHOOK_VERIFY_TOKEN=abcd1234...xyz
 #### How It Works Together
 
 **1. User Sets Preferences**
+
 ```typescript
 // In Settings page (future enhancement)
 {
@@ -277,24 +300,28 @@ WHATSAPP_WEBHOOK_VERIFY_TOKEN=abcd1234...xyz
 ```
 
 **2. Reminder Scheduler Checks**
+
 ```typescript
 // In reminderScheduler.ts
 const preferences = JSON.parse(user.preferences);
 
-if (process.env.ENABLE_WHATSAPP === "true" && 
-    preferences.whatsappReminders && 
-    user.phone) {
+if (
+  process.env.ENABLE_WHATSAPP === "true" &&
+  preferences.whatsappReminders &&
+  user.phone
+) {
   await sendReminderNotification(
     user.phone,
     user.name,
     reminder.title,
     horse.name,
-    formatDate(reminder.dueDate)
+    formatDate(reminder.dueDate),
   );
 }
 ```
 
 **3. WhatsApp Module Sends**
+
 ```typescript
 // Feature flag check
 if (!config.enabled) return false;
@@ -303,11 +330,12 @@ if (!config.enabled) return false;
 const response = await axios.post(
   `https://graph.facebook.com/v18.0/${phoneNumberId}/messages`,
   templateData,
-  { headers: { Authorization: `Bearer ${accessToken}` } }
+  { headers: { Authorization: `Bearer ${accessToken}` } },
 );
 ```
 
 **4. Webhook Receives Status**
+
 ```typescript
 // POST /api/webhooks/whatsapp
 // Receives: sent, delivered, read, failed
@@ -319,6 +347,7 @@ const response = await axios.post(
 ## 📊 STATISTICS
 
 ### Code Metrics
+
 - **Training Templates File:** 1,461 lines, 47KB
 - **WhatsApp Module:** 186 lines, 5.6KB
 - **Webhook Endpoints:** ~80 lines added
@@ -326,6 +355,7 @@ const response = await axios.post(
 - **Total New Code:** ~1,700 lines
 
 ### Template Content Metrics
+
 - **Total Templates:** 5
 - **Total Weeks:** 22 weeks of training
 - **Total Sessions:** 150 individual training sessions
@@ -334,6 +364,7 @@ const response = await axios.post(
 - **Levels Covered:** Beginner, Intermediate, Advanced
 
 ### Feature Completion
+
 - ✅ Training Templates: 100% complete
 - ✅ WhatsApp Configuration: 100% complete
 - ✅ Webhooks: 100% implemented
@@ -348,10 +379,12 @@ const response = await axios.post(
 ### Deploy Training Templates
 
 **Prerequisites:**
+
 - Database migrations run (`npm run db:push`)
 - userId 1 exists in database (admin/system user)
 
 **Steps:**
+
 ```bash
 # 1. Run the seeding script
 npm run seed:templates
@@ -368,6 +401,7 @@ npm run seed:templates
 ```
 
 **Expected Result:**
+
 - 5 templates visible in UI
 - Each template shows:
   - Name and description
@@ -387,6 +421,7 @@ npm run seed:templates
 ### Deploy WhatsApp Integration (Optional)
 
 **Prerequisites:**
+
 - Meta Developer Portal account
 - WhatsApp Business Account
 - Verified phone number
@@ -395,6 +430,7 @@ npm run seed:templates
 **Steps:**
 
 **1. Meta Developer Portal Setup** (1 hour)
+
 ```bash
 # Follow docs/WHATSAPP_SETUP.md sections 1-3:
 # - Create WhatsApp Business App
@@ -403,6 +439,7 @@ npm run seed:templates
 ```
 
 **2. Configure Environment** (5 minutes)
+
 ```bash
 # Add to .env
 ENABLE_WHATSAPP=true
@@ -412,6 +449,7 @@ WHATSAPP_WEBHOOK_VERIFY_TOKEN=$(openssl rand -base64 32)
 ```
 
 **3. Register Webhook** (10 minutes)
+
 ```bash
 # In Meta Developer Portal:
 # URL: https://equipprofile.online/api/webhooks/whatsapp
@@ -423,6 +461,7 @@ curl -X GET "https://equipprofile.online/api/webhooks/whatsapp?hub.mode=subscrib
 ```
 
 **4. Create Message Templates** (1 hour + 1-2 days approval)
+
 ```bash
 # In Meta Business Manager:
 # 1. Create "reminder_notification" template
@@ -433,16 +472,17 @@ curl -X GET "https://equipprofile.online/api/webhooks/whatsapp?hub.mode=subscrib
 ```
 
 **5. Test Sending** (15 minutes)
+
 ```typescript
 // Test with your phone number
-import { sendReminderNotification } from './server/_core/whatsapp';
+import { sendReminderNotification } from "./server/_core/whatsapp";
 
 await sendReminderNotification(
-  '+447123456789',  // Your phone
-  'Test User',
-  'Vaccination Due',
-  'Thunder',
-  '15 Feb 2026'
+  "+447123456789", // Your phone
+  "Test User",
+  "Vaccination Due",
+  "Thunder",
+  "15 Feb 2026",
 );
 
 // Check console logs for success
@@ -450,6 +490,7 @@ await sendReminderNotification(
 ```
 
 **6. Go Live** (5 minutes)
+
 ```bash
 # Restart server
 sudo systemctl restart equiprofile
@@ -465,6 +506,7 @@ sudo journalctl -u equiprofile -f | grep WhatsApp
 ### Testing Training Templates
 
 **Manual Testing:**
+
 ```bash
 # 1. Seed templates
 npm run seed:templates
@@ -493,10 +535,11 @@ npm run seed:templates
 ```
 
 **Database Verification:**
+
 ```sql
 -- Check templates created
-SELECT id, name, duration, discipline, level, isPublic 
-FROM trainingProgramTemplates 
+SELECT id, name, duration, discipline, level, isPublic
+FROM trainingProgramTemplates
 WHERE userId = 1;
 
 -- Should return 5 rows
@@ -512,43 +555,46 @@ WHERE name = 'General Conditioning';
 ### Testing WhatsApp Integration
 
 **With ENABLE_WHATSAPP=false (Default):**
+
 ```typescript
 // Test feature flag check
-import { isWhatsAppEnabled } from './server/_core/whatsapp';
+import { isWhatsAppEnabled } from "./server/_core/whatsapp";
 
 const config = isWhatsAppEnabled();
-console.log(config.enabled);  // Should be false
+console.log(config.enabled); // Should be false
 
 // Test sending (should skip gracefully)
-await sendReminderNotification('+447123456789', 'Test', 'Test', 'Test', 'Test');
+await sendReminderNotification("+447123456789", "Test", "Test", "Test", "Test");
 // Console: "[WhatsApp] Feature disabled - skipping message"
 ```
 
 **With ENABLE_WHATSAPP=true (Production):**
+
 ```typescript
 // Test phone number validation
-validatePhoneNumber('+447123456789');  // Returns: '+447123456789'
-validatePhoneNumber('07123456789');    // Returns: '+447123456789'
-validatePhoneNumber('invalid');         // Returns: null
+validatePhoneNumber("+447123456789"); // Returns: '+447123456789'
+validatePhoneNumber("07123456789"); // Returns: '+447123456789'
+validatePhoneNumber("invalid"); // Returns: null
 
 // Test user preferences
 const prefs = JSON.stringify({ whatsappReminders: true });
-userHasWhatsAppEnabled(prefs);  // Returns: true
+userHasWhatsAppEnabled(prefs); // Returns: true
 
 // Test actual sending (requires Meta setup)
 const result = await sendReminderNotification(
-  '+447123456789',
-  'John Doe',
-  'Farrier Appointment',
-  'Thunder',
-  '15 Feb 2026, 10:00'
+  "+447123456789",
+  "John Doe",
+  "Farrier Appointment",
+  "Thunder",
+  "15 Feb 2026, 10:00",
 );
-console.log(result);  // true if successful
+console.log(result); // true if successful
 
 // Check WhatsApp on phone for message
 ```
 
 **Webhook Testing:**
+
 ```bash
 # Test GET (verification)
 curl -X GET "https://equipprofile.online/api/webhooks/whatsapp?hub.mode=subscribe&hub.challenge=test123&hub.verify_token=YOUR_TOKEN"
@@ -580,6 +626,7 @@ curl -X POST https://equipprofile.online/api/webhooks/whatsapp \
 All documentation already exists and is up to date:
 
 ### Primary Documentation
+
 - ✅ **docs/WHATSAPP_SETUP.md** (13KB)
   - Complete step-by-step setup guide
   - Meta Developer Portal instructions
@@ -590,12 +637,13 @@ All documentation already exists and is up to date:
   - Security notes
 
 ### Code Documentation
+
 - ✅ **server/seeds/trainingTemplates.ts**
   - Inline comments explaining structure
   - Usage instructions
   - 5 complete template definitions
 
-- ✅ **server/_core/whatsapp.ts**
+- ✅ **server/\_core/whatsapp.ts**
   - JSDoc comments on all functions
   - Parameter descriptions
   - Return value documentation
@@ -611,12 +659,15 @@ All documentation already exists and is up to date:
 ## ⚠️ KNOWN LIMITATIONS & FUTURE ENHANCEMENTS
 
 ### Training Templates
+
 **Current State:** ✅ Fully functional
+
 - Templates are public and visible to all users
 - Users can duplicate and modify
 - Applying template creates training program instance
 
 **Future Enhancements:**
+
 - [ ] Private templates (user-specific)
 - [ ] Template sharing/marketplace
 - [ ] Template versioning
@@ -626,12 +677,15 @@ All documentation already exists and is up to date:
 - [ ] Template editor UI (currently JSON)
 
 ### WhatsApp Integration
+
 **Current State:** ✅ Fully configured (disabled by default)
+
 - Send capability implemented
 - Webhook endpoints ready
 - Feature-flagged for safety
 
 **Future Enhancements:**
+
 - [ ] Database tracking of sent messages
 - [ ] Message delivery status updates
 - [ ] User opt-out handling ("STOP" keyword)
@@ -643,6 +697,7 @@ All documentation already exists and is up to date:
 - [ ] A/B testing templates
 
 **Missing Integrations:**
+
 - [ ] Update reminder scheduler to call WhatsApp
 - [ ] Add WhatsApp toggle to Settings UI
 - [ ] Store message IDs for tracking
@@ -654,26 +709,32 @@ All documentation already exists and is up to date:
 ## 💰 COST ANALYSIS
 
 ### Training Templates
+
 **Cost:** FREE ✅
+
 - No ongoing costs
 - Database storage only
 - No API calls
 - No external dependencies
 
 **Value:**
+
 - Professional-quality content
 - 150+ training sessions
 - Time-saving for users
 - Differentiation from competitors
 
 ### WhatsApp Integration
+
 **Setup Cost:** FREE (Meta Developer account)
 
 **Ongoing Costs:**
+
 - Business-initiated conversations: £0.03 - £0.10 per message
 - User-initiated conversations: FREE (first 24 hours)
 
 **Example Monthly Cost:**
+
 ```
 1000 users × 3 reminders each = 3000 messages
 3000 messages × £0.05 average = £150/month
@@ -682,12 +743,14 @@ Cost per user = £0.15/month
 ```
 
 **Cost Optimization:**
+
 - Use email for most reminders
 - WhatsApp for high-priority only
 - Let users opt-in (reduces volume)
 - Monitor quality rating (affects limits)
 
 **ROI Potential:**
+
 - Premium feature for Pro/Stable plans
 - Charge £2-5/month extra for WhatsApp
 - Break-even at 30-50 users
@@ -698,6 +761,7 @@ Cost per user = £0.15/month
 ## ✅ ACCEPTANCE CRITERIA
 
 ### Training Templates: ALL MET ✅
+
 - [x] At least 5 templates created
 - [x] Detailed weekly programs
 - [x] Multiple disciplines covered
@@ -710,6 +774,7 @@ Cost per user = £0.15/month
 - [x] Apply to horse functionality
 
 ### WhatsApp Configuration: ALL MET ✅
+
 - [x] WhatsApp module created
 - [x] Send message functionality
 - [x] Template support
@@ -731,6 +796,7 @@ Cost per user = £0.15/month
 **Both requirements 100% complete and production-ready!**
 
 ### What Was Delivered
+
 1. ✅ **5 Curated Training Templates**
    - Professional quality
    - 150+ detailed sessions
@@ -745,15 +811,18 @@ Cost per user = £0.15/month
    - Documented
 
 ### Production Readiness
+
 - **Training Templates:** Ready to deploy immediately
 - **WhatsApp:** Ready to configure when needed
 
 ### Time Investment
+
 - Training Templates: ~4 hours (content creation)
 - WhatsApp Integration: ~2 hours (coding + config)
 - Total: ~6 hours of development
 
 ### Quality Assurance
+
 - ✅ Code complete
 - ✅ Error handling
 - ✅ Documentation
@@ -767,6 +836,7 @@ Cost per user = £0.15/month
 **The implementation is complete and ready for production use! 🚀**
 
 To deploy:
+
 1. Run `npm run seed:templates` to seed training templates
 2. Optionally configure WhatsApp following `docs/WHATSAPP_SETUP.md`
 3. Monitor usage and gather user feedback

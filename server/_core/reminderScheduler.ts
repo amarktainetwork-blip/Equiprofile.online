@@ -15,37 +15,39 @@ export function startReminderScheduler() {
   }
 
   console.log("[Reminders] Starting reminder scheduler...");
-  
+
   // Run every hour at minute 0
   cron.schedule("0 * * * *", async () => {
     console.log("[Reminders] Checking for due reminders...");
-    
+
     try {
       const now = new Date();
       const tomorrow = new Date(now);
       tomorrow.setDate(tomorrow.getDate() + 1);
-      
+
       // Get event reminders that need to be sent
       const dueReminders = await db.getDueEventReminders(tomorrow);
-      
+
       console.log(`[Reminders] Found ${dueReminders.length} due reminders`);
-      
+
       for (const reminder of dueReminders) {
         try {
           // Get the associated event
           const event = await db.getEventById(reminder.eventId);
           if (!event) {
-            console.log(`[Reminders] Event not found for reminder ${reminder.id}`);
+            console.log(
+              `[Reminders] Event not found for reminder ${reminder.id}`,
+            );
             continue;
           }
-          
+
           // Get user details
           const user = await db.getUserById(event.userId);
           if (!user || !user.email) {
             console.log(`[Reminders] User not found for event ${event.id}`);
             continue;
           }
-          
+
           // Send email reminder
           const emailModule = await import("./email");
           await emailModule.sendReminderEmail(
@@ -53,25 +55,30 @@ export function startReminderScheduler() {
             user.name || "there",
             event.title,
             event.description || "",
-            new Date(event.startTime),
-            undefined // horse name if applicable
+            new Date(event.startDate),
+            undefined, // horse name if applicable
           );
-          
+
           // Mark reminder as sent
           await db.markEventReminderSent(reminder.id);
-          
-          console.log(`[Reminders] Sent reminder ${reminder.id} to ${user.email}`);
+
+          console.log(
+            `[Reminders] Sent reminder ${reminder.id} to ${user.email}`,
+          );
         } catch (error) {
-          console.error(`[Reminders] Failed to send reminder ${reminder.id}:`, error);
+          console.error(
+            `[Reminders] Failed to send reminder ${reminder.id}:`,
+            error,
+          );
         }
       }
-      
+
       console.log("[Reminders] Reminder check complete");
     } catch (error) {
       console.error("[Reminders] Error checking reminders:", error);
     }
   });
-  
+
   isRunning = true;
   console.log("[Reminders] Scheduler started successfully");
 }

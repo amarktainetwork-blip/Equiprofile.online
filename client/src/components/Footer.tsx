@@ -21,12 +21,16 @@ export function Footer() {
             <ul className="space-y-2 text-sm text-gray-600">
               <li>
                 <Link href="/features">
-                  <a className="hover:text-gray-900 transition-colors">Features</a>
+                  <a className="hover:text-gray-900 transition-colors">
+                    Features
+                  </a>
                 </Link>
               </li>
               <li>
                 <Link href="/pricing">
-                  <a className="hover:text-gray-900 transition-colors">Pricing</a>
+                  <a className="hover:text-gray-900 transition-colors">
+                    Pricing
+                  </a>
                 </Link>
               </li>
               <li>
@@ -49,7 +53,9 @@ export function Footer() {
               </li>
               <li>
                 <Link href="/contact">
-                  <a className="hover:text-gray-900 transition-colors">Contact</a>
+                  <a className="hover:text-gray-900 transition-colors">
+                    Contact
+                  </a>
                 </Link>
               </li>
             </ul>
@@ -60,7 +66,9 @@ export function Footer() {
             <ul className="space-y-2 text-sm text-gray-600">
               <li>
                 <Link href="/privacy">
-                  <a className="hover:text-gray-900 transition-colors">Privacy</a>
+                  <a className="hover:text-gray-900 transition-colors">
+                    Privacy
+                  </a>
                 </Link>
               </li>
               <li>

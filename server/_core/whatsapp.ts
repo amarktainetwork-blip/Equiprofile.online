@@ -1,9 +1,9 @@
 /**
  * WhatsApp Cloud API Integration Module
- * 
+ *
  * This module provides functions for sending WhatsApp messages via Meta's Cloud API.
  * It's designed to be feature-flagged (ENABLE_WHATSAPP) and fail gracefully if disabled.
- * 
+ *
  * IMPORTANT: This requires WhatsApp Cloud API to be configured in Meta Developer Portal.
  * See docs/WHATSAPP_SETUP.md for complete setup instructions.
  */
@@ -42,12 +42,12 @@ export function isWhatsAppEnabled(): WhatsAppConfig {
 
 /**
  * Send a WhatsApp message using a pre-approved template
- * 
+ *
  * @param message - Message configuration with template name and parameters
  * @returns true if message sent successfully, false otherwise
  */
 export async function sendWhatsAppMessage(
-  message: WhatsAppMessage
+  message: WhatsAppMessage,
 ): Promise<boolean> {
   const config = isWhatsAppEnabled();
 
@@ -58,7 +58,9 @@ export async function sendWhatsAppMessage(
   }
 
   if (!config.phoneNumberId || !config.accessToken) {
-    console.error("[WhatsApp] Missing credentials (WHATSAPP_PHONE_NUMBER_ID or WHATSAPP_ACCESS_TOKEN)");
+    console.error(
+      "[WhatsApp] Missing credentials (WHATSAPP_PHONE_NUMBER_ID or WHATSAPP_ACCESS_TOKEN)",
+    );
     return false;
   }
 
@@ -87,16 +89,22 @@ export async function sendWhatsAppMessage(
       },
       {
         headers: {
-          "Authorization": `Bearer ${config.accessToken}`,
+          Authorization: `Bearer ${config.accessToken}`,
           "Content-Type": "application/json",
         },
-      }
+      },
     );
 
-    console.log("[WhatsApp] Message sent successfully:", response.data.messages[0].id);
+    console.log(
+      "[WhatsApp] Message sent successfully:",
+      response.data.messages[0].id,
+    );
     return true;
   } catch (error: any) {
-    console.error("[WhatsApp] Send failed:", error.response?.data || error.message);
+    console.error(
+      "[WhatsApp] Send failed:",
+      error.response?.data || error.message,
+    );
     return false;
   }
 }
@@ -110,7 +118,7 @@ export async function sendReminderNotification(
   userName: string,
   reminderTitle: string,
   horseName: string,
-  dueDate: string
+  dueDate: string,
 ): Promise<boolean> {
   return sendWhatsAppMessage({
     to: userPhone,
@@ -128,7 +136,7 @@ export async function sendVaccinationReminder(
   userName: string,
   horseName: string,
   vaccinationType: string,
-  dueDate: string
+  dueDate: string,
 ): Promise<boolean> {
   return sendWhatsAppMessage({
     to: userPhone,
@@ -144,7 +152,7 @@ export async function sendVaccinationReminder(
 export async function sendTrialEndingNotification(
   userPhone: string,
   userName: string,
-  daysRemaining: number
+  daysRemaining: number,
 ): Promise<boolean> {
   return sendWhatsAppMessage({
     to: userPhone,
@@ -156,36 +164,38 @@ export async function sendTrialEndingNotification(
 /**
  * Validate phone number format
  * WhatsApp requires numbers in international format without spaces or dashes
- * 
+ *
  * @param phone - Phone number to validate
  * @returns Formatted phone number or null if invalid
  */
 export function validatePhoneNumber(phone: string): string | null {
   // Remove all non-digit characters except +
-  const cleaned = phone.replace(/[^\d+]/g, '');
-  
+  const cleaned = phone.replace(/[^\d+]/g, "");
+
   // Must start with + and have 10-15 digits
   if (/^\+\d{10,15}$/.test(cleaned)) {
     return cleaned;
   }
-  
+
   // Try to add + if missing and phone starts with country code
   if (/^\d{10,15}$/.test(cleaned)) {
     return `+${cleaned}`;
   }
-  
+
   return null;
 }
 
 /**
  * Check if user has WhatsApp enabled in their preferences
- * 
+ *
  * @param userPreferences - JSON preferences from user record
  * @returns true if user has opted in to WhatsApp notifications
  */
-export function userHasWhatsAppEnabled(userPreferences: string | null): boolean {
+export function userHasWhatsAppEnabled(
+  userPreferences: string | null,
+): boolean {
   if (!userPreferences) return false;
-  
+
   try {
     const prefs = JSON.parse(userPreferences);
     return prefs.whatsappReminders === true;
@@ -197,17 +207,17 @@ export function userHasWhatsAppEnabled(userPreferences: string | null): boolean 
 
 /**
  * Format date for WhatsApp messages
- * 
+ *
  * @param date - Date to format
  * @returns Human-readable date string
  */
 export function formatDateForWhatsApp(date: Date): string {
-  return new Intl.DateTimeFormat('en-GB', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
+  return new Intl.DateTimeFormat("en-GB", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   }).format(date);
 }

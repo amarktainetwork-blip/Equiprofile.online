@@ -75,7 +75,7 @@ function Router() {
   return (
     <>
       <SkipToContent />
-      <UpgradeModal 
+      <UpgradeModal
         open={upgradeModal.isOpen}
         onClose={upgradeModal.close}
         reason={upgradeModal.reason}

@@ -39,16 +39,17 @@ const checkTrialStatus = t.middleware(async (opts) => {
   // If user is on trial status, check if trial has expired
   if (ctx.user.subscriptionStatus === "trial") {
     const now = new Date();
-    
+
     // Calculate trial end date (7 days from createdAt)
     const trialEndDate = new Date(ctx.user.createdAt);
     trialEndDate.setDate(trialEndDate.getDate() + 7);
-    
+
     // If trial has expired, throw PAYMENT_REQUIRED error
     if (now > trialEndDate) {
       throw new TRPCError({
         code: "PAYMENT_REQUIRED",
-        message: "Your 7-day trial has ended. Please upgrade to continue using EquiProfile.",
+        message:
+          "Your 7-day trial has ended. Please upgrade to continue using EquiProfile.",
       });
     }
   }
@@ -60,7 +61,8 @@ const checkTrialStatus = t.middleware(async (opts) => {
   ) {
     throw new TRPCError({
       code: "PAYMENT_REQUIRED",
-      message: "Your subscription has expired. Please renew to continue using EquiProfile.",
+      message:
+        "Your subscription has expired. Please renew to continue using EquiProfile.",
     });
   }
 

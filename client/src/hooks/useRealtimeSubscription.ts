@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
-import { toast } from 'sonner';
+import { useEffect, useRef } from "react";
+import { toast } from "sonner";
 
 interface RealtimeEvent {
   channel: string;
@@ -18,7 +18,7 @@ interface RealtimeEvent {
 export function useRealtimeSubscription(
   channel: string,
   callback: (data: any) => void,
-  showToast: boolean = false
+  showToast: boolean = false,
 ) {
   const eventSourceRef = useRef<EventSource | null>(null);
 
@@ -27,46 +27,47 @@ export function useRealtimeSubscription(
     if (!channel) return;
 
     // Create SSE connection
-    const eventSource = new EventSource('/api/realtime/events');
+    const eventSource = new EventSource("/api/realtime/events");
     eventSourceRef.current = eventSource;
 
     eventSource.onmessage = (event) => {
       try {
         const data: RealtimeEvent = JSON.parse(event.data);
-        
+
         // Check if this event is for our channel
         if (data.channel === channel || data.channel.startsWith(channel)) {
           callback(data.payload);
-          
+
           // Show toast notification if enabled
           if (showToast && data.payload.type) {
-            const eventType = data.payload.type.split('.')[1] || data.payload.type;
-            
+            const eventType =
+              data.payload.type.split(".")[1] || data.payload.type;
+
             switch (eventType) {
-              case 'created':
-                toast.success('New item created');
+              case "created":
+                toast.success("New item created");
                 break;
-              case 'updated':
-                toast.info('Item updated');
+              case "updated":
+                toast.info("Item updated");
                 break;
-              case 'deleted':
-                toast.error('Item deleted');
+              case "deleted":
+                toast.error("Item deleted");
                 break;
-              case 'reminder':
-                toast.info(data.payload.data?.title || 'Reminder');
+              case "reminder":
+                toast.info(data.payload.data?.title || "Reminder");
                 break;
               default:
-                toast.info('Update received');
+                toast.info("Update received");
             }
           }
         }
       } catch (error) {
-        console.error('Error parsing SSE event:', error);
+        console.error("Error parsing SSE event:", error);
       }
     };
 
     eventSource.onerror = (error) => {
-      console.error('SSE connection error:', error);
+      console.error("SSE connection error:", error);
       // Will automatically reconnect
     };
 

@@ -13,7 +13,9 @@
 ### A) Quick Wins & Infrastructure (4 hours)
 
 #### 1. Frontend Pricing Sync with API ✅
+
 **File:** `client/src/pages/Pricing.tsx`
+
 - Removed all hardcoded pricing constants
 - Now fetches from `trpc.billing.getPricing.useQuery()`
 - Added `formatPrice()` helper (pence → pounds)
@@ -21,13 +23,17 @@
 - **Result:** Correct pricing displayed (£7.99/£79.90, not £10/£100)
 
 #### 2. Realtime Health Endpoint ✅
+
 **File:** `server/_core/index.ts`
+
 - Added `GET /api/realtime/health` public endpoint
 - Returns: `status`, `connectedClients`, `activeChannels`, `uptime`, `timestamp`
 - **Testing:** `curl http://localhost:3000/api/realtime/health`
 
 #### 3. Navigation Consistency Fixes ✅
+
 **Files:** All affected dashboard pages
+
 - Fixed Calendar - added `<DashboardLayout>` wrapper
 - Fixed Reports - added `<DashboardLayout>` wrapper
 - Fixed Messages - added `<DashboardLayout>` wrapper
@@ -38,14 +44,18 @@
 ### B) Storage Quota System (2 hours)
 
 #### Database Schema Updates ✅
+
 **File:** `drizzle/schema.ts`
+
 - Added `storageUsedBytes` (default: 0)
 - Added `storageQuotaBytes` (default: 100MB)
 - Added `latitude` and `longitude` for weather
 - **Migration needed:** Run `npm run db:push` to apply changes
 
 #### Storage Management System ✅
+
 **File:** `server/storage.ts`
+
 - **Quotas defined:**
   - Trial: 100MB
   - Pro: 1GB
@@ -61,7 +71,9 @@
 ### C) Weather System with Open-Meteo (2 hours)
 
 #### Weather Service Module ✅
+
 **File:** `server/_core/weather.ts`
+
 - **API:** Open-Meteo (free, no API key required)
 - **Functions:**
   - `getCurrentWeather(lat, lon)` - Real-time weather
@@ -78,7 +90,9 @@
     - Unsafe: "Weather conditions are unsafe for riding. Consider postponing or working indoors."
 
 #### Weather API Endpoints ✅
+
 **File:** `server/routers.ts` (weather router extended)
+
 - `weather.getCurrent` - Get current weather + riding advice
 - `weather.getForecast` - Get 7-day forecast
 - `weather.getHourly` - Get 24-hour hourly forecast
@@ -93,12 +107,12 @@
 ### D) Weather UI Integration (2 hours)
 
 #### What's Needed:
+
 1. **Add Location Capture in Settings**
    - File: `client/src/pages/Settings.tsx`
    - Add "Use My Location" button
    - Calls browser `navigator.geolocation.getCurrentPosition()`
    - Saves lat/lon via `weather.updateLocation` mutation
-   
 2. **Update Weather Page**
    - File: `client/src/pages/Weather.tsx`
    - Add new section at top: "Current Conditions"
@@ -113,6 +127,7 @@
    - Display forecast cards with icons
 
 #### Code Snippet (Settings - Location Capture):
+
 ```typescript
 const updateLocation = trpc.weather.updateLocation.useMutation();
 
@@ -121,7 +136,7 @@ const captureLocation = () => {
     toast.error("Geolocation not supported");
     return;
   }
-  
+
   navigator.geolocation.getCurrentPosition(
     (position) => {
       updateLocation.mutate({
@@ -132,7 +147,7 @@ const captureLocation = () => {
     },
     (error) => {
       toast.error("Failed to get location");
-    }
+    },
   );
 };
 ```
@@ -140,6 +155,7 @@ const captureLocation = () => {
 ### E) AI Chat Redesign (4 hours)
 
 #### Current Issues:
+
 - File: `client/src/pages/AIChat.tsx`
 - No proper chat bubbles
 - No scroll area
@@ -147,6 +163,7 @@ const captureLocation = () => {
 - No loading indicators
 
 #### What's Needed:
+
 1. **Add Chat Message Component**
    - Create `client/src/components/ChatMessage.tsx`
    - Two variants: user (right-aligned, blue) and assistant (left-aligned, gray)
@@ -164,6 +181,7 @@ const captureLocation = () => {
    - Streaming support (already uses Streamdown component)
 
 #### Code Template:
+
 ```typescript
 // ChatMessage.tsx
 export function ChatMessage({ role, content, timestamp }) {
@@ -187,7 +205,9 @@ export function ChatMessage({ role, content, timestamp }) {
 ### F) Notes with Voice Dictation (6 hours)
 
 #### Database Schema:
+
 **File:** `drizzle/schema.ts` - Add new table:
+
 ```typescript
 export const notes = mysqlTable("notes", {
   id: int("id").autoincrement().primaryKey(),
@@ -202,7 +222,9 @@ export const notes = mysqlTable("notes", {
 ```
 
 #### TRPC Endpoints:
+
 **File:** `server/routers.ts` - Add notes router:
+
 ```typescript
 notes: router({
   list: protectedProcedure
@@ -213,7 +235,7 @@ notes: router({
     .query(async ({ ctx, input }) => {
       return db.getNotes(ctx.user.id, input.horseId, input.limit);
     }),
-  
+
   create: protectedProcedure
     .input(z.object({
       title: z.string().optional(),
@@ -227,7 +249,7 @@ notes: router({
         ...input,
       });
     }),
-  
+
   update: protectedProcedure
     .input(z.object({
       id: z.number(),
@@ -242,7 +264,7 @@ notes: router({
       }
       return db.updateNote(input.id, input);
     }),
-  
+
   delete: protectedProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ ctx, input }) => {
@@ -257,7 +279,9 @@ notes: router({
 ```
 
 #### Frontend Implementation:
+
 **File:** `client/src/pages/AIChat.tsx` - Add Notes tab:
+
 ```typescript
 // Add Web Speech API
 const [isListening, setIsListening] = useState(false);
@@ -269,7 +293,7 @@ useEffect(() => {
     const recognition = new (window as any).webkitSpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
-    
+
     recognition.onresult = (event: any) => {
       let interimTranscript = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -281,7 +305,7 @@ useEffect(() => {
         }
       }
     };
-    
+
     recognitionRef.current = recognition;
   }
 }, []);
@@ -302,21 +326,21 @@ const toggleListening = () => {
     <TabsTrigger value="chat">Chat</TabsTrigger>
     <TabsTrigger value="notes">Notes</TabsTrigger>
   </TabsList>
-  
+
   <TabsContent value="notes">
     <Card>
       <CardHeader>
         <CardTitle>Voice Notes</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <Textarea 
-          value={transcript} 
+        <Textarea
+          value={transcript}
           onChange={(e) => setTranscript(e.target.value)}
           placeholder="Start dictating or type here..."
           rows={6}
         />
         <div className="flex gap-2">
-          <Button 
+          <Button
             onClick={toggleListening}
             variant={isListening ? "destructive" : "default"}
           >
@@ -329,7 +353,7 @@ const toggleListening = () => {
         </div>
       </CardContent>
     </Card>
-    
+
     {/* Notes list */}
     <div className="mt-6 space-y-2">
       {notes?.map(note => (
@@ -353,9 +377,11 @@ const toggleListening = () => {
 ### G) Email Reminders (6 hours)
 
 #### Database Check:
+
 - File: `drizzle/schema.ts`
 - Check if reminders table exists (likely already there)
 - If not, add:
+
 ```typescript
 export const reminders = mysqlTable("reminders", {
   id: int("id").autoincrement().primaryKey(),
@@ -370,7 +396,7 @@ export const reminders = mysqlTable("reminders", {
     "farrier",
     "vet",
     "medication",
-    "other"
+    "other",
   ]).notNull(),
   sent: boolean("sent").default(false),
   sentAt: timestamp("sentAt"),
@@ -379,56 +405,65 @@ export const reminders = mysqlTable("reminders", {
 ```
 
 #### Reminder Scheduler:
+
 **File:** `server/_core/reminderScheduler.ts` (NEW)
+
 ```typescript
-import cron from 'node-cron';
-import * as db from '../db';
-import * as email from './email';
+import cron from "node-cron";
+import * as db from "../db";
+import * as email from "./email";
 
 // Run every hour
 export function startReminderScheduler() {
-  cron.schedule('0 * * * *', async () => {
-    console.log('[Reminders] Checking for due reminders...');
-    
+  cron.schedule("0 * * * *", async () => {
+    console.log("[Reminders] Checking for due reminders...");
+
     const now = new Date();
     const tomorrow = new Date(now);
     tomorrow.setDate(tomorrow.getDate() + 1);
-    
+
     // Get reminders due in next 24 hours that haven't been sent
     const dueReminders = await db.getDueReminders(tomorrow);
-    
+
     for (const reminder of dueReminders) {
       try {
         const user = await db.getUserById(reminder.userId);
         if (!user || !user.email) continue;
-        
-        const horse = reminder.horseId 
+
+        const horse = reminder.horseId
           ? await db.getHorseById(reminder.horseId)
           : null;
-        
+
         await email.sendReminderEmail(
           user.email,
-          user.name || 'there',
+          user.name || "there",
           reminder.title,
-          reminder.description || '',
+          reminder.description || "",
           reminder.dueDate,
-          horse?.name
+          horse?.name,
         );
-        
+
         await db.markReminderSent(reminder.id);
-        console.log(`[Reminders] Sent reminder ${reminder.id} to ${user.email}`);
+        console.log(
+          `[Reminders] Sent reminder ${reminder.id} to ${user.email}`,
+        );
       } catch (error) {
-        console.error(`[Reminders] Failed to send reminder ${reminder.id}:`, error);
+        console.error(
+          `[Reminders] Failed to send reminder ${reminder.id}:`,
+          error,
+        );
       }
     }
   });
-  
-  console.log('[Reminders] Scheduler started');
+
+  console.log("[Reminders] Scheduler started");
 }
 ```
 
 #### Email Template:
+
 **File:** `server/_core/email.ts` - Add function:
+
 ```typescript
 export async function sendReminderEmail(
   to: string,
@@ -436,19 +471,19 @@ export async function sendReminderEmail(
   title: string,
   description: string,
   dueDate: Date,
-  horseName?: string
+  horseName?: string,
 ): Promise<boolean> {
   const subject = `Reminder: ${title}`;
-  const formattedDate = format(dueDate, 'MMMM do, yyyy');
-  
+  const formattedDate = format(dueDate, "MMMM do, yyyy");
+
   const html = `
     <h2>Hi ${userName},</h2>
     <p>This is a friendly reminder about an upcoming task:</p>
     <div style="background: #f5f5f5; padding: 20px; margin: 20px 0; border-left: 4px solid #3b82f6;">
       <h3 style="margin-top: 0;">${title}</h3>
-      ${horseName ? `<p><strong>Horse:</strong> ${horseName}</p>` : ''}
+      ${horseName ? `<p><strong>Horse:</strong> ${horseName}</p>` : ""}
       <p><strong>Due Date:</strong> ${formattedDate}</p>
-      ${description ? `<p>${description}</p>` : ''}
+      ${description ? `<p>${description}</p>` : ""}
     </div>
     <p>
       <a href="${ENV.baseUrl}/tasks" style="display: inline-block; padding: 10px 20px; background: #3b82f6; color: white; text-decoration: none; border-radius: 5px;">
@@ -456,72 +491,78 @@ export async function sendReminderEmail(
       </a>
     </p>
   `;
-  
+
   return sendEmail(to, subject, html);
 }
 ```
 
 #### Start Scheduler in Server:
+
 **File:** `server/_core/index.ts` - Add at startup:
+
 ```typescript
 // After server starts
-import { startReminderScheduler } from './_core/reminderScheduler';
+import { startReminderScheduler } from "./_core/reminderScheduler";
 startReminderScheduler();
 ```
 
 ### H) Realtime SSE Enhancements (4 hours)
 
 #### Expand Event Emission:
+
 **File:** `server/routers.ts` - Add to mutations:
+
 ```typescript
 // In horses.create mutation (after success):
-await realtimeManager.publishToChannel(
-  `user:${ctx.user.id}:horses`,
-  { type: 'horse.created', data: newHorse }
-);
+await realtimeManager.publishToChannel(`user:${ctx.user.id}:horses`, {
+  type: "horse.created",
+  data: newHorse,
+});
 
 // In training.create mutation:
-await realtimeManager.publishToChannel(
-  `user:${ctx.user.id}:training`,
-  { type: 'training.created', data: newSession }
-);
+await realtimeManager.publishToChannel(`user:${ctx.user.id}:training`, {
+  type: "training.created",
+  data: newSession,
+});
 
 // In health.create mutation:
-await realtimeManager.publishToChannel(
-  `user:${ctx.user.id}:health`,
-  { type: 'health.created', data: newRecord }
-);
+await realtimeManager.publishToChannel(`user:${ctx.user.id}:health`, {
+  type: "health.created",
+  data: newRecord,
+});
 ```
 
 #### Client Hook:
+
 **File:** `client/src/hooks/useRealtime.ts` (NEW)
+
 ```typescript
-import { useEffect } from 'react';
-import { toast } from 'sonner';
+import { useEffect } from "react";
+import { toast } from "sonner";
 
 export function useRealtimeSubscription(
   channel: string,
-  callback: (data: any) => void
+  callback: (data: any) => void,
 ) {
   useEffect(() => {
-    const eventSource = new EventSource('/api/realtime/events');
-    
+    const eventSource = new EventSource("/api/realtime/events");
+
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.channel === channel) {
         callback(data.payload);
-        
+
         // Show toast notification
-        if (data.payload.type === 'reminder.due') {
+        if (data.payload.type === "reminder.due") {
           toast.info(data.payload.data.title);
         }
       }
     };
-    
+
     eventSource.onerror = () => {
-      console.error('SSE connection error');
+      console.error("SSE connection error");
     };
-    
+
     return () => {
       eventSource.close();
     };
@@ -532,7 +573,9 @@ export function useRealtimeSubscription(
 ### I) Training Templates (12 hours)
 
 #### Database Schema:
+
 **File:** `drizzle/schema.ts` - Add table:
+
 ```typescript
 export const trainingTemplates = mysqlTable("trainingTemplates", {
   id: int("id").autoincrement().primaryKey(),
@@ -548,7 +591,9 @@ export const trainingTemplates = mysqlTable("trainingTemplates", {
 ```
 
 #### 5 Curated Programs:
+
 **File:** `server/data/trainingTemplates.ts` (NEW)
+
 ```typescript
 export const TRAINING_TEMPLATES = [
   {
@@ -562,29 +607,39 @@ export const TRAINING_TEMPLATES = [
           week: 1,
           focus: "Foundation building",
           days: [
-            { day: 1, activity: "30min walk", notes: "Warm-up, focus on rhythm" },
+            {
+              day: 1,
+              activity: "30min walk",
+              notes: "Warm-up, focus on rhythm",
+            },
             { day: 2, activity: "Rest or light groundwork", notes: "" },
-            { day: 3, activity: "30min walk/trot intervals", notes: "5min walk, 2min trot, repeat" },
+            {
+              day: 3,
+              activity: "30min walk/trot intervals",
+              notes: "5min walk, 2min trot, repeat",
+            },
             // ... more days
-          ]
+          ],
         },
         // ... more weeks
-      ]
-    })
+      ],
+    }),
   },
   // ... 4 more programs
 ];
 ```
 
 #### Seeding Script:
+
 **File:** `scripts/seed-training-templates.ts` (NEW)
+
 ```typescript
-import * as db from '../server/db';
-import { TRAINING_TEMPLATES } from '../server/data/trainingTemplates';
+import * as db from "../server/db";
+import { TRAINING_TEMPLATES } from "../server/data/trainingTemplates";
 
 async function seedTemplates() {
-  console.log('Seeding training templates...');
-  
+  console.log("Seeding training templates...");
+
   for (const template of TRAINING_TEMPLATES) {
     const exists = await db.getTemplateByName(template.name);
     if (!exists) {
@@ -592,8 +647,8 @@ async function seedTemplates() {
       console.log(`Created template: ${template.name}`);
     }
   }
-  
-  console.log('Done!');
+
+  console.log("Done!");
 }
 
 seedTemplates();
@@ -604,6 +659,7 @@ seedTemplates();
 **Status:** Documentation complete in `docs/WHATSAPP_SETUP.md`
 
 #### Implementation Steps:
+
 1. **Create WhatsApp Module**
    - File: `server/_core/whatsapp.ts` (NEW)
    - Follow code from WHATSAPP_SETUP.md Section 6
@@ -626,7 +682,9 @@ seedTemplates();
 ### K) Frontend Trial Lock UI (2 hours)
 
 #### Create Upgrade Modal:
+
 **File:** `client/src/components/UpgradeModal.tsx` (NEW)
+
 ```typescript
 export function UpgradeModal({ open, onClose }) {
   return (
@@ -654,14 +712,16 @@ export function UpgradeModal({ open, onClose }) {
 ```
 
 #### Add Global Error Handler:
+
 **File:** `client/src/lib/trpc.ts` - Update config:
+
 ```typescript
 const trpc = createTRPCReact<AppRouter>();
 
 export const trpcClient = trpc.createClient({
   links: [
     httpBatchLink({
-      url: '/api/trpc',
+      url: "/api/trpc",
     }),
   ],
   transformer: superjson,
@@ -670,7 +730,7 @@ export const trpcClient = trpc.createClient({
     defaultOptions: {
       mutations: {
         onError: (error: any) => {
-          if (error.data?.code === 402 || error.message?.includes('trial')) {
+          if (error.data?.code === 402 || error.message?.includes("trial")) {
             // Show upgrade modal
             showUpgradeModal();
           }
@@ -678,7 +738,7 @@ export const trpcClient = trpc.createClient({
       },
       queries: {
         onError: (error: any) => {
-          if (error.data?.code === 402 || error.message?.includes('trial')) {
+          if (error.data?.code === 402 || error.message?.includes("trial")) {
             showUpgradeModal();
           }
         },
@@ -693,6 +753,7 @@ export const trpcClient = trpc.createClient({
 ## TESTING & DEPLOYMENT
 
 ### Required Testing:
+
 1. **Trial Lock Testing:**
    - Create test user with `createdAt` = 8 days ago
    - Try accessing dashboard → should get 402
@@ -715,6 +776,7 @@ export const trpcClient = trpc.createClient({
    - Check forms are usable
 
 ### Build & Deploy:
+
 ```bash
 # 1. Run migrations
 npm run db:push
@@ -737,15 +799,17 @@ sudo systemctl restart equiprofile
 ## SUMMARY
 
 ### Completed (8 hours):
+
 ✅ Frontend pricing sync with API  
 ✅ Realtime health endpoint  
 ✅ All navigation fixes  
 ✅ Storage quota system  
 ✅ Weather service with Open-Meteo  
 ✅ Weather API endpoints  
-✅ Database schema updates  
+✅ Database schema updates
 
 ### Remaining (64 hours):
+
 - Weather UI integration (2h)
 - AI Chat redesign (4h)
 - Notes with voice dictation (6h)
@@ -761,11 +825,13 @@ sudo systemctl restart equiprofile
 - Buffer for issues (6h)
 
 ### Priority Order:
+
 1. **High:** Weather UI, Trial lock UI, Email reminders
 2. **Medium:** AI Chat, Notes, Realtime
 3. **Low:** Training templates, WhatsApp
 
 ### Next Developer Actions:
+
 1. Review this document
 2. Pick highest priority features
 3. Implement systematically
