@@ -46,7 +46,9 @@ export const users = mysqlTable("users", {
   suspendedReason: text("suspendedReason"),
   // Profile
   phone: varchar("phone", { length: 20 }),
-  location: varchar("location", { length: 255 }),
+  location: varchar("location", { length: 255 }), // City/region text
+  latitude: varchar("latitude", { length: 20 }), // Geographic coordinates
+  longitude: varchar("longitude", { length: 20 }), // Geographic coordinates
   profileImageUrl: text("profileImageUrl"),
   // Storage tracking
   storageUsedBytes: int("storageUsedBytes").default(0).notNull(),

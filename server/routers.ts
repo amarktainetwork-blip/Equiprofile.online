@@ -1851,6 +1851,69 @@ Format your response as JSON with keys: recommendation, explanation, precautions
       .query(async ({ ctx, input }) => {
         return db.getWeatherHistory(ctx.user.id, input.limit);
       }),
+
+    // New Open-Meteo endpoints
+    getCurrent: protectedProcedure.query(async ({ ctx }) => {
+      const user = await db.getUserById(ctx.user.id);
+      if (!user || !user.latitude || !user.longitude) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "Please set your location in settings first",
+        });
+      }
+
+      const weather = await import("./_core/weather");
+      const current = await weather.getCurrentWeather(user.latitude, user.longitude);
+      const advice = weather.getRidingAdvice(current);
+
+      return {
+        weather: current,
+        advice,
+      };
+    }),
+
+    getForecast: protectedProcedure.query(async ({ ctx }) => {
+      const user = await db.getUserById(ctx.user.id);
+      if (!user || !user.latitude || !user.longitude) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "Please set your location in settings first",
+        });
+      }
+
+      const weather = await import("./_core/weather");
+      return weather.getWeatherForecast(user.latitude, user.longitude);
+    }),
+
+    getHourly: protectedProcedure.query(async ({ ctx }) => {
+      const user = await db.getUserById(ctx.user.id);
+      if (!user || !user.latitude || !user.longitude) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "Please set your location in settings first",
+        });
+      }
+
+      const weather = await import("./_core/weather");
+      return weather.getHourlyForecast(user.latitude, user.longitude);
+    }),
+
+    updateLocation: protectedProcedure
+      .input(
+        z.object({
+          latitude: z.string(),
+          longitude: z.string(),
+          location: z.string().optional(),
+        }),
+      )
+      .mutation(async ({ ctx, input }) => {
+        await db.updateUser(ctx.user.id, {
+          latitude: input.latitude,
+          longitude: input.longitude,
+          location: input.location || null,
+        });
+        return { success: true };
+      }),
   }),
 
   // Admin routes
