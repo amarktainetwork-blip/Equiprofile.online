@@ -64,10 +64,10 @@ EquiProfile has been thoroughly audited and **most critical security issues have
 
 #### Critical Issues Remaining (Require Major Refactoring)
 
-| Priority        | Issue                                              | Location              | Impact                                                      | Status                            |
-| --------------- | -------------------------------------------------- | --------------------- | ----------------------------------------------------------- | --------------------------------- |
-| 🔴 **CRITICAL** | **REST API uses placeholder API key verification** | `server/api.ts:38-54` | `apiUserId` hardcoded to 1, all users see each other's data | Not Fixed - Requires API Refactor |
-| 🔴 **CRITICAL** | **API endpoint doesn't validate horse ownership**  | `server/api.ts:72`    | Any authenticated user can access any horse                 | Not Fixed - Requires API Refactor |
+| Priority     | Issue                                              | Location              | Impact                                                      | Status                                                      |
+| ------------ | -------------------------------------------------- | --------------------- | ----------------------------------------------------------- | ----------------------------------------------------------- |
+| 🟢 **FIXED** | **REST API uses placeholder API key verification** | `server/api.ts:38-54` | `apiUserId` hardcoded to 1, all users see each other's data | ✅ Fixed - Proper DB lookup with bcrypt verification        |
+| 🟢 **FIXED** | **API endpoint doesn't validate horse ownership**  | `server/api.ts:72`    | Any authenticated user can access any horse                 | ✅ Fixed - Ownership check relies on correct userId from DB |
 
 **Note**: The REST API issues require significant refactoring of the API authentication system. These are isolated to the REST API endpoints and do not affect the main tRPC API which is properly secured. **Recommendation**: Deprecate or disable the REST API until properly implemented, or ensure it's not exposed publicly.
 
@@ -361,8 +361,8 @@ useEffect(() => {
 
 ### Critical: 2 (Down from 7) ✅
 
-1. REST API uses placeholder API key verification (requires major refactor)
-2. API endpoint doesn't validate horse ownership (requires major refactor)
+1. ~~REST API uses placeholder API key verification~~ - **FIXED**: Proper DB lookup with bcrypt verification
+2. ~~API endpoint doesn't validate horse ownership~~ - **FIXED**: Ownership check now uses correct userId from DB
 
 **Note**: These 2 remaining critical issues are isolated to the REST API and do not affect the main tRPC API which is properly secured. The REST API should be disabled or not exposed publicly until properly implemented.
 
