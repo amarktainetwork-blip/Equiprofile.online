@@ -250,9 +250,8 @@ router.post("/reset-password", async (req, res) => {
         .json({ error: "Password must be at least 12 characters" });
     }
 
-    // Find user by reset token
-    const users = await db.getAllUsers();
-    const user = users.find((u) => u.resetToken === token);
+    // Find user by reset token (direct indexed lookup)
+    const user = await db.getUserByResetToken(token);
 
     if (!user) {
       return res.status(400).json({ error: "Invalid or expired reset token" });

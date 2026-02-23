@@ -73,21 +73,21 @@ EquiProfile has been thoroughly audited and **most critical security issues have
 
 #### Medium Priority Issues
 
-| Issue                                         | Location                            | Impact                                              | Status                                   |
-| --------------------------------------------- | ----------------------------------- | --------------------------------------------------- | ---------------------------------------- |
-| **Session token expiry 30 days**              | `server/_core/authRouter.ts:69,142` | Too long for high-security apps                     | Not Fixed - Acceptable for this app type |
-| **Admin endpoint not rate-limited**           | `/api/admin/send-test-email`        | Email bombing/DoS attack vector                     | Not Fixed - Low risk                     |
-| **Body parser limit too high (50MB)**         | `server/_core/index.ts:290-291`     | Large payload attacks (acceptable for file uploads) | Acceptable                               |
-| **No input size limits on string fields**     | `routers.ts`                        | Potential DoS via large descriptions/notes          | Not Fixed - Low risk                     |
-| **getUserIdByStripeSubscription O(n) lookup** | `server/_core/index.ts:281-287`     | Iterates all users - should query directly          | Not Fixed - Optimization                 |
-| **No webhook rate limiting**                  | `server/_core/index.ts:95`          | Could exhaust DB                                    | Not Fixed - Stripe has own limits        |
-| **Storage API key in environment variable**   | `server/storage.ts:18`              | Visible in process.env if accidentally logged       | Not Fixed - Standard practice            |
+| Issue                                         | Location                            | Impact                                              | Status                                            |
+| --------------------------------------------- | ----------------------------------- | --------------------------------------------------- | ------------------------------------------------- |
+| **Session token expiry 30 days**              | `server/_core/authRouter.ts:69,142` | Too long for high-security apps                     | Not Fixed - Acceptable for this app type          |
+| **Admin endpoint not rate-limited**           | `/api/admin/send-test-email`        | Email bombing/DoS attack vector                     | ✅ Fixed - 5 req/hour rate limit added            |
+| **Body parser limit too high (50MB)**         | `server/_core/index.ts:290-291`     | Large payload attacks (acceptable for file uploads) | Acceptable                                        |
+| **No input size limits on string fields**     | `routers.ts`                        | Potential DoS via large descriptions/notes          | ✅ Fixed - `.max()` added to all free-text fields |
+| **getUserIdByStripeSubscription O(n) lookup** | `server/_core/index.ts:281-287`     | Iterates all users - should query directly          | ✅ Fixed - Direct indexed DB query                |
+| **No webhook rate limiting**                  | `server/_core/index.ts:95`          | Could exhaust DB                                    | Not Fixed - Stripe has own limits                 |
+| **Storage API key in environment variable**   | `server/storage.ts:18`              | Visible in process.env if accidentally logged       | Not Fixed - Standard practice                     |
 
 **Note**: The Stripe webhook handler already has proper try-catch error handling (lines 113-123), so that is not an issue.
 
 #### Low Priority Issues
 
-- **Reset token lookup iterates all users** (`server/_core/authRouter.ts:243`) - O(n) complexity
+- **Reset token lookup iterates all users** (`server/_core/authRouter.ts:243`) — ✅ **FIXED**: replaced with direct `getUserByResetToken()` indexed query
 - **No database encryption** for sensitive fields
 - **Activity logs don't redact sensitive data** (line 162)
 - **No session revocation mechanism** (logout clears cookie but JWT still valid)
@@ -140,11 +140,10 @@ EquiProfile has been thoroughly audited and **most critical security issues have
 - ✅ **Service worker properly guarded** by `VITE_PWA_ENABLED` flag
 - ✅ **Error handling** in query/mutation caches with auto-redirect on 401
 
-#### Issues Found
+#### Frontend Issues Resolved ✅
 
-- ⚠️ **NO Protected Route Enforcement in Router**: Routes like `/admin`, `/dashboard`, `/horses` are NOT wrapped in `<ProtectedRoute>` component
-- Each page must individually import ProtectedRoute
-- **Risk**: Users can view page shells before auth check redirects them
+- ✅ **Protected routes**: All app routes are now wrapped in `<ProtectedRoute>` in `App.tsx`
+- ✅ **Service worker interval**: `setInterval` in `bootstrap.ts` is now cleared on page unload (no memory leak)
 
 ### Performance: ✅ GOOD
 

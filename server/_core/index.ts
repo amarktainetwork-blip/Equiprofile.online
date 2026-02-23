@@ -316,8 +316,7 @@ async function startServer() {
   async function getUserIdByStripeSubscription(
     subscriptionId: string,
   ): Promise<number | null> {
-    const users = await db.getAllUsers();
-    const user = users.find((u) => u.stripeSubscriptionId === subscriptionId);
+    const user = await db.getUserByStripeSubscriptionId(subscriptionId);
     return user?.id || null;
   }
 
@@ -467,26 +466,37 @@ async function startServer() {
   // Billing routes (Stripe)
   app.use("/api/billing", billingRouter);
 
-  // Test email endpoint (admin only)
-  app.post("/api/admin/send-test-email", async (req, res) => {
-    try {
-      const { to } = req.body;
-      if (!to) {
-        return res.status(400).json({ error: "Email address required" });
-      }
-
-      const success = await email.sendTestEmail(to);
-      res.json({
-        success,
-        message: success
-          ? "Test email sent"
-          : "Failed to send email (check SMTP config)",
-      });
-    } catch (error) {
-      console.error("[Admin] Test email error:", error);
-      res.status(500).json({ error: "Internal server error" });
-    }
+  // Test email endpoint (admin only) - tightly rate-limited to prevent email abuse
+  const adminEmailLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 5, // 5 test emails per hour
+    message: "Too many test email requests, please try again later.",
+    standardHeaders: true,
+    legacyHeaders: false,
   });
+  app.post(
+    "/api/admin/send-test-email",
+    adminEmailLimiter,
+    async (req, res) => {
+      try {
+        const { to } = req.body;
+        if (!to) {
+          return res.status(400).json({ error: "Email address required" });
+        }
+
+        const success = await email.sendTestEmail(to);
+        res.json({
+          success,
+          message: success
+            ? "Test email sent"
+            : "Failed to send email (check SMTP config)",
+        });
+      } catch (error) {
+        console.error("[Admin] Test email error:", error);
+        res.status(500).json({ error: "Internal server error" });
+      }
+    },
+  );
 
   // Real-time SSE endpoint
   const { realtimeManager } = await import("./realtime");

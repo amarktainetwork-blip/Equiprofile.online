@@ -17,10 +17,17 @@ export function registerServiceWorker() {
         .then((registration) => {
           console.log("ServiceWorker registration successful");
 
-          // Check for updates periodically
-          setInterval(() => {
+          // Check for updates periodically - keep reference so we can clear on unload
+          const updateInterval = setInterval(() => {
             registration.update();
           }, 60000); // Check every minute
+
+          // Clean up interval when the page is unloaded to prevent leaks
+          window.addEventListener(
+            "beforeunload",
+            () => clearInterval(updateInterval),
+            { once: true },
+          );
         })
         .catch((err) => {
           console.log("ServiceWorker registration failed: ", err);

@@ -446,10 +446,10 @@ export const appRouter = router({
     updateProfile: protectedProcedure
       .input(
         z.object({
-          name: z.string().optional(),
-          phone: z.string().optional(),
-          location: z.string().optional(),
-          profileImageUrl: z.string().optional(),
+          name: z.string().max(500).optional(),
+          phone: z.string().max(50).optional(),
+          location: z.string().max(500).optional(),
+          profileImageUrl: z.string().max(2000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -517,19 +517,19 @@ export const appRouter = router({
       .input(
         z.object({
           name: z.string().min(1),
-          breed: z.string().optional(),
+          breed: z.string().max(500).optional(),
           age: z.number().optional(),
           dateOfBirth: z.string().optional(),
           height: z.number().optional(),
           weight: z.number().optional(),
-          color: z.string().optional(),
+          color: z.string().max(500).optional(),
           gender: z.enum(["stallion", "mare", "gelding"]).optional(),
-          discipline: z.string().optional(),
-          level: z.string().optional(),
-          registrationNumber: z.string().optional(),
-          microchipNumber: z.string().optional(),
-          notes: z.string().optional(),
-          photoUrl: z.string().optional(),
+          discipline: z.string().max(200).optional(),
+          level: z.string().max(200).optional(),
+          registrationNumber: z.string().max(100).optional(),
+          microchipNumber: z.string().max(50).optional(),
+          notes: z.string().max(10000).optional(),
+          photoUrl: z.string().max(2000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -560,20 +560,20 @@ export const appRouter = router({
       .input(
         z.object({
           id: z.number(),
-          name: z.string().optional(),
-          breed: z.string().optional(),
+          name: z.string().max(500).optional(),
+          breed: z.string().max(500).optional(),
           age: z.number().optional(),
           dateOfBirth: z.string().optional(),
           height: z.number().optional(),
           weight: z.number().optional(),
-          color: z.string().optional(),
+          color: z.string().max(500).optional(),
           gender: z.enum(["stallion", "mare", "gelding"]).optional(),
-          discipline: z.string().optional(),
-          level: z.string().optional(),
-          registrationNumber: z.string().optional(),
-          microchipNumber: z.string().optional(),
-          notes: z.string().optional(),
-          photoUrl: z.string().optional(),
+          discipline: z.string().max(200).optional(),
+          level: z.string().max(200).optional(),
+          registrationNumber: z.string().max(100).optional(),
+          microchipNumber: z.string().max(50).optional(),
+          notes: z.string().max(10000).optional(),
+          photoUrl: z.string().max(2000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -668,7 +668,7 @@ export const appRouter = router({
             "other",
           ]),
           title: z.string().min(1),
-          description: z.string().optional(),
+          description: z.string().max(10000).optional(),
           recordDate: z.string(),
           nextDueDate: z.string().optional(),
           vetName: z.string().optional(),
@@ -676,7 +676,7 @@ export const appRouter = router({
           vetClinic: z.string().optional(),
           cost: z.number().optional(),
           documentUrl: z.string().optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -720,7 +720,7 @@ export const appRouter = router({
             ])
             .optional(),
           title: z.string().optional(),
-          description: z.string().optional(),
+          description: z.string().max(10000).optional(),
           recordDate: z.string().optional(),
           nextDueDate: z.string().optional(),
           vetName: z.string().optional(),
@@ -728,7 +728,7 @@ export const appRouter = router({
           vetClinic: z.string().optional(),
           cost: z.number().optional(),
           documentUrl: z.string().optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -812,12 +812,12 @@ export const appRouter = router({
             "lesson",
             "other",
           ]),
-          discipline: z.string().optional(),
+          discipline: z.string().max(200).optional(),
           trainer: z.string().optional(),
-          location: z.string().optional(),
+          location: z.string().max(500).optional(),
           goals: z.string().optional(),
           exercises: z.string().optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -861,12 +861,12 @@ export const appRouter = router({
               "other",
             ])
             .optional(),
-          discipline: z.string().optional(),
+          discipline: z.string().max(200).optional(),
           trainer: z.string().optional(),
-          location: z.string().optional(),
+          location: z.string().max(500).optional(),
           goals: z.string().optional(),
           exercises: z.string().optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
           performance: z
             .enum(["excellent", "good", "average", "poor"])
             .optional(),
@@ -914,7 +914,7 @@ export const appRouter = router({
           performance: z
             .enum(["excellent", "good", "average", "poor"])
             .optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -1070,7 +1070,7 @@ export const appRouter = router({
         z.object({
           horseId: z.number().optional(),
           title: z.string().min(1),
-          description: z.string().optional(),
+          description: z.string().max(10000).optional(),
           taskType: z.enum([
             "hoofcare",
             "health_appointment",
@@ -1091,7 +1091,7 @@ export const appRouter = router({
             .default("pending"),
           dueDate: z.string().optional(),
           assignedTo: z.string().optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
           reminderDays: z.number().default(1),
           isRecurring: z.boolean().default(false),
           recurringInterval: z
@@ -1132,7 +1132,7 @@ export const appRouter = router({
         z.object({
           id: z.number(),
           title: z.string().optional(),
-          description: z.string().optional(),
+          description: z.string().max(10000).optional(),
           taskType: z
             .enum([
               "hoofcare",
@@ -1153,7 +1153,7 @@ export const appRouter = router({
             .optional(),
           dueDate: z.string().optional(),
           assignedTo: z.string().optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
           reminderDays: z.number().optional(),
           isRecurring: z.boolean().optional(),
           recurringInterval: z
@@ -1251,14 +1251,14 @@ export const appRouter = router({
           ]),
           company: z.string().optional(),
           email: z.string().email().optional(),
-          phone: z.string().optional(),
+          phone: z.string().max(50).optional(),
           mobile: z.string().optional(),
           address: z.string().optional(),
           city: z.string().optional(),
           postcode: z.string().optional(),
           country: z.string().optional(),
           website: z.string().optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
           isPrimary: z.boolean().default(false),
         }),
       )
@@ -1286,7 +1286,7 @@ export const appRouter = router({
       .input(
         z.object({
           id: z.number(),
-          name: z.string().optional(),
+          name: z.string().max(500).optional(),
           contactType: z
             .enum([
               "vet",
@@ -1302,14 +1302,14 @@ export const appRouter = router({
             .optional(),
           company: z.string().optional(),
           email: z.string().email().optional(),
-          phone: z.string().optional(),
+          phone: z.string().max(50).optional(),
           mobile: z.string().optional(),
           address: z.string().optional(),
           city: z.string().optional(),
           postcode: z.string().optional(),
           country: z.string().optional(),
           website: z.string().optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
           isPrimary: z.boolean().optional(),
           isActive: z.boolean().optional(),
         }),
@@ -1381,7 +1381,7 @@ export const appRouter = router({
           vetName: z.string().optional(),
           vetClinic: z.string().optional(),
           cost: z.number().optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
           documentUrl: z.string().optional(),
         }),
       )
@@ -1422,7 +1422,7 @@ export const appRouter = router({
           vetName: z.string().optional(),
           vetClinic: z.string().optional(),
           cost: z.number().optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
           documentUrl: z.string().optional(),
         }),
       )
@@ -1498,7 +1498,7 @@ export const appRouter = router({
           dosage: z.string().optional(),
           weight: z.number().optional(),
           cost: z.number().optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -1532,7 +1532,7 @@ export const appRouter = router({
           dosage: z.string().optional(),
           weight: z.number().optional(),
           cost: z.number().optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -1669,7 +1669,7 @@ export const appRouter = router({
               "other",
             ])
             .optional(),
-          description: z.string().optional(),
+          description: z.string().max(10000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -1906,7 +1906,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         z.object({
           latitude: z.string(),
           longitude: z.string(),
-          location: z.string().optional(),
+          location: z.string().max(500).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -2120,7 +2120,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
           key: z.string(),
           value: z.string(),
           type: z.enum(["string", "number", "boolean", "json"]).optional(),
-          description: z.string().optional(),
+          description: z.string().max(10000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -2220,7 +2220,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         .input(
           z.object({
             id: z.number(),
-            name: z.string().optional(),
+            name: z.string().max(500).optional(),
             rateLimit: z.number().optional(),
             permissions: z.array(z.string()).optional(),
             isActive: z.boolean().optional(),
@@ -2352,8 +2352,8 @@ Format your response as JSON with keys: recommendation, explanation, precautions
       .input(
         z.object({
           name: z.string().min(1).max(200),
-          description: z.string().optional(),
-          location: z.string().optional(),
+          description: z.string().max(10000).optional(),
+          location: z.string().max(500).optional(),
           logo: z.string().optional(),
           primaryColor: z.string().optional(),
           secondaryColor: z.string().optional(),
@@ -2438,9 +2438,9 @@ Format your response as JSON with keys: recommendation, explanation, precautions
       .input(
         z.object({
           id: z.number(),
-          name: z.string().optional(),
-          description: z.string().optional(),
-          location: z.string().optional(),
+          name: z.string().max(500).optional(),
+          description: z.string().max(10000).optional(),
+          location: z.string().max(500).optional(),
           logo: z.string().optional(),
           primaryColor: z.string().optional(),
           secondaryColor: z.string().optional(),
@@ -2859,7 +2859,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
       .input(
         z.object({
           title: z.string().min(1).max(200),
-          description: z.string().optional(),
+          description: z.string().max(10000).optional(),
           eventType: z.enum([
             "training",
             "competition",
@@ -2873,9 +2873,9 @@ Format your response as JSON with keys: recommendation, explanation, precautions
           endDate: z.string().optional(),
           horseId: z.number().optional(),
           stableId: z.number().optional(),
-          location: z.string().optional(),
+          location: z.string().max(500).optional(),
           isAllDay: z.boolean().default(false),
-          color: z.string().optional(),
+          color: z.string().max(500).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -2897,7 +2897,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         z.object({
           id: z.number(),
           title: z.string().optional(),
-          description: z.string().optional(),
+          description: z.string().max(10000).optional(),
           startDate: z.string().optional(),
           endDate: z.string().optional(),
           isCompleted: z.boolean().optional(),
@@ -2948,12 +2948,12 @@ Format your response as JSON with keys: recommendation, explanation, precautions
           competitionName: z.string().min(1).max(200),
           venue: z.string().optional(),
           date: z.string(),
-          discipline: z.string().optional(),
-          level: z.string().optional(),
+          discipline: z.string().max(200).optional(),
+          level: z.string().max(200).optional(),
           class: z.string().optional(),
           placement: z.string().optional(),
           score: z.string().optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
           cost: z.number().optional(),
           winnings: z.number().optional(),
         }),
@@ -3019,10 +3019,10 @@ Format your response as JSON with keys: recommendation, explanation, precautions
       .input(
         z.object({
           name: z.string().min(1).max(200),
-          description: z.string().optional(),
+          description: z.string().max(10000).optional(),
           duration: z.number().optional(),
-          discipline: z.string().optional(),
-          level: z.string().optional(),
+          discipline: z.string().max(200).optional(),
+          level: z.string().max(200).optional(),
           goals: z.string().optional(),
           programData: z.string(),
           isPublic: z.boolean().default(false),
@@ -3068,10 +3068,10 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         z.object({
           id: z.number(),
           name: z.string().min(1).max(200).optional(),
-          description: z.string().optional(),
+          description: z.string().max(10000).optional(),
           duration: z.number().optional(),
-          discipline: z.string().optional(),
-          level: z.string().optional(),
+          discipline: z.string().max(200).optional(),
+          level: z.string().max(200).optional(),
           goals: z.string().optional(),
           programData: z.string().optional(),
           isPublic: z.boolean().optional(),
@@ -3215,7 +3215,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
           method: z.enum(["natural", "artificial", "embryo_transfer"]),
           veterinarianName: z.string().optional(),
           cost: z.number().optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -3317,7 +3317,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
             .optional(),
           veterinarianName: z.string().optional(),
           cost: z.number().optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -3463,8 +3463,8 @@ Format your response as JSON with keys: recommendation, explanation, precautions
           breedingId: z.number(),
           birthDate: z.string(),
           gender: z.enum(["colt", "filly"]),
-          name: z.string().optional(),
-          color: z.string().optional(),
+          name: z.string().max(500).optional(),
+          color: z.string().max(500).optional(),
           birthWeight: z.number().optional(),
         }),
       )
@@ -3714,9 +3714,9 @@ Format your response as JSON with keys: recommendation, explanation, precautions
           lessonDate: z.string(),
           duration: z.number(),
           lessonType: z.string().optional(),
-          location: z.string().optional(),
+          location: z.string().max(500).optional(),
           fee: z.number().optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -3810,13 +3810,13 @@ Format your response as JSON with keys: recommendation, explanation, precautions
           lessonDate: z.string().optional(),
           duration: z.number().optional(),
           lessonType: z.string().optional(),
-          location: z.string().optional(),
+          location: z.string().max(500).optional(),
           status: z
             .enum(["scheduled", "completed", "cancelled", "no_show"])
             .optional(),
           fee: z.number().optional(),
           paid: z.boolean().optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -3982,7 +3982,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
           horseId: z.number(),
           treatmentType: z.string().min(1),
           treatmentName: z.string().min(1).max(200),
-          description: z.string().optional(),
+          description: z.string().max(10000).optional(),
           startDate: z.string(), // ISO date string
           endDate: z.string().optional(),
           frequency: z.string().optional(),
@@ -3992,7 +3992,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
           vetClinic: z.string().optional(),
           cost: z.number().optional(),
           status: z.enum(["active", "completed", "discontinued"]).optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -4029,7 +4029,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
           id: z.number(),
           treatmentType: z.string().optional(),
           treatmentName: z.string().optional(),
-          description: z.string().optional(),
+          description: z.string().max(10000).optional(),
           startDate: z.string().optional(),
           endDate: z.string().optional(),
           frequency: z.string().optional(),
@@ -4039,7 +4039,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
           vetClinic: z.string().optional(),
           cost: z.number().optional(),
           status: z.enum(["active", "completed", "discontinued"]).optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -4120,19 +4120,19 @@ Format your response as JSON with keys: recommendation, explanation, precautions
           horseId: z.number(),
           appointmentType: z.string().min(1).max(100),
           title: z.string().min(1).max(200),
-          description: z.string().optional(),
+          description: z.string().max(10000).optional(),
           appointmentDate: z.string(), // ISO date string
           appointmentTime: z.string().optional(),
           duration: z.number().optional(),
           providerName: z.string().optional(),
           providerPhone: z.string().optional(),
           providerClinic: z.string().optional(),
-          location: z.string().optional(),
+          location: z.string().max(500).optional(),
           cost: z.number().optional(),
           status: z
             .enum(["scheduled", "confirmed", "completed", "cancelled"])
             .optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -4174,19 +4174,19 @@ Format your response as JSON with keys: recommendation, explanation, precautions
           id: z.number(),
           appointmentType: z.string().optional(),
           title: z.string().optional(),
-          description: z.string().optional(),
+          description: z.string().max(10000).optional(),
           appointmentDate: z.string().optional(),
           appointmentTime: z.string().optional(),
           duration: z.number().optional(),
           providerName: z.string().optional(),
           providerPhone: z.string().optional(),
           providerClinic: z.string().optional(),
-          location: z.string().optional(),
+          location: z.string().max(500).optional(),
           cost: z.number().optional(),
           status: z
             .enum(["scheduled", "confirmed", "completed", "cancelled"])
             .optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -4283,7 +4283,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
           teethCondition: z
             .enum(["excellent", "good", "fair", "poor"])
             .optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -4330,7 +4330,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
           teethCondition: z
             .enum(["excellent", "good", "fair", "poor"])
             .optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -4421,7 +4421,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
           fileSize: z.number().optional(),
           mimeType: z.string().optional(),
           cost: z.number().optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -4467,7 +4467,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
           fileSize: z.number().optional(),
           mimeType: z.string().optional(),
           cost: z.number().optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -4534,9 +4534,9 @@ Format your response as JSON with keys: recommendation, explanation, precautions
       .input(
         z.object({
           name: z.string().min(1).max(100),
-          color: z.string().optional(),
+          color: z.string().max(500).optional(),
           category: z.string().optional(),
-          description: z.string().optional(),
+          description: z.string().max(10000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -4568,10 +4568,10 @@ Format your response as JSON with keys: recommendation, explanation, precautions
       .input(
         z.object({
           id: z.number(),
-          name: z.string().optional(),
-          color: z.string().optional(),
+          name: z.string().max(500).optional(),
+          color: z.string().max(500).optional(),
           category: z.string().optional(),
-          description: z.string().optional(),
+          description: z.string().max(10000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -4659,7 +4659,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
           workPerformed: z.string().optional(),
           nextDueDate: z.string().optional(),
           cost: z.number().optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -4708,7 +4708,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
           workPerformed: z.string().optional(),
           nextDueDate: z.string().optional(),
           cost: z.number().optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -4797,7 +4797,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
           water: z.string().optional(),
           bodyConditionScore: z.number().optional(),
           weight: z.number().optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -4841,7 +4841,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
           water: z.string().optional(),
           bodyConditionScore: z.number().optional(),
           weight: z.number().optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -4932,7 +4932,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
           caloriesPerDay: z.number().optional(),
           proteinPerDay: z.string().optional(),
           isActive: z.boolean().optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -4980,7 +4980,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
           caloriesPerDay: z.number().optional(),
           proteinPerDay: z.string().optional(),
           isActive: z.boolean().optional(),
-          notes: z.string().optional(),
+          notes: z.string().max(10000).optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {

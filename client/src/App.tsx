@@ -11,6 +11,7 @@ import {
 import { useScrollToTop } from "./hooks/useScrollToTop";
 import { UpgradeModal } from "./components/UpgradeModal";
 import { useUpgradeModal } from "./hooks/useUpgradeModal";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 import "./i18n/config";
 
 // Marketing Pages (Public)
@@ -98,90 +99,227 @@ function Router() {
           <Route path="/forgot-password" component={ForgotPassword} />
           <Route path="/reset-password" component={ResetPassword} />
 
-          {/* Dashboard - requires auth */}
           {/* App Pages (Protected - require auth) */}
-          <Route path="/dashboard" component={Dashboard} />
+          <Route path="/dashboard">
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          </Route>
 
           {/* Horse management */}
-          <Route path="/horses" component={Horses} />
-          <Route path="/horses/new" component={HorseForm} />
-          <Route path="/horses/:id/edit" component={HorseForm} />
-          <Route path="/horses/:id" component={HorseDetail} />
+          <Route path="/horses">
+            <ProtectedRoute>
+              <Horses />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/horses/new">
+            <ProtectedRoute>
+              <HorseForm />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/horses/:id/edit">
+            <ProtectedRoute>
+              <HorseForm />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/horses/:id">
+            <ProtectedRoute>
+              <HorseDetail />
+            </ProtectedRoute>
+          </Route>
 
           {/* Health records */}
-          <Route path="/health" component={Health} />
-          <Route path="/vaccinations" component={Vaccinations} />
-          <Route path="/dental" component={DentalCare} />
-          <Route path="/hoofcare" component={Hoofcare} />
-          <Route path="/dewormings" component={Dewormings} />
-          <Route path="/treatments" component={Treatments} />
-          <Route path="/xrays" component={Xrays} />
+          <Route path="/health">
+            <ProtectedRoute>
+              <Health />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/vaccinations">
+            <ProtectedRoute>
+              <Vaccinations />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/dental">
+            <ProtectedRoute>
+              <DentalCare />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/hoofcare">
+            <ProtectedRoute>
+              <Hoofcare />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/dewormings">
+            <ProtectedRoute>
+              <Dewormings />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/treatments">
+            <ProtectedRoute>
+              <Treatments />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/xrays">
+            <ProtectedRoute>
+              <Xrays />
+            </ProtectedRoute>
+          </Route>
 
           {/* Pedigree */}
-          <Route path="/pedigree" component={Pedigree} />
+          <Route path="/pedigree">
+            <ProtectedRoute>
+              <Pedigree />
+            </ProtectedRoute>
+          </Route>
 
           {/* Training */}
-          <Route path="/training" component={Training} />
-
-          {/* Training Templates */}
-          <Route path="/training-templates" component={TrainingTemplates} />
+          <Route path="/training">
+            <ProtectedRoute>
+              <Training />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/training-templates">
+            <ProtectedRoute>
+              <TrainingTemplates />
+            </ProtectedRoute>
+          </Route>
 
           {/* Breeding Management */}
-          <Route path="/breeding" component={BreedingManagement} />
+          <Route path="/breeding">
+            <ProtectedRoute>
+              <BreedingManagement />
+            </ProtectedRoute>
+          </Route>
 
           {/* Lesson Scheduling */}
-          <Route path="/lessons" component={LessonScheduling} />
+          <Route path="/lessons">
+            <ProtectedRoute>
+              <LessonScheduling />
+            </ProtectedRoute>
+          </Route>
 
           {/* Feeding plans */}
-          <Route path="/feeding" component={Feeding} />
-          <Route path="/nutrition-plans" component={NutritionPlans} />
-          <Route path="/nutrition-logs" component={NutritionLogs} />
+          <Route path="/feeding">
+            <ProtectedRoute>
+              <Feeding />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/nutrition-plans">
+            <ProtectedRoute>
+              <NutritionPlans />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/nutrition-logs">
+            <ProtectedRoute>
+              <NutritionLogs />
+            </ProtectedRoute>
+          </Route>
 
           {/* Weather */}
-          <Route path="/weather" component={Weather} />
+          <Route path="/weather">
+            <ProtectedRoute>
+              <Weather />
+            </ProtectedRoute>
+          </Route>
 
           {/* Documents */}
-          <Route path="/documents" component={Documents} />
+          <Route path="/documents">
+            <ProtectedRoute>
+              <Documents />
+            </ProtectedRoute>
+          </Route>
 
           {/* Tasks */}
-          <Route path="/tasks" component={Tasks} />
+          <Route path="/tasks">
+            <ProtectedRoute>
+              <Tasks />
+            </ProtectedRoute>
+          </Route>
 
           {/* Contacts */}
-          <Route path="/contacts" component={Contacts} />
+          <Route path="/contacts">
+            <ProtectedRoute>
+              <Contacts />
+            </ProtectedRoute>
+          </Route>
 
           {/* Stable Management */}
-          <Route path="/stable" component={Stable} />
+          <Route path="/stable">
+            <ProtectedRoute>
+              <Stable />
+            </ProtectedRoute>
+          </Route>
 
           {/* Messaging */}
-          <Route path="/messages" component={Messages} />
+          <Route path="/messages">
+            <ProtectedRoute>
+              <Messages />
+            </ProtectedRoute>
+          </Route>
 
           {/* Analytics */}
-          <Route path="/analytics" component={Analytics} />
+          <Route path="/analytics">
+            <ProtectedRoute>
+              <Analytics />
+            </ProtectedRoute>
+          </Route>
 
           {/* Reports */}
-          <Route path="/reports" component={Reports} />
+          <Route path="/reports">
+            <ProtectedRoute>
+              <Reports />
+            </ProtectedRoute>
+          </Route>
 
           {/* Calendar */}
-          <Route path="/calendar" component={Calendar} />
-          <Route path="/appointments" component={Appointments} />
+          <Route path="/calendar">
+            <ProtectedRoute>
+              <Calendar />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/appointments">
+            <ProtectedRoute>
+              <Appointments />
+            </ProtectedRoute>
+          </Route>
 
           {/* Tags */}
-          <Route path="/tags" component={Tags} />
+          <Route path="/tags">
+            <ProtectedRoute>
+              <Tags />
+            </ProtectedRoute>
+          </Route>
 
           {/* Settings */}
-          <Route path="/settings" component={Settings} />
+          <Route path="/settings">
+            <ProtectedRoute>
+              <Settings />
+            </ProtectedRoute>
+          </Route>
 
           {/* Billing */}
-          <Route path="/billing" component={BillingPage} />
+          <Route path="/billing">
+            <ProtectedRoute>
+              <BillingPage />
+            </ProtectedRoute>
+          </Route>
 
           {/* AI Chat */}
-          <Route path="/ai-chat" component={AIChat} />
+          <Route path="/ai-chat">
+            <ProtectedRoute>
+              <AIChat />
+            </ProtectedRoute>
+          </Route>
 
           {/* Client Portal */}
           <Route path="/client/:clientId" component={ClientPortal} />
 
           {/* Admin panel - requires admin role */}
-          <Route path="/admin" component={Admin} />
+          <Route path="/admin">
+            <ProtectedRoute requireAdmin>
+              <Admin />
+            </ProtectedRoute>
+          </Route>
 
           {/* 404 */}
           <Route path="/404" component={NotFound} />
