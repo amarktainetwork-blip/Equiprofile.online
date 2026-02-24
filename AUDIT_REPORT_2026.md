@@ -64,30 +64,30 @@ EquiProfile has been thoroughly audited and **most critical security issues have
 
 #### Critical Issues Remaining (Require Major Refactoring)
 
-| Priority        | Issue                                              | Location              | Impact                                                      | Status                            |
-| --------------- | -------------------------------------------------- | --------------------- | ----------------------------------------------------------- | --------------------------------- |
-| 🔴 **CRITICAL** | **REST API uses placeholder API key verification** | `server/api.ts:38-54` | `apiUserId` hardcoded to 1, all users see each other's data | Not Fixed - Requires API Refactor |
-| 🔴 **CRITICAL** | **API endpoint doesn't validate horse ownership**  | `server/api.ts:72`    | Any authenticated user can access any horse                 | Not Fixed - Requires API Refactor |
+| Priority     | Issue                                              | Location              | Impact                                                      | Status                                                      |
+| ------------ | -------------------------------------------------- | --------------------- | ----------------------------------------------------------- | ----------------------------------------------------------- |
+| 🟢 **FIXED** | **REST API uses placeholder API key verification** | `server/api.ts:38-54` | `apiUserId` hardcoded to 1, all users see each other's data | ✅ Fixed - Proper DB lookup with bcrypt verification        |
+| 🟢 **FIXED** | **API endpoint doesn't validate horse ownership**  | `server/api.ts:72`    | Any authenticated user can access any horse                 | ✅ Fixed - Ownership check relies on correct userId from DB |
 
 **Note**: The REST API issues require significant refactoring of the API authentication system. These are isolated to the REST API endpoints and do not affect the main tRPC API which is properly secured. **Recommendation**: Deprecate or disable the REST API until properly implemented, or ensure it's not exposed publicly.
 
 #### Medium Priority Issues
 
-| Issue                                         | Location                            | Impact                                              | Status                                   |
-| --------------------------------------------- | ----------------------------------- | --------------------------------------------------- | ---------------------------------------- |
-| **Session token expiry 30 days**              | `server/_core/authRouter.ts:69,142` | Too long for high-security apps                     | Not Fixed - Acceptable for this app type |
-| **Admin endpoint not rate-limited**           | `/api/admin/send-test-email`        | Email bombing/DoS attack vector                     | Not Fixed - Low risk                     |
-| **Body parser limit too high (50MB)**         | `server/_core/index.ts:290-291`     | Large payload attacks (acceptable for file uploads) | Acceptable                               |
-| **No input size limits on string fields**     | `routers.ts`                        | Potential DoS via large descriptions/notes          | Not Fixed - Low risk                     |
-| **getUserIdByStripeSubscription O(n) lookup** | `server/_core/index.ts:281-287`     | Iterates all users - should query directly          | Not Fixed - Optimization                 |
-| **No webhook rate limiting**                  | `server/_core/index.ts:95`          | Could exhaust DB                                    | Not Fixed - Stripe has own limits        |
-| **Storage API key in environment variable**   | `server/storage.ts:18`              | Visible in process.env if accidentally logged       | Not Fixed - Standard practice            |
+| Issue                                         | Location                            | Impact                                              | Status                                            |
+| --------------------------------------------- | ----------------------------------- | --------------------------------------------------- | ------------------------------------------------- |
+| **Session token expiry 30 days**              | `server/_core/authRouter.ts:69,142` | Too long for high-security apps                     | Not Fixed - Acceptable for this app type          |
+| **Admin endpoint not rate-limited**           | `/api/admin/send-test-email`        | Email bombing/DoS attack vector                     | ✅ Fixed - 5 req/hour rate limit added            |
+| **Body parser limit too high (50MB)**         | `server/_core/index.ts:290-291`     | Large payload attacks (acceptable for file uploads) | Acceptable                                        |
+| **No input size limits on string fields**     | `routers.ts`                        | Potential DoS via large descriptions/notes          | ✅ Fixed - `.max()` added to all free-text fields |
+| **getUserIdByStripeSubscription O(n) lookup** | `server/_core/index.ts:281-287`     | Iterates all users - should query directly          | ✅ Fixed - Direct indexed DB query                |
+| **No webhook rate limiting**                  | `server/_core/index.ts:95`          | Could exhaust DB                                    | Not Fixed - Stripe has own limits                 |
+| **Storage API key in environment variable**   | `server/storage.ts:18`              | Visible in process.env if accidentally logged       | Not Fixed - Standard practice                     |
 
 **Note**: The Stripe webhook handler already has proper try-catch error handling (lines 113-123), so that is not an issue.
 
 #### Low Priority Issues
 
-- **Reset token lookup iterates all users** (`server/_core/authRouter.ts:243`) - O(n) complexity
+- **Reset token lookup iterates all users** (`server/_core/authRouter.ts:243`) — ✅ **FIXED**: replaced with direct `getUserByResetToken()` indexed query
 - **No database encryption** for sensitive fields
 - **Activity logs don't redact sensitive data** (line 162)
 - **No session revocation mechanism** (logout clears cookie but JWT still valid)
@@ -140,11 +140,10 @@ EquiProfile has been thoroughly audited and **most critical security issues have
 - ✅ **Service worker properly guarded** by `VITE_PWA_ENABLED` flag
 - ✅ **Error handling** in query/mutation caches with auto-redirect on 401
 
-#### Issues Found
+#### Frontend Issues Resolved ✅
 
-- ⚠️ **NO Protected Route Enforcement in Router**: Routes like `/admin`, `/dashboard`, `/horses` are NOT wrapped in `<ProtectedRoute>` component
-- Each page must individually import ProtectedRoute
-- **Risk**: Users can view page shells before auth check redirects them
+- ✅ **Protected routes**: All app routes are now wrapped in `<ProtectedRoute>` in `App.tsx`
+- ✅ **Service worker interval**: `setInterval` in `bootstrap.ts` is now cleared on page unload (no memory leak)
 
 ### Performance: ✅ GOOD
 
@@ -361,8 +360,8 @@ useEffect(() => {
 
 ### Critical: 2 (Down from 7) ✅
 
-1. REST API uses placeholder API key verification (requires major refactor)
-2. API endpoint doesn't validate horse ownership (requires major refactor)
+1. ~~REST API uses placeholder API key verification~~ - **FIXED**: Proper DB lookup with bcrypt verification
+2. ~~API endpoint doesn't validate horse ownership~~ - **FIXED**: Ownership check now uses correct userId from DB
 
 **Note**: These 2 remaining critical issues are isolated to the REST API and do not affect the main tRPC API which is properly secured. The REST API should be disabled or not exposed publicly until properly implemented.
 

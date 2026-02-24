@@ -232,6 +232,28 @@ export async function getAllUsers() {
   return db.select().from(users).orderBy(desc(users.createdAt));
 }
 
+export async function getUserByResetToken(token: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db
+    .select()
+    .from(users)
+    .where(eq(users.resetToken, token))
+    .limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getUserByStripeSubscriptionId(subscriptionId: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db
+    .select()
+    .from(users)
+    .where(eq(users.stripeSubscriptionId, subscriptionId))
+    .limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
 export async function updateUser(id: number, data: Partial<InsertUser>) {
   const db = await getDb();
   if (!db) return;

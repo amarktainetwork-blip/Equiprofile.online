@@ -6,6 +6,7 @@ import {
   healthRecords,
   trainingSessions,
   competitions,
+  apiKeys,
 } from "../drizzle/schema";
 import { eq, desc } from "drizzle-orm";
 import bcrypt from "bcryptjs";
@@ -29,22 +30,57 @@ async function verifyApiKey(req: Request, res: Response, next: NextFunction) {
   }
 
   try {
-    // Validate API key
+    // Validate API key against database
     const dbInstance = await getDb();
     if (!dbInstance) {
       return res.status(500).json({ error: "Database connection failed" });
     }
 
-    // In production, you would:
-    // 1. Hash the provided API key
-    // 2. Check against stored key hashes in apiKeys table
-    // 3. Verify isActive and expiresAt
-    // 4. Enforce rate limiting based on rateLimit field
-    // 5. Check permissions field for endpoint access
+    // API key format: ep_XXXX_<secret> — prefix is "ep_XXXX"
+    const underscoreIdx = apiKey.indexOf("_", 3); // skip "ep_"
+    const prefix =
+      underscoreIdx > 0 ? apiKey.substring(0, underscoreIdx) : null;
 
-    // For MVP, we'll do a simplified check
-    // Store the userId in req for downstream use
-    (req as any).apiUserId = 1; // Replace with actual user lookup from API key
+    if (!prefix) {
+      return res.status(401).json({ error: "Invalid API key format" });
+    }
+
+    // Find candidate keys by prefix (narrows down bcrypt comparison)
+    const candidates = await dbInstance
+      .select()
+      .from(apiKeys)
+      .where(eq(apiKeys.keyPrefix, prefix));
+
+    let matchedKey: (typeof candidates)[0] | undefined;
+    for (const candidate of candidates) {
+      if (await bcrypt.compare(apiKey, candidate.keyHash)) {
+        matchedKey = candidate;
+        break;
+      }
+    }
+
+    if (!matchedKey) {
+      return res.status(401).json({ error: "Invalid API key" });
+    }
+
+    if (!matchedKey.isActive) {
+      return res.status(401).json({ error: "API key has been revoked" });
+    }
+
+    if (matchedKey.expiresAt && matchedKey.expiresAt < new Date()) {
+      return res.status(401).json({ error: "API key has expired" });
+    }
+
+    // Update last used timestamp (fire and forget)
+    dbInstance
+      .update(apiKeys)
+      .set({ lastUsedAt: new Date() })
+      .where(eq(apiKeys.id, matchedKey.id))
+      .catch((err) => {
+        console.error("[API] Failed to update lastUsedAt:", err);
+      });
+
+    (req as any).apiUserId = matchedKey.userId;
 
     next();
   } catch (error) {
