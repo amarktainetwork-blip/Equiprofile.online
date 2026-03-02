@@ -10,10 +10,11 @@ interface AuthSplitLayoutProps {
  * Auth Split Layout Component
  *
  * Desktop (md+): 50/50 split — left panel plays the auth video, right panel
- * hosts the form on a solid dark background.
+ * is a solid dark scrollable panel that never overflows the viewport.
  *
- * Mobile: Video fills the full background; the form panel uses glass-morphism
- * (frosted glass) so it reads clearly over the video.
+ * Mobile: Video fills the full background. The panel itself is transparent so
+ * the video remains visible all around. Only the Card (form block) carries the
+ * glass-morphism effect via its own backdrop-blur / bg classes.
  */
 export function AuthSplitLayout({ children }: AuthSplitLayoutProps) {
   return (
@@ -29,22 +30,22 @@ export function AuthSplitLayout({ children }: AuthSplitLayoutProps) {
         >
           <source src={marketingAssets.auth.video} type="video/mp4" />
         </video>
-        {/* Mobile: darken video so the glass form panel reads clearly */}
-        <div className="absolute inset-0 bg-black/50 md:hidden" />
+        {/* Mobile: very light scrim so the card stands out against the video */}
+        <div className="absolute inset-0 bg-black/30 md:hidden" />
       </div>
 
       {/* Form panel
-          Mobile:  glass-morphism overlay over the video (backdrop-blur + translucent bg),
-                   full-height so the form centres over the video
-          Desktop: solid dark right-half panel, no blur needed */}
+          Mobile:  transparent — glass effect lives on the Card itself so the
+                   video shows through everywhere around the input block
+          Desktop: solid dark right half; overflow-y-auto so tall forms scroll
+                   instead of overflowing the viewport */}
       <div
         className={[
-          // base
+          // base — centres the card, transparent on mobile
           "relative z-10 w-full flex items-center justify-center px-4 py-8",
-          // mobile: full-height glass panel over the video
-          "min-h-[calc(100vh-72px)] bg-white/10 backdrop-blur-md border-t border-white/10",
-          // desktop: solid dark right half, drop the blur
-          "md:min-h-0 md:w-1/2 md:bg-gray-950 md:backdrop-blur-none md:border-t-0 md:border-l md:border-white/5",
+          "min-h-[calc(100vh-72px)]",
+          // desktop overrides
+          "md:w-1/2 md:min-h-0 md:bg-gray-950 md:overflow-y-auto md:border-l md:border-white/5",
         ].join(" ")}
       >
         <div className="w-full max-w-md">
