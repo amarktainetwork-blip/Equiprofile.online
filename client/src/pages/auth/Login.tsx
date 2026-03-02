@@ -85,7 +85,7 @@ export default function Login() {
 
   return (
     <>
-      <MarketingNav />
+      <MarketingNav alwaysLight />
       <PageTransition>
         <AuthSplitLayout>
           <motion.div
@@ -94,11 +94,9 @@ export default function Login() {
             transition={{ duration: 0.5 }}
           >
             {/* Back button */}
-            <Link href="/">
-              <a className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors mb-4">
-                <ArrowLeft className="w-4 h-4" />
-                <span>Back to home</span>
-              </a>
+            <Link href="/" className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors mb-4">
+              <ArrowLeft className="w-4 h-4" />
+              <span>Back to home</span>
             </Link>
 
             {/* Login Form Card */}
@@ -195,10 +193,8 @@ export default function Login() {
                           <Label htmlFor="password" className="text-white">
                             Password
                           </Label>
-                          <Link href="/forgot-password">
-                            <a className="text-sm bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent hover:from-indigo-300 hover:to-cyan-300 transition-all duration-200">
-                              Forgot password?
-                            </a>
+                          <Link href="/forgot-password" className="text-sm bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent hover:from-indigo-300 hover:to-cyan-300 transition-all duration-200">
+                            Forgot password?
                           </Link>
                         </div>
                         <Input
@@ -245,10 +241,8 @@ export default function Login() {
                 {/* Register link */}
                 <div className="text-center text-sm">
                   <span className="text-gray-400">Don't have an account? </span>
-                  <Link href="/register">
-                    <a className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent font-medium hover:from-indigo-300 hover:to-cyan-300 transition-all duration-200">
-                      Create account
-                    </a>
+                  <Link href="/register" className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent font-medium hover:from-indigo-300 hover:to-cyan-300 transition-all duration-200">
+                    Create account
                   </Link>
                 </div>
               </CardContent>

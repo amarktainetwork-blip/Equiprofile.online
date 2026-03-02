@@ -20,14 +20,10 @@ export function Footer() {
             <h4 className="font-semibold mb-4 text-white">Product</h4>
             <ul className="space-y-2 text-sm text-gray-400">
               <li>
-                <Link href="/features">
-                  <a className="hover:text-white transition-colors">Features</a>
-                </Link>
+                <Link href="/features" className="hover:text-white transition-colors">Features</Link>
               </li>
               <li>
-                <Link href="/pricing">
-                  <a className="hover:text-white transition-colors">Pricing</a>
-                </Link>
+                <Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link>
               </li>
             </ul>
           </div>
@@ -36,14 +32,10 @@ export function Footer() {
             <h4 className="font-semibold mb-4 text-white">Company</h4>
             <ul className="space-y-2 text-sm text-gray-400">
               <li>
-                <Link href="/about">
-                  <a className="hover:text-white transition-colors">About</a>
-                </Link>
+                <Link href="/about" className="hover:text-white transition-colors">About</Link>
               </li>
               <li>
-                <Link href="/contact">
-                  <a className="hover:text-white transition-colors">Contact</a>
-                </Link>
+                <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
               </li>
             </ul>
           </div>
@@ -52,14 +44,10 @@ export function Footer() {
             <h4 className="font-semibold mb-4 text-white">Legal</h4>
             <ul className="space-y-2 text-sm text-gray-400">
               <li>
-                <Link href="/privacy">
-                  <a className="hover:text-white transition-colors">Privacy</a>
-                </Link>
+                <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
               </li>
               <li>
-                <Link href="/terms">
-                  <a className="hover:text-white transition-colors">Terms</a>
-                </Link>
+                <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
               </li>
             </ul>
           </div>

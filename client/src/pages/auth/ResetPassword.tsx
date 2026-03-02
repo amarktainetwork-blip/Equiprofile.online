@@ -170,10 +170,8 @@ export default function ResetPassword() {
                     </Button>
 
                     <div className="text-center text-sm">
-                      <Link href="/login">
-                        <a className="text-primary font-medium hover:underline">
-                          Back to login
-                        </a>
+                      <Link href="/login" className="text-primary font-medium hover:underline">
+                        Back to login
                       </Link>
                     </div>
                   </form>
