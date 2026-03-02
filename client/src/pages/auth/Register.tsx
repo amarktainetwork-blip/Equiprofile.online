@@ -48,19 +48,35 @@ export default function Register() {
   const hasSubscribeIntent = !!intentPlan && (intentInterval === "monthly" || intentInterval === "yearly");
 
   const createCheckout = trpc.billing.createCheckout.useMutation();
+  const [checkoutRedirecting, setCheckoutRedirecting] = useState(false);
 
   // Redirect if already authenticated
-  if (isAuthenticated) {
+  if (isAuthenticated && !checkoutRedirecting) {
     if (hasSubscribeIntent) {
-      // Logged-in user reached register with a plan intent → send to checkout
+      // Logged-in user reached register with a plan intent → go to checkout.
+      // Set redirecting flag first so we render a loading state instead of
+      // triggering the mutation again on the next render.
+      setCheckoutRedirecting(true);
       createCheckout
         .mutateAsync({ plan: intentInterval })
-        .then((r) => { if (r.url) window.location.href = r.url; })
+        .then((r) => { if (r.url) window.location.href = r.url; else setLocation("/dashboard"); })
         .catch(() => setLocation("/dashboard"));
+      // Fall through and show a brief loading UI below
     } else {
       setLocation("/dashboard");
+      return null;
     }
-    return null;
+  }
+
+  if (checkoutRedirecting) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-gray-400 text-sm">Preparing checkout…</p>
+        </div>
+      </div>
+    );
   }
 
   const handleNameStep = (e: FormEvent) => {

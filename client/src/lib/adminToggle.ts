@@ -6,6 +6,11 @@
  * - Type "showAdmin()" in browser console to reveal admin section
  * - Type "hideAdmin()" to hide it again
  * - Admin role is enforced server-side; the client toggle is UI-only.
+ *
+ * Security note: this sessionStorage flag only controls *UI visibility*.
+ * All admin API actions require role=admin in the server session token plus
+ * a valid server-side admin-unlock session.  Manually toggling the flag in
+ * the browser has no security impact.
  */
 
 const ADMIN_VISIBLE_KEY = "equiprofile_admin_visible";

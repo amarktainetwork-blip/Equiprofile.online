@@ -1796,15 +1796,51 @@ Please provide:
 Format your response as JSON with keys: recommendation, explanation, precautions, bestTime`;
 
         // Determine basic recommendation from numeric data (no-AI fallback)
+        const EXTREME_WIND = 50; // km/h – dangerous for horses
+        const HIGH_WIND = 35;
+        const MODERATE_WIND = 25;
+        const CALM_WIND = 15;
+        const EXTREME_HEAT = 38; // °C
+        const HIGH_HEAT = 32;
+        const WARM = 28;
+        const IDEAL_MAX = 25;
+        const IDEAL_MIN = 15;
+        const COLD = 5;
+        const FREEZING = 0;
+        const EXTREME_COLD = -10;
+        const HEAVY_RAIN = 10; // mm
+        const MODERATE_RAIN = 5;
+        const LIGHT_RAIN = 2;
+
         const basicRec = (() => {
           const precip = input.precipitation ?? 0;
-          if (input.windSpeed > 50 || precip > 10 || input.temperature > 38 || input.temperature < -10)
+          if (
+            input.windSpeed > EXTREME_WIND ||
+            precip > HEAVY_RAIN ||
+            input.temperature > EXTREME_HEAT ||
+            input.temperature < EXTREME_COLD
+          )
             return "not_recommended";
-          if (input.windSpeed > 35 || precip > 5 || input.temperature > 32 || input.temperature < 0)
+          if (
+            input.windSpeed > HIGH_WIND ||
+            precip > MODERATE_RAIN ||
+            input.temperature > HIGH_HEAT ||
+            input.temperature < FREEZING
+          )
             return "poor";
-          if (input.windSpeed > 25 || precip > 2 || input.temperature > 28 || input.temperature < 5)
+          if (
+            input.windSpeed > MODERATE_WIND ||
+            precip > LIGHT_RAIN ||
+            input.temperature > WARM ||
+            input.temperature < COLD
+          )
             return "fair";
-          if (input.windSpeed < 15 && precip === 0 && input.temperature >= 15 && input.temperature <= 25)
+          if (
+            input.windSpeed < CALM_WIND &&
+            precip === 0 &&
+            input.temperature >= IDEAL_MIN &&
+            input.temperature <= IDEAL_MAX
+          )
             return "excellent";
           return "good";
         })();
