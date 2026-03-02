@@ -16,6 +16,7 @@ import rateLimit from "express-rate-limit";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import crypto from "crypto";
 import * as emailModule from "./email";
 import { invokeLLM, isAIConfigured } from "./llm";
 import { sanitizeHtml } from "./htmlEscape";
@@ -153,7 +154,10 @@ function ruleFallback(userMessage: string): string | null {
 }
 
 // ──────────────────────────────────────────────────────────
-// In-memory lead store (replace with DB if you want persistence)
+// In-memory lead store
+// TODO: replace with DB persistence so leads survive restarts.
+//       For V1/beta this is acceptable; add a LeadCapture table in the
+//       next schema migration.
 // ──────────────────────────────────────────────────────────
 
 interface Lead {
@@ -311,10 +315,27 @@ router.post("/sales-lead", leadLimiter, async (req, res) => {
 
 router.get("/sales-leads", (req, res) => {
   const adminKey = process.env.ADMIN_LEADS_KEY;
-  const provided = req.headers["x-admin-leads-key"];
+  const provided = String(req.headers["x-admin-leads-key"] || "");
 
-  // Require env key to be set AND match
-  if (!adminKey || provided !== adminKey) {
+  // Require env key to be set AND match using constant-time comparison
+  // to prevent timing-based enumeration of the key.
+  if (!adminKey) {
+    return res.status(403).json({ error: "Forbidden" });
+  }
+
+  let keysMatch = false;
+  try {
+    const expectedBuf = Buffer.from(adminKey, "utf8");
+    const providedBuf = Buffer.from(provided, "utf8");
+    // timingSafeEqual requires equal-length buffers
+    if (expectedBuf.length === providedBuf.length) {
+      keysMatch = crypto.timingSafeEqual(expectedBuf, providedBuf);
+    }
+  } catch {
+    keysMatch = false;
+  }
+
+  if (!keysMatch) {
     return res.status(403).json({ error: "Forbidden" });
   }
 

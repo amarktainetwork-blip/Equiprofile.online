@@ -384,9 +384,18 @@ function injectStyles(): void {
 }
 
 // ──────────────────────────────────────────────────────────
-// Quick suggestion chips
+// Constants
 // ──────────────────────────────────────────────────────────
-const SUGGESTIONS = [
+
+/** Detects messages where the user wants to speak with a human / be contacted. */
+const LEAD_INTENT_PATTERN =
+  /\b(human|agent|person|staff|speak|talk|contact|email me|reach out)\b/i;
+
+/** Basic email validation (same pattern as backend salesChatRouter.ts). */
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+// ──────────────────────────────────────────────────────────
+// Main Component
+// ──────────────────────────────────────────────────────────
   "What plans do you offer?",
   "Is there a free trial?",
   "How do I sign up?",
@@ -394,7 +403,7 @@ const SUGGESTIONS = [
 ];
 
 // ──────────────────────────────────────────────────────────
-// Main Component
+// Quick suggestion chips
 // ──────────────────────────────────────────────────────────
 export function SalesChatWidget() {
   const [location] = useLocation();
@@ -448,8 +457,7 @@ export function SalesChatWidget() {
       setShowSuggestions(false);
 
       // Detect lead-capture intent
-      const wantsHuman =
-        /\b(human|agent|person|staff|speak|talk|contact|email me|reach out)\b/i.test(trimmed);
+      const wantsHuman = LEAD_INTENT_PATTERN.test(trimmed);
 
       try {
         const history = messages.slice(-10).map((m) => ({
@@ -511,7 +519,7 @@ export function SalesChatWidget() {
       setLeadError("Please enter your name.");
       return;
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(lead.email.trim())) {
+    if (!EMAIL_REGEX.test(lead.email.trim())) {
       setLeadError("Please enter a valid email address.");
       return;
     }
