@@ -117,7 +117,7 @@ export const STRIPE_PRICING = {
 export function validatePricingConfig(): void {
   if (!ENV.enableStripe) {
     console.warn(
-      "[Pricing] Stripe is disabled – showing default GBP prices (£10/£100 Individual, £30/£300 Stable). Configure ENABLE_STRIPE=true and Stripe keys to enable live billing.",
+      `[Pricing] Stripe is disabled – showing default GBP prices (£${DEFAULT_PRICING.individual.monthly.amount / 100}/£${DEFAULT_PRICING.individual.yearly.amount / 100} Individual, £${DEFAULT_PRICING.stable.monthly.amount / 100}/£${DEFAULT_PRICING.stable.yearly.amount / 100} Stable). Configure ENABLE_STRIPE=true and Stripe keys to enable live billing.`,
     );
     return;
   }

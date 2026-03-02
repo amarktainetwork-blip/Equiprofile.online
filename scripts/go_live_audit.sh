@@ -197,14 +197,14 @@ check_pricing() {
   fi
 
   if echo "$body" | grep -q '"amount"'; then
-    # Extract pro monthly amount – must be ≥ 1000 pence (£10)
+    # Threshold of 1000 pence = £10 matches DEFAULT_PRICING.individual.monthly.amount in shared/pricing.ts
     local pro_monthly
     pro_monthly="$(echo "$body" | grep -o '"amount":[0-9]*' | head -1 | grep -o '[0-9]*$' || echo "0")"
 
     if [ "${pro_monthly:-0}" -ge 1000 ] 2>/dev/null; then
       local pounds_display
-      pounds_display="$(echo "scale=2; ${pro_monthly}/100" | bc 2>/dev/null || echo "${pro_monthly}")"
-      pass "Pricing – Pro monthly amount ${pounds_display} pence (≥ £10)"
+      pounds_display="$(awk "BEGIN {printf \"%.2f\", ${pro_monthly}/100}" 2>/dev/null || echo "${pro_monthly}p")"
+      pass "Pricing – Pro monthly £${pounds_display} (≥ £10)"
     elif [ "${pro_monthly:-0}" -gt 0 ] 2>/dev/null; then
       fail "Pricing – Pro monthly amount ${pro_monthly} pence is less than expected £10 (1000p)"
     else

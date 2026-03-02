@@ -25,7 +25,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { MarketingLayout } from "@/components/MarketingLayout";
 import { PageBanner } from "@/components/PageBanner";
-import { DEFAULT_PRICING } from "@shared/pricing";
+import { DEFAULT_PRICING, penceToGBP } from "@shared/pricing";
 
 const YEARLY_SAVINGS_PERCENTAGE = 17;
 
@@ -156,7 +156,7 @@ export default function Pricing() {
   // Falls back to hard-coded GBP defaults so UI never shows £0
   const formatPrice = (amountInPence: number | undefined): string => {
     if (!amountInPence || amountInPence <= 0) return "0.00";
-    return (amountInPence / 100).toFixed(2);
+    return penceToGBP(amountInPence);
   };
 
   const getProPlanPrice = () => {
