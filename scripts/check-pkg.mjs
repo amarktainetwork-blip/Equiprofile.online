@@ -12,7 +12,12 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkgPath = resolve(__dirname, "..", "package.json");
 const pkg = JSON.parse(readFileSync(pkgPath, "utf-8"));
 
-const sections = ["dependencies", "devDependencies", "peerDependencies", "optionalDependencies"];
+const sections = [
+  "dependencies",
+  "devDependencies",
+  "peerDependencies",
+  "optionalDependencies",
+];
 let invalid = 0;
 
 for (const section of sections) {
@@ -21,7 +26,7 @@ for (const section of sections) {
   for (const [name, spec] of Object.entries(entries)) {
     if (typeof spec !== "string" || spec.trim() === "") {
       console.error(
-        `❌  ${section}["${name}"] has invalid spec: ${JSON.stringify(spec)}`
+        `❌  ${section}["${name}"] has invalid spec: ${JSON.stringify(spec)}`,
       );
       invalid++;
     }
@@ -29,7 +34,9 @@ for (const section of sections) {
 }
 
 if (invalid > 0) {
-  console.error(`\n${invalid} invalid dependency spec(s) found in package.json.`);
+  console.error(
+    `\n${invalid} invalid dependency spec(s) found in package.json.`,
+  );
   console.error("Fix or remove them before deploying.\n");
   process.exit(1);
 } else {
