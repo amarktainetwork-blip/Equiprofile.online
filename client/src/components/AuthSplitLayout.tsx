@@ -10,7 +10,8 @@ interface AuthSplitLayoutProps {
  * Auth Split Layout Component
  *
  * Desktop (md+): 50/50 split — left panel plays the auth video, right panel
- * is a solid dark scrollable panel that never overflows the viewport.
+ * hosts the form. The outer wrapper is locked to exactly one viewport height
+ * (h-screen overflow-hidden) so there is zero page scroll on desktop.
  *
  * Mobile: Video fills the full background. The panel itself is transparent so
  * the video remains visible all around. Only the Card (form block) carries the
@@ -18,7 +19,7 @@ interface AuthSplitLayoutProps {
  */
 export function AuthSplitLayout({ children }: AuthSplitLayoutProps) {
   return (
-    <div className="min-h-screen w-full pt-[72px] relative md:flex">
+    <div className="w-full pt-[72px] relative flex flex-col min-h-screen md:flex-row md:h-screen md:overflow-hidden">
       {/* Video panel — absolute full-bg on mobile, left 50% on desktop */}
       <div className="absolute inset-0 md:relative md:inset-auto md:w-1/2 md:flex-shrink-0 overflow-hidden">
         <video
@@ -35,22 +36,29 @@ export function AuthSplitLayout({ children }: AuthSplitLayoutProps) {
       </div>
 
       {/* Form panel
-          Mobile:  transparent — glass effect lives on the Card itself so the
-                   video shows through everywhere around the input block
-          Desktop: solid dark right half; overflow-y-auto so tall forms scroll
-                   instead of overflowing the viewport */}
+          Mobile:  transparent + natural height so the video shows through
+                   everywhere except the Card itself (which has its own glass)
+          Desktop: solid dark right half, locked height — no scroll */}
       <div
         className={[
           // base — centres the card, transparent on mobile
           "relative z-10 w-full flex items-center justify-center px-4 py-8",
           "min-h-[calc(100vh-72px)]",
-          // desktop overrides
-          "md:w-1/2 md:min-h-0 md:bg-gray-950 md:overflow-y-auto md:border-l md:border-white/5",
+          // desktop: fill remaining height exactly, clip overflow — zero scroll
+          "md:w-1/2 md:min-h-0 md:py-0 md:bg-gray-950 md:overflow-hidden md:border-l md:border-white/5",
         ].join(" ")}
       >
         <div className="w-full max-w-md">
           {children}
         </div>
+
+        {/* Copyright — visible on auth pages since the full Footer is omitted */}
+        <p
+          className="absolute bottom-3 left-0 right-0 text-center text-xs text-gray-600"
+          aria-label={`© ${new Date().getFullYear()} EquiProfile.online · Part of AmarktAI Network`}
+        >
+          © {new Date().getFullYear()} EquiProfile.online · Part of Amarkt<span className="text-blue-400 font-semibold">AI</span> Network
+        </p>
       </div>
     </div>
   );

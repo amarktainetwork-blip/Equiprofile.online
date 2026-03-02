@@ -66,7 +66,7 @@ export function Footer() {
         </div>
 
         <div className="border-t border-white/10 pt-8 text-center text-sm text-gray-500">
-          <p>© {new Date().getFullYear()} EquiProfile. All rights reserved.</p>
+          <p aria-label={`© ${new Date().getFullYear()} EquiProfile.online · Part of AmarktAI Network`}>© {new Date().getFullYear()} EquiProfile.online · Part of Amarkt<span className="text-blue-400 font-semibold">AI</span> Network</p>
         </div>
       </div>
     </footer>
