@@ -56,7 +56,9 @@ export default function Contact() {
         });
       }
     } catch {
-      toast.error("An error occurred. Please check your connection and try again.");
+      toast.error(
+        "An error occurred. Please check your connection and try again.",
+      );
     } finally {
       setIsSubmitting(false);
     }

@@ -24,7 +24,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const PROJECT_ROOT = path.resolve(__dirname, "..");
 
-function ask(rl: readline.Interface, question: string, hidden = false): Promise<string> {
+function ask(
+  rl: readline.Interface,
+  question: string,
+  hidden = false,
+): Promise<string> {
   return new Promise((resolve) => {
     if (hidden) {
       // Hide input on compatible TTYs
@@ -69,7 +73,8 @@ function upsertEnvLine(envPath: string, key: string, value: string): void {
   if (regex.test(contents)) {
     contents = contents.replace(regex, newLine);
   } else {
-    contents = contents + (contents.endsWith("\n") ? "" : "\n") + newLine + "\n";
+    contents =
+      contents + (contents.endsWith("\n") ? "" : "\n") + newLine + "\n";
   }
 
   fs.writeFileSync(envPath, contents, "utf-8");
@@ -132,7 +137,9 @@ async function cmdCheckAdminPassword() {
     } else {
       valid = pwd === stored;
     }
-    console.log(valid ? "\n✅ Password is CORRECT.\n" : "\n❌ Password is INCORRECT.\n");
+    console.log(
+      valid ? "\n✅ Password is CORRECT.\n" : "\n❌ Password is INCORRECT.\n",
+    );
     process.exit(valid ? 0 : 1);
   } finally {
     rl.close();
