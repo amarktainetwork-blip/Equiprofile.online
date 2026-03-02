@@ -123,10 +123,19 @@ export function validatePricingConfig(): void {
   }
 
   const requiredPriceIds: Array<{ name: string; value: string }> = [
-    { name: "STRIPE_MONTHLY_PRICE_ID", value: PRICING_PLANS.pro.monthly.priceId },
+    {
+      name: "STRIPE_MONTHLY_PRICE_ID",
+      value: PRICING_PLANS.pro.monthly.priceId,
+    },
     { name: "STRIPE_YEARLY_PRICE_ID", value: PRICING_PLANS.pro.yearly.priceId },
-    { name: "STRIPE_STABLE_MONTHLY_PRICE_ID", value: PRICING_PLANS.stable.monthly.priceId },
-    { name: "STRIPE_STABLE_YEARLY_PRICE_ID", value: PRICING_PLANS.stable.yearly.priceId },
+    {
+      name: "STRIPE_STABLE_MONTHLY_PRICE_ID",
+      value: PRICING_PLANS.stable.monthly.priceId,
+    },
+    {
+      name: "STRIPE_STABLE_YEARLY_PRICE_ID",
+      value: PRICING_PLANS.stable.yearly.priceId,
+    },
   ];
 
   const missing = requiredPriceIds.filter((p) => !p.value);

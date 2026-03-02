@@ -253,411 +253,411 @@ export default function Pricing() {
         imageSrc="/images/riding-lesson.jpg"
         imagePosition="center"
       />
-        <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black">
-          <div className="container mx-auto px-4 py-16">
-            {/* Top 3 Blocks - What's included, Free trial, Cancel anytime */}
-            <motion.div
-              className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 max-w-5xl mx-auto"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-lg p-6 hover:border-white/30 transition-all duration-300">
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 flex items-center justify-center mb-4">
-                    <Check className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">
-                    What's Included
-                  </h3>
-                  <p className="text-gray-400 text-sm">
-                    All plans include unlimited updates, priority support, and
-                    access to all core features
-                  </p>
+      <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black">
+        <div className="container mx-auto px-4 py-16">
+          {/* Top 3 Blocks - What's included, Free trial, Cancel anytime */}
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 max-w-5xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-lg p-6 hover:border-white/30 transition-all duration-300">
+              <div className="flex flex-col items-center text-center">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 flex items-center justify-center mb-4">
+                  <Check className="w-6 h-6 text-white" />
                 </div>
+                <h3 className="text-xl font-semibold text-white mb-2">
+                  What's Included
+                </h3>
+                <p className="text-gray-400 text-sm">
+                  All plans include unlimited updates, priority support, and
+                  access to all core features
+                </p>
               </div>
-              <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-lg p-6 hover:border-white/30 transition-all duration-300">
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 flex items-center justify-center mb-4">
-                    <Clock className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">
-                    7-Day Free Trial
-                  </h3>
-                  <p className="text-gray-400 text-sm">
-                    Try EquiProfile risk-free with full access to ALL features
-                    for 1 horse for 7 days
-                  </p>
+            </div>
+            <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-lg p-6 hover:border-white/30 transition-all duration-300">
+              <div className="flex flex-col items-center text-center">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 flex items-center justify-center mb-4">
+                  <Clock className="w-6 h-6 text-white" />
                 </div>
+                <h3 className="text-xl font-semibold text-white mb-2">
+                  7-Day Free Trial
+                </h3>
+                <p className="text-gray-400 text-sm">
+                  Try EquiProfile risk-free with full access to ALL features for
+                  1 horse for 7 days
+                </p>
               </div>
-              <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-lg p-6 hover:border-white/30 transition-all duration-300">
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 flex items-center justify-center mb-4">
-                    <XCircle className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">
-                    Cancel Anytime
-                  </h3>
-                  <p className="text-gray-400 text-sm">
-                    No long-term contracts. Cancel or change your plan anytime
-                    with no hidden fees
-                  </p>
+            </div>
+            <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-lg p-6 hover:border-white/30 transition-all duration-300">
+              <div className="flex flex-col items-center text-center">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 flex items-center justify-center mb-4">
+                  <XCircle className="w-6 h-6 text-white" />
                 </div>
+                <h3 className="text-xl font-semibold text-white mb-2">
+                  Cancel Anytime
+                </h3>
+                <p className="text-gray-400 text-sm">
+                  No long-term contracts. Cancel or change your plan anytime
+                  with no hidden fees
+                </p>
               </div>
-            </motion.div>
+            </div>
+          </motion.div>
 
-            {/* Billing Period Header */}
+          {/* Billing Period Header */}
+          <motion.div
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <h2 className="text-3xl font-bold tracking-tight mb-4 text-white">
+              Choose Your{" "}
+              <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 text-transparent bg-clip-text">
+                Perfect Plan
+              </span>
+            </h2>
+
+            {/* Billing Period Toggle */}
             <motion.div
-              className="text-center mb-12"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              className="mt-8 inline-flex items-center gap-4 bg-black/40 backdrop-blur-md rounded-full p-2 border border-white/10"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <h2 className="text-3xl font-bold tracking-tight mb-4 text-white">
-                Choose Your{" "}
-                <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 text-transparent bg-clip-text">
-                  Perfect Plan
+              <button
+                onClick={() => setBillingPeriod("monthly")}
+                className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
+                  billingPeriod === "monthly"
+                    ? "bg-gradient-to-r from-indigo-500 to-cyan-500 text-white shadow-lg"
+                    : "text-gray-400 hover:text-white"
+                }`}
+              >
+                Monthly
+              </button>
+              <button
+                onClick={() => setBillingPeriod("yearly")}
+                className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
+                  billingPeriod === "yearly"
+                    ? "bg-gradient-to-r from-indigo-500 to-cyan-500 text-white shadow-lg"
+                    : "text-gray-400 hover:text-white"
+                }`}
+              >
+                Yearly
+                <span className="ml-2 text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">
+                  Save {YEARLY_SAVINGS_PERCENTAGE}%
                 </span>
-              </h2>
-
-              {/* Billing Period Toggle */}
-              <motion.div
-                className="mt-8 inline-flex items-center gap-4 bg-black/40 backdrop-blur-md rounded-full p-2 border border-white/10"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-              >
-                <button
-                  onClick={() => setBillingPeriod("monthly")}
-                  className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
-                    billingPeriod === "monthly"
-                      ? "bg-gradient-to-r from-indigo-500 to-cyan-500 text-white shadow-lg"
-                      : "text-gray-400 hover:text-white"
-                  }`}
-                >
-                  Monthly
-                </button>
-                <button
-                  onClick={() => setBillingPeriod("yearly")}
-                  className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
-                    billingPeriod === "yearly"
-                      ? "bg-gradient-to-r from-indigo-500 to-cyan-500 text-white shadow-lg"
-                      : "text-gray-400 hover:text-white"
-                  }`}
-                >
-                  Yearly
-                  <span className="ml-2 text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">
-                    Save {YEARLY_SAVINGS_PERCENTAGE}%
-                  </span>
-                </button>
-              </motion.div>
+              </button>
             </motion.div>
+          </motion.div>
 
-            {/* Current Subscription Alert */}
-            {hasActiveSubscription && subscriptionStatus && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
-              >
-                <Alert className="mb-8 max-w-3xl mx-auto bg-black/40 backdrop-blur-md border-white/10 text-white">
-                  <AlertDescription className="flex items-center justify-between">
-                    <span>
-                      Your current plan:{" "}
-                      <strong className="capitalize text-cyan-400">
-                        {subscriptionStatus.plan}
-                      </strong>
-                      {subscriptionStatus.status === "active" && " (Active)"}
-                    </span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleManageBilling}
-                      className="bg-gradient-to-r from-indigo-500 to-cyan-500 text-white border-0 hover:from-indigo-600 hover:to-cyan-600"
-                    >
-                      Manage Billing
-                    </Button>
-                  </AlertDescription>
-                </Alert>
-              </motion.div>
-            )}
-
-            {/* Pricing Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              {pricingPlans.map((planData, index) => {
-                const isCurrentPlanActive = isCurrentPlan(planData.plan);
-
-                return (
-                  <motion.div
-                    key={planData.plan}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: index * 0.1 }}
-                    whileHover={{ scale: 1.05, y: -10 }}
-                    className="relative flex"
+          {/* Current Subscription Alert */}
+          {hasActiveSubscription && subscriptionStatus && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              <Alert className="mb-8 max-w-3xl mx-auto bg-black/40 backdrop-blur-md border-white/10 text-white">
+                <AlertDescription className="flex items-center justify-between">
+                  <span>
+                    Your current plan:{" "}
+                    <strong className="capitalize text-cyan-400">
+                      {subscriptionStatus.plan}
+                    </strong>
+                    {subscriptionStatus.status === "active" && " (Active)"}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleManageBilling}
+                    className="bg-gradient-to-r from-indigo-500 to-cyan-500 text-white border-0 hover:from-indigo-600 hover:to-cyan-600"
                   >
-                    {planData.popular && (
-                      <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
-                        <span className="bg-gradient-to-r from-indigo-500 to-cyan-500 text-white px-4 py-1 rounded-full text-sm font-semibold shadow-lg">
-                          Most Popular
-                        </span>
-                      </div>
-                    )}
+                    Manage Billing
+                  </Button>
+                </AlertDescription>
+              </Alert>
+            </motion.div>
+          )}
 
-                    {/* Card uses flex column for equal-height layout:
+          {/* Pricing Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {pricingPlans.map((planData, index) => {
+              const isCurrentPlanActive = isCurrentPlan(planData.plan);
+
+              return (
+                <motion.div
+                  key={planData.plan}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  whileHover={{ scale: 1.05, y: -10 }}
+                  className="relative flex"
+                >
+                  {planData.popular && (
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                      <span className="bg-gradient-to-r from-indigo-500 to-cyan-500 text-white px-4 py-1 rounded-full text-sm font-semibold shadow-lg">
+                        Most Popular
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Card uses flex column for equal-height layout:
                         - Card and CardContent use flex-grow to expand
                         - CardFooter uses mt-auto to stick to bottom
                         This ensures all cards have same height with footer aligned */}
-                    <Card
-                      className={`
+                  <Card
+                    className={`
                     flex flex-col w-full bg-black/40 backdrop-blur-md border-white/10 
                     hover:border-white/30 transition-all duration-300
                     ${planData.popular ? "border-2 border-indigo-500/50 shadow-xl shadow-indigo-500/20" : ""}
                     ${isCurrentPlanActive ? "ring-2 ring-cyan-400/50" : ""}
                     overflow-hidden group
                   `}
-                    >
-                      {/* Icon Header */}
-                      <div className="h-40 overflow-hidden bg-gradient-to-br from-indigo-900/20 to-cyan-900/20 relative flex items-center justify-center">
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
-                        <div
-                          className={`relative z-20 w-24 h-24 rounded-full bg-gradient-to-r ${planData.iconColor} flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-2xl`}
-                        >
-                          <planData.icon className="w-12 h-12 text-white" />
-                        </div>
-                      </div>
-
-                      <CardHeader>
-                        <CardTitle className="text-white text-2xl">
-                          {planData.name}
-                        </CardTitle>
-                        <CardDescription className="text-gray-400">
-                          {planData.description}
-                        </CardDescription>
-                        <div className="mt-4">
-                          <span className="text-5xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 text-transparent bg-clip-text">
-                            £{planData.price}
-                          </span>
-                          <span className="text-gray-400 text-lg">
-                            {planData.period}
-                          </span>
-                        </div>
-                        {planData.monthlySavings &&
-                          billingPeriod === "yearly" && (
-                            <p className="text-sm text-gray-400 mt-2">
-                              <span className="text-green-400 font-semibold">
-                                Save {YEARLY_SAVINGS_PERCENTAGE}% with yearly
-                                billing
-                              </span>
-                            </p>
-                          )}
-                      </CardHeader>
-
-                      <CardContent className="flex-grow">
-                        <ul className="space-y-3">
-                          {planData.features.map((feature, i) => (
-                            <li key={i} className="flex items-start gap-3">
-                              <Check className="h-5 w-5 text-cyan-400 shrink-0 mt-0.5" />
-                              <span className="text-sm text-gray-300">
-                                {feature}
-                              </span>
-                            </li>
-                          ))}
-                        </ul>
-                      </CardContent>
-
-                      <CardFooter className="flex-col gap-2 mt-auto">
-                        {isCurrentPlanActive ? (
-                          <>
-                            <Button
-                              className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 text-white border-0"
-                              disabled
-                            >
-                              Current Plan
-                            </Button>
-                            {planData.plan === "pro" && (
-                              <Button
-                                className="w-full bg-black/60 backdrop-blur-sm border border-white/20 text-white hover:bg-white/10"
-                                onClick={handleManageBilling}
-                              >
-                                Manage Subscription
-                              </Button>
-                            )}
-                          </>
-                        ) : planData.plan === "trial" ? (
-                          <Button
-                            className="w-full bg-black/60 backdrop-blur-sm border border-white/20 text-white hover:bg-white/10"
-                            onClick={() => setLocation("/dashboard")}
-                          >
-                            Get Started
-                          </Button>
-                        ) : planData.plan === "pro" ? (
-                          <Button
-                            className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 text-white border-0 hover:from-indigo-600 hover:to-cyan-600 shadow-lg hover:shadow-indigo-500/50 transition-all duration-300"
-                            onClick={() => handleSubscribe(billingPeriod)}
-                            disabled={loadingPlan === billingPeriod}
-                          >
-                            {loadingPlan === billingPeriod ? (
-                              <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Processing...
-                              </>
-                            ) : (
-                              <>
-                                Subscribe{" "}
-                                {billingPeriod === "monthly"
-                                  ? "Monthly"
-                                  : "Yearly"}
-                              </>
-                            )}
-                          </Button>
-                        ) : (
-                          <Button
-                            className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 text-white border-0 hover:from-indigo-600 hover:to-cyan-600 shadow-lg hover:shadow-indigo-500/50 transition-all duration-300"
-                            onClick={() => handleSubscribe(billingPeriod)}
-                            disabled={loadingPlan === billingPeriod}
-                          >
-                            {loadingPlan === billingPeriod ? (
-                              <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Processing...
-                              </>
-                            ) : (
-                              <>
-                                Subscribe{" "}
-                                {billingPeriod === "monthly"
-                                  ? "Monthly"
-                                  : "Yearly"}
-                              </>
-                            )}
-                          </Button>
-                        )}
-                      </CardFooter>
-                    </Card>
-                  </motion.div>
-                );
-              })}
-            </div>
-
-            {/* FAQ Section */}
-            <motion.div
-              className="mt-24 text-center"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-            >
-              <h2 className="text-3xl font-bold mb-8 text-white">
-                Frequently Asked{" "}
-                <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 text-transparent bg-clip-text">
-                  Questions
-                </span>
-              </h2>
-              <div className="max-w-3xl mx-auto text-left grid md:grid-cols-2 gap-6">
-                {[
-                  {
-                    question: "Can I cancel anytime?",
-                    answer:
-                      "Yes! You can cancel your subscription at any time. Your access continues until the end of your billing period.",
-                  },
-                  {
-                    question: "What happens after the free trial?",
-                    answer:
-                      "Your account becomes read-only. You can upgrade to a paid plan anytime to regain full access to all features.",
-                  },
-                  {
-                    question: "Can I switch plans?",
-                    answer:
-                      "Yes! You can upgrade or downgrade your plan at any time. Changes are prorated automatically.",
-                  },
-                  {
-                    question: "What payment methods do you accept?",
-                    answer:
-                      "We accept all major credit cards via Stripe. Your payment information is securely processed and never stored on our servers.",
-                  },
-                  {
-                    question: "How many horses can I manage?",
-                    answer:
-                      "Free trial: 1 horse. Pro plan: up to 5 horses. Stable plan: up to 20 horses. Choose the plan that fits your needs.",
-                  },
-                  {
-                    question: "Is there a discount for yearly billing?",
-                    answer:
-                      "Yes! Save 17% when you choose yearly billing. Plus, you only need to renew once per year.",
-                  },
-                  {
-                    question: "Do I need a credit card for the trial?",
-                    answer:
-                      "No! Start your 7-day free trial without entering any credit card information. No hidden charges.",
-                  },
-                  {
-                    question: "Can I export my data?",
-                    answer:
-                      "Yes! All paid plans include the ability to export your data to CSV and PDF formats for backup or sharing.",
-                  },
-                ].map((faq, index) => (
-                  <motion.div
-                    key={index}
-                    className="bg-black/40 backdrop-blur-md border border-white/10 rounded-lg p-6 hover:border-white/30 transition-all duration-300"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}
-                    whileHover={{ scale: 1.02 }}
                   >
-                    <h3 className="font-semibold mb-2 text-white">
-                      {faq.question}
-                    </h3>
-                    <p className="text-gray-400 text-sm">{faq.answer}</p>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* CTA Section */}
-            <motion.div
-              className="mt-24 max-w-4xl mx-auto"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.8 }}
-            >
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-cyan-500/20 rounded-3xl blur-3xl" />
-                <div className="relative backdrop-blur-md bg-white/5 border-2 border-white/20 rounded-3xl p-8 md:p-12 hover:bg-white/10 hover:border-white/30 transition-all duration-500">
-                  <div className="text-center">
-                    <h2 className="text-3xl md:text-4xl font-bold font-serif mb-4 text-white">
-                      Ready to Get{" "}
-                      <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
-                        Started?
-                      </span>
-                    </h2>
-                    <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-                      Start your free 7-day trial today. No credit card
-                      required. Experience all features with 1 horse.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                      <Link href="/register">
-                        <Button
-                          size="lg"
-                          className="text-lg px-10 py-6 bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 text-white border-0 shadow-xl"
-                        >
-                          Start Free Trial
-                        </Button>
-                      </Link>
-                      <Link href="/contact">
-                        <Button
-                          size="lg"
-                          variant="outline"
-                          className="text-lg px-10 py-6 border-white/20 text-white hover:bg-white/10"
-                        >
-                          Contact Sales
-                        </Button>
-                      </Link>
+                    {/* Icon Header */}
+                    <div className="h-40 overflow-hidden bg-gradient-to-br from-indigo-900/20 to-cyan-900/20 relative flex items-center justify-center">
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
+                      <div
+                        className={`relative z-20 w-24 h-24 rounded-full bg-gradient-to-r ${planData.iconColor} flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-2xl`}
+                      >
+                        <planData.icon className="w-12 h-12 text-white" />
+                      </div>
                     </div>
+
+                    <CardHeader>
+                      <CardTitle className="text-white text-2xl">
+                        {planData.name}
+                      </CardTitle>
+                      <CardDescription className="text-gray-400">
+                        {planData.description}
+                      </CardDescription>
+                      <div className="mt-4">
+                        <span className="text-5xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 text-transparent bg-clip-text">
+                          £{planData.price}
+                        </span>
+                        <span className="text-gray-400 text-lg">
+                          {planData.period}
+                        </span>
+                      </div>
+                      {planData.monthlySavings &&
+                        billingPeriod === "yearly" && (
+                          <p className="text-sm text-gray-400 mt-2">
+                            <span className="text-green-400 font-semibold">
+                              Save {YEARLY_SAVINGS_PERCENTAGE}% with yearly
+                              billing
+                            </span>
+                          </p>
+                        )}
+                    </CardHeader>
+
+                    <CardContent className="flex-grow">
+                      <ul className="space-y-3">
+                        {planData.features.map((feature, i) => (
+                          <li key={i} className="flex items-start gap-3">
+                            <Check className="h-5 w-5 text-cyan-400 shrink-0 mt-0.5" />
+                            <span className="text-sm text-gray-300">
+                              {feature}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+
+                    <CardFooter className="flex-col gap-2 mt-auto">
+                      {isCurrentPlanActive ? (
+                        <>
+                          <Button
+                            className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 text-white border-0"
+                            disabled
+                          >
+                            Current Plan
+                          </Button>
+                          {planData.plan === "pro" && (
+                            <Button
+                              className="w-full bg-black/60 backdrop-blur-sm border border-white/20 text-white hover:bg-white/10"
+                              onClick={handleManageBilling}
+                            >
+                              Manage Subscription
+                            </Button>
+                          )}
+                        </>
+                      ) : planData.plan === "trial" ? (
+                        <Button
+                          className="w-full bg-black/60 backdrop-blur-sm border border-white/20 text-white hover:bg-white/10"
+                          onClick={() => setLocation("/dashboard")}
+                        >
+                          Get Started
+                        </Button>
+                      ) : planData.plan === "pro" ? (
+                        <Button
+                          className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 text-white border-0 hover:from-indigo-600 hover:to-cyan-600 shadow-lg hover:shadow-indigo-500/50 transition-all duration-300"
+                          onClick={() => handleSubscribe(billingPeriod)}
+                          disabled={loadingPlan === billingPeriod}
+                        >
+                          {loadingPlan === billingPeriod ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Processing...
+                            </>
+                          ) : (
+                            <>
+                              Subscribe{" "}
+                              {billingPeriod === "monthly"
+                                ? "Monthly"
+                                : "Yearly"}
+                            </>
+                          )}
+                        </Button>
+                      ) : (
+                        <Button
+                          className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 text-white border-0 hover:from-indigo-600 hover:to-cyan-600 shadow-lg hover:shadow-indigo-500/50 transition-all duration-300"
+                          onClick={() => handleSubscribe(billingPeriod)}
+                          disabled={loadingPlan === billingPeriod}
+                        >
+                          {loadingPlan === billingPeriod ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Processing...
+                            </>
+                          ) : (
+                            <>
+                              Subscribe{" "}
+                              {billingPeriod === "monthly"
+                                ? "Monthly"
+                                : "Yearly"}
+                            </>
+                          )}
+                        </Button>
+                      )}
+                    </CardFooter>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* FAQ Section */}
+          <motion.div
+            className="mt-24 text-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+          >
+            <h2 className="text-3xl font-bold mb-8 text-white">
+              Frequently Asked{" "}
+              <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 text-transparent bg-clip-text">
+                Questions
+              </span>
+            </h2>
+            <div className="max-w-3xl mx-auto text-left grid md:grid-cols-2 gap-6">
+              {[
+                {
+                  question: "Can I cancel anytime?",
+                  answer:
+                    "Yes! You can cancel your subscription at any time. Your access continues until the end of your billing period.",
+                },
+                {
+                  question: "What happens after the free trial?",
+                  answer:
+                    "Your account becomes read-only. You can upgrade to a paid plan anytime to regain full access to all features.",
+                },
+                {
+                  question: "Can I switch plans?",
+                  answer:
+                    "Yes! You can upgrade or downgrade your plan at any time. Changes are prorated automatically.",
+                },
+                {
+                  question: "What payment methods do you accept?",
+                  answer:
+                    "We accept all major credit cards via Stripe. Your payment information is securely processed and never stored on our servers.",
+                },
+                {
+                  question: "How many horses can I manage?",
+                  answer:
+                    "Free trial: 1 horse. Pro plan: up to 5 horses. Stable plan: up to 20 horses. Choose the plan that fits your needs.",
+                },
+                {
+                  question: "Is there a discount for yearly billing?",
+                  answer:
+                    "Yes! Save 17% when you choose yearly billing. Plus, you only need to renew once per year.",
+                },
+                {
+                  question: "Do I need a credit card for the trial?",
+                  answer:
+                    "No! Start your 7-day free trial without entering any credit card information. No hidden charges.",
+                },
+                {
+                  question: "Can I export my data?",
+                  answer:
+                    "Yes! All paid plans include the ability to export your data to CSV and PDF formats for backup or sharing.",
+                },
+              ].map((faq, index) => (
+                <motion.div
+                  key={index}
+                  className="bg-black/40 backdrop-blur-md border border-white/10 rounded-lg p-6 hover:border-white/30 transition-all duration-300"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}
+                  whileHover={{ scale: 1.02 }}
+                >
+                  <h3 className="font-semibold mb-2 text-white">
+                    {faq.question}
+                  </h3>
+                  <p className="text-gray-400 text-sm">{faq.answer}</p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* CTA Section */}
+          <motion.div
+            className="mt-24 max-w-4xl mx-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
+          >
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-cyan-500/20 rounded-3xl blur-3xl" />
+              <div className="relative backdrop-blur-md bg-white/5 border-2 border-white/20 rounded-3xl p-8 md:p-12 hover:bg-white/10 hover:border-white/30 transition-all duration-500">
+                <div className="text-center">
+                  <h2 className="text-3xl md:text-4xl font-bold font-serif mb-4 text-white">
+                    Ready to Get{" "}
+                    <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+                      Started?
+                    </span>
+                  </h2>
+                  <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+                    Start your free 7-day trial today. No credit card required.
+                    Experience all features with 1 horse.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Link href="/register">
+                      <Button
+                        size="lg"
+                        className="text-lg px-10 py-6 bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 text-white border-0 shadow-xl"
+                      >
+                        Start Free Trial
+                      </Button>
+                    </Link>
+                    <Link href="/contact">
+                      <Button
+                        size="lg"
+                        variant="outline"
+                        className="text-lg px-10 py-6 border-white/20 text-white hover:bg-white/10"
+                      >
+                        Contact Sales
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               </div>
-            </motion.div>
-          </div>
+            </div>
+          </motion.div>
         </div>
+      </div>
     </MarketingLayout>
   );
 }
