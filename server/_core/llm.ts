@@ -230,7 +230,11 @@ const assertApiKey = () => {
  * Use this before calling invokeLLM to provide a graceful fallback.
  */
 export function isAIConfigured(): boolean {
-  return !!(ENV.forgeApiKey || process.env.OPENAI_API_KEY || process.env.HUGGINGFACE_API_KEY);
+  return !!(
+    ENV.forgeApiKey ||
+    process.env.OPENAI_API_KEY ||
+    process.env.HUGGINGFACE_API_KEY
+  );
 }
 
 const normalizeResponseFormat = ({

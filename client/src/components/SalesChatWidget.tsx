@@ -452,7 +452,11 @@ export function SalesChatWidget() {
       const trimmed = text.trim();
       if (!trimmed || loading) return;
 
-      const userMsg: ChatMessage = { id: uid(), role: "user", content: trimmed };
+      const userMsg: ChatMessage = {
+        id: uid(),
+        role: "user",
+        content: trimmed,
+      };
       setMessages((prev) => [...prev, userMsg]);
       setInput("");
       setLoading(true);
@@ -474,7 +478,8 @@ export function SalesChatWidget() {
         });
 
         const data = await resp.json();
-        const reply = data.reply || "Sorry, I couldn't get a response. Please try again.";
+        const reply =
+          data.reply || "Sorry, I couldn't get a response. Please try again.";
 
         const assistantMsg: ChatMessage = {
           id: uid(),
@@ -564,16 +569,35 @@ export function SalesChatWidget() {
       <button
         data-equip-chat-btn
         onClick={() => setOpen((o) => !o)}
-        aria-label={open ? "Close chat" : "Open chat with EquiProfile assistant"}
+        aria-label={
+          open ? "Close chat" : "Open chat with EquiProfile assistant"
+        }
         title={open ? "Close chat" : "Chat with us"}
       >
         {open ? (
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#fff"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+          >
             <line x1="18" y1="6" x2="6" y2="18" />
             <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
         ) : (
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#fff"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
           </svg>
         )}
@@ -584,13 +608,19 @@ export function SalesChatWidget() {
 
       {/* Panel */}
       {open && (
-        <div data-equip-chat-panel role="dialog" aria-label="EquiProfile chat assistant">
+        <div
+          data-equip-chat-panel
+          role="dialog"
+          aria-label="EquiProfile chat assistant"
+        >
           {/* Header */}
           <div data-equip-chat-header>
             <div data-equip-chat-avatar>🐴</div>
             <div data-equip-chat-header-info>
               <div data-equip-chat-header-name>EquiProfile Assistant</div>
-              <div data-equip-chat-header-status>Online · Typically replies instantly</div>
+              <div data-equip-chat-header-status>
+                Online · Typically replies instantly
+              </div>
             </div>
             <button
               data-equip-chat-close
@@ -613,7 +643,9 @@ export function SalesChatWidget() {
                 type="text"
                 placeholder="Your name"
                 value={lead.name}
-                onChange={(e) => setLead((l) => ({ ...l, name: e.target.value }))}
+                onChange={(e) =>
+                  setLead((l) => ({ ...l, name: e.target.value }))
+                }
                 maxLength={100}
                 autoFocus
               />
@@ -622,9 +654,13 @@ export function SalesChatWidget() {
                 type="email"
                 placeholder="Your email address"
                 value={lead.email}
-                onChange={(e) => setLead((l) => ({ ...l, email: e.target.value }))}
+                onChange={(e) =>
+                  setLead((l) => ({ ...l, email: e.target.value }))
+                }
                 maxLength={320}
-                onKeyDown={(e) => { if (e.key === "Enter") handleLeadSubmit(); }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleLeadSubmit();
+                }}
               />
               {leadError && <div data-equip-lead-error>{leadError}</div>}
               <button
@@ -650,7 +686,8 @@ export function SalesChatWidget() {
                           width: 28,
                           height: 28,
                           borderRadius: "50%",
-                          background: "linear-gradient(135deg, #6366f1, #06b6d4)",
+                          background:
+                            "linear-gradient(135deg, #6366f1, #06b6d4)",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
@@ -743,7 +780,8 @@ export function SalesChatWidget() {
                     setInput(e.target.value);
                     // Auto-resize
                     e.target.style.height = "auto";
-                    e.target.style.height = Math.min(e.target.scrollHeight, 120) + "px";
+                    e.target.style.height =
+                      Math.min(e.target.scrollHeight, 120) + "px";
                   }}
                   onKeyDown={handleKeyDown}
                   rows={1}
@@ -756,7 +794,16 @@ export function SalesChatWidget() {
                   disabled={loading || !input.trim()}
                   aria-label="Send message"
                 >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#fff"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <line x1="22" y1="2" x2="11" y2="13" />
                     <polygon points="22 2 15 22 11 13 2 9 22 2" />
                   </svg>

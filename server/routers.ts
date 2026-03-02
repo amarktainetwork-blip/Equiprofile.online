@@ -178,7 +178,7 @@ export const appRouter = router({
           // It's plaintext – allow but warn
           console.warn(
             "⚠️  WARNING: ADMIN_UNLOCK_PASSWORD is stored in plaintext. " +
-            "Run: node dist/cli.js set-admin-password  to store a bcrypt hash instead.",
+              "Run: node dist/cli.js set-admin-password  to store a bcrypt hash instead.",
           );
           isValid = input.password === adminPassword;
         }
@@ -1848,7 +1848,8 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         if (!isAIConfigured()) {
           return {
             recommendation: basicRec,
-            aiAnalysis: "AI analysis not available – configure an API key to enable detailed recommendations.",
+            aiAnalysis:
+              "AI analysis not available – configure an API key to enable detailed recommendations.",
           };
         }
 

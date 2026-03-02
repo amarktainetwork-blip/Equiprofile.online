@@ -44,8 +44,11 @@ export default function Register() {
   // Detect subscription intent from query params (set by Pricing page)
   const searchParams = new URLSearchParams(window.location.search);
   const intentPlan = searchParams.get("plan"); // e.g. "pro"
-  const intentInterval = (searchParams.get("interval") as "monthly" | "yearly") || "monthly";
-  const hasSubscribeIntent = !!intentPlan && (intentInterval === "monthly" || intentInterval === "yearly");
+  const intentInterval =
+    (searchParams.get("interval") as "monthly" | "yearly") || "monthly";
+  const hasSubscribeIntent =
+    !!intentPlan &&
+    (intentInterval === "monthly" || intentInterval === "yearly");
 
   const createCheckout = trpc.billing.createCheckout.useMutation();
   const [checkoutRedirecting, setCheckoutRedirecting] = useState(false);
@@ -59,7 +62,10 @@ export default function Register() {
       setCheckoutRedirecting(true);
       createCheckout
         .mutateAsync({ plan: intentInterval })
-        .then((r) => { if (r.url) window.location.href = r.url; else setLocation("/dashboard"); })
+        .then((r) => {
+          if (r.url) window.location.href = r.url;
+          else setLocation("/dashboard");
+        })
         .catch(() => setLocation("/dashboard"));
       // Fall through and show a brief loading UI below
     } else {
@@ -150,7 +156,9 @@ export default function Register() {
       // Stripe checkout.  Otherwise go to dashboard.
       if (hasSubscribeIntent) {
         try {
-          const checkout = await createCheckout.mutateAsync({ plan: intentInterval });
+          const checkout = await createCheckout.mutateAsync({
+            plan: intentInterval,
+          });
           if (checkout.url) {
             window.location.href = checkout.url;
             return;
@@ -197,13 +205,16 @@ export default function Register() {
                   {step === 1
                     ? "Let's start with your name"
                     : step === 2
-                    ? "What's your email address?"
-                    : "Create a secure password"}
+                      ? "What's your email address?"
+                      : "Create a secure password"}
                 </CardDescription>
                 {hasSubscribeIntent && (
                   <p className="text-xs text-center text-indigo-300 bg-indigo-950/40 border border-indigo-500/30 rounded-lg px-3 py-2 mt-2">
                     After signup you'll be taken to checkout for the{" "}
-                    <strong className="text-indigo-200">Pro {intentInterval}</strong> plan.
+                    <strong className="text-indigo-200">
+                      Pro {intentInterval}
+                    </strong>{" "}
+                    plan.
                   </p>
                 )}
               </CardHeader>

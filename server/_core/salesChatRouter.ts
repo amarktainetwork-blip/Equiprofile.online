@@ -98,7 +98,11 @@ RULES:
 function ruleFallback(userMessage: string): string | null {
   const lower = userMessage.toLowerCase();
 
-  if (/\b(price|pricing|cost|how much|plan|subscribe|subscription|monthly|yearly|annual)\b/.test(lower)) {
+  if (
+    /\b(price|pricing|cost|how much|plan|subscribe|subscription|monthly|yearly|annual)\b/.test(
+      lower,
+    )
+  ) {
     return "EquiProfile has a 7-day free trial (no credit card needed!). After that, Pro is £10/month or £100/year (up to 5 horses), and Stable is £30/month or £300/year (up to 20 horses + team). Visit equiprofile.online/pricing for the full breakdown, or click 'Start Free Trial' to get going today!";
   }
 
@@ -106,11 +110,15 @@ function ruleFallback(userMessage: string): string | null {
     return "Great news — EquiProfile offers a 7-day free trial with full access to ALL features for 1 horse. No credit card required. Sign up in seconds at equiprofile.online/register!";
   }
 
-  if (/\b(feature|what can|what does|capabilities|include|offer)\b/.test(lower)) {
+  if (
+    /\b(feature|what can|what does|capabilities|include|offer)\b/.test(lower)
+  ) {
     return "EquiProfile covers health records (vaccinations, dental, hoof care, treatments), training logs, competition tracking, AI weather analysis, document storage, breeding management, stable team tools, and full CSV/PDF export. Visit equiprofile.online/features for the complete list!";
   }
 
-  if (/\b(login|sign in|password|forgot|reset|can't log|cannot log)\b/.test(lower)) {
+  if (
+    /\b(login|sign in|password|forgot|reset|can't log|cannot log)\b/.test(lower)
+  ) {
     return "To log in, visit equiprofile.online/login. If you've forgotten your password, click 'Forgot password?' on that page and we'll email a reset link within 2 minutes. Check your spam folder if you don't see it!";
   }
 
@@ -142,7 +150,11 @@ function ruleFallback(userMessage: string): string | null {
     return "The Stable plan lets you invite unlimited team members with role-based permissions (Owner, Manager, Staff, Viewer). Each person only sees what their role allows. Great for professional yards!";
   }
 
-  if (/\b(hello|hi|hey|good morning|good afternoon|good evening|howdy)\b/.test(lower)) {
+  if (
+    /\b(hello|hi|hey|good morning|good afternoon|good evening|howdy)\b/.test(
+      lower,
+    )
+  ) {
     return "Hello! 👋 I'm the EquiProfile assistant. I can help you with pricing, features, getting started, or any questions about horse management. What can I help you with today?";
   }
 
@@ -193,7 +205,9 @@ router.post("/sales-chat", chatLimiter, async (req, res) => {
     }
 
     if (message.length > 2000) {
-      return res.status(400).json({ error: "Message too long (max 2000 chars)" });
+      return res
+        .status(400)
+        .json({ error: "Message too long (max 2000 chars)" });
     }
 
     if (!Array.isArray(history) || history.length > 30) {
@@ -218,11 +232,16 @@ router.post("/sales-chat", chatLimiter, async (req, res) => {
     }
 
     // Build conversation for AI
-    const messages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
+    const messages: Array<{
+      role: "system" | "user" | "assistant";
+      content: string;
+    }> = [
       { role: "system", content: SYSTEM_PROMPT },
       // Include last N turns of history (cap at 10 for token efficiency)
       ...history.slice(-10).map((turn: { role: string; content: string }) => ({
-        role: (turn.role === "assistant" ? "assistant" : "user") as "user" | "assistant",
+        role: (turn.role === "assistant" ? "assistant" : "user") as
+          | "user"
+          | "assistant",
         content: String(turn.content).slice(0, 1000),
       })),
       { role: "user", content: safeMessage },
@@ -252,11 +271,21 @@ router.post("/sales-lead", leadLimiter, async (req, res) => {
   try {
     const { name, email: leadEmail, message, source = "chat" } = req.body;
 
-    if (!name || typeof name !== "string" || name.trim().length < 2 || name.length > 200) {
+    if (
+      !name ||
+      typeof name !== "string" ||
+      name.trim().length < 2 ||
+      name.length > 200
+    ) {
       return res.status(400).json({ error: "Valid name is required" });
     }
 
-    if (!leadEmail || typeof leadEmail !== "string" || !isValidEmail(leadEmail) || leadEmail.length > 320) {
+    if (
+      !leadEmail ||
+      typeof leadEmail !== "string" ||
+      !isValidEmail(leadEmail) ||
+      leadEmail.length > 320
+    ) {
       return res.status(400).json({ error: "Valid email address is required" });
     }
 

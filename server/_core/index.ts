@@ -401,17 +401,18 @@ async function startServer() {
    * Used by the frontend and monitoring to show a "setup checklist".
    */
   app.get("/api/system/config-status", (req, res) => {
-    const smtpConfigured =
-      !!(process.env.SMTP_USER && process.env.SMTP_PASS);
+    const smtpConfigured = !!(process.env.SMTP_USER && process.env.SMTP_PASS);
     const stripeReady =
       ENV.enableStripe &&
       !!(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_WEBHOOK_SECRET);
     const uploadsReady =
       ENV.enableUploads &&
-      !!(process.env.BUILT_IN_FORGE_API_URL && process.env.BUILT_IN_FORGE_API_KEY);
-    const aiOpenAI = !!(process.env.OPENAI_API_KEY);
-    const aiHuggingFace = !!(process.env.HUGGINGFACE_API_KEY);
-    const aiForge = !!(ENV.forgeApiKey);
+      !!(
+        process.env.BUILT_IN_FORGE_API_URL && process.env.BUILT_IN_FORGE_API_KEY
+      );
+    const aiOpenAI = !!process.env.OPENAI_API_KEY;
+    const aiHuggingFace = !!process.env.HUGGINGFACE_API_KEY;
+    const aiForge = !!ENV.forgeApiKey;
 
     res.json({
       db: true, // If we got here the server started successfully
@@ -425,7 +426,7 @@ async function startServer() {
         anyConfigured: aiOpenAI || aiHuggingFace || aiForge,
       },
       weather: true, // Open-Meteo needs no key
-      adminPasswordSet: !!(process.env.ADMIN_UNLOCK_PASSWORD),
+      adminPasswordSet: !!process.env.ADMIN_UNLOCK_PASSWORD,
     });
   });
 
@@ -436,24 +437,32 @@ async function startServer() {
    */
   app.get("/api/admin/status", async (req, res) => {
     const smtpConfigured = !!(process.env.SMTP_USER && process.env.SMTP_PASS);
-    const stripeConfigured = !!(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_WEBHOOK_SECRET);
-    const stripePublicKey = !!(process.env.VITE_STRIPE_PUBLIC_KEY || process.env.STRIPE_PUBLIC_KEY);
-    const aiOpenAI = !!(process.env.OPENAI_API_KEY);
-    const aiHuggingFace = !!(process.env.HUGGINGFACE_API_KEY);
-    const weatherKey = !!(process.env.WEATHER_API_KEY);
-    const adminPasswordSet = !!(process.env.ADMIN_UNLOCK_PASSWORD);
-    const jwtSet = !!(process.env.JWT_SECRET);
+    const stripeConfigured = !!(
+      process.env.STRIPE_SECRET_KEY && process.env.STRIPE_WEBHOOK_SECRET
+    );
+    const stripePublicKey = !!(
+      process.env.VITE_STRIPE_PUBLIC_KEY || process.env.STRIPE_PUBLIC_KEY
+    );
+    const aiOpenAI = !!process.env.OPENAI_API_KEY;
+    const aiHuggingFace = !!process.env.HUGGINGFACE_API_KEY;
+    const weatherKey = !!process.env.WEATHER_API_KEY;
+    const adminPasswordSet = !!process.env.ADMIN_UNLOCK_PASSWORD;
+    const jwtSet = !!process.env.JWT_SECRET;
 
     let dbOk = false;
     try {
       dbOk = !!(await db.getDb());
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
 
     let realtimeOk = false;
     try {
       const { realtimeManager } = await import("./realtime");
       realtimeOk = typeof realtimeManager?.getStats === "function";
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
 
     const toStatus = (ok: boolean, warn = false) =>
       ok ? "green" : warn ? "yellow" : "red";
@@ -464,7 +473,9 @@ async function startServer() {
         db: {
           status: toStatus(dbOk),
           ok: dbOk,
-          message: dbOk ? "Database connected" : "DATABASE_URL not set or DB unreachable",
+          message: dbOk
+            ? "Database connected"
+            : "DATABASE_URL not set or DB unreachable",
         },
         smtp: {
           status: toStatus(smtpConfigured, true),
@@ -506,7 +517,9 @@ async function startServer() {
         realtime: {
           status: toStatus(realtimeOk),
           ok: realtimeOk,
-          message: realtimeOk ? "Realtime (SSE) active" : "Realtime manager not initialised",
+          message: realtimeOk
+            ? "Realtime (SSE) active"
+            : "Realtime manager not initialised",
         },
         adminPassword: {
           status: toStatus(adminPasswordSet),
@@ -588,7 +601,9 @@ async function startServer() {
 
   // Contact form endpoint (public) – rate limited to prevent abuse
   const isValidEmail = (e: string) =>
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e) && !e.includes("@@") && e.length <= 320;
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e) &&
+    !e.includes("@@") &&
+    e.length <= 320;
   const contactLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 5, // 5 submissions per 15 minutes per IP
@@ -601,15 +616,19 @@ async function startServer() {
       const { name, email: fromEmail, subject, message } = req.body;
 
       if (!name || !fromEmail || !subject || !message) {
-        return res
-          .status(400)
-          .json({ error: "All fields (name, email, subject, message) are required" });
+        return res.status(400).json({
+          error: "All fields (name, email, subject, message) are required",
+        });
       }
 
       if (typeof name !== "string" || name.length > 200) {
         return res.status(400).json({ error: "Invalid name" });
       }
-      if (typeof fromEmail !== "string" || fromEmail.length > 320 || !isValidEmail(fromEmail)) {
+      if (
+        typeof fromEmail !== "string" ||
+        fromEmail.length > 320 ||
+        !isValidEmail(fromEmail)
+      ) {
         return res.status(400).json({ error: "Invalid email address" });
       }
       if (typeof subject !== "string" || subject.length > 500) {
@@ -619,7 +638,12 @@ async function startServer() {
         return res.status(400).json({ error: "Message too long" });
       }
 
-      await email.sendContactEmail({ name, email: fromEmail, subject, message });
+      await email.sendContactEmail({
+        name,
+        email: fromEmail,
+        subject,
+        message,
+      });
 
       res.json({
         success: true,
@@ -627,7 +651,9 @@ async function startServer() {
       });
     } catch (error) {
       console.error("[Contact] Error sending contact email:", error);
-      res.status(500).json({ error: "Failed to send message. Please try again." });
+      res
+        .status(500)
+        .json({ error: "Failed to send message. Please try again." });
     }
   });
 
