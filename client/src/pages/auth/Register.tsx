@@ -31,7 +31,7 @@ import { trpc } from "@/lib/trpc";
  */
 export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
-  const [step, setStep] = useState<1 | 2>(1);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -89,8 +89,23 @@ export default function Register() {
     setStep(2);
   };
 
+  const handleEmailStep = (e: FormEvent) => {
+    e.preventDefault();
+    setError("");
+    if (!email.trim()) {
+      setError("Please enter your email address");
+      return;
+    }
+    setStep(3);
+  };
+
   const handleChangeName = () => {
     setStep(1);
+    setError("");
+  };
+
+  const handleChangeEmail = () => {
+    setStep(2);
     setError("");
   };
 
@@ -181,7 +196,9 @@ export default function Register() {
                 <CardDescription className="text-center text-gray-400">
                   {step === 1
                     ? "Let's start with your name"
-                    : "Now set up your login details"}
+                    : step === 2
+                    ? "What's your email address?"
+                    : "Create a secure password"}
                 </CardDescription>
                 {hasSubscribeIntent && (
                   <p className="text-xs text-center text-indigo-300 bg-indigo-950/40 border border-indigo-500/30 rounded-lg px-3 py-2 mt-2">
@@ -244,14 +261,14 @@ export default function Register() {
                         <ArrowRight className="w-4 h-4 ml-2" />
                       </Button>
                     </motion.form>
-                  ) : (
+                  ) : step === 2 ? (
                     <motion.form
                       key="step2"
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -20 }}
                       transition={{ duration: 0.3 }}
-                      onSubmit={handleEmailRegister}
+                      onSubmit={handleEmailStep}
                       className="space-y-4"
                     >
                       <div className="flex items-center gap-2 p-3 bg-white/5 rounded-lg border border-white/10">
@@ -283,6 +300,47 @@ export default function Register() {
                         />
                       </div>
 
+                      <div className="flex gap-3">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={handleChangeName}
+                          className="flex-1 border-white/10 text-white hover:bg-white/10 h-12 text-base"
+                        >
+                          Back
+                        </Button>
+                        <Button
+                          type="submit"
+                          className="flex-1 bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white border-0 shadow-lg shadow-indigo-500/20 h-12 text-base"
+                        >
+                          Continue
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </Button>
+                      </div>
+                    </motion.form>
+                  ) : (
+                    <motion.form
+                      key="step3"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.3 }}
+                      onSubmit={handleEmailRegister}
+                      className="space-y-4"
+                    >
+                      <div className="flex items-center gap-2 p-3 bg-white/5 rounded-lg border border-white/10">
+                        <span className="text-sm text-gray-400 truncate flex-1">
+                          {email}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={handleChangeEmail}
+                          className="text-xs text-indigo-400 hover:text-indigo-300 flex-shrink-0"
+                        >
+                          Change
+                        </button>
+                      </div>
+
                       <div className="space-y-2">
                         <Label htmlFor="password" className="text-white">
                           Password
@@ -294,6 +352,7 @@ export default function Register() {
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           required
+                          autoFocus
                           className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:bg-white/10 focus:border-white/20 h-12 text-base transition-all duration-200"
                         />
                         <p className="text-xs text-gray-500">
@@ -349,20 +408,31 @@ export default function Register() {
                         </Label>
                       </div>
 
-                      <Button
-                        type="submit"
-                        className="w-full bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white border-0 shadow-lg shadow-indigo-500/20 h-12 text-base"
-                        disabled={isLoading}
-                      >
-                        {isLoading ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Creating account...
-                          </>
-                        ) : (
-                          "Create account"
-                        )}
-                      </Button>
+                      <div className="flex gap-3">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={handleChangeEmail}
+                          className="flex-1 border-white/10 text-white hover:bg-white/10 h-12 text-base"
+                          disabled={isLoading}
+                        >
+                          Back
+                        </Button>
+                        <Button
+                          type="submit"
+                          className="flex-1 bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white border-0 shadow-lg shadow-indigo-500/20 h-12 text-base"
+                          disabled={isLoading}
+                        >
+                          {isLoading ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              Creating account...
+                            </>
+                          ) : (
+                            "Create account"
+                          )}
+                        </Button>
+                      </div>
                     </motion.form>
                   )}
                 </AnimatePresence>

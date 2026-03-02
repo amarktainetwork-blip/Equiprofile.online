@@ -429,6 +429,97 @@ async function startServer() {
     });
   });
 
+  /**
+   * GET /api/admin/status
+   * Returns red/yellow/green readiness report for each service.
+   * Used by admin UI and audit scripts to show actionable "what's missing" info.
+   */
+  app.get("/api/admin/status", async (req, res) => {
+    const smtpConfigured = !!(process.env.SMTP_USER && process.env.SMTP_PASS);
+    const stripeConfigured = !!(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_WEBHOOK_SECRET);
+    const stripePublicKey = !!(process.env.VITE_STRIPE_PUBLIC_KEY || process.env.STRIPE_PUBLIC_KEY);
+    const aiOpenAI = !!(process.env.OPENAI_API_KEY);
+    const aiHuggingFace = !!(process.env.HUGGINGFACE_API_KEY);
+    const weatherKey = !!(process.env.WEATHER_API_KEY);
+    const adminPasswordSet = !!(process.env.ADMIN_UNLOCK_PASSWORD);
+    const jwtSet = !!(process.env.JWT_SECRET);
+
+    let dbOk = false;
+    try {
+      dbOk = !!(await db.getDb());
+    } catch { /* ignore */ }
+
+    let realtimeOk = false;
+    try {
+      const { realtimeManager } = await import("./realtime");
+      realtimeOk = typeof realtimeManager?.getStats === "function";
+    } catch { /* ignore */ }
+
+    const toStatus = (ok: boolean, warn = false) =>
+      ok ? "green" : warn ? "yellow" : "red";
+
+    res.json({
+      overall: dbOk && jwtSet && adminPasswordSet ? "green" : "red",
+      services: {
+        db: {
+          status: toStatus(dbOk),
+          ok: dbOk,
+          message: dbOk ? "Database connected" : "DATABASE_URL not set or DB unreachable",
+        },
+        smtp: {
+          status: toStatus(smtpConfigured, true),
+          ok: smtpConfigured,
+          message: smtpConfigured
+            ? "SMTP configured"
+            : "Set SMTP_HOST, SMTP_USER, SMTP_PASS to enable email",
+        },
+        stripe: {
+          status: toStatus(stripeConfigured && stripePublicKey, true),
+          ok: stripeConfigured && stripePublicKey,
+          message:
+            stripeConfigured && stripePublicKey
+              ? "Stripe configured"
+              : "Set STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, VITE_STRIPE_PUBLIC_KEY to enable billing",
+        },
+        ai: {
+          status: toStatus(aiOpenAI || aiHuggingFace, true),
+          ok: aiOpenAI || aiHuggingFace,
+          message:
+            aiOpenAI || aiHuggingFace
+              ? "AI configured"
+              : "Set OPENAI_API_KEY or HUGGINGFACE_API_KEY to enable AI features",
+        },
+        weather: {
+          status: "green",
+          ok: true, // Open-Meteo is free and requires no API key
+          message: weatherKey
+            ? "Weather API key configured (additional provider available)"
+            : "Using Open-Meteo (free, no key required) – weather features fully functional",
+        },
+        storage: {
+          status: toStatus(ENV.enableUploads, true),
+          ok: ENV.enableUploads,
+          message: ENV.enableUploads
+            ? "Document uploads enabled"
+            : "Set ENABLE_UPLOADS=true and configure storage keys to enable uploads",
+        },
+        realtime: {
+          status: toStatus(realtimeOk),
+          ok: realtimeOk,
+          message: realtimeOk ? "Realtime (SSE) active" : "Realtime manager not initialised",
+        },
+        adminPassword: {
+          status: toStatus(adminPasswordSet),
+          ok: adminPasswordSet,
+          message: adminPasswordSet
+            ? "ADMIN_UNLOCK_PASSWORD is set"
+            : "Set ADMIN_UNLOCK_PASSWORD env var to secure the admin panel",
+        },
+      },
+      timestamp: new Date().toISOString(),
+    });
+  });
+
   // Simple ping endpoint (minimal response for monitoring)
   app.get("/api/health/ping", (req, res) => {
     res.json({ status: "ok", timestamp: new Date().toISOString() });

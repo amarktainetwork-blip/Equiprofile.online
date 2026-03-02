@@ -393,9 +393,11 @@ const LEAD_INTENT_PATTERN =
 
 /** Basic email validation (same pattern as backend salesChatRouter.ts). */
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
 // ──────────────────────────────────────────────────────────
-// Main Component
+// Quick suggestion chips
 // ──────────────────────────────────────────────────────────
+const SUGGESTIONS = [
   "What plans do you offer?",
   "Is there a free trial?",
   "How do I sign up?",
@@ -403,7 +405,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 ];
 
 // ──────────────────────────────────────────────────────────
-// Quick suggestion chips
+// Main Component
 // ──────────────────────────────────────────────────────────
 export function SalesChatWidget() {
   const [location] = useLocation();
