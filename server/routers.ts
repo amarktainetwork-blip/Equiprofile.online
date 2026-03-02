@@ -10,7 +10,7 @@ import {
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import * as db from "./db";
-import { invokeLLM } from "./_core/llm";
+import { invokeLLM, isAIConfigured } from "./_core/llm";
 import { storagePut } from "./storage";
 import { nanoid } from "nanoid";
 import {
@@ -143,7 +143,15 @@ export const appRouter = router({
     submitPassword: protectedProcedure
       .input(z.object({ password: z.string() }))
       .mutation(async ({ ctx, input }) => {
-        const adminPassword = process.env.ADMIN_UNLOCK_PASSWORD || "ashmor12@";
+        const adminPassword = process.env.ADMIN_UNLOCK_PASSWORD;
+
+        if (!adminPassword) {
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message:
+              "Admin password not configured. Set ADMIN_UNLOCK_PASSWORD in environment.",
+          });
+        }
 
         // Check rate limit
         const attempts = await db.incrementUnlockAttempts(ctx.user.id);
@@ -159,17 +167,18 @@ export const appRouter = router({
         const bcrypt = await import("bcrypt");
         let isValid = false;
 
-        // For backward compatibility, check if password is bcrypt hash or plaintext
+        // Support both bcrypt hash and plaintext (bcrypt hash recommended)
         if (
           adminPassword.startsWith("$2a$") ||
           adminPassword.startsWith("$2b$")
         ) {
-          // It's already a bcrypt hash, compare directly
+          // It's a bcrypt hash
           isValid = await bcrypt.compare(input.password, adminPassword);
         } else {
-          // It's plaintext (legacy), do direct comparison (but log warning)
+          // It's plaintext – allow but warn
           console.warn(
-            "⚠️  WARNING: ADMIN_UNLOCK_PASSWORD is stored in plaintext. Consider hashing it.",
+            "⚠️  WARNING: ADMIN_UNLOCK_PASSWORD is stored in plaintext. " +
+            "Run: node dist/cli.js set-admin-password  to store a bcrypt hash instead.",
           );
           isValid = input.password === adminPassword;
         }
@@ -256,6 +265,14 @@ export const appRouter = router({
         }
 
         // Normal AI chat processing
+        if (!isAIConfigured()) {
+          return {
+            role: "assistant" as const,
+            content:
+              "⚠️ AI assistant is not yet configured. Please set OPENAI_API_KEY or BUILT_IN_FORGE_API_KEY in the server environment to enable AI features.",
+          };
+        }
+
         const response = await invokeLLM({
           messages: input.messages.map((m) => ({
             role: m.role,
@@ -1777,6 +1794,63 @@ Please provide:
 4. Best time of day to ride if conditions are marginal
 
 Format your response as JSON with keys: recommendation, explanation, precautions, bestTime`;
+
+        // Determine basic recommendation from numeric data (no-AI fallback)
+        const EXTREME_WIND = 50; // km/h – dangerous for horses
+        const HIGH_WIND = 35;
+        const MODERATE_WIND = 25;
+        const CALM_WIND = 15;
+        const EXTREME_HEAT = 38; // °C
+        const HIGH_HEAT = 32;
+        const WARM = 28;
+        const IDEAL_MAX = 25;
+        const IDEAL_MIN = 15;
+        const COLD = 5;
+        const FREEZING = 0;
+        const EXTREME_COLD = -10;
+        const HEAVY_RAIN = 10; // mm
+        const MODERATE_RAIN = 5;
+        const LIGHT_RAIN = 2;
+
+        const basicRec = (() => {
+          const precip = input.precipitation ?? 0;
+          if (
+            input.windSpeed > EXTREME_WIND ||
+            precip > HEAVY_RAIN ||
+            input.temperature > EXTREME_HEAT ||
+            input.temperature < EXTREME_COLD
+          )
+            return "not_recommended";
+          if (
+            input.windSpeed > HIGH_WIND ||
+            precip > MODERATE_RAIN ||
+            input.temperature > HIGH_HEAT ||
+            input.temperature < FREEZING
+          )
+            return "poor";
+          if (
+            input.windSpeed > MODERATE_WIND ||
+            precip > LIGHT_RAIN ||
+            input.temperature > WARM ||
+            input.temperature < COLD
+          )
+            return "fair";
+          if (
+            input.windSpeed < CALM_WIND &&
+            precip === 0 &&
+            input.temperature >= IDEAL_MIN &&
+            input.temperature <= IDEAL_MAX
+          )
+            return "excellent";
+          return "good";
+        })();
+
+        if (!isAIConfigured()) {
+          return {
+            recommendation: basicRec,
+            aiAnalysis: "AI analysis not available – configure an API key to enable detailed recommendations.",
+          };
+        }
 
         const response = await invokeLLM({
           messages: [

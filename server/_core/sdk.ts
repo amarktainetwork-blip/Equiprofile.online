@@ -207,7 +207,8 @@ class SDKServer {
     userId?: number;
   } | null> {
     if (!cookieValue) {
-      console.warn("[Auth] Missing session cookie");
+      // Silently return null – missing cookies are normal for unauthenticated
+      // public requests and should not flood the logs.
       return null;
     }
 

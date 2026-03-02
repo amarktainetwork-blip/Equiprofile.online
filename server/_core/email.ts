@@ -330,7 +330,69 @@ export async function sendPasswordResetEmail(
 }
 
 /**
- * Test email endpoint (for admin testing)
+ * Send contact-form email to the business inbox (CONTACT_TO)
+ */
+export async function sendContactEmail(fields: {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}): Promise<void> {
+  const to =
+    process.env.CONTACT_TO ||
+    process.env.SMTP_FROM ||
+    "support@equiprofile.online";
+
+  // Escape HTML entities to prevent XSS in email clients
+  const esc = (s: string) =>
+    s
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+
+  const safeName = esc(fields.name);
+  const safeEmail = esc(fields.email);
+  const safeSubject = esc(fields.subject);
+  const safeMessage = esc(fields.message);
+
+  const subject = `[Contact Form] ${safeSubject}`;
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <h2 style="color: #1e40af; border-bottom: 2px solid #1e40af; padding-bottom: 10px;">
+        New Contact Form Submission
+      </h2>
+      <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+        <tr>
+          <td style="padding: 8px; font-weight: bold; width: 120px; color: #374151;">Name:</td>
+          <td style="padding: 8px; color: #111827;">${safeName}</td>
+        </tr>
+        <tr style="background: #f9fafb;">
+          <td style="padding: 8px; font-weight: bold; color: #374151;">Email:</td>
+          <td style="padding: 8px; color: #111827;">
+            <a href="mailto:${safeEmail}" style="color: #1e40af;">${safeEmail}</a>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; font-weight: bold; color: #374151;">Subject:</td>
+          <td style="padding: 8px; color: #111827;">${safeSubject}</td>
+        </tr>
+      </table>
+      <div style="background: #f3f4f6; border-left: 4px solid #1e40af; padding: 16px; border-radius: 4px;">
+        <p style="margin: 0; font-weight: bold; color: #374151; margin-bottom: 8px;">Message:</p>
+        <p style="margin: 0; color: #111827; white-space: pre-wrap;">${safeMessage}</p>
+      </div>
+      <p style="color: #6b7280; font-size: 12px; margin-top: 24px;">
+        Sent via EquiProfile Contact Form · ${new Date().toISOString()}
+      </p>
+    </div>
+  `;
+
+  await sendEmail(to, subject, html);
+}
+
+/**
  */
 export async function sendTestEmail(to: string): Promise<boolean> {
   try {

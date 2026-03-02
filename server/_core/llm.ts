@@ -221,9 +221,17 @@ const resolveApiUrl = () =>
 
 const assertApiKey = () => {
   if (!ENV.forgeApiKey) {
-    throw new Error("OPENAI_API_KEY is not configured");
+    throw new Error("AI service is not configured (API key missing)");
   }
 };
+
+/**
+ * Check whether the AI service is configured (key present).
+ * Use this before calling invokeLLM to provide a graceful fallback.
+ */
+export function isAIConfigured(): boolean {
+  return !!(ENV.forgeApiKey || process.env.OPENAI_API_KEY || process.env.HUGGINGFACE_API_KEY);
+}
 
 const normalizeResponseFormat = ({
   responseFormat,

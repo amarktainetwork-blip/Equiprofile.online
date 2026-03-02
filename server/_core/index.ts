@@ -9,6 +9,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import authRouter from "./authRouter";
 import billingRouter from "./billingRouter";
+import salesChatRouter from "./salesChatRouter";
 import { appRouter } from "../routers";
 import { apiRouter } from "../api";
 import { createContext } from "./context";
@@ -394,6 +395,40 @@ async function startServer() {
     });
   });
 
+  /**
+   * GET /api/system/config-status
+   * Returns which optional services are configured (boolean flags only, no secrets).
+   * Used by the frontend and monitoring to show a "setup checklist".
+   */
+  app.get("/api/system/config-status", (req, res) => {
+    const smtpConfigured =
+      !!(process.env.SMTP_USER && process.env.SMTP_PASS);
+    const stripeReady =
+      ENV.enableStripe &&
+      !!(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_WEBHOOK_SECRET);
+    const uploadsReady =
+      ENV.enableUploads &&
+      !!(process.env.BUILT_IN_FORGE_API_URL && process.env.BUILT_IN_FORGE_API_KEY);
+    const aiOpenAI = !!(process.env.OPENAI_API_KEY);
+    const aiHuggingFace = !!(process.env.HUGGINGFACE_API_KEY);
+    const aiForge = !!(ENV.forgeApiKey);
+
+    res.json({
+      db: true, // If we got here the server started successfully
+      smtp: smtpConfigured,
+      stripe: stripeReady,
+      uploads: uploadsReady,
+      ai: {
+        openai: aiOpenAI,
+        huggingface: aiHuggingFace,
+        forge: aiForge,
+        anyConfigured: aiOpenAI || aiHuggingFace || aiForge,
+      },
+      weather: true, // Open-Meteo needs no key
+      adminPasswordSet: !!(process.env.ADMIN_UNLOCK_PASSWORD),
+    });
+  });
+
   // Simple ping endpoint (minimal response for monitoring)
   app.get("/api/health/ping", (req, res) => {
     res.json({ status: "ok", timestamp: new Date().toISOString() });
@@ -460,11 +495,59 @@ async function startServer() {
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
 
+  // Contact form endpoint (public) – rate limited to prevent abuse
+  const isValidEmail = (e: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e) && !e.includes("@@") && e.length <= 320;
+  const contactLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // 5 submissions per 15 minutes per IP
+    message: "Too many contact form submissions, please try again later.",
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+  app.post("/api/contact", contactLimiter, async (req, res) => {
+    try {
+      const { name, email: fromEmail, subject, message } = req.body;
+
+      if (!name || !fromEmail || !subject || !message) {
+        return res
+          .status(400)
+          .json({ error: "All fields (name, email, subject, message) are required" });
+      }
+
+      if (typeof name !== "string" || name.length > 200) {
+        return res.status(400).json({ error: "Invalid name" });
+      }
+      if (typeof fromEmail !== "string" || fromEmail.length > 320 || !isValidEmail(fromEmail)) {
+        return res.status(400).json({ error: "Invalid email address" });
+      }
+      if (typeof subject !== "string" || subject.length > 500) {
+        return res.status(400).json({ error: "Invalid subject" });
+      }
+      if (typeof message !== "string" || message.length > 10000) {
+        return res.status(400).json({ error: "Message too long" });
+      }
+
+      await email.sendContactEmail({ name, email: fromEmail, subject, message });
+
+      res.json({
+        success: true,
+        message: "Your message has been sent. We'll get back to you soon!",
+      });
+    } catch (error) {
+      console.error("[Contact] Error sending contact email:", error);
+      res.status(500).json({ error: "Failed to send message. Please try again." });
+    }
+  });
+
   // Local auth routes
   app.use("/api/auth", authRouter);
 
   // Billing routes (Stripe)
   app.use("/api/billing", billingRouter);
+
+  // Sales Chat & Lead Capture (public, rate-limited)
+  app.use("/api", salesChatRouter);
 
   // Test email endpoint (admin only) - tightly rate-limited to prevent email abuse
   const adminEmailLimiter = rateLimit({
