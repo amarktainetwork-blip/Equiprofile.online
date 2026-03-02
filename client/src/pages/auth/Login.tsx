@@ -50,6 +50,11 @@ export default function Login() {
     setStep(2);
   };
 
+  const handleChangeEmail = () => {
+    setStep(1);
+    setError("");
+  };
+
   const handlePasswordStep = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
@@ -179,7 +184,7 @@ export default function Login() {
                         </span>
                         <button
                           type="button"
-                          onClick={() => { setStep(1); setError(""); }}
+                          onClick={handleChangeEmail}
                           className="text-xs text-indigo-400 hover:text-indigo-300 flex-shrink-0"
                         >
                           Change

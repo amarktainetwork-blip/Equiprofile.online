@@ -12,6 +12,7 @@ import {
   Loader2,
   Clock,
   XCircle,
+  Sparkles,
   Crown,
   Building2,
 } from "lucide-react";
@@ -185,6 +186,17 @@ export default function Pricing() {
   };
 
   const pricingPlans = [
+    {
+      name: pricing?.trial?.name || "Free Trial",
+      plan: "trial",
+      description: "Try all features with 1 horse",
+      price: "Free",
+      period: `/${pricing?.trial?.duration || 7} days`,
+      features: pricing?.trial?.features || features.free,
+      icon: Sparkles,
+      iconColor: "from-blue-400 to-cyan-400",
+      popular: false,
+    },
     {
       name: pricing?.pro?.name || "Standard",
       plan: "pro",
@@ -424,7 +436,7 @@ export default function Pricing() {
                       </CardDescription>
                       <div className="mt-4">
                         <span className="text-5xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 text-transparent bg-clip-text">
-                          £{planData.price}
+                          {planData.plan === "trial" ? planData.price : `£${planData.price}`}
                         </span>
                         <span className="text-gray-400 text-lg">
                           {planData.period}
@@ -472,6 +484,13 @@ export default function Pricing() {
                             </Button>
                           )}
                         </>
+                      ) : planData.plan === "trial" ? (
+                        <Button
+                          className="w-full bg-black/60 backdrop-blur-sm border border-white/20 text-white hover:bg-white/10"
+                          onClick={() => setLocation("/register")}
+                        >
+                          Start Free Trial
+                        </Button>
                       ) : planData.plan === "pro" ? (
                         <Button
                           className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 text-white border-0 hover:from-indigo-600 hover:to-cyan-600 shadow-lg hover:shadow-indigo-500/50 transition-all duration-300"

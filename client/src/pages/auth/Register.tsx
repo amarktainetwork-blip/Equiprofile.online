@@ -54,6 +54,11 @@ export default function Register() {
     setStep(2);
   };
 
+  const handleChangeName = () => {
+    setStep(1);
+    setError("");
+  };
+
   const handleEmailRegister = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
@@ -199,7 +204,7 @@ export default function Register() {
                         </span>
                         <button
                           type="button"
-                          onClick={() => { setStep(1); setError(""); }}
+                          onClick={handleChangeName}
                           className="text-xs text-indigo-400 hover:text-indigo-300 flex-shrink-0"
                         >
                           Change
