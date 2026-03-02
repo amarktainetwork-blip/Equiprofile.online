@@ -461,6 +461,8 @@ async function startServer() {
   registerOAuthRoutes(app);
 
   // Contact form endpoint (public) – rate limited to prevent abuse
+  const isValidEmail = (e: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e) && !e.includes("@@") && e.length <= 320;
   const contactLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 5, // 5 submissions per 15 minutes per IP
@@ -481,7 +483,7 @@ async function startServer() {
       if (typeof name !== "string" || name.length > 200) {
         return res.status(400).json({ error: "Invalid name" });
       }
-      if (typeof fromEmail !== "string" || fromEmail.length > 320 || !/\S+@\S+\.\S+/.test(fromEmail)) {
+      if (typeof fromEmail !== "string" || fromEmail.length > 320 || !isValidEmail(fromEmail)) {
         return res.status(400).json({ error: "Invalid email address" });
       }
       if (typeof subject !== "string" || subject.length > 500) {

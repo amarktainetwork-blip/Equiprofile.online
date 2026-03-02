@@ -29,7 +29,7 @@ CALL _add_col('users', 'longitude',         'varchar(20)');--> statement-breakpo
 CALL _add_col('users', 'storageUsedBytes',  'int NOT NULL DEFAULT 0');--> statement-breakpoint
 CALL _add_col('users', 'storageQuotaBytes', 'int NOT NULL DEFAULT 104857600');--> statement-breakpoint
 CALL _add_col('users', 'preferences',       'text');--> statement-breakpoint
-CALL _add_col('users', 'language',          'varchar(10) DEFAULT \'en\'');--> statement-breakpoint
-CALL _add_col('users', 'theme',             'enum(\'light\',\'dark\',\'system\') DEFAULT \'system\'');--> statement-breakpoint
+CALL _add_col('users', 'language',          "varchar(10) DEFAULT 'en'");--> statement-breakpoint
+CALL _add_col('users', 'theme',             "enum('light','dark','system') DEFAULT 'system'");--> statement-breakpoint
 
 DROP PROCEDURE IF EXISTS _add_col;
