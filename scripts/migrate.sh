@@ -140,8 +140,28 @@ async function main() {
 
     const { entries } = JSON.parse(readFileSync(journalPath, 'utf-8'));
 
+    // Check which columns already exist so we can decide whether to baseline
+    // additive migrations (like 0002) or let them run to fill in gaps.
+    const url = new URL(process.env.DATABASE_URL);
+    const dbName = url.pathname.replace(/^\//, '');
+
+    // Sentinel: if 'latitude' column is missing, migration 0002 must run.
+    const [latRows] = await conn.execute(
+      "SELECT COUNT(*) AS cnt FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'users' AND COLUMN_NAME = 'latitude'",
+      [dbName]
+    );
+    const latitudeExists = Number(latRows[0].cnt) > 0;
+
     for (const entry of entries) {
       const hash = entry.tag;
+
+      // For migration 0002 (adds missing user columns): only baseline if the
+      // columns already exist; otherwise let drizzle run it so gaps are filled.
+      if (hash === '0002_add_missing_user_columns' && !latitudeExists) {
+        console.log(`   ⚠️  Skipping baseline for ${hash} – missing columns detected, will run migration.`);
+        continue;
+      }
+
       const [existing] = await conn.execute(
         'SELECT id FROM `__drizzle_migrations` WHERE hash = ?',
         [hash]

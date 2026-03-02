@@ -460,6 +460,49 @@ async function startServer() {
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
 
+  // Contact form endpoint (public) – rate limited to prevent abuse
+  const contactLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // 5 submissions per 15 minutes per IP
+    message: "Too many contact form submissions, please try again later.",
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+  app.post("/api/contact", contactLimiter, async (req, res) => {
+    try {
+      const { name, email: fromEmail, subject, message } = req.body;
+
+      if (!name || !fromEmail || !subject || !message) {
+        return res
+          .status(400)
+          .json({ error: "All fields (name, email, subject, message) are required" });
+      }
+
+      if (typeof name !== "string" || name.length > 200) {
+        return res.status(400).json({ error: "Invalid name" });
+      }
+      if (typeof fromEmail !== "string" || fromEmail.length > 320 || !/\S+@\S+\.\S+/.test(fromEmail)) {
+        return res.status(400).json({ error: "Invalid email address" });
+      }
+      if (typeof subject !== "string" || subject.length > 500) {
+        return res.status(400).json({ error: "Invalid subject" });
+      }
+      if (typeof message !== "string" || message.length > 10000) {
+        return res.status(400).json({ error: "Message too long" });
+      }
+
+      await email.sendContactEmail({ name, email: fromEmail, subject, message });
+
+      res.json({
+        success: true,
+        message: "Your message has been sent. We'll get back to you soon!",
+      });
+    } catch (error) {
+      console.error("[Contact] Error sending contact email:", error);
+      res.status(500).json({ error: "Failed to send message. Please try again." });
+    }
+  });
+
   // Local auth routes
   app.use("/api/auth", authRouter);
 

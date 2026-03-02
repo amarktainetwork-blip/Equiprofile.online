@@ -330,7 +330,55 @@ export async function sendPasswordResetEmail(
 }
 
 /**
- * Test email endpoint (for admin testing)
+ * Send contact-form email to the business inbox (CONTACT_TO)
+ */
+export async function sendContactEmail(fields: {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}): Promise<void> {
+  const to =
+    process.env.CONTACT_TO ||
+    process.env.SMTP_FROM ||
+    "support@equiprofile.online";
+
+  const subject = `[Contact Form] ${fields.subject}`;
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <h2 style="color: #1e40af; border-bottom: 2px solid #1e40af; padding-bottom: 10px;">
+        New Contact Form Submission
+      </h2>
+      <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+        <tr>
+          <td style="padding: 8px; font-weight: bold; width: 120px; color: #374151;">Name:</td>
+          <td style="padding: 8px; color: #111827;">${fields.name}</td>
+        </tr>
+        <tr style="background: #f9fafb;">
+          <td style="padding: 8px; font-weight: bold; color: #374151;">Email:</td>
+          <td style="padding: 8px; color: #111827;">
+            <a href="mailto:${fields.email}" style="color: #1e40af;">${fields.email}</a>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; font-weight: bold; color: #374151;">Subject:</td>
+          <td style="padding: 8px; color: #111827;">${fields.subject}</td>
+        </tr>
+      </table>
+      <div style="background: #f3f4f6; border-left: 4px solid #1e40af; padding: 16px; border-radius: 4px;">
+        <p style="margin: 0; font-weight: bold; color: #374151; margin-bottom: 8px;">Message:</p>
+        <p style="margin: 0; color: #111827; white-space: pre-wrap;">${fields.message}</p>
+      </div>
+      <p style="color: #6b7280; font-size: 12px; margin-top: 24px;">
+        Sent via EquiProfile Contact Form · ${new Date().toISOString()}
+      </p>
+    </div>
+  `;
+
+  await sendEmail(to, subject, html);
+}
+
+/**
  */
 export async function sendTestEmail(to: string): Promise<boolean> {
   try {

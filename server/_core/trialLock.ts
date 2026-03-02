@@ -117,7 +117,16 @@ export async function trialLockMiddleware(
     // All checks passed, continue
     next();
   } catch (error) {
-    console.error("[TrialLock] Error checking trial status:", error);
+    // ForbiddenError (no session / invalid cookie) is expected for public
+    // requests – do not spam logs for it.  Only log genuine server errors.
+    const isAuthError =
+      error instanceof Error &&
+      (error.message.includes("Invalid session cookie") ||
+        error.message.includes("User not found") ||
+        error.message.includes("session"));
+    if (!isAuthError) {
+      console.error("[TrialLock] Error checking trial status:", error);
+    }
     // Don't block on error, let request through
     next();
   }
