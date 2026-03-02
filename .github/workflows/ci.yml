@@ -19,28 +19,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 10
-
       - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: "pnpm"
+          cache: "npm"
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Type check
-        run: pnpm check
+        run: npm run check
 
       - name: Run tests
-        run: pnpm test
+        run: npm test
 
       - name: Build application
-        run: pnpm build
+        run: npm run build
         env:
           NODE_ENV: production
 
@@ -59,22 +54,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 10
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22.x
-          cache: "pnpm"
+          cache: "npm"
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Check formatting
-        run: pnpm format:check
+        run: npm run format:check
 
   security:
     name: Security Scan
@@ -108,22 +98,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 10
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22.x
-          cache: "pnpm"
+          cache: "npm"
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Build for production
-        run: pnpm build
+        run: npm run build
         env:
           NODE_ENV: production
 
@@ -143,6 +128,7 @@ jobs:
     #     script: |
     #       cd /var/www/equiprofile
     #       git pull origin main
-    #       pnpm install
-    #       pnpm build
-    #       pm2 restart equiprofile
+    #       npm ci
+    #       npm run build
+    #       bash scripts/migrate.sh
+    #       sudo systemctl restart equiprofile
