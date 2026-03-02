@@ -66,19 +66,14 @@ fi
 
 # Step 4: Install dependencies
 echo ""
-echo "[4/9] Installing dependencies..."
-if ! command -v pnpm &> /dev/null; then
-    echo "ERROR: pnpm is not installed. Please install it first:"
-    echo "  npm install -g pnpm"
-    exit 1
-fi
+echo "[4/9] Installing dependencies (npm ci)..."
 
-sudo -u www-data pnpm install --frozen-lockfile
+sudo -u www-data npm ci
 
 # Step 5: Build application
 echo ""
 echo "[5/9] Building application..."
-sudo -u www-data pnpm build
+sudo -u www-data npm run build
 
 # Verify build output exists
 if [ ! -f "dist/index.js" ]; then
