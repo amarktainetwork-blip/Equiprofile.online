@@ -56,11 +56,12 @@ export default function ForgotPassword() {
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 px-4 pt-20">
           <div className="w-full max-w-md">
             {/* Back button */}
-            <Link href="/login">
-              <a className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6">
-                <ArrowLeft className="w-4 h-4" />
-                Back to login
-              </a>
+            <Link
+              href="/login"
+              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to login
             </Link>
 
             <Card className="shadow-xl">
@@ -135,10 +136,11 @@ export default function ForgotPassword() {
                       <span className="text-muted-foreground">
                         Remember your password?{" "}
                       </span>
-                      <Link href="/login">
-                        <a className="text-primary font-medium hover:underline">
-                          Sign in
-                        </a>
+                      <Link
+                        href="/login"
+                        className="text-primary font-medium hover:underline"
+                      >
+                        Sign in
                       </Link>
                     </div>
                   </form>

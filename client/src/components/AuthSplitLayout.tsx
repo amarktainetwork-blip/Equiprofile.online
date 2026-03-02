@@ -9,55 +9,55 @@ interface AuthSplitLayoutProps {
 /**
  * Auth Split Layout Component
  *
- * Full-screen dark background with hero image and glass form overlay.
- * Matches the dark site styling of the marketing pages.
+ * Desktop (md+): 50/50 split — left panel plays the auth video, right panel
+ * hosts the form. The outer wrapper is locked to exactly one viewport height
+ * (h-screen overflow-hidden) so there is zero page scroll on desktop.
  *
- * Desktop: Hero image fills the right half; form on a dark-glass left panel.
- * Mobile: Full-screen background image with dark overlay for the form.
+ * Mobile: Video fills the full background. The panel itself is transparent so
+ * the video remains visible all around. Only the Card (form block) carries the
+ * glass-morphism effect via its own backdrop-blur / bg classes.
  */
-export function AuthSplitLayout({
-  children,
-  imageUrl = marketingAssets.hero.heroHorse,
-}: AuthSplitLayoutProps) {
+export function AuthSplitLayout({ children }: AuthSplitLayoutProps) {
   return (
-    <div className="min-h-screen w-full flex overflow-hidden pt-[72px]">
-      {/* Left side – dark form panel */}
-      <div className="flex-1 flex items-center justify-center p-4 md:p-8 relative bg-black">
-        {/* Mobile: show hero image as background */}
-        <div className="md:hidden absolute inset-0 z-0">
-          <img
-            src={imageUrl}
-            alt="Background"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-black/75 backdrop-blur-sm" />
-        </div>
-
-        {/* Form content */}
-        <div className="w-full max-w-md relative z-10 my-auto max-h-[calc(100vh-72px-2rem)] overflow-y-auto">
-          {children}
-        </div>
+    <div className="w-full pt-[72px] relative flex flex-col min-h-screen md:flex-row md:h-screen md:overflow-hidden">
+      {/* Video panel — absolute full-bg on mobile, left 50% on desktop */}
+      <div className="absolute inset-0 md:relative md:inset-auto md:w-1/2 md:flex-shrink-0 overflow-hidden">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-full object-cover"
+        >
+          <source src={marketingAssets.auth.video} type="video/mp4" />
+        </video>
+        {/* Mobile: very light scrim so the card stands out against the video */}
+        <div className="absolute inset-0 bg-black/30 md:hidden" />
       </div>
 
-      {/* Right side – image panel (desktop only) */}
-      <div className="hidden md:flex flex-1 relative overflow-hidden">
-        <img
-          src={imageUrl}
-          alt="EquiProfile"
-          className="w-full h-full object-cover"
-        />
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/20 to-cyan-600/20" />
+      {/* Form panel
+          Mobile:  transparent + natural height so the video shows through
+                   everywhere except the Card itself (which has its own glass)
+          Desktop: solid dark right half, locked height — no scroll */}
+      <div
+        className={[
+          // base — centres the card, transparent on mobile
+          "relative z-10 w-full flex items-center justify-center px-4 py-8",
+          "min-h-[calc(100vh-72px)]",
+          // desktop: fill remaining height exactly, clip overflow — zero scroll
+          "md:w-1/2 md:min-h-0 md:py-0 md:bg-gray-950 md:overflow-hidden md:border-l md:border-white/5",
+        ].join(" ")}
+      >
+        <div className="w-full max-w-md">{children}</div>
 
-        {/* Branding overlay */}
-        <div className="absolute bottom-8 left-8 right-8">
-          <div className="text-white">
-            <h2 className="text-3xl font-bold font-serif mb-2">EquiProfile</h2>
-            <p className="text-white/80 text-lg">
-              Professional horse management made simple
-            </p>
-          </div>
-        </div>
+        {/* Copyright — visible on auth pages since the full Footer is omitted */}
+        <p
+          className="absolute bottom-3 left-0 right-0 text-center text-xs text-gray-600"
+          aria-label={`© ${new Date().getFullYear()} EquiProfile.online · Part of AmarktAI Network`}
+        >
+          © {new Date().getFullYear()} EquiProfile.online · Part of Amarkt
+          <span className="text-blue-400 font-semibold">AI</span> Network
+        </p>
       </div>
     </div>
   );

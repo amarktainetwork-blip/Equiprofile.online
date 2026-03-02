@@ -98,6 +98,7 @@ export const marketingAssets = {
   // ========================================
   auth: {
     background: `${MARKETING_BASE}/auth/auth-bg.svg`,
+    video: `${MARKETING_BASE}/auth/auth.mp4`,
   },
 
   // ========================================
@@ -134,7 +135,7 @@ export function getAllAssetPaths(): string[] {
  */
 export const assetInventory = {
   totalImages: 26,
-  totalVideos: 1,
+  totalVideos: 2,
   breakdown: {
     brand: 6,
     hero: 2,

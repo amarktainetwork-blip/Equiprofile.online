@@ -19,7 +19,7 @@ export default function Features() {
         <PageBanner
           title="Powerful Features for Modern Horse Management"
           subtitle="Everything you need to manage your horses efficiently, all in one place"
-          imageSrc="/images/hero-horse.jpg"
+          imageSrc="/images/stable.jpg"
           imagePosition="center"
         />
 
@@ -51,7 +51,6 @@ export default function Features() {
                         className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r ${section.gradient} bg-opacity-20 border border-white/20 mb-6`}
                       >
                         <Icon className="w-5 h-5" />
-                        <span className="font-medium">Featured</span>
                       </div>
 
                       <h2 className="text-3xl md:text-4xl font-bold font-serif mb-4 bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">

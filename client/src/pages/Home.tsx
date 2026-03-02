@@ -20,7 +20,6 @@ import {
   FileText,
   Check,
   ChevronRight,
-  Sparkles,
   Activity,
   Utensils,
   Star,
@@ -148,12 +147,7 @@ export default function Home() {
                   transition={{ duration: 0.8 }}
                   className="text-center"
                 >
-                  <Badge className="mb-6 inline-flex items-center gap-2 px-6 py-2 text-base bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/20">
-                    <Sparkles className="w-5 h-5" />
-                    7-Day Free Trial • No Credit Card Required
-                  </Badge>
-
-                  <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight mb-6 text-white drop-shadow-2xl">
+                  <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight mb-6 text-white drop-shadow-2xl">
                     Professional Horse
                     <br />
                     Management Made{" "}
