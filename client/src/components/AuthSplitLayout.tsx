@@ -28,7 +28,7 @@ export function AuthSplitLayout({
           playsInline
           className="w-full h-full object-cover"
         >
-          <source src={marketingAssets.hero.video} type="video/mp4" />
+          <source src={marketingAssets.auth.video} type="video/mp4" />
         </video>
         <div className="absolute inset-0 bg-black/65" />
       </div>
