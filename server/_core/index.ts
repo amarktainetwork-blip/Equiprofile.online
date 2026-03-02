@@ -9,6 +9,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import authRouter from "./authRouter";
 import billingRouter from "./billingRouter";
+import salesChatRouter from "./salesChatRouter";
 import { appRouter } from "../routers";
 import { apiRouter } from "../api";
 import { createContext } from "./context";
@@ -544,6 +545,9 @@ async function startServer() {
 
   // Billing routes (Stripe)
   app.use("/api/billing", billingRouter);
+
+  // Sales Chat & Lead Capture (public, rate-limited)
+  app.use("/api", salesChatRouter);
 
   // Test email endpoint (admin only) - tightly rate-limited to prevent email abuse
   const adminEmailLimiter = rateLimit({
