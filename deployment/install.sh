@@ -76,16 +76,6 @@ else
 fi
 echo ""
 
-# Step 4: Install pnpm
-info "Installing pnpm..."
-if ! command -v pnpm >/dev/null 2>&1; then
-  npm install -g pnpm@10.4.1
-  success "pnpm installed: $(pnpm --version)"
-else
-  success "pnpm already installed: $(pnpm --version)"
-fi
-echo ""
-
 # Step 5: Create application directory
 info "Creating application directory..."
 mkdir -p "$APP_DIR"
@@ -137,15 +127,15 @@ fi
 echo ""
 
 # Step 8: Install dependencies
-info "Installing application dependencies..."
+info "Installing application dependencies (npm ci)..."
 cd "$APP_DIR"
-pnpm install --frozen-lockfile
+npm ci
 success "Dependencies installed"
 echo ""
 
 # Step 9: Build application
 info "Building application..."
-pnpm run build
+npm run build
 success "Application built"
 echo ""
 

@@ -175,16 +175,29 @@ function validateEnvironment() {
   );
 
   // Validate JWT secret length in production
-  if (
-    isProduction &&
-    process.env.JWT_SECRET &&
-    process.env.JWT_SECRET.length < 32
-  ) {
-    console.error(
-      "❌ PRODUCTION ERROR: JWT_SECRET must be at least 32 characters long!",
-    );
-    console.error("Generate a secure secret with: openssl rand -base64 32\n");
-    process.exit(1);
+  if (isProduction && process.env.JWT_SECRET) {
+    const secret = process.env.JWT_SECRET;
+    if (secret.length < 32) {
+      if (process.env.AUTO_FIX_SECRETS === "true") {
+        console.warn(
+          "⚠️  WARNING: JWT_SECRET is shorter than 32 characters. AUTO_FIX_SECRETS=true set – continuing anyway.",
+        );
+        console.warn(
+          "   Generate a proper secret with: openssl rand -base64 32\n",
+        );
+      } else {
+        console.error(
+          "❌ PRODUCTION ERROR: JWT_SECRET must be at least 32 characters long!",
+        );
+        console.error(
+          "   Generate a secure secret with: openssl rand -base64 32",
+        );
+        console.error(
+          "   To bypass (NOT recommended): set AUTO_FIX_SECRETS=true\n",
+        );
+        process.exit(1);
+      }
+    }
   }
 }
 

@@ -216,7 +216,7 @@ cd Equiprofile.online
 # 2. Install dependencies
 npm install --legacy-peer-deps
 # 2. Install dependencies with frozen lockfile
-pnpm install --frozen-lockfile
+npm ci
 
 # 3. Copy environment configuration
 cp .env.example .env
@@ -259,6 +259,34 @@ docker-compose down
 ---
 
 ## Production Deployment
+
+### ⚡ One-Command Deploy (existing server)
+
+On a server that already has the app set up, a full deployment is:
+
+```bash
+bash ops/deploy.sh
+```
+
+This performs, in order: `git fetch/reset` → `npm ci` → `npm run build` → DB migrate (idempotent) → `systemctl restart equiprofile` → health checks.
+On failure the last 120 lines of `journalctl` are printed and the exit code is non-zero.
+
+Verify health independently at any time:
+
+```bash
+bash ops/verify.sh
+```
+
+### How to Rotate JWT_SECRET Safely
+
+1. Generate a new secret: `openssl rand -base64 48`
+2. Update `/var/equiprofile/app/.env` → `JWT_SECRET=<new-secret>`
+3. Ensure the file is owner-readable only: `chmod 600 .env`
+4. Restart: `sudo systemctl restart equiprofile`
+5. All existing sessions will be invalidated (users will need to log in again).
+
+> JWT_SECRET must be ≥ 32 characters. The server refuses to start in production if it is shorter,
+> unless `AUTO_FIX_SECRETS=true` is set (NOT recommended for production use).
 
 ### Ubuntu 24.04 Deployment
 
@@ -782,11 +810,11 @@ openssl rand -base64 32
 
 # 6. Initialize database
 
-pnpm db:push
+npm run db:push
 
 # 7. Start development server
 
-pnpm dev
+npm run dev
 
 ````
 
@@ -858,8 +886,8 @@ sudo apt update && sudo apt upgrade -y
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
-# Install pnpm
-npm install -g pnpm
+
+
 
 # Install Nginx
 sudo apt-get install nginx
@@ -895,7 +923,7 @@ sudo git clone https://github.com/amarktainetwork-blip/Equiprofile.online.git ap
 cd app
 
 # Install dependencies
-pnpm install --frozen-lockfile
+npm ci
 
 # Configure environment
 cp .env.example .env
@@ -906,7 +934,7 @@ nano .env
 
 ```bash
 # Build for production
-pnpm build
+npm run build
 
 # Verify build output
 ls -la dist/
@@ -1515,25 +1543,25 @@ const mutation = useMutation({
 
 ```bash
 # Development
-pnpm dev              # Start dev server with hot reload
-pnpm check            # TypeScript type checking
-pnpm format           # Format code with Prettier
-pnpm format:check     # Check code formatting
+npm run dev              # Start dev server with hot reload
+npm run check            # TypeScript type checking
+npm run format           # Format code with Prettier
+npm run format:check     # Check code formatting
 
 # Building
-pnpm build            # Production build
-pnpm build:safe       # Build with extra memory allocation
-pnpm prebuild         # Clean before build
-pnpm clean            # Remove dist folder
+npm run build            # Production build
+npm run build:safe       # Build with extra memory allocation
+npm run prebuild         # Clean before build
+npm run clean            # Remove dist folder
 
 # Database
-pnpm db:push          # Generate and run migrations
+npm run db:push          # Generate and run migrations
 
 # Production
-pnpm start            # Start production server
+npm start            # Start production server
 
 # Testing
-pnpm test             # Run tests with Vitest
+npm test             # Run tests with Vitest
 ```
 
 ### Testing
@@ -1542,13 +1570,13 @@ EquiProfile uses Vitest for testing:
 
 ```bash
 # Run all tests
-pnpm test
+npm test
 
 # Run tests in watch mode
-pnpm test --watch
+npm run test -- --watch
 
 # Run tests with coverage
-pnpm test --coverage
+npm run test -- --coverage
 ```
 
 **Test Coverage Goals:**
@@ -1567,10 +1595,10 @@ We welcome contributions! Here's how to get started:
 ```bash
 git clone https://github.com/YOUR_USERNAME/Equiprofile.online.git
 cd Equiprofile.online
-pnpm install
+npm ci
 cp .env.example .env
-pnpm db:push
-pnpm dev
+npm run db:push
+npm run dev
 ```
 
 #### Commit Message Guidelines
@@ -2471,7 +2499,7 @@ sudo lsof -i :3000
 - Verify `.env` file exists and has correct values
 - Test MySQL connection manually
 - Kill any process using port 3000
-- Rebuild application: `cd /var/equiprofile/app && pnpm build`
+- Rebuild application: `cd /var/equiprofile/app && npm run build`
 - Check Node.js version: `node --version` (should be 20.x+)
 
 #### 2. 502 Bad Gateway
@@ -2526,8 +2554,8 @@ ls -la /var/equiprofile/app/dist/
 ```bash
 # Clean and rebuild
 cd /var/equiprofile/app
-pnpm clean
-pnpm build
+npm run clean
+npm run build
 
 # Restart service
 sudo systemctl restart equiprofile
@@ -2754,10 +2782,10 @@ sudo systemctl start mysql
 ```bash
 # Check current schema
 cd /var/equiprofile/app
-pnpm drizzle-kit introspect
+npx drizzle-kit introspect
 
 # Generate new migration
-pnpm db:push
+npm run db:push
 
 # Manual migration (if needed)
 mysql -u equiprofile -p equiprofile < drizzle/migrations/xxxx.sql
@@ -2769,10 +2797,10 @@ mysql -u equiprofile -p equiprofile < drizzle/migrations/xxxx.sql
 
 ```bash
 # Use safe build command
-pnpm build:safe
+npm run build:safe
 
 # Or increase memory manually
-NODE_OPTIONS='--max_old_space_size=4096' pnpm build
+NODE_OPTIONS='--max_old_space_size=4096' npm run build
 ```
 
 #### Log Monitoring
@@ -2850,16 +2878,16 @@ DATABASE_POOL_SIZE=10
 
 # Check for type errors
 
-pnpm check
+npm run check
 
 # View detailed errors
 
-pnpm tsc --noEmit
+npx tsc --noEmit
 
 # Clean and reinstall
 
-rm -rf node_modules pnpm-lock.yaml
-pnpm install --frozen-lockfile
+rm -rf node_modules
+npm ci
 
 ````
 
@@ -2872,15 +2900,15 @@ If all else fails, rollback to a previous version:
 cd /var/equiprofile/app
 git log --oneline -10  # Find last working commit
 git reset --hard <commit-hash>
-pnpm install --frozen-lockfile
-pnpm build
+npm ci
+npm run build
 sudo systemctl restart equiprofile
 
 # Option 2: Switch to stable branch
 git checkout main
 git pull origin main
-pnpm install --frozen-lockfile
-pnpm build
+npm ci
+npm run build
 sudo systemctl restart equiprofile
 
 # Option 3: Full fresh clone (nuclear option)
@@ -2889,8 +2917,8 @@ sudo mv app app.backup
 sudo git clone https://github.com/amarktainetwork-blip/Equiprofile.online.git app
 cd app
 sudo cp ../app.backup/.env .env  # Restore environment
-pnpm install --frozen-lockfile
-pnpm build
+npm ci
+npm run build
 sudo systemctl restart equiprofile
 ````
 
@@ -2908,13 +2936,13 @@ cd /var/equiprofile/app
 git pull origin main
 
 # Install dependencies
-pnpm install --frozen-lockfile
+npm ci
 
 # Run database migrations
-pnpm db:push
+npm run db:push
 
 # Build
-pnpm build
+npm run build
 
 # Restart service
 sudo systemctl restart equiprofile
@@ -2937,8 +2965,8 @@ node --version
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
-# Update pnpm
-npm install -g pnpm@latest
+
+
 ```
 
 ### Backup Procedures
