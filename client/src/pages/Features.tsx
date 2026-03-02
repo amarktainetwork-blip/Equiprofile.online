@@ -1,7 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { MarketingNav } from "@/components/MarketingNav";
-import { Footer } from "@/components/Footer";
-import { PageTransition } from "@/components/PageTransition";
+import { MarketingLayout } from "@/components/MarketingLayout";
 import { PageBanner } from "@/components/PageBanner";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
@@ -15,17 +13,15 @@ const fadeInUpVariants = {
 
 export default function Features() {
   return (
-    <>
-      <MarketingNav />
-      <PageTransition>
-        <div className="min-h-screen bg-black text-white">
-          {/* Page Banner */}
-          <PageBanner
-            title="Powerful Features for Modern Horse Management"
-            subtitle="Everything you need to manage your horses efficiently, all in one place"
-            imageSrc="/images/hero-horse.jpg"
-            imagePosition="center"
-          />
+    <MarketingLayout>
+      <div className="min-h-screen bg-black text-white">
+        {/* Page Banner */}
+        <PageBanner
+          title="Powerful Features for Modern Horse Management"
+          subtitle="Everything you need to manage your horses efficiently, all in one place"
+          imageSrc="/images/hero-horse.jpg"
+          imagePosition="center"
+        />
 
           {/* Feature Sections with Alternating Layout */}
           <div className="py-20">
@@ -158,8 +154,6 @@ export default function Features() {
             </div>
           </section>
         </div>
-      </PageTransition>
-      <Footer />
-    </>
+    </MarketingLayout>
   );
 }

@@ -23,11 +23,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { marketingAssets } from "@/config/marketingAssets";
-import { MarketingNav } from "@/components/MarketingNav";
-import { Footer } from "@/components/Footer";
-import { PageTransition } from "@/components/PageTransition";
+import { MarketingLayout } from "@/components/MarketingLayout";
 import { PageBanner } from "@/components/PageBanner";
+import { DEFAULT_PRICING } from "@shared/pricing";
 
 const YEARLY_SAVINGS_PERCENTAGE = 17;
 
@@ -155,23 +153,36 @@ export default function Pricing() {
   const hasActiveSubscription = subscriptionStatus?.status === "active";
 
   // Helper function to format price from API (pence to pounds)
+  // Falls back to hard-coded GBP defaults so UI never shows £0
   const formatPrice = (amountInPence: number | undefined): string => {
-    if (!amountInPence) return "0.00";
+    if (!amountInPence || amountInPence <= 0) return "0.00";
     return (amountInPence / 100).toFixed(2);
   };
 
   const getProPlanPrice = () => {
     if (billingPeriod === "monthly") {
-      return formatPrice(pricing?.pro?.monthly?.amount);
+      const amount = pricing?.pro?.monthly?.amount;
+      return amount && amount > 0
+        ? formatPrice(amount)
+        : formatPrice(DEFAULT_PRICING.individual.monthly.amount);
     }
-    return formatPrice(pricing?.pro?.yearly?.amount);
+    const amount = pricing?.pro?.yearly?.amount;
+    return amount && amount > 0
+      ? formatPrice(amount)
+      : formatPrice(DEFAULT_PRICING.individual.yearly.amount);
   };
 
   const getStablePlanPrice = () => {
     if (billingPeriod === "monthly") {
-      return formatPrice(pricing?.stable?.monthly?.amount);
+      const amount = pricing?.stable?.monthly?.amount;
+      return amount && amount > 0
+        ? formatPrice(amount)
+        : formatPrice(DEFAULT_PRICING.stable.monthly.amount);
     }
-    return formatPrice(pricing?.stable?.yearly?.amount);
+    const amount = pricing?.stable?.yearly?.amount;
+    return amount && amount > 0
+      ? formatPrice(amount)
+      : formatPrice(DEFAULT_PRICING.stable.yearly.amount);
   };
 
   const pricingPlans = [
@@ -217,37 +228,31 @@ export default function Pricing() {
   // Show loading state while pricing data is being fetched
   if (pricingLoading) {
     return (
-      <>
-        <MarketingNav />
-        <PageTransition>
-          <PageBanner
-            title="Pricing"
-            subtitle="Professional equine management for every need"
-            imageSrc="/images/riding-lesson.jpg"
-            imagePosition="center"
-          />
-          <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black flex items-center justify-center">
-            <div className="text-center">
-              <Loader2 className="w-12 h-12 animate-spin text-cyan-400 mx-auto mb-4" />
-              <p className="text-gray-400">Loading pricing information...</p>
-            </div>
-          </div>
-        </PageTransition>
-        <Footer />
-      </>
-    );
-  }
-
-  return (
-    <>
-      <MarketingNav />
-      <PageTransition>
+      <MarketingLayout>
         <PageBanner
           title="Pricing"
           subtitle="Professional equine management for every need"
           imageSrc="/images/riding-lesson.jpg"
           imagePosition="center"
         />
+        <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black flex items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="w-12 h-12 animate-spin text-cyan-400 mx-auto mb-4" />
+            <p className="text-gray-400">Loading pricing information...</p>
+          </div>
+        </div>
+      </MarketingLayout>
+    );
+  }
+
+  return (
+    <MarketingLayout>
+      <PageBanner
+        title="Pricing"
+        subtitle="Professional equine management for every need"
+        imageSrc="/images/riding-lesson.jpg"
+        imagePosition="center"
+      />
         <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black">
           <div className="container mx-auto px-4 py-16">
             {/* Top 3 Blocks - What's included, Free trial, Cancel anytime */}
@@ -653,8 +658,6 @@ export default function Pricing() {
             </motion.div>
           </div>
         </div>
-      </PageTransition>
-      <Footer />
-    </>
+    </MarketingLayout>
   );
 }

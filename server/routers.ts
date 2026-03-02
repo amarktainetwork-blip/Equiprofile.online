@@ -273,19 +273,16 @@ export const appRouter = router({
   // Billing and subscription management
   billing: router({
     getPricing: publicProcedure.query(() => {
-      // Return disabled state if billing is disabled
+      // Always return pricing data so the UI never shows £0.
+      // When Stripe is disabled, fall back to the hard-coded GBP defaults.
       if (!ENV.enableStripe) {
-        return {
-          enabled: false,
-          message: "Billing is disabled",
-          trial: null,
-          pro: null,
-          stable: null,
-        };
+        console.info(
+          "[Pricing] Stripe disabled – returning default GBP prices (£10/£100 Individual, £30/£300 Stable)",
+        );
       }
 
       return {
-        enabled: true,
+        enabled: ENV.enableStripe,
         trial: {
           name: PRICING_PLANS.trial.name,
           horses: PRICING_PLANS.trial.horses,

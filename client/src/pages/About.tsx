@@ -1,7 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { MarketingNav } from "@/components/MarketingNav";
-import { Footer } from "@/components/Footer";
-import { PageTransition } from "@/components/PageTransition";
+import { MarketingLayout } from "@/components/MarketingLayout";
 import { PageBanner } from "@/components/PageBanner";
 import { Heart, Target, Users, Award, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
@@ -71,10 +69,8 @@ export default function About() {
   ];
 
   return (
-    <>
-      <MarketingNav />
-      <PageTransition>
-        <div className="min-h-screen bg-black relative overflow-hidden">
+    <MarketingLayout>
+      <div className="min-h-screen bg-black relative overflow-hidden">
           {/* Background Gradient Overlays */}
           <div className="absolute inset-0 bg-gradient-to-br from-indigo-950/30 via-black to-cyan-950/30 pointer-events-none" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/20 via-transparent to-transparent pointer-events-none" />
@@ -292,9 +288,7 @@ export default function About() {
               </AnimatedSection>
             </section>
           </div>
-        </div>
-      </PageTransition>
-      <Footer />
-    </>
+      </div>
+    </MarketingLayout>
   );
 }

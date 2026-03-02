@@ -16,7 +16,7 @@ import { serveStatic, setupVite } from "./vite";
 import { nanoid } from "nanoid";
 import Stripe from "stripe";
 import * as db from "../db";
-import { getStripe } from "../stripe";
+import { getStripe, validatePricingConfig } from "../stripe";
 import * as email from "./email";
 import { ENV } from "./env";
 import { resolve } from "path";
@@ -665,6 +665,9 @@ async function startServer() {
   const port = parseInt(process.env.PORT || "3000");
 
   console.log(`Starting server on ${host}:${port}...`);
+
+  // Validate pricing configuration at startup
+  validatePricingConfig();
 
   server.listen(port, host, () => {
     console.log(`✓ Server running on http://${host}:${port}/`);

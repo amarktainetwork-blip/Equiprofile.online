@@ -9,9 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { MarketingNav } from "@/components/MarketingNav";
-import { Footer } from "@/components/Footer";
-import { PageTransition } from "@/components/PageTransition";
+import { MarketingLayout } from "@/components/MarketingLayout";
 import { PageBanner } from "@/components/PageBanner";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { marketingAssets } from "@/config/marketingAssets";
@@ -61,16 +59,14 @@ export default function Contact() {
   };
 
   return (
-    <>
-      <MarketingNav />
-      <PageTransition>
-        <div className="min-h-screen bg-black">
-          {/* Page Banner */}
-          <PageBanner
-            title="Get in Touch"
-            subtitle="Have a question or need help? We're here for you. Send us a message and we'll respond as soon as possible."
-            imageSrc="/images/gallery/21.jpg"
-          />
+    <MarketingLayout>
+      <div className="min-h-screen bg-black">
+        {/* Page Banner */}
+        <PageBanner
+          title="Get in Touch"
+          subtitle="Have a question or need help? We're here for you. Send us a message and we'll respond as soon as possible."
+          imageSrc="/images/gallery/21.jpg"
+        />
 
           <div className="container mx-auto px-4 py-16">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
@@ -308,8 +304,6 @@ export default function Contact() {
             </div>
           </div>
         </div>
-      </PageTransition>
-      <Footer />
-    </>
+    </MarketingLayout>
   );
 }

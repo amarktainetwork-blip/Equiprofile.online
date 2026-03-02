@@ -1,6 +1,7 @@
 import Stripe from "stripe";
 import { ENV } from "./_core/env";
 import { TRPCError } from "@trpc/server";
+import { DEFAULT_PRICING } from "../shared/pricing";
 
 // Check if Stripe is enabled
 function checkStripeEnabled() {
@@ -55,13 +56,13 @@ export const PRICING_PLANS = {
     horses: 5,
     monthly: {
       priceId: process.env.STRIPE_MONTHLY_PRICE_ID || "",
-      amount: 799, // £7.99 in pence
+      amount: DEFAULT_PRICING.individual.monthly.amount, // £10.00 in pence
       currency: "gbp",
       interval: "month" as const,
     },
     yearly: {
       priceId: process.env.STRIPE_YEARLY_PRICE_ID || "",
-      amount: 7990, // £79.90 in pence (equivalent to ~£6.66/month)
+      amount: DEFAULT_PRICING.individual.yearly.amount, // £100.00 in pence
       currency: "gbp",
       interval: "year" as const,
     },
@@ -81,13 +82,13 @@ export const PRICING_PLANS = {
     horses: 20,
     monthly: {
       priceId: process.env.STRIPE_STABLE_MONTHLY_PRICE_ID || "",
-      amount: 3000, // £30.00 in pence
+      amount: DEFAULT_PRICING.stable.monthly.amount, // £30.00 in pence
       currency: "gbp",
       interval: "month" as const,
     },
     yearly: {
       priceId: process.env.STRIPE_STABLE_YEARLY_PRICE_ID || "",
-      amount: 30000, // £300.00 in pence (equivalent to £25/month)
+      amount: DEFAULT_PRICING.stable.yearly.amount, // £300.00 in pence
       currency: "gbp",
       interval: "year" as const,
     },
@@ -111,6 +112,32 @@ export const STRIPE_PRICING = {
   monthly: PRICING_PLANS.pro.monthly,
   yearly: PRICING_PLANS.pro.yearly,
 };
+
+// Validate Stripe price IDs and log warnings at startup
+export function validatePricingConfig(): void {
+  if (!ENV.enableStripe) {
+    console.warn(
+      "[Pricing] Stripe is disabled – showing default GBP prices (£10/£100 Individual, £30/£300 Stable). Configure ENABLE_STRIPE=true and Stripe keys to enable live billing.",
+    );
+    return;
+  }
+
+  const requiredPriceIds: Array<{ name: string; value: string }> = [
+    { name: "STRIPE_MONTHLY_PRICE_ID", value: PRICING_PLANS.pro.monthly.priceId },
+    { name: "STRIPE_YEARLY_PRICE_ID", value: PRICING_PLANS.pro.yearly.priceId },
+    { name: "STRIPE_STABLE_MONTHLY_PRICE_ID", value: PRICING_PLANS.stable.monthly.priceId },
+    { name: "STRIPE_STABLE_YEARLY_PRICE_ID", value: PRICING_PLANS.stable.yearly.priceId },
+  ];
+
+  const missing = requiredPriceIds.filter((p) => !p.value);
+  if (missing.length > 0) {
+    console.warn(
+      `[Pricing] Missing Stripe price IDs: ${missing.map((p) => p.name).join(", ")}. Checkout will fail until these are set.`,
+    );
+  } else {
+    console.log("[Pricing] All Stripe price IDs configured.");
+  }
+}
 
 // Create checkout session
 export async function createCheckoutSession(
