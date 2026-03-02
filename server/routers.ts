@@ -10,7 +10,7 @@ import {
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import * as db from "./db";
-import { invokeLLM } from "./_core/llm";
+import { invokeLLM, isAIConfigured } from "./_core/llm";
 import { storagePut } from "./storage";
 import { nanoid } from "nanoid";
 import {
@@ -143,7 +143,15 @@ export const appRouter = router({
     submitPassword: protectedProcedure
       .input(z.object({ password: z.string() }))
       .mutation(async ({ ctx, input }) => {
-        const adminPassword = process.env.ADMIN_UNLOCK_PASSWORD || "ashmor12@";
+        const adminPassword = process.env.ADMIN_UNLOCK_PASSWORD;
+
+        if (!adminPassword) {
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message:
+              "Admin password not configured. Set ADMIN_UNLOCK_PASSWORD in environment.",
+          });
+        }
 
         // Check rate limit
         const attempts = await db.incrementUnlockAttempts(ctx.user.id);
@@ -159,17 +167,18 @@ export const appRouter = router({
         const bcrypt = await import("bcrypt");
         let isValid = false;
 
-        // For backward compatibility, check if password is bcrypt hash or plaintext
+        // Support both bcrypt hash and plaintext (bcrypt hash recommended)
         if (
           adminPassword.startsWith("$2a$") ||
           adminPassword.startsWith("$2b$")
         ) {
-          // It's already a bcrypt hash, compare directly
+          // It's a bcrypt hash
           isValid = await bcrypt.compare(input.password, adminPassword);
         } else {
-          // It's plaintext (legacy), do direct comparison (but log warning)
+          // It's plaintext – allow but warn
           console.warn(
-            "⚠️  WARNING: ADMIN_UNLOCK_PASSWORD is stored in plaintext. Consider hashing it.",
+            "⚠️  WARNING: ADMIN_UNLOCK_PASSWORD is stored in plaintext. " +
+            "Run: node dist/cli.js set-admin-password  to store a bcrypt hash instead.",
           );
           isValid = input.password === adminPassword;
         }
@@ -256,6 +265,14 @@ export const appRouter = router({
         }
 
         // Normal AI chat processing
+        if (!isAIConfigured()) {
+          return {
+            role: "assistant" as const,
+            content:
+              "⚠️ AI assistant is not yet configured. Please set OPENAI_API_KEY or BUILT_IN_FORGE_API_KEY in the server environment to enable AI features.",
+          };
+        }
+
         const response = await invokeLLM({
           messages: input.messages.map((m) => ({
             role: m.role,
@@ -1777,6 +1794,27 @@ Please provide:
 4. Best time of day to ride if conditions are marginal
 
 Format your response as JSON with keys: recommendation, explanation, precautions, bestTime`;
+
+        // Determine basic recommendation from numeric data (no-AI fallback)
+        const basicRec = (() => {
+          const precip = input.precipitation ?? 0;
+          if (input.windSpeed > 50 || precip > 10 || input.temperature > 38 || input.temperature < -10)
+            return "not_recommended";
+          if (input.windSpeed > 35 || precip > 5 || input.temperature > 32 || input.temperature < 0)
+            return "poor";
+          if (input.windSpeed > 25 || precip > 2 || input.temperature > 28 || input.temperature < 5)
+            return "fair";
+          if (input.windSpeed < 15 && precip === 0 && input.temperature >= 15 && input.temperature <= 25)
+            return "excellent";
+          return "good";
+        })();
+
+        if (!isAIConfigured()) {
+          return {
+            recommendation: basicRec,
+            aiAnalysis: "AI analysis not available – configure an API key to enable detailed recommendations.",
+          };
+        }
 
         const response = await invokeLLM({
           messages: [

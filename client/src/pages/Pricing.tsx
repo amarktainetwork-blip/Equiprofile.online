@@ -65,10 +65,9 @@ export default function Pricing() {
 
   const handleSubscribe = async (plan: "monthly" | "yearly") => {
     if (!user) {
-      setLocation("/");
-      toast.error("Authentication required", {
-        description: "Please sign in to subscribe.",
-      });
+      // Not logged in: send to /register with intent preserved so that after
+      // successful signup the app can auto-redirect to Stripe checkout.
+      setLocation(`/register?plan=pro&interval=${plan}`);
       return;
     }
 

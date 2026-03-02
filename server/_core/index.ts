@@ -394,6 +394,40 @@ async function startServer() {
     });
   });
 
+  /**
+   * GET /api/system/config-status
+   * Returns which optional services are configured (boolean flags only, no secrets).
+   * Used by the frontend and monitoring to show a "setup checklist".
+   */
+  app.get("/api/system/config-status", (req, res) => {
+    const smtpConfigured =
+      !!(process.env.SMTP_USER && process.env.SMTP_PASS);
+    const stripeReady =
+      ENV.enableStripe &&
+      !!(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_WEBHOOK_SECRET);
+    const uploadsReady =
+      ENV.enableUploads &&
+      !!(process.env.BUILT_IN_FORGE_API_URL && process.env.BUILT_IN_FORGE_API_KEY);
+    const aiOpenAI = !!(process.env.OPENAI_API_KEY);
+    const aiHuggingFace = !!(process.env.HUGGINGFACE_API_KEY);
+    const aiForge = !!(ENV.forgeApiKey);
+
+    res.json({
+      db: true, // If we got here the server started successfully
+      smtp: smtpConfigured,
+      stripe: stripeReady,
+      uploads: uploadsReady,
+      ai: {
+        openai: aiOpenAI,
+        huggingface: aiHuggingFace,
+        forge: aiForge,
+        anyConfigured: aiOpenAI || aiHuggingFace || aiForge,
+      },
+      weather: true, // Open-Meteo needs no key
+      adminPasswordSet: !!(process.env.ADMIN_UNLOCK_PASSWORD),
+    });
+  });
+
   // Simple ping endpoint (minimal response for monitoring)
   app.get("/api/health/ping", (req, res) => {
     res.json({ status: "ok", timestamp: new Date().toISOString() });

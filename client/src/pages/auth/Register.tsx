@@ -18,12 +18,16 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AuthSplitLayout } from "@/components/AuthSplitLayout";
 import { MarketingNav } from "@/components/MarketingNav";
 import { motion, AnimatePresence } from "framer-motion";
+import { trpc } from "@/lib/trpc";
 
 /**
  * Register page
  *
  * Step 1: Full name input
  * Step 2: Email + Password + Confirm Password + Terms
+ *
+ * Supports ?plan=pro&interval=monthly|yearly from the Pricing page:
+ * after successful signup the user is automatically sent to Stripe checkout.
  */
 export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
@@ -37,9 +41,25 @@ export default function Register() {
   const { isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
 
+  // Detect subscription intent from query params (set by Pricing page)
+  const searchParams = new URLSearchParams(window.location.search);
+  const intentPlan = searchParams.get("plan"); // e.g. "pro"
+  const intentInterval = (searchParams.get("interval") as "monthly" | "yearly") || "monthly";
+  const hasSubscribeIntent = !!intentPlan && (intentInterval === "monthly" || intentInterval === "yearly");
+
+  const createCheckout = trpc.billing.createCheckout.useMutation();
+
   // Redirect if already authenticated
   if (isAuthenticated) {
-    setLocation("/dashboard");
+    if (hasSubscribeIntent) {
+      // Logged-in user reached register with a plan intent → send to checkout
+      createCheckout
+        .mutateAsync({ plan: intentInterval })
+        .then((r) => { if (r.url) window.location.href = r.url; })
+        .catch(() => setLocation("/dashboard"));
+    } else {
+      setLocation("/dashboard");
+    }
     return null;
   }
 
@@ -95,7 +115,21 @@ export default function Register() {
         return;
       }
 
-      // Redirect to dashboard on success
+      // If the user came from the Pricing page with a plan intent, redirect to
+      // Stripe checkout.  Otherwise go to dashboard.
+      if (hasSubscribeIntent) {
+        try {
+          const checkout = await createCheckout.mutateAsync({ plan: intentInterval });
+          if (checkout.url) {
+            window.location.href = checkout.url;
+            return;
+          }
+        } catch {
+          // checkout failed – fall through to dashboard
+        }
+      }
+
+      // Default: go to dashboard
       window.location.href = "/dashboard";
     } catch (err) {
       setError("An error occurred. Please try again.");
@@ -133,6 +167,12 @@ export default function Register() {
                     ? "Let's start with your name"
                     : "Now set up your login details"}
                 </CardDescription>
+                {hasSubscribeIntent && (
+                  <p className="text-xs text-center text-indigo-300 bg-indigo-950/40 border border-indigo-500/30 rounded-lg px-3 py-2 mt-2">
+                    After signup you'll be taken to checkout for the{" "}
+                    <strong className="text-indigo-200">Pro {intentInterval}</strong> plan.
+                  </p>
+                )}
               </CardHeader>
               <CardContent className="space-y-4">
                 {error && (
