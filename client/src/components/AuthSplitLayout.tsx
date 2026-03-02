@@ -48,16 +48,15 @@ export function AuthSplitLayout({ children }: AuthSplitLayoutProps) {
           "md:w-1/2 md:min-h-0 md:py-0 md:bg-gray-950 md:overflow-hidden md:border-l md:border-white/5",
         ].join(" ")}
       >
-        <div className="w-full max-w-md">
-          {children}
-        </div>
+        <div className="w-full max-w-md">{children}</div>
 
         {/* Copyright — visible on auth pages since the full Footer is omitted */}
         <p
           className="absolute bottom-3 left-0 right-0 text-center text-xs text-gray-600"
           aria-label={`© ${new Date().getFullYear()} EquiProfile.online · Part of AmarktAI Network`}
         >
-          © {new Date().getFullYear()} EquiProfile.online · Part of Amarkt<span className="text-blue-400 font-semibold">AI</span> Network
+          © {new Date().getFullYear()} EquiProfile.online · Part of Amarkt
+          <span className="text-blue-400 font-semibold">AI</span> Network
         </p>
       </div>
     </div>

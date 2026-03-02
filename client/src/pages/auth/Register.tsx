@@ -114,7 +114,10 @@ export default function Register() {
             transition={{ duration: 0.5 }}
           >
             {/* Back button */}
-            <Link href="/" className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors mb-4">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors mb-4"
+            >
               <ArrowLeft className="w-4 h-4" />
               <span>Back to home</span>
             </Link>
@@ -243,7 +246,10 @@ export default function Register() {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="confirm-password" className="text-white">
+                        <Label
+                          htmlFor="confirm-password"
+                          className="text-white"
+                        >
                           Confirm Password
                         </Label>
                         <Input
@@ -271,11 +277,17 @@ export default function Register() {
                           className="text-sm font-normal cursor-pointer leading-relaxed text-gray-300"
                         >
                           I agree to the{" "}
-                          <Link href="/terms" className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent hover:from-indigo-300 hover:to-cyan-300 transition-all duration-200">
+                          <Link
+                            href="/terms"
+                            className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent hover:from-indigo-300 hover:to-cyan-300 transition-all duration-200"
+                          >
                             Terms of Service
                           </Link>{" "}
                           and{" "}
-                          <Link href="/privacy" className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent hover:from-indigo-300 hover:to-cyan-300 transition-all duration-200">
+                          <Link
+                            href="/privacy"
+                            className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent hover:from-indigo-300 hover:to-cyan-300 transition-all duration-200"
+                          >
                             Privacy Policy
                           </Link>
                         </Label>
@@ -314,7 +326,10 @@ export default function Register() {
                   <span className="text-gray-400">
                     Already have an account?{" "}
                   </span>
-                  <Link href="/login" className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent font-medium hover:from-indigo-300 hover:to-cyan-300 transition-all duration-200">
+                  <Link
+                    href="/login"
+                    className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent font-medium hover:from-indigo-300 hover:to-cyan-300 transition-all duration-200"
+                  >
                     Sign in
                   </Link>
                 </div>

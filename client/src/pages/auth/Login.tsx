@@ -94,7 +94,10 @@ export default function Login() {
             transition={{ duration: 0.5 }}
           >
             {/* Back button */}
-            <Link href="/" className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors mb-4">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors mb-4"
+            >
               <ArrowLeft className="w-4 h-4" />
               <span>Back to home</span>
             </Link>
@@ -193,7 +196,10 @@ export default function Login() {
                           <Label htmlFor="password" className="text-white">
                             Password
                           </Label>
-                          <Link href="/forgot-password" className="text-sm bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent hover:from-indigo-300 hover:to-cyan-300 transition-all duration-200">
+                          <Link
+                            href="/forgot-password"
+                            className="text-sm bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent hover:from-indigo-300 hover:to-cyan-300 transition-all duration-200"
+                          >
                             Forgot password?
                           </Link>
                         </div>
@@ -241,7 +247,10 @@ export default function Login() {
                 {/* Register link */}
                 <div className="text-center text-sm">
                   <span className="text-gray-400">Don't have an account? </span>
-                  <Link href="/register" className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent font-medium hover:from-indigo-300 hover:to-cyan-300 transition-all duration-200">
+                  <Link
+                    href="/register"
+                    className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent font-medium hover:from-indigo-300 hover:to-cyan-300 transition-all duration-200"
+                  >
                     Create account
                   </Link>
                 </div>

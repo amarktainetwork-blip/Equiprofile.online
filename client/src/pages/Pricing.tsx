@@ -436,7 +436,9 @@ export default function Pricing() {
                       </CardDescription>
                       <div className="mt-4">
                         <span className="text-5xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 text-transparent bg-clip-text">
-                          {planData.plan === "trial" ? planData.price : `£${planData.price}`}
+                          {planData.plan === "trial"
+                            ? planData.price
+                            : `£${planData.price}`}
                         </span>
                         <span className="text-gray-400 text-lg">
                           {planData.period}

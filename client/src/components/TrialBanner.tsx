@@ -65,7 +65,9 @@ export function TrialBanner() {
           <span className="text-sm text-blue-900 dark:text-blue-100">
             <strong>Free Trial:</strong> {trialDaysLeft} days remaining.
             Enjoying EquiProfile?{" "}
-            <Link href="/billing" className="underline font-medium">Subscribe now</Link>
+            <Link href="/billing" className="underline font-medium">
+              Subscribe now
+            </Link>
           </span>
         </AlertDescription>
       </Alert>

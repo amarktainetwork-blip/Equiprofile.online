@@ -20,10 +20,20 @@ export function Footer() {
             <h4 className="font-semibold mb-4 text-white">Product</h4>
             <ul className="space-y-2 text-sm text-gray-400">
               <li>
-                <Link href="/features" className="hover:text-white transition-colors">Features</Link>
+                <Link
+                  href="/features"
+                  className="hover:text-white transition-colors"
+                >
+                  Features
+                </Link>
               </li>
               <li>
-                <Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link>
+                <Link
+                  href="/pricing"
+                  className="hover:text-white transition-colors"
+                >
+                  Pricing
+                </Link>
               </li>
             </ul>
           </div>
@@ -32,10 +42,20 @@ export function Footer() {
             <h4 className="font-semibold mb-4 text-white">Company</h4>
             <ul className="space-y-2 text-sm text-gray-400">
               <li>
-                <Link href="/about" className="hover:text-white transition-colors">About</Link>
+                <Link
+                  href="/about"
+                  className="hover:text-white transition-colors"
+                >
+                  About
+                </Link>
               </li>
               <li>
-                <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
+                <Link
+                  href="/contact"
+                  className="hover:text-white transition-colors"
+                >
+                  Contact
+                </Link>
               </li>
             </ul>
           </div>
@@ -44,17 +64,32 @@ export function Footer() {
             <h4 className="font-semibold mb-4 text-white">Legal</h4>
             <ul className="space-y-2 text-sm text-gray-400">
               <li>
-                <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+                <Link
+                  href="/privacy"
+                  className="hover:text-white transition-colors"
+                >
+                  Privacy
+                </Link>
               </li>
               <li>
-                <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
+                <Link
+                  href="/terms"
+                  className="hover:text-white transition-colors"
+                >
+                  Terms
+                </Link>
               </li>
             </ul>
           </div>
         </div>
 
         <div className="border-t border-white/10 pt-8 text-center text-sm text-gray-500">
-          <p aria-label={`© ${new Date().getFullYear()} EquiProfile.online · Part of AmarktAI Network`}>© {new Date().getFullYear()} EquiProfile.online · Part of Amarkt<span className="text-blue-400 font-semibold">AI</span> Network</p>
+          <p
+            aria-label={`© ${new Date().getFullYear()} EquiProfile.online · Part of AmarktAI Network`}
+          >
+            © {new Date().getFullYear()} EquiProfile.online · Part of Amarkt
+            <span className="text-blue-400 font-semibold">AI</span> Network
+          </p>
         </div>
       </div>
     </footer>
