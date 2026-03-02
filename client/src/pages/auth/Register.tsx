@@ -9,25 +9,26 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { getLoginUrl, isOAuthAvailable } from "@/const";
 import { Link, useLocation } from "wouter";
 import { useState, FormEvent } from "react";
-import { Loader2, ArrowLeft, AlertCircle } from "lucide-react";
+import { Loader2, ArrowLeft, AlertCircle, ArrowRight } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { PageTransition } from "@/components/PageTransition";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AuthSplitLayout } from "@/components/AuthSplitLayout";
 import { MarketingNav } from "@/components/MarketingNav";
 import { Footer } from "@/components/Footer";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 /**
  * Register page
  *
- * Supports both OAuth (if configured) and email/password registration.
+ * Step 1: Full name input
+ * Step 2: Email + Password + Confirm Password + Terms
  */
 export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
+  const [step, setStep] = useState<1 | 2>(1);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,29 +38,26 @@ export default function Register() {
   const { isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
 
-  const oauthEnabled = isOAuthAvailable();
-
   // Redirect if already authenticated
   if (isAuthenticated) {
     setLocation("/dashboard");
     return null;
   }
 
-  const handleOAuthRegister = () => {
-    const loginUrl = getLoginUrl();
-    if (!loginUrl) {
-      setError("OAuth is not configured");
+  const handleNameStep = (e: FormEvent) => {
+    e.preventDefault();
+    setError("");
+    if (!name.trim()) {
+      setError("Please enter your full name");
       return;
     }
-    setIsLoading(true);
-    window.location.href = loginUrl;
+    setStep(2);
   };
 
   const handleEmailRegister = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
 
-    // Validation
     if (!acceptTerms) {
       setError("Please accept the Terms of Service and Privacy Policy");
       return;
@@ -105,7 +103,7 @@ export default function Register() {
     <>
       <MarketingNav />
       <PageTransition>
-        <AuthSplitLayout imageUrl="/images/stable.jpg">
+        <AuthSplitLayout>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -120,13 +118,15 @@ export default function Register() {
             </Link>
 
             {/* Dark Glass Form Card */}
-            <Card className="bg-black/40 backdrop-blur-xl border border-white/10 shadow-2xl">
+            <Card className="bg-black/50 backdrop-blur-xl border border-white/10 shadow-2xl">
               <CardHeader className="space-y-1">
                 <CardTitle className="text-3xl font-bold text-center bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
                   Create an account
                 </CardTitle>
                 <CardDescription className="text-center text-gray-400">
-                  Get started with EquiProfile today
+                  {step === 1
+                    ? "Let's start with your name"
+                    : "Now set up your login details"}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -148,187 +148,158 @@ export default function Register() {
                   </motion.div>
                 )}
 
-                <form onSubmit={handleEmailRegister} className="space-y-4">
-                  {/* Name field */}
-                  <motion.div
-                    className="space-y-2"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: 0.2 }}
-                  >
-                    <Label htmlFor="name" className="text-white">
-                      Full Name
-                    </Label>
-                    <Input
-                      id="name"
-                      type="text"
-                      placeholder="John Doe"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      disabled={isLoading}
-                      className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:bg-white/10 focus:border-white/20 focus:scale-[1.01] transition-all duration-200"
-                    />
-                  </motion.div>
-
-                  {/* Email field */}
-                  <motion.div
-                    className="space-y-2"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: 0.3 }}
-                  >
-                    <Label htmlFor="email" className="text-white">
-                      Email
-                    </Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="you@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      disabled={isLoading}
-                      required
-                      className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:bg-white/10 focus:border-white/20 focus:scale-[1.01] transition-all duration-200"
-                    />
-                  </motion.div>
-
-                  {/* Password field */}
-                  <motion.div
-                    className="space-y-2"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: 0.4 }}
-                  >
-                    <Label htmlFor="password" className="text-white">
-                      Password
-                    </Label>
-                    <Input
-                      id="password"
-                      type="password"
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      disabled={isLoading}
-                      required
-                      className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:bg-white/10 focus:border-white/20 focus:scale-[1.01] transition-all duration-200"
-                    />
-                    <p className="text-xs text-gray-500">
-                      At least 8 characters
-                    </p>
-                  </motion.div>
-
-                  {/* Confirm Password field */}
-                  <motion.div
-                    className="space-y-2"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: 0.5 }}
-                  >
-                    <Label htmlFor="confirm-password" className="text-white">
-                      Confirm Password
-                    </Label>
-                    <Input
-                      id="confirm-password"
-                      type="password"
-                      placeholder="••••••••"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      disabled={isLoading}
-                      required
-                      className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:bg-white/10 focus:border-white/20 focus:scale-[1.01] transition-all duration-200"
-                    />
-                  </motion.div>
-
-                  {/* Terms acceptance */}
-                  <motion.div
-                    className="flex items-start gap-2"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.4, delay: 0.6 }}
-                  >
-                    <Checkbox
-                      id="terms"
-                      className="mt-1 border-white/20 data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-indigo-500 data-[state=checked]:to-cyan-500"
-                      checked={acceptTerms}
-                      onCheckedChange={(checked) =>
-                        setAcceptTerms(checked as boolean)
-                      }
-                    />
-                    <Label
-                      htmlFor="terms"
-                      className="text-sm font-normal cursor-pointer leading-relaxed text-gray-300"
+                <AnimatePresence mode="wait">
+                  {step === 1 ? (
+                    <motion.form
+                      key="step1"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.3 }}
+                      onSubmit={handleNameStep}
+                      className="space-y-4"
                     >
-                      I agree to the{" "}
-                      <Link href="/terms">
-                        <a className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent hover:from-indigo-300 hover:to-cyan-300 transition-all duration-200">
-                          Terms of Service
-                        </a>
-                      </Link>{" "}
-                      and{" "}
-                      <Link href="/privacy">
-                        <a className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent hover:from-indigo-300 hover:to-cyan-300 transition-all duration-200">
-                          Privacy Policy
-                        </a>
-                      </Link>
-                    </Label>
-                  </motion.div>
-
-                  {/* Create account button */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: 0.7 }}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <Button
-                      type="submit"
-                      className="w-full bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white border-0 shadow-lg shadow-indigo-500/20 transition-all duration-200"
-                      size="lg"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Creating account...
-                        </>
-                      ) : (
-                        "Create account"
-                      )}
-                    </Button>
-                  </motion.div>
-                </form>
-
-                {/* OAuth option if available */}
-                {oauthEnabled && (
-                  <>
-                    <div className="relative">
-                      <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t border-white/10" />
+                      <div className="space-y-2">
+                        <Label htmlFor="name" className="text-white">
+                          Full Name
+                        </Label>
+                        <Input
+                          id="name"
+                          type="text"
+                          placeholder="John Doe"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          required
+                          autoFocus
+                          className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:bg-white/10 focus:border-white/20 h-12 text-base transition-all duration-200"
+                        />
                       </div>
-                      <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-black/40 px-2 text-gray-400">
-                          Or continue with
-                        </span>
-                      </div>
-                    </div>
 
-                    <motion.div
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
                       <Button
-                        type="button"
-                        variant="outline"
-                        className="w-full bg-white/5 border-white/10 text-white hover:bg-white/10 hover:border-white/20 transition-all duration-200"
-                        onClick={handleOAuthRegister}
+                        type="submit"
+                        className="w-full bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white border-0 shadow-lg shadow-indigo-500/20 h-12 text-base"
+                      >
+                        Continue
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </motion.form>
+                  ) : (
+                    <motion.form
+                      key="step2"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.3 }}
+                      onSubmit={handleEmailRegister}
+                      className="space-y-4"
+                    >
+                      <div className="flex items-center gap-2 p-3 bg-white/5 rounded-lg border border-white/10">
+                        <span className="text-sm text-white flex-1">
+                          {name}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => { setStep(1); setError(""); }}
+                          className="text-xs text-indigo-400 hover:text-indigo-300 flex-shrink-0"
+                        >
+                          Change
+                        </button>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="email" className="text-white">
+                          Email
+                        </Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          placeholder="you@example.com"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          required
+                          autoFocus
+                          className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:bg-white/10 focus:border-white/20 h-12 text-base transition-all duration-200"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="password" className="text-white">
+                          Password
+                        </Label>
+                        <Input
+                          id="password"
+                          type="password"
+                          placeholder="••••••••"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          required
+                          className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:bg-white/10 focus:border-white/20 h-12 text-base transition-all duration-200"
+                        />
+                        <p className="text-xs text-gray-500">
+                          At least 12 characters
+                        </p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="confirm-password" className="text-white">
+                          Confirm Password
+                        </Label>
+                        <Input
+                          id="confirm-password"
+                          type="password"
+                          placeholder="••••••••"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          required
+                          className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:bg-white/10 focus:border-white/20 h-12 text-base transition-all duration-200"
+                        />
+                      </div>
+
+                      <div className="flex items-start gap-2">
+                        <Checkbox
+                          id="terms"
+                          className="mt-1 border-white/20 data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-indigo-500 data-[state=checked]:to-cyan-500"
+                          checked={acceptTerms}
+                          onCheckedChange={(checked) =>
+                            setAcceptTerms(checked as boolean)
+                          }
+                        />
+                        <Label
+                          htmlFor="terms"
+                          className="text-sm font-normal cursor-pointer leading-relaxed text-gray-300"
+                        >
+                          I agree to the{" "}
+                          <Link href="/terms">
+                            <a className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent hover:from-indigo-300 hover:to-cyan-300 transition-all duration-200">
+                              Terms of Service
+                            </a>
+                          </Link>{" "}
+                          and{" "}
+                          <Link href="/privacy">
+                            <a className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent hover:from-indigo-300 hover:to-cyan-300 transition-all duration-200">
+                              Privacy Policy
+                            </a>
+                          </Link>
+                        </Label>
+                      </div>
+
+                      <Button
+                        type="submit"
+                        className="w-full bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white border-0 shadow-lg shadow-indigo-500/20 h-12 text-base"
                         disabled={isLoading}
                       >
-                        OAuth Sign Up
+                        {isLoading ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Creating account...
+                          </>
+                        ) : (
+                          "Create account"
+                        )}
                       </Button>
-                    </motion.div>
-                  </>
-                )}
+                    </motion.form>
+                  )}
+                </AnimatePresence>
 
                 {/* Divider */}
                 <div className="relative">
@@ -341,12 +312,7 @@ export default function Register() {
                 </div>
 
                 {/* Login link */}
-                <motion.div
-                  className="text-center text-sm"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.4, delay: 0.8 }}
-                >
+                <div className="text-center text-sm">
                   <span className="text-gray-400">
                     Already have an account?{" "}
                   </span>
@@ -355,17 +321,11 @@ export default function Register() {
                       Sign in
                     </a>
                   </Link>
-                </motion.div>
+                </div>
               </CardContent>
             </Card>
 
-            {/* Note */}
             <p className="text-xs text-center text-gray-500 mt-4">
-              {oauthEnabled
-                ? "Secure authentication with OAuth or email/password"
-                : "Secure email/password authentication"}
-            </p>
-            <p className="text-xs text-center text-gray-500 mt-2">
               Start your{" "}
               <strong className="text-gray-400">7-day free trial</strong> - no
               credit card required

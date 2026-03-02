@@ -12,7 +12,6 @@ import {
   Loader2,
   Clock,
   XCircle,
-  Sparkles,
   Crown,
   Building2,
 } from "lucide-react";
@@ -155,7 +154,7 @@ export default function Pricing() {
   // Helper function to format price from API (pence to pounds)
   // Falls back to hard-coded GBP defaults so UI never shows £0
   const formatPrice = (amountInPence: number | undefined): string => {
-    if (!amountInPence || amountInPence <= 0) return "0.00";
+    if (!amountInPence || amountInPence <= 0) return "";
     return penceToGBP(amountInPence);
   };
 
@@ -187,18 +186,7 @@ export default function Pricing() {
 
   const pricingPlans = [
     {
-      name: pricing?.trial?.name || "Free Trial",
-      plan: "trial",
-      description: "Try all features with 1 horse",
-      price: "0",
-      period: `/${pricing?.trial?.duration || 7} days`,
-      features: pricing?.trial?.features || features.free,
-      icon: Sparkles,
-      iconColor: "from-blue-400 to-cyan-400",
-      popular: false,
-    },
-    {
-      name: pricing?.pro?.name || "Pro",
+      name: pricing?.pro?.name || "Standard",
       plan: "pro",
       description: "For individual horse owners",
       price: getProPlanPrice(),
@@ -484,13 +472,6 @@ export default function Pricing() {
                             </Button>
                           )}
                         </>
-                      ) : planData.plan === "trial" ? (
-                        <Button
-                          className="w-full bg-black/60 backdrop-blur-sm border border-white/20 text-white hover:bg-white/10"
-                          onClick={() => setLocation("/dashboard")}
-                        >
-                          Get Started
-                        </Button>
                       ) : planData.plan === "pro" ? (
                         <Button
                           className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 text-white border-0 hover:from-indigo-600 hover:to-cyan-600 shadow-lg hover:shadow-indigo-500/50 transition-all duration-300"
