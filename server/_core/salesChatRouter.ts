@@ -22,7 +22,7 @@ import { invokeLLM, isAIConfigured } from "./llm";
 import { sanitizeHtml } from "./htmlEscape";
 import { getDb } from "../db";
 import { chatLeads } from "../../drizzle/schema";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 
 const router: Router = Router();
 
@@ -420,7 +420,7 @@ router.get("/sales-leads", async (req, res) => {
     const rows = await db
       .select()
       .from(chatLeads)
-      .orderBy(chatLeads.createdAt);
+      .orderBy(desc(chatLeads.createdAt));
     res.json({ leads: rows, total: rows.length });
   } catch (err) {
     console.error("[SalesLeads] DB query failed:", err);
