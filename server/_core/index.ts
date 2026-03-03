@@ -26,6 +26,10 @@ import { ENV } from "./env";
 import { resolve } from "path";
 import fs from "fs";
 
+// Module-level server reference used by the graceful-shutdown handler below.
+// Set inside server.listen() callback once the port is bound.
+let _activeServer: import("http").Server | null = null;
+
 // Port checking functions removed - now using deterministic port binding
 // If port is in use, server will fail with clear error message instead of auto-switching
 
@@ -873,11 +877,19 @@ async function startServer() {
   app.use("/api/v1", apiRouter);
 
   // ── API SAFETY NET ─────────────────────────────────────────────────────────
-  // Any request that starts with /api/* and has NOT been handled by a route
+  // Any request that starts with /api/ and has NOT been handled by a route
   // above must return JSON, never the SPA index.html.
   // This prevents the "login returns HTML 200" bug where an unmatched API path
   // falls through to the SPA catch-all.
-  app.all("/api/*", (req, res) => {
+  //
+  // Uses a RegExp instead of a string wildcard to avoid path-to-regexp 8.x
+  // errors.  Express 5 + router 2 pass string patterns through path-to-regexp
+  // 8.x, which requires every wildcard to carry an explicit parameter name
+  // (e.g. "/api/*path").  Bare "/api/*" and "/api/:path(.*)" both throw:
+  //   PathError: Missing parameter name at index N
+  // A RegExp literal bypasses path-to-regexp entirely and is safe across all
+  // Express/router versions.
+  app.all(/^\/api\/.*/, (req, res) => {
     res.status(404).json({
       error: "Not found",
       path: req.originalUrl,
@@ -906,7 +918,10 @@ async function startServer() {
   }
 
   // Deterministic port binding - fail if port is in use (no auto-switching)
-  const host = process.env.HOST || "127.0.0.1";
+  // Bind to 0.0.0.0 by default so the server is reachable from all interfaces
+  // (required when running behind Nginx on the same host).  Override via HOST
+  // env var (e.g. HOST=127.0.0.1 to restrict to loopback only).
+  const host = process.env.HOST || "0.0.0.0";
   const port = parseInt(process.env.PORT || "3000");
 
   console.log(`Starting server on ${host}:${port}...`);
@@ -918,6 +933,9 @@ async function startServer() {
     console.log(`✓ Server running on http://${host}:${port}/`);
     console.log(`✓ Environment: ${process.env.NODE_ENV || "development"}`);
     console.log(`✓ Health check: http://${host}:${port}/api/health`);
+
+    // Expose server handle for graceful shutdown handler below
+    _activeServer = server;
 
     // Start reminder scheduler
     import("./reminderScheduler")
@@ -949,3 +967,27 @@ async function startServer() {
 }
 
 startServer().catch(console.error);
+
+// ── Graceful shutdown (systemd SIGTERM + Ctrl-C SIGINT) ─────────────────────
+// Keep the process in the foreground; do NOT call process.exit() immediately so
+// that in-flight requests can drain.  The HTTP server's close() callback calls
+// process.exit(0) once all connections are finished.
+function shutdown(signal: string) {
+  console.log(`\n[Server] Received ${signal} — shutting down gracefully…`);
+  if (_activeServer) {
+    _activeServer.close(() => {
+      console.log("[Server] All connections closed. Exiting.");
+      process.exit(0);
+    });
+    // Force-exit after 10 s if connections don't drain in time
+    setTimeout(() => {
+      console.error("[Server] Forced exit after 10 s shutdown timeout.");
+      process.exit(1);
+    }, 10_000).unref();
+  } else {
+    process.exit(0);
+  }
+}
+
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => shutdown("SIGINT"));
