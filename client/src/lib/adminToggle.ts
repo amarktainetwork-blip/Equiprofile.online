@@ -28,18 +28,21 @@ class AdminToggleSystem {
     (window as any).showAdmin = () => this.showAdmin();
     (window as any).hideAdmin = () => this.hideAdmin();
 
-    console.log(
-      "%c🐴 EquiProfile Admin Commands",
-      "color: #10b981; font-size: 16px; font-weight: bold;",
-    );
-    console.log(
-      "%cType 'showAdmin()' to reveal admin section",
-      "color: #6b7280; font-size: 12px;",
-    );
-    console.log(
-      "%cType 'hideAdmin()' to hide admin section",
-      "color: #6b7280; font-size: 12px;",
-    );
+    // Only print console hints in development to avoid noisy banners in production
+    if (import.meta.env.DEV) {
+      console.log(
+        "%c🐴 EquiProfile Admin Commands",
+        "color: #10b981; font-size: 16px; font-weight: bold;",
+      );
+      console.log(
+        "%cType 'showAdmin()' to reveal admin section",
+        "color: #6b7280; font-size: 12px;",
+      );
+      console.log(
+        "%cType 'hideAdmin()' to hide admin section",
+        "color: #6b7280; font-size: 12px;",
+      );
+    }
   }
 
   private loadState() {

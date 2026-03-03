@@ -87,8 +87,16 @@ export function Footer() {
           <p
             aria-label={`© ${new Date().getFullYear()} EquiProfile.online · Part of AmarktAI Network`}
           >
-            © {new Date().getFullYear()} EquiProfile.online · Part of Amarkt
-            <span className="text-blue-400 font-semibold">AI</span> Network
+            © {new Date().getFullYear()} EquiProfile.online · Part of{" "}
+            <a
+              href="https://amarktai.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-gray-300 transition-colors"
+            >
+              Amarkt<span className="text-blue-400 font-semibold">AI</span>{" "}
+              Network
+            </a>
           </p>
         </div>
       </div>

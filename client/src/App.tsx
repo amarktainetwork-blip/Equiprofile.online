@@ -13,6 +13,7 @@ import { UpgradeModal } from "./components/UpgradeModal";
 import { useUpgradeModal } from "./hooks/useUpgradeModal";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { SalesChatWidget } from "./components/SalesChatWidget";
+import { CookieConsent } from "./components/CookieConsent";
 import "./i18n/config";
 
 // Marketing Pages (Public)
@@ -339,6 +340,7 @@ function App() {
           <Toaster />
           <Router />
           <SalesChatWidget />
+          <CookieConsent />
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>
