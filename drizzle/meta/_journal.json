@@ -29,6 +29,13 @@
       "when": 1741046400000,
       "tag": "0003_chat_contact_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1741132800000,
+      "tag": "0004_notes_table",
+      "breakpoints": true
     }
   ]
 }
