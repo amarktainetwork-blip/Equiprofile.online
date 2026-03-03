@@ -73,6 +73,13 @@ router.get("/plans", (req, res) => {
  */
 router.get("/checkout", async (req, res) => {
   try {
+    // Guard: billing must be enabled
+    if (!ENV.enableStripe) {
+      return res
+        .status(402)
+        .json({ error: "Billing is not enabled on this server" });
+    }
+
     // Authenticate user
     const user = await sdk.authenticateRequest(req);
     if (!user) {
@@ -92,7 +99,9 @@ router.get("/checkout", async (req, res) => {
         : STRIPE_PRICING.yearly.priceId;
 
     if (!priceId) {
-      return res.status(500).json({ error: "Stripe price ID not configured" });
+      return res
+        .status(503)
+        .json({ error: "Stripe price ID not configured on this server" });
     }
 
     // Create checkout session
@@ -107,7 +116,7 @@ router.get("/checkout", async (req, res) => {
 
     if (!session) {
       return res
-        .status(500)
+        .status(503)
         .json({ error: "Failed to create checkout session" });
     }
 
@@ -125,6 +134,13 @@ router.get("/checkout", async (req, res) => {
  */
 router.get("/portal", async (req, res) => {
   try {
+    // Guard: billing must be enabled
+    if (!ENV.enableStripe) {
+      return res
+        .status(402)
+        .json({ error: "Billing is not enabled on this server" });
+    }
+
     // Authenticate user
     const user = await sdk.authenticateRequest(req);
     if (!user) {
@@ -142,7 +158,7 @@ router.get("/portal", async (req, res) => {
     );
 
     if (!portalUrl) {
-      return res.status(500).json({ error: "Failed to create portal session" });
+      return res.status(503).json({ error: "Failed to create portal session" });
     }
 
     // Redirect to Stripe portal
