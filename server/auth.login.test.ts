@@ -136,7 +136,11 @@ describe("auth login — status codes (not 500)", () => {
 
     expect(result.status).toBe(200);
     expect(result.body.success).toBe(true);
-    const user = result.body.user as { id: number; name: string; email: string };
+    const user = result.body.user as {
+      id: number;
+      name: string;
+      email: string;
+    };
     expect(user.id).toBe(3);
     expect(mockUpdateUser).toHaveBeenCalledWith(
       3,

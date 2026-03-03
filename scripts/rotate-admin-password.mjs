@@ -86,16 +86,13 @@ async function main() {
   // server-side validateEnvironment() check in server/_core/env.ts.
   // These mirror the same patterns enforced at server startup to stay in sync.
   const weakPatterns = [
-    /^admin/i,       // generic admin prefix
-    /^password/i,    // generic "password" prefix
-    /^12345/,        // sequential numbers
-    /^ashmor/i,      // known project-specific default (from .env.example)
+    /^admin/i, // generic admin prefix
+    /^password/i, // generic "password" prefix
+    /^12345/, // sequential numbers
+    /^ashmor/i, // known project-specific default (from .env.example)
     /^equiprofile/i, // product name used as password
   ];
-  if (
-    newPassword.length < 8 ||
-    weakPatterns.some((p) => p.test(newPassword))
-  ) {
+  if (newPassword.length < 8 || weakPatterns.some((p) => p.test(newPassword))) {
     console.error(
       "❌  Password is too weak. Use at least 8 chars, avoid common prefixes.\n",
     );
