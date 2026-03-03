@@ -178,7 +178,7 @@ export default function Register() {
 
   return (
     <>
-      <MarketingNav alwaysLight />
+      <MarketingNav />
       <PageTransition>
         <AuthSplitLayout>
           <motion.div
