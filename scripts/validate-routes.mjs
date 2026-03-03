@@ -47,7 +47,7 @@ const INVALID_PATTERNS = [
     regex: /["'`]\/api\/\*["'`\s,)]/,
   },
   {
-    label: 'regex-capture param — use a RegExp route or named param instead',
+    label: "regex-capture param — use a RegExp route or named param instead",
     // matches: "/api/:path(.*)"  "/api/:anything(..."
     regex: /["'`]\/api\/:[\w]+\(/,
   },
@@ -62,9 +62,16 @@ function collectFiles(dir) {
   for (const entry of entries) {
     const full = join(dir, entry);
     const stat = statSync(full);
-    if (stat.isDirectory() && !entry.startsWith(".") && entry !== "node_modules") {
+    if (
+      stat.isDirectory() &&
+      !entry.startsWith(".") &&
+      entry !== "node_modules"
+    ) {
       files.push(...collectFiles(full));
-    } else if (stat.isFile() && [".ts", ".js", ".mjs", ".cjs"].includes(extname(entry))) {
+    } else if (
+      stat.isFile() &&
+      [".ts", ".js", ".mjs", ".cjs"].includes(extname(entry))
+    ) {
       files.push(full);
     }
   }
@@ -97,8 +104,8 @@ for (const dir of SCAN_DIRS) {
 if (errors > 0) {
   console.error(
     `\n${errors} invalid Express route pattern(s) found in source.\n` +
-    `Fix them before building to prevent startup crashes.\n` +
-    `See comments in scripts/validate-routes.mjs for safe alternatives.\n`,
+      `Fix them before building to prevent startup crashes.\n` +
+      `See comments in scripts/validate-routes.mjs for safe alternatives.\n`,
   );
   process.exit(1);
 } else {
