@@ -20,6 +20,28 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { DEFAULT_PRICING, penceToGBP } from "@shared/pricing";
+
+const YEARLY_SAVINGS_PERCENTAGE = Math.round(
+  ((DEFAULT_PRICING.individual.monthly.amount * 12 -
+    DEFAULT_PRICING.individual.yearly.amount) /
+    (DEFAULT_PRICING.individual.monthly.amount * 12)) *
+    100,
+);
+
+// Derived display values – always in sync with shared/pricing.ts
+const MONTHLY_PRICE = penceToGBP(DEFAULT_PRICING.individual.monthly.amount); // e.g. "10.00"
+const YEARLY_PRICE = penceToGBP(DEFAULT_PRICING.individual.yearly.amount); // e.g. "100.00"
+const YEARLY_PER_MONTH = (
+  DEFAULT_PRICING.individual.yearly.amount /
+  100 /
+  12
+).toFixed(2); // e.g. "8.33"
+const YEARLY_SAVINGS = (
+  DEFAULT_PRICING.individual.monthly.amount * 12 -
+  DEFAULT_PRICING.individual.yearly.amount
+).toFixed(0); // savings in pence → £ whole number
+const YEARLY_SAVINGS_GBP = (parseInt(YEARLY_SAVINGS, 10) / 100).toFixed(0); // e.g. "20"
 
 export default function BillingPage() {
   const { user } = useAuth();
@@ -198,7 +220,7 @@ export default function BillingPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="mb-6">
-                      <div className="text-4xl font-bold">£7.99</div>
+                      <div className="text-4xl font-bold">£{MONTHLY_PRICE}</div>
                       <div className="text-muted-foreground">per month</div>
                     </div>
 
@@ -257,21 +279,21 @@ export default function BillingPage() {
                 <Card className="border-2 border-primary relative">
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                     <Badge className="bg-primary text-primary-foreground">
-                      Save 17%
+                      Save {YEARLY_SAVINGS_PERCENTAGE}%
                     </Badge>
                   </div>
                   <CardHeader>
                     <CardTitle>Yearly</CardTitle>
                     <CardDescription>
-                      Best value - save £16 per year
+                      Best value - save £{YEARLY_SAVINGS_GBP} per year
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="mb-6">
-                      <div className="text-4xl font-bold">£79.90</div>
+                      <div className="text-4xl font-bold">£{YEARLY_PRICE}</div>
                       <div className="text-muted-foreground">per year</div>
                       <div className="text-sm text-primary mt-1">
-                        Just £6.66 per month
+                        Just £{YEARLY_PER_MONTH} per month
                       </div>
                     </div>
 
