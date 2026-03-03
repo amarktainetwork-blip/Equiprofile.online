@@ -15,7 +15,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { PageTransition } from "@/components/PageTransition";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AuthSplitLayout } from "@/components/AuthSplitLayout";
-import { AuthNav } from "@/components/AuthNav";
+import { MarketingNav } from "@/components/MarketingNav";
 import { motion, AnimatePresence } from "framer-motion";
 
 /**
@@ -88,7 +88,7 @@ export default function Login() {
 
   return (
     <>
-      <AuthNav />
+      <MarketingNav />
       <PageTransition>
         <AuthSplitLayout>
           <motion.div
@@ -181,19 +181,6 @@ export default function Login() {
                       onSubmit={handlePasswordStep}
                       className="space-y-4"
                     >
-                      <div className="flex items-center gap-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                        <span className="text-sm text-gray-400 truncate flex-1">
-                          {email}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={handleChangeEmail}
-                          className="text-xs text-indigo-400 hover:text-indigo-300 flex-shrink-0"
-                        >
-                          Change
-                        </button>
-                      </div>
-
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
                           <Label htmlFor="password" className="text-white">
@@ -219,20 +206,31 @@ export default function Login() {
                         />
                       </div>
 
-                      <Button
-                        type="submit"
-                        className="w-full bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white border-0 shadow-lg shadow-indigo-500/20 h-12 text-base"
-                        disabled={isLoading}
-                      >
-                        {isLoading ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Signing in...
-                          </>
-                        ) : (
-                          "Sign in"
-                        )}
-                      </Button>
+                      <div className="flex gap-3">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={handleChangeEmail}
+                          className="flex-1 border-white/10 text-white hover:bg-white/10 h-12 text-base"
+                          disabled={isLoading}
+                        >
+                          Back
+                        </Button>
+                        <Button
+                          type="submit"
+                          className="flex-1 bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white border-0 shadow-lg shadow-indigo-500/20 h-12 text-base"
+                          disabled={isLoading}
+                        >
+                          {isLoading ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              Signing in...
+                            </>
+                          ) : (
+                            "Sign in"
+                          )}
+                        </Button>
+                      </div>
                     </motion.form>
                   )}
                 </AnimatePresence>

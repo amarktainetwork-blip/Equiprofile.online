@@ -16,7 +16,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { PageTransition } from "@/components/PageTransition";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AuthSplitLayout } from "@/components/AuthSplitLayout";
-import { AuthNav } from "@/components/AuthNav";
+import { MarketingNav } from "@/components/MarketingNav";
 import { motion, AnimatePresence } from "framer-motion";
 import { trpc } from "@/lib/trpc";
 
@@ -191,7 +191,7 @@ export default function Register() {
 
   return (
     <>
-      <AuthNav />
+      <MarketingNav />
       <PageTransition>
         <AuthSplitLayout>
           <motion.div
@@ -297,19 +297,6 @@ export default function Register() {
                       onSubmit={handleEmailStep}
                       className="space-y-4"
                     >
-                      <div className="flex items-center gap-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                        <span className="text-sm text-white flex-1">
-                          {name}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={handleChangeName}
-                          className="text-xs text-indigo-400 hover:text-indigo-300 flex-shrink-0"
-                        >
-                          Change
-                        </button>
-                      </div>
-
                       <div className="space-y-2">
                         <Label htmlFor="email" className="text-white">
                           Email
@@ -354,19 +341,6 @@ export default function Register() {
                       onSubmit={handlePasswordStep}
                       className="space-y-4"
                     >
-                      <div className="flex items-center gap-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                        <span className="text-sm text-gray-400 truncate flex-1">
-                          {email}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={handleChangeEmail}
-                          className="text-xs text-indigo-400 hover:text-indigo-300 flex-shrink-0"
-                        >
-                          Change
-                        </button>
-                      </div>
-
                       <div className="space-y-2">
                         <Label htmlFor="password" className="text-white">
                           Password
