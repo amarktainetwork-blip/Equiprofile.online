@@ -413,7 +413,7 @@ export function SalesChatWidget() {
   const [messages, setMessages] = useState<ChatMessage[]>([WELCOME_MESSAGE]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState<Step>("chat");
+  const [step, setStep] = useState<Step>("lead");
   const [lead, setLead] = useState<LeadForm>({ name: "", email: "" });
   const [leadSubmitting, setLeadSubmitting] = useState(false);
   const [leadError, setLeadError] = useState("");
@@ -645,11 +645,12 @@ export function SalesChatWidget() {
           </div>
 
           {step === "lead" ? (
-            /* Lead Capture Form */
+            /* Lead Capture Form – mandatory before chat */
             <div data-equip-chat-lead>
-              <div data-equip-lead-title>Leave your details</div>
+              <div data-equip-lead-title>👋 Welcome to EquiProfile!</div>
               <div data-equip-lead-sub>
-                Our team will get back to you as soon as possible.
+                To get started, please share your name and email so we can
+                personalise your experience and follow up if needed.
               </div>
               <input
                 data-equip-lead-input
@@ -681,10 +682,7 @@ export function SalesChatWidget() {
                 onClick={handleLeadSubmit}
                 disabled={leadSubmitting}
               >
-                {leadSubmitting ? "Sending…" : "Send my details →"}
-              </button>
-              <button data-equip-lead-skip onClick={() => setStep("chat")}>
-                Skip — keep chatting
+                {leadSubmitting ? "Starting chat…" : "Start chatting →"}
               </button>
             </div>
           ) : (

@@ -52,6 +52,7 @@ import {
   trainerAvailability,
   horses,
   siteSettings,
+  chatLeads,
 } from "../drizzle/schema";
 
 // Subscription check middleware
@@ -2453,6 +2454,15 @@ Format your response as JSON with keys: recommendation, explanation, precautions
           .onDuplicateKeyUpdate({ set: { value: input.value } });
         return { success: true };
       }),
+
+    getLeads: adminUnlockedProcedure.query(async () => {
+      const dbConn = await getDb();
+      if (!dbConn) return [];
+      return dbConn
+        .select()
+        .from(chatLeads)
+        .orderBy(desc(chatLeads.createdAt));
+    }),
   }),
 
   // Stable management
