@@ -51,6 +51,7 @@ import {
   lessonBookings,
   trainerAvailability,
   horses,
+  siteSettings,
 } from "../drizzle/schema";
 
 // Subscription check middleware
@@ -2416,6 +2417,42 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         timestamp: new Date().toISOString(),
       };
     }),
+
+    // ── Site Settings (admin notification email + feature toggles) ──────────
+    getSiteSettings: adminUnlockedProcedure.query(async () => {
+      const dbConn = await getDb();
+      if (!dbConn) return {};
+      const rows = await dbConn.select().from(siteSettings);
+      return Object.fromEntries(rows.map((r) => [r.key, r.value ?? ""]));
+    }),
+
+    setSiteSetting: adminUnlockedProcedure
+      .input(
+        z.object({
+          key: z
+            .string()
+            .min(1)
+            .max(100)
+            .regex(
+              /^[a-z_]+$/,
+              "Key must be lowercase letters and underscores only",
+            ),
+          value: z.string().max(2000),
+        }),
+      )
+      .mutation(async ({ input }) => {
+        const dbConn = await getDb();
+        if (!dbConn)
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Database not available",
+          });
+        await dbConn
+          .insert(siteSettings)
+          .values({ key: input.key, value: input.value })
+          .onDuplicateKeyUpdate({ set: { value: input.value } });
+        return { success: true };
+      }),
   }),
 
   // Stable management

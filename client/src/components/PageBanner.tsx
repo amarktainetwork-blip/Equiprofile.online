@@ -26,7 +26,7 @@ export function PageBanner({
   subtitle,
   imageSrc,
   imagePosition = "center",
-  minHeight = "min-h-[360px] md:min-h-[480px]",
+  minHeight = "min-h-[432px] md:min-h-[552px]",
   overlay = true,
 }: PageBannerProps) {
   const objectPosition = {
@@ -36,8 +36,8 @@ export function PageBanner({
   }[imagePosition];
 
   return (
-    <div className={`relative ${minHeight} overflow-hidden mt-[72px]`}>
-      {/* Background Image */}
+    <div className={`relative ${minHeight} overflow-hidden`}>
+      {/* Background Image – starts at top-0 so it sits behind the transparent navbar */}
       <img
         src={imageSrc}
         alt={title}
@@ -49,9 +49,9 @@ export function PageBanner({
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70" />
       )}
 
-      {/* Content */}
+      {/* Content – pt-[72px] ensures text is below the fixed navbar */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="container mx-auto px-4 text-center py-12">
+        <div className="container mx-auto px-4 text-center pt-[72px] pb-12">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}

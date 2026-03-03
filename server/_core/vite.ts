@@ -23,9 +23,10 @@ export async function setupVite(app: Express, server: Server) {
   app.use(vite.middlewares);
   // SPA fallback for development - serve index.html for non-static routes
   app.use((req, res, next) => {
-    // Skip if it's an API route or static asset
+    // Skip if it's an API route, tRPC route, or static asset
     if (
       req.originalUrl.startsWith("/api/") ||
+      req.originalUrl.startsWith("/trpc") ||
       req.originalUrl.startsWith("/assets/") ||
       req.originalUrl.match(/\.[a-z0-9]+$/i)
     ) {
@@ -143,8 +144,11 @@ export function serveStatic(app: Express) {
   // SPA fallback - serve index.html ONLY for navigation requests
   // NOT for asset requests (prevents CSS/JS returning HTML)
   app.use((req, res, next) => {
-    // Skip if it's an API route
-    if (req.originalUrl.startsWith("/api/")) {
+    // Skip if it's an API or tRPC route — must never serve HTML for these
+    if (
+      req.originalUrl.startsWith("/api/") ||
+      req.originalUrl.startsWith("/trpc")
+    ) {
       return next();
     }
 

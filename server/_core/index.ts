@@ -4,6 +4,7 @@ import { createServer } from "http";
 import net from "net";
 import helmet from "helmet";
 import cors from "cors";
+import crypto from "crypto";
 import rateLimit from "express-rate-limit";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
@@ -17,6 +18,8 @@ import { serveStatic, setupVite } from "./vite";
 import { nanoid } from "nanoid";
 import Stripe from "stripe";
 import * as db from "../db";
+import { getDb } from "../db";
+import { contactSubmissions } from "../../drizzle/schema";
 import { getStripe, validatePricingConfig } from "../stripe";
 import * as email from "./email";
 import { ENV } from "./env";
@@ -645,6 +648,22 @@ async function startServer() {
         message,
       });
 
+      // Persist to DB (non-blocking on failure so the response is always fast)
+      const dbConn = await getDb();
+      if (dbConn) {
+        const ipHash = crypto
+          .createHash("sha256")
+          .update(String(req.ip || ""))
+          .digest("hex")
+          .slice(0, 64);
+        dbConn
+          .insert(contactSubmissions)
+          .values({ name, email: fromEmail, subject, message, ipHash })
+          .catch((err: Error) =>
+            console.warn("[Contact] DB insert failed:", err.message),
+          );
+      }
+
       res.json({
         success: true,
         message: "Your message has been sent. We'll get back to you soon!",
@@ -852,6 +871,32 @@ async function startServer() {
 
   // REST API v1 (for third-party integrations)
   app.use("/api/v1", apiRouter);
+
+  // ── API SAFETY NET ─────────────────────────────────────────────────────────
+  // Any request that starts with /api/* and has NOT been handled by a route
+  // above must return JSON, never the SPA index.html.
+  // This prevents the "login returns HTML 200" bug where an unmatched API path
+  // falls through to the SPA catch-all.
+  app.all("/api/*", (req, res) => {
+    res.status(404).json({
+      error: "Not found",
+      path: req.originalUrl,
+    });
+  });
+
+  // Global JSON error handler for Express errors thrown inside API handlers.
+  // Must be registered AFTER all routes and BEFORE static serving.
+  // The 4-argument signature is required by Express to recognise this as an
+  // error handler (not a regular middleware).
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  app.use((err: Error, req: any, res: any, next: any) => {
+    // Only override if the response hasn't started and the request is an API call
+    if (!res.headersSent && req.originalUrl.startsWith("/api/")) {
+      console.error("[API Error]", req.method, req.originalUrl, err.message);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+    next(err);
+  });
 
   // development mode uses Vite, production mode uses static files
   if (process.env.NODE_ENV === "development") {
