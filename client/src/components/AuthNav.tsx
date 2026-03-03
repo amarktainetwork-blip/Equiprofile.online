@@ -12,7 +12,7 @@ export function AuthNav() {
           href="/"
           className="pointer-events-auto hover:opacity-80 transition-opacity"
         >
-          <span className="text-2xl font-bold font-serif bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+          <span className="text-2xl font-bold font-serif text-blue-500">
             EquiProfile
           </span>
         </Link>

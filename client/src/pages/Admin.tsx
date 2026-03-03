@@ -63,6 +63,7 @@ import {
   Plus,
   RotateCw,
   Server,
+  MessageSquare,
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
@@ -123,6 +124,7 @@ function AdminContent() {
   const envHealthQuery = trpc.admin.getEnvHealth.useQuery(undefined, {
     refetchInterval: 30000, // Refresh every 30s
   });
+  const leadsQuery = trpc.admin.getLeads.useQuery();
 
   const suspendMutation = trpc.admin.suspendUser.useMutation({
     onSuccess: () => {
@@ -342,6 +344,10 @@ function AdminContent() {
           <TabsTrigger value="system" className="flex items-center gap-2">
             <Server className="w-4 h-4" />
             System
+          </TabsTrigger>
+          <TabsTrigger value="leads" className="flex items-center gap-2">
+            <MessageSquare className="w-4 h-4" />
+            Leads
           </TabsTrigger>
         </TabsList>
 
@@ -910,6 +916,63 @@ function AdminContent() {
                       ))}
                     </TableBody>
                   </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Sales Leads Tab */}
+        <TabsContent value="leads">
+          <Card>
+            <CardHeader>
+              <CardTitle>Chat Leads</CardTitle>
+              <CardDescription>
+                Visitors who submitted their details via the sales chat widget
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {leadsQuery.isLoading ? (
+                <div className="space-y-2">
+                  {[...Array(4)].map((_, i) => (
+                    <Skeleton key={i} className="h-10 w-full" />
+                  ))}
+                </div>
+              ) : leadsQuery.data && leadsQuery.data.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Source</TableHead>
+                      <TableHead>Date</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {leadsQuery.data.map((lead) => (
+                      <TableRow key={lead.id}>
+                        <TableCell className="font-medium">
+                          {lead.name}
+                        </TableCell>
+                        <TableCell>{lead.email}</TableCell>
+                        <TableCell>
+                          <Badge variant="secondary">
+                            {lead.source ?? "chat"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground text-sm">
+                          {formatDistanceToNow(new Date(lead.createdAt), {
+                            addSuffix: true,
+                          })}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <MessageSquare className="mx-auto h-12 w-12 mb-4 opacity-50" />
+                  <p>No leads captured yet</p>
                 </div>
               )}
             </CardContent>
