@@ -1,18 +1,14 @@
-import { MarketingNav } from "@/components/MarketingNav";
-import { Footer } from "@/components/Footer";
-import { PageTransition } from "@/components/PageTransition";
+import { MarketingLayout } from "@/components/MarketingLayout";
 import { PageBanner } from "@/components/PageBanner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function PrivacyPage() {
   return (
-    <>
-      <MarketingNav />
-      <PageTransition>
-        <div className="min-h-screen bg-black">
-          <PageBanner
-            title="Privacy Policy"
-            subtitle="How we collect, use, and protect your personal information"
+    <MarketingLayout>
+      <div className="min-h-screen bg-black">
+        <PageBanner
+          title="Privacy Policy"
+          subtitle="How we collect, use, and protect your personal information"
             imageSrc="/images/gallery/23.jpg"
             imagePosition="center"
           />
@@ -765,9 +761,7 @@ export default function PrivacyPage() {
               </div>
             </div>
           </div>
-          <Footer />
         </div>
-      </PageTransition>
-    </>
+      </MarketingLayout>
   );
 }

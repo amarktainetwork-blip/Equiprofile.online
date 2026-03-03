@@ -1,18 +1,14 @@
-import { MarketingNav } from "@/components/MarketingNav";
-import { Footer } from "@/components/Footer";
-import { PageTransition } from "@/components/PageTransition";
+import { MarketingLayout } from "@/components/MarketingLayout";
 import { PageBanner } from "@/components/PageBanner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function TermsPage() {
   return (
-    <>
-      <MarketingNav />
-      <PageTransition>
-        <div className="min-h-screen bg-black">
-          <PageBanner
-            title="Terms of Service"
-            subtitle="Legal terms and conditions for using EquiProfile"
+    <MarketingLayout>
+      <div className="min-h-screen bg-black">
+        <PageBanner
+          title="Terms of Service"
+          subtitle="Legal terms and conditions for using EquiProfile"
             imageSrc="/images/gallery/20.jpg"
             imagePosition="center"
           />
@@ -560,9 +556,7 @@ export default function TermsPage() {
               </div>
             </div>
           </div>
-          <Footer />
         </div>
-      </PageTransition>
-    </>
+      </MarketingLayout>
   );
 }

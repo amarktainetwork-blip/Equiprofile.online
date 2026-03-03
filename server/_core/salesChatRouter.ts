@@ -2,8 +2,8 @@
  * Sales Chat Router
  *
  * POST /api/sales-chat   – AI chat grounded in the Knowledge Pack
- * POST /api/sales-lead   – Capture a lead (name + email)
- * GET  /api/sales-leads  – Admin: list captured leads (requires admin session cookie)
+ * POST /api/sales-lead   – Capture a lead (name + email), persist to DB + email transcript
+ * GET  /api/sales-leads  – Admin: list captured leads (requires ADMIN_LEADS_KEY header)
  *
  * The Knowledge Pack is loaded from /knowledge/*.md at server start and used as
  * a static system prompt so the AI is grounded in facts about EquiProfile.
@@ -20,6 +20,9 @@ import crypto from "crypto";
 import * as emailModule from "./email";
 import { invokeLLM, isAIConfigured } from "./llm";
 import { sanitizeHtml } from "./htmlEscape";
+import { getDb } from "../db";
+import { chatLeads } from "../../drizzle/schema";
+import { eq } from "drizzle-orm";
 
 const router: Router = Router();
 
@@ -166,30 +169,16 @@ function ruleFallback(userMessage: string): string | null {
 }
 
 // ──────────────────────────────────────────────────────────
-// In-memory lead store
-// TODO: replace with DB persistence so leads survive restarts.
-//       For V1/beta this is acceptable; add a LeadCapture table in the
-//       next schema migration.
-// ──────────────────────────────────────────────────────────
-
-interface Lead {
-  id: string;
-  name: string;
-  email: string;
-  message?: string;
-  source: string;
-  capturedAt: string;
-  ip: string;
-}
-
-const leads: Lead[] = [];
-
-// ──────────────────────────────────────────────────────────
 // Helpers
 // ──────────────────────────────────────────────────────────
 
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+}
+
+/** One-way hash of IP for audit trail (not stored in cleartext). */
+function hashIp(ip: string): string {
+  return crypto.createHash("sha256").update(ip).digest("hex").slice(0, 64);
 }
 
 // ──────────────────────────────────────────────────────────
@@ -269,7 +258,13 @@ router.post("/sales-chat", chatLimiter, async (req, res) => {
 
 router.post("/sales-lead", leadLimiter, async (req, res) => {
   try {
-    const { name, email: leadEmail, message, source = "chat" } = req.body;
+    const {
+      name,
+      email: leadEmail,
+      message,
+      source = "chat",
+      transcript,
+    } = req.body;
 
     if (
       !name ||
@@ -294,39 +289,88 @@ router.post("/sales-lead", leadLimiter, async (req, res) => {
     const safeMessage = message
       ? sanitizeHtml(String(message).slice(0, 500))
       : undefined;
+    const safeSource = String(source).slice(0, 50);
+    const ipHash = hashIp(String(req.ip || ""));
+    const leadId =
+      Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
-    const lead: Lead = {
-      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-      name: safeName,
-      email: safeEmail,
-      message: safeMessage,
-      source: String(source).slice(0, 50),
-      capturedAt: new Date().toISOString(),
-      ip: String(req.ip || "").slice(0, 45),
-    };
+    // Serialise transcript if provided (array of {role, content} objects)
+    let transcriptJson: string | undefined;
+    if (Array.isArray(transcript) && transcript.length > 0) {
+      try {
+        transcriptJson = JSON.stringify(
+          transcript.slice(0, 50).map((t: any) => ({
+            role: String(t.role || "user").slice(0, 20),
+            content: String(t.content || "").slice(0, 1000),
+          })),
+        );
+      } catch {
+        // ignore serialisation errors
+      }
+    }
 
-    leads.push(lead);
+    // Persist to DB (non-blocking on failure so the response is always fast)
+    const db = await getDb();
+    if (db) {
+      try {
+        await db.insert(chatLeads).values({
+          leadId,
+          name: safeName,
+          email: safeEmail,
+          message: safeMessage,
+          source: safeSource,
+          transcript: transcriptJson,
+          ipHash,
+        });
+      } catch (dbErr) {
+        console.warn("[SalesLead] DB insert failed:", dbErr);
+        // Continue – don't block the response
+      }
+    }
 
     // Notify admin by email (fire-and-forget)
     const contactTo = process.env.CONTACT_TO || process.env.SMTP_USER;
     if (contactTo) {
+      // Build a readable transcript section for the email
+      let transcriptHtml = "";
+      if (transcriptJson) {
+        try {
+          const turns = JSON.parse(transcriptJson) as Array<{
+            role: string;
+            content: string;
+          }>;
+          const rows = turns
+            .map(
+              (t) =>
+                `<tr><td style="padding:4px 12px 4px 0;font-weight:bold;text-transform:capitalize;color:#374151;">${sanitizeHtml(t.role)}:</td><td style="padding:4px 0;color:#111827;">${sanitizeHtml(t.content)}</td></tr>`,
+            )
+            .join("");
+          transcriptHtml = `
+<h3 style="color:#374151;margin-top:24px;">Chat Transcript</h3>
+<table style="border-collapse:collapse;width:100%;">${rows}</table>`;
+        } catch {
+          // ignore
+        }
+      }
+
       emailModule
         .sendEmail(
           contactTo,
           `[EquiProfile] New Sales Lead: ${safeName}`,
           `
-<html><body style="font-family: Arial, sans-serif; color: #222;">
+<html><body style="font-family: Arial, sans-serif; color: #222; max-width:600px;">
 <h2>🐴 New Sales Lead from EquiProfile Chat</h2>
 <table style="border-collapse:collapse;">
   <tr><td style="padding:4px 12px 4px 0;font-weight:bold;">Name:</td><td>${safeName}</td></tr>
   <tr><td style="padding:4px 12px 4px 0;font-weight:bold;">Email:</td><td>${safeEmail}</td></tr>
-  <tr><td style="padding:4px 12px 4px 0;font-weight:bold;">Source:</td><td>${String(source).slice(0, 50)}</td></tr>
-  <tr><td style="padding:4px 12px 4px 0;font-weight:bold;">Time:</td><td>${lead.capturedAt}</td></tr>
+  <tr><td style="padding:4px 12px 4px 0;font-weight:bold;">Source:</td><td>${safeSource}</td></tr>
+  <tr><td style="padding:4px 12px 4px 0;font-weight:bold;">Time:</td><td>${new Date().toISOString()}</td></tr>
   ${safeMessage ? `<tr><td style="padding:4px 12px 4px 0;font-weight:bold;">Message:</td><td>${safeMessage}</td></tr>` : ""}
 </table>
+${transcriptHtml}
 <p style="margin-top:16px;">Reply to this lead at <a href="mailto:${safeEmail}">${safeEmail}</a>.</p>
 </body></html>`,
-          `New Sales Lead\nName: ${safeName}\nEmail: ${safeEmail}\nSource: ${source}${safeMessage ? "\nMessage: " + safeMessage : ""}`,
+          `New Sales Lead\nName: ${safeName}\nEmail: ${safeEmail}\nSource: ${safeSource}${safeMessage ? "\nMessage: " + safeMessage : ""}`,
         )
         .catch((e) => console.warn("[SalesLead] Email notify failed:", e));
     }
@@ -342,7 +386,7 @@ router.post("/sales-lead", leadLimiter, async (req, res) => {
 // GET /api/sales-leads  (admin-only: requires ADMIN_LEADS_KEY header)
 // ──────────────────────────────────────────────────────────
 
-router.get("/sales-leads", (req, res) => {
+router.get("/sales-leads", async (req, res) => {
   const adminKey = process.env.ADMIN_LEADS_KEY;
   const provided = String(req.headers["x-admin-leads-key"] || "");
 
@@ -368,7 +412,20 @@ router.get("/sales-leads", (req, res) => {
     return res.status(403).json({ error: "Forbidden" });
   }
 
-  res.json({ leads, total: leads.length });
+  try {
+    const db = await getDb();
+    if (!db) {
+      return res.status(503).json({ error: "Database not available" });
+    }
+    const rows = await db
+      .select()
+      .from(chatLeads)
+      .orderBy(chatLeads.createdAt);
+    res.json({ leads: rows, total: rows.length });
+  } catch (err) {
+    console.error("[SalesLeads] DB query failed:", err);
+    res.status(500).json({ error: "Failed to retrieve leads" });
+  }
 });
 
 export default router;

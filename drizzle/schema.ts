@@ -1166,3 +1166,53 @@ export const notes = mysqlTable("notes", {
 
 export type Note = typeof notes.$inferSelect;
 export type InsertNote = typeof notes.$inferInsert;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Sales chat leads – persisted from the floating chat widget
+// ─────────────────────────────────────────────────────────────────────────────
+export const chatLeads = mysqlTable("chatLeads", {
+  id: int("id").autoincrement().primaryKey(),
+  leadId: varchar("leadId", { length: 40 }).notNull().unique(), // client-generated id
+  name: varchar("name", { length: 100 }).notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  message: text("message"),
+  source: varchar("source", { length: 50 }).default("chat"),
+  // Full chat transcript stored as JSON string: [{role, content}]
+  transcript: text("transcript"),
+  ipHash: varchar("ipHash", { length: 64 }), // SHA-256 of IP for audit, not raw IP
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ChatLead = typeof chatLeads.$inferSelect;
+export type InsertChatLead = typeof chatLeads.$inferInsert;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Contact form submissions
+// ─────────────────────────────────────────────────────────────────────────────
+export const contactSubmissions = mysqlTable("contactSubmissions", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 200 }).notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  subject: varchar("subject", { length: 500 }).notNull(),
+  message: text("message").notNull(),
+  ipHash: varchar("ipHash", { length: 64 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ContactSubmission = typeof contactSubmissions.$inferSelect;
+export type InsertContactSubmission = typeof contactSubmissions.$inferInsert;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Site settings – key/value store for admin-configurable options
+// (sensitive API keys must still be set via env vars, this is for non-sensitive
+//  settings only, e.g. admin notification email)
+// ─────────────────────────────────────────────────────────────────────────────
+export const siteSettings = mysqlTable("siteSettings", {
+  id: int("id").autoincrement().primaryKey(),
+  key: varchar("key", { length: 100 }).notNull().unique(),
+  value: text("value"),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SiteSetting = typeof siteSettings.$inferSelect;
+export type InsertSiteSetting = typeof siteSettings.$inferInsert;
