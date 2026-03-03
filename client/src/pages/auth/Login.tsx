@@ -85,7 +85,7 @@ export default function Login() {
 
   return (
     <>
-      <MarketingNav alwaysLight />
+      <MarketingNav />
       <PageTransition>
         <AuthSplitLayout>
           <motion.div
