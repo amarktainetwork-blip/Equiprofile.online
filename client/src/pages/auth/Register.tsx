@@ -31,7 +31,7 @@ import { trpc } from "@/lib/trpc";
  */
 export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -115,6 +115,21 @@ export default function Register() {
     setError("");
   };
 
+  const handlePasswordStep = (e: FormEvent) => {
+    e.preventDefault();
+    setError("");
+    if (password.length < 12) {
+      setError("Password must be at least 12 characters");
+      return;
+    }
+    setStep(4);
+  };
+
+  const handleChangePassword = () => {
+    setStep(3);
+    setError("");
+  };
+
   const handleEmailRegister = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
@@ -126,11 +141,6 @@ export default function Register() {
 
     if (password !== confirmPassword) {
       setError("Passwords do not match");
-      return;
-    }
-
-    if (password.length < 12) {
-      setError("Password must be at least 12 characters");
       return;
     }
 
@@ -209,7 +219,9 @@ export default function Register() {
                     ? "Let's start with your name"
                     : step === 2
                       ? "What's your email address?"
-                      : "Create a secure password"}
+                      : step === 3
+                        ? "Create a secure password"
+                        : "Confirm your password"}
                 </CardDescription>
                 {hasSubscribeIntent && (
                   <p className="text-xs text-center text-indigo-300 bg-indigo-950/40 border border-indigo-500/30 rounded-lg px-3 py-2 mt-2">
@@ -332,14 +344,14 @@ export default function Register() {
                         </Button>
                       </div>
                     </motion.form>
-                  ) : (
+                  ) : step === 3 ? (
                     <motion.form
                       key="step3"
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -20 }}
                       transition={{ duration: 0.3 }}
-                      onSubmit={handleEmailRegister}
+                      onSubmit={handlePasswordStep}
                       className="space-y-4"
                     >
                       <div className="flex items-center gap-2 p-3 bg-white/5 rounded-lg border border-white/10">
@@ -374,6 +386,34 @@ export default function Register() {
                         </p>
                       </div>
 
+                      <div className="flex gap-3">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={handleChangeEmail}
+                          className="flex-1 border-white/10 text-white hover:bg-white/10 h-12 text-base"
+                        >
+                          Back
+                        </Button>
+                        <Button
+                          type="submit"
+                          className="flex-1 bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white border-0 shadow-lg shadow-indigo-500/20 h-12 text-base"
+                        >
+                          Continue
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </Button>
+                      </div>
+                    </motion.form>
+                  ) : (
+                    <motion.form
+                      key="step4"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.3 }}
+                      onSubmit={handleEmailRegister}
+                      className="space-y-4"
+                    >
                       <div className="space-y-2">
                         <Label
                           htmlFor="confirm-password"
@@ -388,6 +428,7 @@ export default function Register() {
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
                           required
+                          autoFocus
                           className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:bg-white/10 focus:border-white/20 h-12 text-base transition-all duration-200"
                         />
                       </div>
@@ -426,7 +467,7 @@ export default function Register() {
                         <Button
                           type="button"
                           variant="outline"
-                          onClick={handleChangeEmail}
+                          onClick={handleChangePassword}
                           className="flex-1 border-white/10 text-white hover:bg-white/10 h-12 text-base"
                           disabled={isLoading}
                         >

@@ -55,8 +55,16 @@ export function AuthSplitLayout({ children }: AuthSplitLayoutProps) {
           className="absolute bottom-3 left-0 right-0 text-center text-xs text-gray-600"
           aria-label={`© ${new Date().getFullYear()} EquiProfile.online · Part of AmarktAI Network`}
         >
-          © {new Date().getFullYear()} EquiProfile.online · Part of Amarkt
-          <span className="text-blue-400 font-semibold">AI</span> Network
+          © {new Date().getFullYear()} EquiProfile.online · Part of{" "}
+          <a
+            href="https://amarktai.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-gray-400 transition-colors"
+          >
+            Amarkt<span className="text-blue-400 font-semibold">AI</span>{" "}
+            Network
+          </a>
         </p>
       </div>
     </div>
