@@ -58,7 +58,7 @@ const WELCOME_MESSAGE: ChatMessage = {
   id: "welcome",
   role: "assistant",
   content:
-    "👋 Hi! I'm the EquiProfile assistant. I can answer questions about features, pricing, getting started, and more. How can I help you today?",
+    "Hello! I'm the EquiProfile assistant. I can help you with questions about horse health tracking, training logs, scheduling, billing, and everything else in the platform. What would you like to know?",
 };
 
 // ──────────────────────────────────────────────────────────
@@ -398,10 +398,10 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 // Quick suggestion chips
 // ──────────────────────────────────────────────────────────
 const SUGGESTIONS = [
-  "What plans do you offer?",
-  "Is there a free trial?",
-  "How do I sign up?",
-  "What features are included?",
+  "How does the 7-day free trial work?",
+  "Can I track health records for multiple horses?",
+  "What does the scheduling feature include?",
+  "How do I get started?",
 ];
 
 // ──────────────────────────────────────────────────────────
@@ -615,7 +615,11 @@ export function SalesChatWidget() {
         >
           {/* Header */}
           <div data-equip-chat-header>
-            <div data-equip-chat-avatar>🐴</div>
+            <div data-equip-chat-avatar>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+              </div>
             <div data-equip-chat-header-info>
               <div data-equip-chat-header-name>EquiProfile Assistant</div>
               <div data-equip-chat-header-status>
@@ -691,12 +695,13 @@ export function SalesChatWidget() {
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          fontSize: 14,
                           flexShrink: 0,
                           alignSelf: "flex-end",
                         }}
                       >
-                        🐴
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                        </svg>
                       </div>
                     )}
                     <div data-equip-msg-bubble>{msg.content}</div>
@@ -714,11 +719,12 @@ export function SalesChatWidget() {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        fontSize: 14,
                         flexShrink: 0,
                       }}
                     >
-                      🐴
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                      </svg>
                     </div>
                     <div
                       data-equip-msg-bubble

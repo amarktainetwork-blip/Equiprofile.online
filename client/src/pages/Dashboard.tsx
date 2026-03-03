@@ -231,13 +231,15 @@ function ModuleCard({
 
 function DashboardContent() {
   const { user } = useAuth();
-  const { data: stats } = trpc.user.getDashboardStats.useQuery();
+  const { data: stats } = trpc.user.getDashboardStats.useQuery(undefined, {
+    retry: false,
+  });
   const { data: subscription } = trpc.user.getSubscriptionStatus.useQuery();
 
   const getSubscriptionBadge = () => {
     if (!subscription) return null;
     switch (subscription.status) {
-      case "trial":
+      case "trial": {
         const trialDays = subscription.trialEndsAt
           ? Math.ceil(
               (new Date(subscription.trialEndsAt).getTime() - Date.now()) /
@@ -252,6 +254,7 @@ function DashboardContent() {
             {trialDays} days left in trial
           </Badge>
         );
+      }
       case "active":
         return (
           <Badge

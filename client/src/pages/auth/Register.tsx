@@ -16,7 +16,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { PageTransition } from "@/components/PageTransition";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AuthSplitLayout } from "@/components/AuthSplitLayout";
-import { MarketingNav } from "@/components/MarketingNav";
+import { AuthNav } from "@/components/AuthNav";
 import { motion, AnimatePresence } from "framer-motion";
 import { trpc } from "@/lib/trpc";
 
@@ -191,7 +191,7 @@ export default function Register() {
 
   return (
     <>
-      <MarketingNav />
+      <AuthNav />
       <PageTransition>
         <AuthSplitLayout>
           <motion.div
