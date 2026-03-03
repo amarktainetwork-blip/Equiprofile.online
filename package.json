@@ -12,7 +12,7 @@
     "build:safe": "NODE_OPTIONS='--max_old_space_size=2048' npm run build",
     "start": "NODE_ENV=production node dist/index.js",
     "check": "tsc --noEmit",
-    "preflight": "node scripts/check-pkg.mjs",
+    "preflight": "node scripts/check-pkg.mjs && node scripts/validate-routes.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",

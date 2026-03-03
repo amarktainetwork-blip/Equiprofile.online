@@ -118,6 +118,17 @@ for i in 1 2 3; do
   curl -fsS -o /dev/null --max-time 5 "$HEALTH_LOCAL" 2>/dev/null && break || true
 done
 
+# Verify the process is actually listening on port 3000
+echo "   Checking listener on port 3000..."
+if ss -lntp 2>/dev/null | grep -q ":3000"; then
+  echo "   ✅ Port 3000 listener confirmed (ss -lntp)"
+else
+  echo "   ❌ No listener found on port 3000!"
+  echo "   --- Last 80 lines of $SERVICE_NAME logs ---"
+  journalctl -u "$SERVICE_NAME" -n 80 --no-pager 2>/dev/null || true
+  exit 1
+fi
+
 check_health "$HEALTH_LOCAL"  "Local  ($HEALTH_LOCAL)"
 check_health "$HEALTH_PUBLIC" "Public ($HEALTH_PUBLIC)" || \
   echo "   ⚠️  Public health check failed – DNS/TLS may not yet be pointing to this server."
