@@ -80,7 +80,7 @@ export default function About() {
         <PageBanner
           title="About EquiProfile"
           subtitle="We're on a mission to revolutionize horse management with technology that empowers horse owners, trainers, and equestrian professionals."
-          imageSrc="/images/horse-stable.jpg"
+          imageSrc="/images/aboutus.jpg"
           imagePosition="center"
         />
 

@@ -246,6 +246,41 @@ export default function Home() {
             </div>
           </section>
 
+          {/* Premium CTA Quote Block */}
+          <section className="py-20 bg-black relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-indigo-900/20 via-black to-cyan-900/20 pointer-events-none" />
+            <div className="container px-4 relative z-10">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7 }}
+                viewport={{ once: true }}
+                className="max-w-3xl mx-auto text-center"
+              >
+                <p className="text-lg md:text-2xl font-serif text-white/90 italic leading-relaxed">
+                  "The difference between a good stable and a great one is{" "}
+                  <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent not-italic font-semibold">
+                    the quality of the records behind it
+                  </span>
+                  ."
+                </p>
+                <p className="mt-6 text-white/50 text-sm uppercase tracking-widest font-medium">
+                  EquiProfile — Built for professionals who care deeply
+                </p>
+                <div className="mt-8">
+                  <Link href="/register">
+                    <Button
+                      size="lg"
+                      className="bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white border-0 shadow-lg shadow-indigo-500/20 px-8 hover:scale-105 transition-transform"
+                    >
+                      Start Your Free Trial
+                    </Button>
+                  </Link>
+                </div>
+              </motion.div>
+            </div>
+          </section>
+
           {/* Features Grid */}
           <section className="py-24 bg-black relative">
             <div className="container px-4">
