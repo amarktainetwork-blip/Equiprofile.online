@@ -19,7 +19,7 @@ interface AuthSplitLayoutProps {
  */
 export function AuthSplitLayout({ children }: AuthSplitLayoutProps) {
   return (
-    <div className="w-full pt-[72px] relative flex flex-col min-h-screen md:flex-row md:h-screen md:overflow-hidden">
+    <div className="w-full pt-[72px] relative flex flex-col min-h-screen md:flex-row md:h-screen md:overflow-hidden md:bg-gray-950">
       {/* Video panel — absolute full-bg on mobile, left 50% on desktop */}
       <div className="absolute inset-0 md:relative md:inset-auto md:w-1/2 md:flex-shrink-0 overflow-hidden">
         <video

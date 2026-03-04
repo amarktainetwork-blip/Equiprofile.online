@@ -108,14 +108,12 @@ export default defineConfig({
           if (id.includes("node_modules/@radix-ui/")) {
             return "radix-ui";
           }
-          // Charts
-          if (
-            id.includes("node_modules/recharts") ||
-            id.includes("node_modules/chart.js") ||
-            id.includes("node_modules/react-chartjs-2")
-          ) {
-            return "charts";
-          }
+          // Charts — intentionally NOT assigned to a manual chunk.
+          // recharts (the only chart library imported) is only used in the
+          // lazy-loaded Analytics page, so Rollup will bundle it there
+          // naturally.  Assigning it to a separate chunk caused a circular
+          // dependency with react-core (shared CJS interop helpers) that
+          // produced an "Cannot access 'S' before initialization" TDZ crash.
           // Animation
           if (id.includes("node_modules/framer-motion")) {
             return "framer-motion";
