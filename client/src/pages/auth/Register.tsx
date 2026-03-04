@@ -62,7 +62,10 @@ export default function Register() {
       // triggering the mutation again on the next render.
       setCheckoutRedirecting(true);
       createCheckout
-        .mutateAsync({ plan: intentInterval })
+        .mutateAsync({
+          plan: intentPlan === "stable" ? "stable" : ("pro" as const),
+          interval: intentInterval,
+        })
         .then((r) => {
           if (r.url) window.location.href = r.url;
           else setLocation("/dashboard");
@@ -171,7 +174,8 @@ export default function Register() {
       if (hasSubscribeIntent) {
         try {
           const checkout = await createCheckout.mutateAsync({
-            plan: intentInterval,
+            plan: intentPlan === "stable" ? "stable" : ("pro" as const),
+            interval: intentInterval,
           });
           if (checkout.url) {
             window.location.href = checkout.url;

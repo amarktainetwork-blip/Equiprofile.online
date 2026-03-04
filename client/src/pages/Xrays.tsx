@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { trpc } from "../_core/trpc";
 import { DashboardLayout } from "../components/DashboardLayout";
 import { Button } from "../components/ui/button";
@@ -30,7 +30,7 @@ import {
 } from "../components/ui/select";
 import { useToast } from "../hooks/use-toast";
 import { useRealtimeModule } from "../hooks/useRealtime";
-import { PlusCircle, Edit2, Trash2, FileImage } from "lucide-react";
+import { PlusCircle, Edit2, Trash2, FileImage, Upload, X } from "lucide-react";
 
 export default function Xrays() {
   return (
@@ -44,6 +44,8 @@ function XraysContent() {
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingXray, setEditingXray] = useState<any>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [fileUploading, setFileUploading] = useState(false);
 
   const [formData, setFormData] = useState({
     horseId: 0,
@@ -64,6 +66,8 @@ function XraysContent() {
   const { data: horses } = trpc.horses.list.useQuery();
   const { data: xrays, refetch } = trpc.xrays.list.useQuery();
   const [localXrays, setLocalXrays] = useState(xrays || []);
+
+  const uploadMutation = trpc.documents.upload.useMutation();
 
   // Real-time updates
   useRealtimeModule("xrays", (action, data) => {
@@ -147,6 +151,72 @@ function XraysContent() {
       cost: 0,
       notes: "",
     });
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const maxSize = 20 * 1024 * 1024; // 20MB for x-ray images
+    if (file.size > maxSize) {
+      toast({
+        title: "File too large",
+        description: "Max 20MB",
+        variant: "destructive",
+      });
+      return;
+    }
+    setFileUploading(true);
+    try {
+      const reader = new FileReader();
+      reader.onload = async (ev) => {
+        const dataUrl = ev.target?.result;
+        if (typeof dataUrl !== "string" || !dataUrl.includes(",")) {
+          toast({ title: "Failed to read file", variant: "destructive" });
+          setFileUploading(false);
+          return;
+        }
+        const base64 = dataUrl.split(",")[1];
+        try {
+          const result = await uploadMutation.mutateAsync({
+            fileName: file.name,
+            fileType: file.type,
+            fileSize: file.size,
+            fileData: base64,
+            category: "health",
+            description: "X-ray file",
+          });
+          setFormData((prev) => ({
+            ...prev,
+            fileUrl: result.url,
+            fileName: file.name,
+            fileSize: file.size,
+            fileMimeType: file.type,
+          }));
+          toast({ title: "File uploaded successfully" });
+        } catch (err: any) {
+          toast({
+            title: "Upload failed",
+            description: err.message,
+            variant: "destructive",
+          });
+        } finally {
+          setFileUploading(false);
+        }
+      };
+      reader.onerror = () => {
+        toast({ title: "Failed to read file", variant: "destructive" });
+        setFileUploading(false);
+      };
+      reader.readAsDataURL(file);
+    } catch (err: any) {
+      toast({
+        title: "Upload failed",
+        description: err.message,
+        variant: "destructive",
+      });
+      setFileUploading(false);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -345,17 +415,60 @@ function XraysContent() {
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="fileUrl">File URL (placeholder)</Label>
-                  <Input
-                    id="fileUrl"
-                    placeholder="File will be uploaded to secure storage"
-                    value={formData.fileUrl}
-                    onChange={(e) =>
-                      setFormData({ ...formData, fileUrl: e.target.value })
-                    }
+                  <Label>X-ray File</Label>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*,application/pdf"
+                    className="hidden"
+                    onChange={handleFileChange}
                   />
-                  <p className="text-sm text-muted-foreground">
-                    File upload integration pending
+                  {formData.fileUrl ? (
+                    <div className="flex items-center gap-2 p-2 border rounded-md bg-muted/30">
+                      <FileImage className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <span className="text-sm truncate flex-1">
+                        {formData.fileName || "Uploaded file"}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            fileUrl: "",
+                            fileName: "",
+                            fileSize: 0,
+                            fileMimeType: "",
+                          }))
+                        }
+                        className="text-muted-foreground hover:text-destructive"
+                        aria-label="Remove file"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={fileUploading}
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      {fileUploading ? (
+                        <>
+                          <Upload className="mr-2 h-4 w-4 animate-pulse" />
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="mr-2 h-4 w-4" />
+                          Upload X-ray File
+                        </>
+                      )}
+                    </Button>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    Images (JPEG, PNG, etc.) or PDF. Max 20MB.
                   </p>
                 </div>
 
