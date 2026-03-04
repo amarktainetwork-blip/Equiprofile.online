@@ -13,6 +13,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useLocation } from "wouter";
+import { useAuth } from "@/_core/hooks/useAuth";
 
 // ──────────────────────────────────────────────────────────
 // Route allowlist — only show on public marketing pages
@@ -122,10 +123,10 @@ function injectStyles(): void {
   right: 24px;
   width: min(420px, calc(100vw - 32px));
   max-height: 70vh;
-  background: #0f0f1a;
-  border: 1px solid rgba(255,255,255,0.12);
+  background: #f0f7ff;
+  border: 1px solid rgba(99,102,241,0.18);
   border-radius: 16px;
-  box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+  box-shadow: 0 24px 60px rgba(99,102,241,0.18);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -157,8 +158,8 @@ function injectStyles(): void {
   align-items: center;
   gap: 10px;
   padding: 14px 16px;
-  background: linear-gradient(135deg, rgba(99,102,241,0.3), rgba(6,182,212,0.2));
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(6,182,212,0.10));
+  border-bottom: 1px solid rgba(99,102,241,0.12);
   flex-shrink: 0;
 }
 [data-equip-chat-avatar] {
@@ -177,12 +178,12 @@ function injectStyles(): void {
   min-width: 0;
 }
 [data-equip-chat-header-name] {
-  color: #fff;
+  color: #1e293b;
   font-weight: 600;
   font-size: 14px;
 }
 [data-equip-chat-header-status] {
-  color: #4ade80;
+  color: #16a34a;
   font-size: 11px;
   display: flex;
   align-items: center;
@@ -193,13 +194,13 @@ function injectStyles(): void {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #4ade80;
+  background: #16a34a;
   display: inline-block;
 }
 [data-equip-chat-close] {
   background: none;
   border: none;
-  color: rgba(255,255,255,0.5);
+  color: rgba(30,41,59,0.4);
   cursor: pointer;
   font-size: 20px;
   padding: 4px;
@@ -211,7 +212,7 @@ function injectStyles(): void {
   align-items: center;
   justify-content: center;
 }
-[data-equip-chat-close]:hover { color: #fff; background: rgba(255,255,255,0.1); }
+[data-equip-chat-close]:hover { color: #1e293b; background: rgba(99,102,241,0.08); }
 [data-equip-chat-messages] {
   flex: 1;
   overflow-y: auto;
@@ -220,10 +221,10 @@ function injectStyles(): void {
   flex-direction: column;
   gap: 12px;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.15) transparent;
+  scrollbar-color: rgba(99,102,241,0.2) transparent;
 }
 [data-equip-chat-messages]::-webkit-scrollbar { width: 4px; }
-[data-equip-chat-messages]::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+[data-equip-chat-messages]::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.2); border-radius: 2px; }
 [data-equip-msg] {
   display: flex;
   gap: 8px;
@@ -239,8 +240,9 @@ function injectStyles(): void {
   word-break: break-word;
 }
 [data-equip-msg="assistant"] [data-equip-msg-bubble] {
-  background: rgba(255,255,255,0.07);
-  color: #e5e7eb;
+  background: #ffffff;
+  color: #1e293b;
+  border: 1px solid rgba(99,102,241,0.12);
   border-bottom-left-radius: 4px;
 }
 [data-equip-msg="user"] [data-equip-msg-bubble] {
@@ -258,7 +260,7 @@ function injectStyles(): void {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.4);
+  background: rgba(99,102,241,0.5);
   animation: equipBlink 1.2s infinite;
 }
 [data-equip-typing] span:nth-child(2) { animation-delay: 0.2s; }
@@ -271,16 +273,16 @@ function injectStyles(): void {
   display: flex;
   gap: 8px;
   padding: 12px 16px;
-  border-top: 1px solid rgba(255,255,255,0.08);
+  border-top: 1px solid rgba(99,102,241,0.12);
   flex-shrink: 0;
   align-items: flex-end;
 }
 [data-equip-chat-textarea] {
   flex: 1;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12);
+  background: #ffffff;
+  border: 1px solid rgba(99,102,241,0.2);
   border-radius: 10px;
-  color: #fff;
+  color: #1e293b;
   font-size: 14px;
   padding: 10px 12px;
   resize: none;
@@ -291,8 +293,8 @@ function injectStyles(): void {
   outline: none;
   transition: border-color 0.2s;
 }
-[data-equip-chat-textarea]::placeholder { color: rgba(255,255,255,0.3); }
-[data-equip-chat-textarea]:focus { border-color: rgba(99,102,241,0.6); }
+[data-equip-chat-textarea]::placeholder { color: rgba(30,41,59,0.4); }
+[data-equip-chat-textarea]:focus { border-color: rgba(99,102,241,0.5); }
 [data-equip-send-btn] {
   width: 42px;
   height: 42px;
@@ -315,24 +317,24 @@ function injectStyles(): void {
   gap: 12px;
 }
 [data-equip-lead-title] {
-  color: #fff;
+  color: #1e293b;
   font-weight: 600;
   font-size: 15px;
 }
-[data-equip-lead-sub] { color: rgba(255,255,255,0.6); font-size: 13px; }
+[data-equip-lead-sub] { color: rgba(30,41,59,0.6); font-size: 13px; }
 [data-equip-lead-input] {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12);
+  background: #ffffff;
+  border: 1px solid rgba(99,102,241,0.2);
   border-radius: 8px;
-  color: #fff;
+  color: #1e293b;
   font-size: 14px;
   padding: 10px 12px;
   font-family: inherit;
   outline: none;
   transition: border-color 0.2s;
 }
-[data-equip-lead-input]::placeholder { color: rgba(255,255,255,0.3); }
-[data-equip-lead-input]:focus { border-color: rgba(99,102,241,0.6); }
+[data-equip-lead-input]::placeholder { color: rgba(30,41,59,0.35); }
+[data-equip-lead-input]:focus { border-color: rgba(99,102,241,0.5); }
 [data-equip-lead-submit] {
   padding: 12px 16px;
   border-radius: 10px;
@@ -349,7 +351,7 @@ function injectStyles(): void {
 [data-equip-lead-skip] {
   background: none;
   border: none;
-  color: rgba(255,255,255,0.4);
+  color: rgba(30,41,59,0.4);
   font-size: 12px;
   cursor: pointer;
   text-align: center;
@@ -357,7 +359,7 @@ function injectStyles(): void {
   text-decoration: underline;
 }
 [data-equip-lead-error] {
-  color: #f87171;
+  color: #dc2626;
   font-size: 12px;
 }
 [data-equip-suggestions] {
@@ -367,9 +369,9 @@ function injectStyles(): void {
   padding: 4px 0 8px;
 }
 [data-equip-suggestion] {
-  background: rgba(99,102,241,0.15);
-  border: 1px solid rgba(99,102,241,0.3);
-  color: #a5b4fc;
+  background: rgba(99,102,241,0.08);
+  border: 1px solid rgba(99,102,241,0.2);
+  color: #4f46e5;
   font-size: 12px;
   border-radius: 20px;
   padding: 5px 10px;
@@ -378,7 +380,7 @@ function injectStyles(): void {
   transition: background 0.15s;
   font-family: inherit;
 }
-[data-equip-suggestion]:hover { background: rgba(99,102,241,0.3); }
+[data-equip-suggestion]:hover { background: rgba(99,102,241,0.16); }
 `;
   document.head.appendChild(style);
 }
@@ -409,15 +411,17 @@ const SUGGESTIONS = [
 // ──────────────────────────────────────────────────────────
 export function SalesChatWidget() {
   const [location] = useLocation();
+  const { isAuthenticated } = useAuth();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([WELCOME_MESSAGE]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState<Step>("lead");
+  // Authenticated users skip lead capture; anonymous users start at "lead"
+  const [step, setStep] = useState<Step>(isAuthenticated ? "chat" : "lead");
   const [lead, setLead] = useState<LeadForm>({ name: "", email: "" });
   const [leadSubmitting, setLeadSubmitting] = useState(false);
   const [leadError, setLeadError] = useState("");
-  const [leadDone, setLeadDone] = useState(false);
+  const [leadDone, setLeadDone] = useState(isAuthenticated);
   const [unread, setUnread] = useState(0);
   const [showSuggestions, setShowSuggestions] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -427,6 +431,14 @@ export function SalesChatWidget() {
   useEffect(() => {
     injectStyles();
   }, []);
+
+  // Skip lead form when user logs in mid-session
+  useEffect(() => {
+    if (isAuthenticated) {
+      setStep("chat");
+      setLeadDone(true);
+    }
+  }, [isAuthenticated]);
 
   // Only render on allowlisted routes
   const isAllowed =
@@ -471,11 +483,17 @@ export function SalesChatWidget() {
           content: m.content,
         }));
 
-        const resp = await fetch("/api/sales-chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: trimmed, history }),
-        });
+        // Natural typing delay (1.2–1.8 s) so replies don't feel instant/spammy
+        const [resp] = await Promise.all([
+          fetch("/api/sales-chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: trimmed, history }),
+          }),
+          new Promise((resolve) =>
+            setTimeout(resolve, 1200 + Math.random() * 600),
+          ),
+        ]);
 
         const data = await resp.json();
         const reply =
@@ -753,7 +771,10 @@ export function SalesChatWidget() {
                     </div>
                     <div
                       data-equip-msg-bubble
-                      style={{ background: "rgba(255,255,255,0.07)" }}
+                      style={{
+                        background: "#ffffff",
+                        border: "1px solid rgba(99,102,241,0.12)",
+                      }}
                     >
                       <div data-equip-typing>
                         <span />

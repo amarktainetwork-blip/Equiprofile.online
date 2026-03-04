@@ -17,6 +17,7 @@ import { PageTransition } from "@/components/PageTransition";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AuthSplitLayout } from "@/components/AuthSplitLayout";
 import { MarketingNav } from "@/components/MarketingNav";
+import { Footer } from "@/components/Footer";
 import { motion, AnimatePresence } from "framer-motion";
 import { trpc } from "@/lib/trpc";
 
@@ -499,6 +500,7 @@ export default function Register() {
           </motion.div>
         </AuthSplitLayout>
       </PageTransition>
+      <Footer />
     </>
   );
 }

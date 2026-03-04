@@ -98,7 +98,7 @@ export const marketingAssets = {
   // ========================================
   auth: {
     background: `${MARKETING_BASE}/auth/auth-bg.svg`,
-    video: `${MARKETING_BASE}/auth/auth.mp4`,
+    video: `/videos/loginfinal.mp4`,
   },
 
   // ========================================

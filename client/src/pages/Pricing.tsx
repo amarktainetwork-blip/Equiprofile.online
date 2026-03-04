@@ -231,7 +231,7 @@ export default function Pricing() {
         <PageBanner
           title="Pricing"
           subtitle="Professional equine management for every need"
-          imageSrc="/images/price2.jpg"
+          imageSrc="/images/price3.jpg"
           imagePosition="center"
         />
         <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black flex items-center justify-center">
@@ -249,7 +249,7 @@ export default function Pricing() {
       <PageBanner
         title="Pricing"
         subtitle="Professional equine management for every need"
-        imageSrc="/images/price2.jpg"
+        imageSrc="/images/price3.jpg"
         imagePosition="center"
       />
       <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black">

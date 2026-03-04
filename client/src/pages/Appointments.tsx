@@ -382,7 +382,7 @@ function AppointmentsContent() {
                     <SelectValue placeholder="No reminder" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No reminder</SelectItem>
+                    <SelectItem value="none">No reminder</SelectItem>
                     <SelectItem value="1day">1 day before</SelectItem>
                     <SelectItem value="3days">3 days before</SelectItem>
                     <SelectItem value="1week">1 week before</SelectItem>
