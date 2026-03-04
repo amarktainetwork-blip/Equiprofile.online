@@ -30,7 +30,7 @@ export default function AIChat() {
     {
       role: "system",
       content:
-        "You are EquiProfile AI Assistant, an expert in horse care, training, and management.",
+        "You are the EquiProfile bot, an expert in horse care, training, and management.",
     },
   ]);
   const [showPasswordInput, setShowPasswordInput] = useState(false);

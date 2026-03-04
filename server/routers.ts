@@ -483,6 +483,45 @@ export const appRouter = router({
         return { success: true };
       }),
 
+    updateNotificationPreferences: protectedProcedure
+      .input(
+        z.object({
+          emailNotifications: z.boolean().optional(),
+          healthReminders: z.boolean().optional(),
+          trainingReminders: z.boolean().optional(),
+          feedingReminders: z.boolean().optional(),
+          weatherAlerts: z.boolean().optional(),
+          weeklyDigest: z.boolean().optional(),
+        }),
+      )
+      .mutation(async ({ ctx, input }) => {
+        // Persist notification prefs in the user's JSON preferences field
+        const user = await db.getUserById(ctx.user.id);
+        const existing = user?.preferences ? JSON.parse(user.preferences) : {};
+        const updated = {
+          ...existing,
+          notifications: { ...existing.notifications, ...input },
+        };
+        await db.updateUser(ctx.user.id, {
+          preferences: JSON.stringify(updated),
+        });
+        return { success: true };
+      }),
+
+    getNotificationPreferences: protectedProcedure.query(async ({ ctx }) => {
+      const user = await db.getUserById(ctx.user.id);
+      const existing = user?.preferences ? JSON.parse(user.preferences) : {};
+      const defaults = {
+        emailNotifications: true,
+        healthReminders: true,
+        trainingReminders: true,
+        feedingReminders: true,
+        weatherAlerts: true,
+        weeklyDigest: true,
+      };
+      return { ...defaults, ...existing.notifications };
+    }),
+
     getSubscriptionStatus: protectedProcedure.query(async ({ ctx }) => {
       const user = await db.getUserById(ctx.user.id);
       if (!user) return null;

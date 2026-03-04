@@ -15,7 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { PageTransition } from "@/components/PageTransition";
 import DashboardLayout from "@/components/DashboardLayout";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Bell, Lock, User, Moon, MapPin, Loader2 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -46,6 +46,19 @@ export default function Settings() {
     },
   });
 
+  const updateNotificationPreferences =
+    trpc.user.updateNotificationPreferences.useMutation({
+      onSuccess: () => {
+        toast.success("Notification preferences saved");
+      },
+      onError: (error) => {
+        toast.error(error.message || "Failed to save preferences");
+      },
+    });
+
+  const { data: savedNotificationPrefs } =
+    trpc.user.getNotificationPreferences.useQuery();
+
   const [profileData, setProfileData] = useState({
     name: user?.name || "",
     email: user?.email || "",
@@ -56,6 +69,7 @@ export default function Settings() {
     newPassword: "",
     confirmPassword: "",
   });
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   const [notifications, setNotifications] = useState({
     emailNotifications: true,
@@ -65,6 +79,13 @@ export default function Settings() {
     weatherAlerts: true,
     weeklyDigest: true,
   });
+
+  // Sync notification prefs from server when loaded
+  useEffect(() => {
+    if (savedNotificationPrefs) {
+      setNotifications((prev) => ({ ...prev, ...savedNotificationPrefs }));
+    }
+  }, [savedNotificationPrefs]);
 
   const handleProfileSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,7 +105,7 @@ export default function Settings() {
       return;
     }
 
-    // Password change via the reset-password API flow
+    setIsChangingPassword(true);
     try {
       const res = await fetch("/api/auth/change-password", {
         method: "POST",
@@ -97,19 +118,24 @@ export default function Settings() {
       });
       if (res.ok) {
         toast.success("Password changed successfully");
-        setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
+        setPasswordData({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
       } else {
         const data = await res.json().catch(() => ({}));
         toast.error(data.error || "Failed to change password");
       }
     } catch {
       toast.error("Failed to change password. Please try again.");
+    } finally {
+      setIsChangingPassword(false);
     }
   };
 
   const handleNotificationSave = () => {
-    // Notification preferences are stored locally (no dedicated server endpoint yet)
-    toast.success("Notification preferences saved");
+    updateNotificationPreferences.mutate(notifications);
   };
 
   const captureLocation = () => {
@@ -124,7 +150,7 @@ export default function Settings() {
         updateLocation.mutate({
           latitude: position.coords.latitude.toString(),
           longitude: position.coords.longitude.toString(),
-          location: "", // Optional city name
+          location: "",
         });
       },
       (error) => {
@@ -331,7 +357,16 @@ export default function Settings() {
                       />
                     </div>
 
-                    <Button type="submit">Change Password</Button>
+                    <Button type="submit" disabled={isChangingPassword}>
+                      {isChangingPassword ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Changing...
+                        </>
+                      ) : (
+                        "Change Password"
+                      )}
+                    </Button>
                   </form>
                 </CardContent>
               </Card>
@@ -411,8 +446,18 @@ export default function Settings() {
                     ))}
                   </div>
 
-                  <Button onClick={handleNotificationSave}>
-                    Save Preferences
+                  <Button
+                    onClick={handleNotificationSave}
+                    disabled={updateNotificationPreferences.isPending}
+                  >
+                    {updateNotificationPreferences.isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      "Save Preferences"
+                    )}
                   </Button>
                 </CardContent>
               </Card>
@@ -435,7 +480,6 @@ export default function Settings() {
                         <button
                           key={themeOption}
                           onClick={() => {
-                            // Only toggle if clicking on the non-active theme
                             if (theme !== themeOption) {
                               toggleTheme();
                             }
