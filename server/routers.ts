@@ -2458,10 +2458,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
     getLeads: adminUnlockedProcedure.query(async () => {
       const dbConn = await getDb();
       if (!dbConn) return [];
-      return dbConn
-        .select()
-        .from(chatLeads)
-        .orderBy(desc(chatLeads.createdAt));
+      return dbConn.select().from(chatLeads).orderBy(desc(chatLeads.createdAt));
     }),
   }),
 
