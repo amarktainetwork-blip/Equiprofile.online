@@ -81,12 +81,18 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
+        # Pin to a specific release tag instead of @master to avoid unexpected
+        # breakage, and set db-repository to the primary GHCR source so the
+        # scan does not depend on the mirror.gcr.io mirror (which can return
+        # transient 404 errors for the vulnerability DB download).
+        uses: aquasecurity/trivy-action@0.30.0
+        continue-on-error: true
         with:
           scan-type: "fs"
           scan-ref: "."
           format: "sarif"
           output: "trivy-results.sarif"
+          db-repository: "ghcr.io/aquasecurity/trivy-db"
 
       - name: Upload Trivy results to GitHub Security
         uses: github/codeql-action/upload-sarif@v4
