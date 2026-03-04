@@ -155,9 +155,8 @@ function DashboardLayoutContent({
   const isMobile = useIsMobile();
   const { isAdminVisible } = useAdminToggle();
 
-  // Check admin unlock status
+  // Check admin unlock status — available to any authenticated user
   const { data: adminStatus } = trpc.adminUnlock.getStatus.useQuery(undefined, {
-    enabled: user?.role === "admin", // Only fetch if admin
     staleTime: 60 * 1000, // Cache for 1 minute
     refetchInterval: 60 * 1000, // Refresh every minute
   });
@@ -245,8 +244,8 @@ function DashboardLayoutContent({
                   </SidebarMenuItem>
                 );
               })}
-              {/* Admin menu items - shown to admin users who have unlocked admin mode */}
-              {user?.role === "admin" && adminStatus?.isUnlocked && (
+              {/* Admin menu items - shown to any user who has unlocked admin mode */}
+              {adminStatus?.isUnlocked && (
                 <>
                   <div className="my-2 px-2">
                     <div className="h-px bg-border" />

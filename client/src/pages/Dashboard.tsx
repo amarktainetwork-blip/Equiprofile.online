@@ -235,6 +235,10 @@ function DashboardContent() {
     retry: false,
   });
   const { data: subscription } = trpc.user.getSubscriptionStatus.useQuery();
+  const { data: trainingStats } = trpc.analytics.getTrainingStats.useQuery(
+    {},
+    { retry: false },
+  );
 
   const getSubscriptionBadge = () => {
     if (!subscription) return null;
@@ -332,7 +336,7 @@ function DashboardContent() {
       >
         <StatsOverview
           totalHorses={stats?.horseCount || 0}
-          trainingHours={0}
+          trainingHours={Math.round((trainingStats?.totalDuration || 0) / 60)}
           upcomingEvents={stats?.upcomingSessionCount || 0}
           healthReminders={stats?.reminderCount || 0}
         />

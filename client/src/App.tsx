@@ -316,9 +316,9 @@ function Router() {
           {/* Client Portal */}
           <Route path="/client/:clientId" component={ClientPortal} />
 
-          {/* Admin panel - requires admin role */}
+          {/* Admin panel - accessible to any user with admin session unlocked */}
           <Route path="/admin">
-            <ProtectedRoute requireAdmin>
+            <ProtectedRoute>
               <Admin />
             </ProtectedRoute>
           </Route>
