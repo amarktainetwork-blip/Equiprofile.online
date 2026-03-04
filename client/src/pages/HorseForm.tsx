@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import {
   Card,
@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 import { useLocation, useParams } from "wouter";
-import { ArrowLeft, Save, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "wouter";
 
@@ -51,6 +51,9 @@ function HorseFormContent() {
   const [, navigate] = useLocation();
   const isEditing = params.id && params.id !== "new";
   const horseId = isEditing ? parseInt(params.id!) : null;
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [photoPreview, setPhotoPreview] = useState<string>("");
+  const [photoUploading, setPhotoUploading] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -73,6 +76,8 @@ function HorseFormContent() {
     { id: horseId! },
     { enabled: !!horseId },
   );
+
+  const uploadMutation = trpc.documents.upload.useMutation();
 
   const createMutation = trpc.horses.create.useMutation({
     onSuccess: (data) => {
@@ -114,8 +119,57 @@ function HorseFormContent() {
         notes: horse.notes || "",
         photoUrl: horse.photoUrl || "",
       });
+      if (horse.photoUrl) setPhotoPreview(horse.photoUrl);
     }
   }, [horse]);
+
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      toast.error("Photo must be under 5MB");
+      return;
+    }
+    setPhotoUploading(true);
+    try {
+      const reader = new FileReader();
+      reader.onload = async (ev) => {
+        const dataUrl = ev.target?.result;
+        if (typeof dataUrl !== "string" || !dataUrl.includes(",")) {
+          toast.error("Failed to read file");
+          setPhotoUploading(false);
+          return;
+        }
+        const base64 = dataUrl.split(",")[1];
+        try {
+          const result = await uploadMutation.mutateAsync({
+            fileName: file.name,
+            fileType: file.type,
+            fileSize: file.size,
+            fileData: base64,
+            category: "other",
+            description: "Horse profile photo",
+          });
+          setFormData((prev) => ({ ...prev, photoUrl: result.url }));
+          setPhotoPreview(URL.createObjectURL(file));
+          toast.success("Photo uploaded");
+        } catch (err: any) {
+          toast.error(err.message || "Failed to upload photo");
+        } finally {
+          setPhotoUploading(false);
+        }
+      };
+      reader.onerror = () => {
+        toast.error("Failed to read file");
+        setPhotoUploading(false);
+      };
+      reader.readAsDataURL(file);
+    } catch (err: any) {
+      toast.error(err.message || "Failed to upload photo");
+      setPhotoUploading(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -149,7 +203,8 @@ function HorseFormContent() {
     }
   };
 
-  const isSubmitting = createMutation.isPending || updateMutation.isPending;
+  const isSubmitting =
+    createMutation.isPending || updateMutation.isPending || photoUploading;
 
   if (horseLoading) {
     return (
@@ -405,19 +460,64 @@ function HorseFormContent() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="photoUrl">Photo URL</Label>
-              <Input
-                id="photoUrl"
-                type="url"
-                value={formData.photoUrl}
-                onChange={(e) =>
-                  setFormData({ ...formData, photoUrl: e.target.value })
-                }
-                placeholder="https://example.com/photo.jpg"
-              />
-              <p className="text-xs text-muted-foreground">
-                Enter a URL to your horse's photo. File upload coming soon.
-              </p>
+              <Label>Photo</Label>
+              <div className="flex items-start gap-4">
+                {photoPreview ? (
+                  <div className="relative">
+                    <img
+                      src={photoPreview}
+                      alt="Horse preview"
+                      className="w-20 h-20 object-cover rounded-lg border"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPhotoPreview("");
+                        setFormData((prev) => ({ ...prev, photoUrl: "" }));
+                      }}
+                      className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center"
+                      aria-label="Remove photo"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="w-20 h-20 rounded-lg border-2 border-dashed border-muted-foreground/30 flex items-center justify-center bg-muted/20">
+                    <Upload className="w-6 h-6 text-muted-foreground/50" />
+                  </div>
+                )}
+                <div className="flex-1 space-y-2">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="hidden"
+                    onChange={handlePhotoChange}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={photoUploading}
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    {photoUploading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-4 h-4 mr-2" />
+                        {photoPreview ? "Change Photo" : "Upload Photo"}
+                      </>
+                    )}
+                  </Button>
+                  <p className="text-xs text-muted-foreground">
+                    JPG, PNG or WebP. Max 5MB.
+                  </p>
+                </div>
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="notes">Notes</Label>

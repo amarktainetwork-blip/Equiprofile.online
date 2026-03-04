@@ -63,17 +63,23 @@ export default function Pricing() {
     }
   }, []);
 
-  const handleSubscribe = async (plan: "monthly" | "yearly") => {
+  const handleSubscribe = async (
+    planName: "pro" | "stable",
+    interval: "monthly" | "yearly",
+  ) => {
     if (!user) {
       // Not logged in: send to /register with intent preserved so that after
       // successful signup the app can auto-redirect to Stripe checkout.
-      setLocation(`/register?plan=pro&interval=${plan}`);
+      setLocation(`/register?plan=${planName}&interval=${interval}`);
       return;
     }
 
-    setLoadingPlan(plan);
+    setLoadingPlan(interval);
     try {
-      const result = await createCheckout.mutateAsync({ plan });
+      const result = await createCheckout.mutateAsync({
+        plan: planName,
+        interval,
+      });
       if (result.url) {
         window.location.href = result.url;
       }
@@ -122,7 +128,7 @@ export default function Pricing() {
     stable: [
       "Everything in Pro, plus:",
       "Up to 20 horses",
-      "Unlimited team members",
+      "Up to 5 users",
       "Role-based permissions",
       "Stable management",
       "Secure storage",
@@ -231,7 +237,7 @@ export default function Pricing() {
         <PageBanner
           title="Pricing"
           subtitle="Professional equine management for every need"
-          imageSrc="/images/price2.jpg"
+          imageSrc="/images/price3.jpg"
           imagePosition="center"
         />
         <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black flex items-center justify-center">
@@ -249,7 +255,7 @@ export default function Pricing() {
       <PageBanner
         title="Pricing"
         subtitle="Professional equine management for every need"
-        imageSrc="/images/price2.jpg"
+        imageSrc="/images/price3.jpg"
         imagePosition="center"
       />
       <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black">
@@ -495,7 +501,7 @@ export default function Pricing() {
                       ) : planData.plan === "pro" ? (
                         <Button
                           className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 text-white border-0 hover:from-indigo-600 hover:to-cyan-600 shadow-lg hover:shadow-indigo-500/50 transition-all duration-300"
-                          onClick={() => handleSubscribe(billingPeriod)}
+                          onClick={() => handleSubscribe("pro", billingPeriod)}
                           disabled={loadingPlan === billingPeriod}
                         >
                           {loadingPlan === billingPeriod ? (
@@ -515,7 +521,12 @@ export default function Pricing() {
                       ) : (
                         <Button
                           className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 text-white border-0 hover:from-indigo-600 hover:to-cyan-600 shadow-lg hover:shadow-indigo-500/50 transition-all duration-300"
-                          onClick={() => handleSubscribe(billingPeriod)}
+                          onClick={() =>
+                            handleSubscribe(
+                              planData.plan === "stable" ? "stable" : "pro",
+                              billingPeriod,
+                            )
+                          }
                           disabled={loadingPlan === billingPeriod}
                         >
                           {loadingPlan === billingPeriod ? (

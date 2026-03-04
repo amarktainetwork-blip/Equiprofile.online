@@ -347,7 +347,8 @@ export const appRouter = router({
     createCheckout: protectedProcedure
       .input(
         z.object({
-          plan: z.enum(["monthly", "yearly"]),
+          plan: z.enum(["pro", "stable"]).default("pro"),
+          interval: z.enum(["monthly", "yearly"]).default("monthly"),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -364,10 +365,12 @@ export const appRouter = router({
           throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
         }
 
+        const planConfig =
+          input.plan === "stable" ? PRICING_PLANS.stable : PRICING_PLANS.pro;
         const priceId =
-          input.plan === "monthly"
-            ? STRIPE_PRICING.monthly.priceId
-            : STRIPE_PRICING.yearly.priceId;
+          input.interval === "yearly"
+            ? planConfig.yearly.priceId
+            : planConfig.monthly.priceId;
 
         if (!priceId) {
           throw new TRPCError({
@@ -549,6 +552,23 @@ export const appRouter = router({
         }),
       )
       .mutation(async ({ ctx, input }) => {
+        // Enforce plan horse limits
+        const user = await db.getUserById(ctx.user.id);
+        if (user) {
+          const currentHorses = await db.getHorsesByUserId(ctx.user.id);
+          const isTrial = user.subscriptionStatus === "trial";
+          // Trial = 1 horse; any paid plan = 20 horses max
+          const limit = isTrial ? 1 : 20;
+          if (currentHorses.length >= limit) {
+            throw new TRPCError({
+              code: "FORBIDDEN",
+              message: isTrial
+                ? "Your free trial allows 1 horse. Upgrade to Pro or Stable to add more."
+                : `You have reached the maximum of ${limit} horses for your plan. Please contact support to add more.`,
+            });
+          }
+        }
+
         const id = await db.createHorse({
           ...input,
           userId: ctx.user!.id,

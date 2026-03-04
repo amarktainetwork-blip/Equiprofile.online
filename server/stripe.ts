@@ -80,6 +80,7 @@ export const PRICING_PLANS = {
   stable: {
     name: "Stable",
     horses: 20,
+    users: 5,
     monthly: {
       priceId: process.env.STRIPE_STABLE_MONTHLY_PRICE_ID || "",
       amount: DEFAULT_PRICING.stable.monthly.amount, // £30.00 in pence
@@ -95,7 +96,7 @@ export const PRICING_PLANS = {
     features: [
       "Everything in Pro, plus:",
       "Up to 20 horses",
-      "Unlimited team members",
+      "Up to 5 users",
       "Role-based permissions",
       "Stable management",
       "Secure storage",

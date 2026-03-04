@@ -302,30 +302,33 @@ function DashboardContent() {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5 pb-4">
       {/* Welcome Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+        transition={{ duration: 0.4 }}
+        className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
       >
         <div>
-          <h1 className="font-serif text-3xl md:text-4xl font-bold text-foreground">
-            Welcome back, {user?.name?.split(" ")[0] || "Rider"}
+          <h1 className="font-serif text-2xl sm:text-3xl font-bold text-foreground leading-tight">
+            Welcome back,{" "}
+            <span className="bg-gradient-to-r from-indigo-600 to-cyan-600 bg-clip-text text-transparent">
+              {user?.name?.split(" ")[0] || "Rider"}
+            </span>
           </h1>
-          <p className="text-muted-foreground mt-1">
-            Your comprehensive equestrian management hub
+          <p className="text-muted-foreground text-sm mt-0.5">
+            Your equestrian command centre
           </p>
         </div>
-        <div className="flex items-center gap-3">{getSubscriptionBadge()}</div>
+        <div className="flex items-center gap-2">{getSubscriptionBadge()}</div>
       </motion.div>
 
       {/* Stats Overview */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
       >
         <StatsOverview
           totalHorses={stats?.horseCount || 0}
@@ -339,37 +342,33 @@ function DashboardContent() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
+        transition={{ duration: 0.4, delay: 0.15 }}
       >
         <Card className="border-muted/50 bg-card/50 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="font-serif">Quick Actions</CardTitle>
-            <CardDescription>Common tasks to get you started</CardDescription>
+          <CardHeader className="pb-3">
+            <CardTitle className="font-serif text-base">
+              Quick Actions
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {quickActions.map((action, idx) => {
+            <div className="grid grid-cols-4 gap-2">
+              {quickActions.map((action) => {
                 const ActionIcon = action.icon;
                 return (
                   <Link key={action.href} href={action.href}>
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
+                    <button
+                      className="w-full flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl border border-muted/50 hover:bg-muted/50 active:scale-95 transition-all touch-manipulation min-h-[72px]"
+                      aria-label={action.label}
                     >
-                      <Button
-                        variant="outline"
-                        className="w-full h-20 flex flex-col items-center justify-center gap-2 hover:bg-muted/50"
+                      <div
+                        className={`w-8 h-8 rounded-lg bg-gradient-to-br ${action.color} flex items-center justify-center shrink-0`}
                       >
-                        <div
-                          className={`w-8 h-8 rounded-lg bg-gradient-to-br ${action.color} flex items-center justify-center`}
-                        >
-                          <ActionIcon className="w-4 h-4 text-white" />
-                        </div>
-                        <span className="text-xs font-medium">
-                          {action.label}
-                        </span>
-                      </Button>
-                    </motion.div>
+                        <ActionIcon className="w-4 h-4 text-white" />
+                      </div>
+                      <span className="text-[11px] font-medium leading-tight text-center">
+                        {action.label}
+                      </span>
+                    </button>
                   </Link>
                 );
               })}
@@ -379,19 +378,17 @@ function DashboardContent() {
       </motion.div>
 
       {/* Module Navigation */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="font-serif text-2xl font-bold text-foreground">
-              All Modules
-            </h2>
-            <p className="text-sm text-muted-foreground mt-1">
-              Access all 20+ features to manage your equestrian operations
-            </p>
-          </div>
+      <div className="space-y-3">
+        <div>
+          <h2 className="font-serif text-xl font-bold text-foreground">
+            All Modules
+          </h2>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            20+ features for complete equestrian management
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
           {moduleCategories.map((category, index) => (
             <ModuleCard key={category.id} category={category} index={index} />
           ))}
@@ -405,22 +402,22 @@ function DashboardContent() {
         transition={{ duration: 0.5, delay: 0.5 }}
       >
         <Card className="border-muted/50 bg-gradient-to-br from-primary/5 to-primary/10 backdrop-blur-sm">
-          <CardContent className="pt-6">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <CardContent className="pt-5 pb-5">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Brain className="w-6 h-6 text-primary" />
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                  <Brain className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-semibold">Need Help?</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <h3 className="font-semibold text-sm">Need Help?</h3>
+                  <p className="text-xs text-muted-foreground">
                     Try our AI assistant for instant guidance
                   </p>
                 </div>
               </div>
               <Link href="/ai-chat">
-                <Button>
-                  <Sparkles className="w-4 h-4 mr-2" />
+                <Button size="sm" className="shrink-0">
+                  <Sparkles className="w-3.5 h-3.5 mr-1.5" />
                   Open AI Chat
                 </Button>
               </Link>

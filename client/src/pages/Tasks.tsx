@@ -135,7 +135,10 @@ function TasksContent() {
     }
 
     createMutation.mutate({
-      horseId: formData.horseId ? parseInt(formData.horseId) : undefined,
+      horseId:
+        formData.horseId && formData.horseId !== "none"
+          ? parseInt(formData.horseId)
+          : undefined,
       title: formData.title,
       description: formData.description || undefined,
       taskType: formData.taskType as any,
@@ -244,7 +247,7 @@ function TasksContent() {
                       <SelectValue placeholder="General task" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">General (all horses)</SelectItem>
+                      <SelectItem value="none">General (all horses)</SelectItem>
                       {horses?.map((horse) => (
                         <SelectItem key={horse.id} value={horse.id.toString()}>
                           {horse.name}
