@@ -44,6 +44,7 @@ import Documents from "./pages/Documents";
 import Tasks from "./pages/Tasks";
 import Contacts from "./pages/Contacts";
 import Admin from "./pages/Admin";
+import QAChecklist from "./pages/QAChecklist";
 import Stable from "./pages/Stable";
 import Messages from "./pages/Messages";
 import Analytics from "./pages/Analytics";
@@ -320,6 +321,13 @@ function Router() {
           <Route path="/admin">
             <ProtectedRoute>
               <Admin />
+            </ProtectedRoute>
+          </Route>
+
+          {/* QA Checklist - admin-unlocked users only */}
+          <Route path="/qa-check">
+            <ProtectedRoute>
+              <QAChecklist />
             </ProtectedRoute>
           </Route>
 

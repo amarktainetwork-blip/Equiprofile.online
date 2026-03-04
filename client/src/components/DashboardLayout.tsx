@@ -68,7 +68,10 @@ const menuItems = [
   { icon: MessageSquare, label: "AI Chat", path: "/ai-chat" },
 ];
 
-const adminMenuItems = [{ icon: Shield, label: "Admin Panel", path: "/admin" }];
+const adminMenuItems = [
+  { icon: Shield, label: "Admin Panel", path: "/admin" },
+  { icon: Shield, label: "QA Checklist", path: "/qa-check" },
+];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
 const DEFAULT_WIDTH = 280;

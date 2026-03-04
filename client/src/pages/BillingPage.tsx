@@ -584,6 +584,52 @@ export default function BillingPage() {
               </CardContent>
             </Card>
           )}
+
+          {/* Need more? upgrade CTA — always visible */}
+          <Card className="border-dashed border-2 border-primary/30 bg-primary/5">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <span>🐴</span> Need more horses or users?
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-muted-foreground">
+              <p>
+                Our platform supports up to{" "}
+                <strong className="text-foreground">10 total users</strong> and
+                up to{" "}
+                <strong className="text-foreground">20 horses</strong> on the
+                Stable plan.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="rounded-lg border border-primary/20 bg-background p-3">
+                  <p className="font-semibold text-foreground mb-1">
+                    &gt; 5 Horses
+                  </p>
+                  <p className="text-xs">
+                    Upgrade to the <strong>Stable plan</strong> for up to 20
+                    horses.
+                  </p>
+                </div>
+                <div className="rounded-lg border border-primary/20 bg-background p-3">
+                  <p className="font-semibold text-foreground mb-1">
+                    &gt; 5 Users
+                  </p>
+                  <p className="text-xs">
+                    Contact us to discuss custom arrangements for your team.
+                  </p>
+                </div>
+              </div>
+              <p className="text-xs">
+                Need more than 10 users or a custom enterprise setup?{" "}
+                <a
+                  href="mailto:hello@equiprofile.online"
+                  className="text-primary underline font-medium"
+                >
+                  Contact hello@equiprofile.online
+                </a>
+              </p>
+            </CardContent>
+          </Card>
         </div>
       </PageTransition>
     </AppLayout>

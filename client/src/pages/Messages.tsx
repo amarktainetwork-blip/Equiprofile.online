@@ -45,7 +45,7 @@ export default function MessagesPage() {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // Get user's stables
-  const { data: stables = [] } = trpc.stable.list.useQuery();
+  const { data: stables = [] } = trpc.stables.list.useQuery();
   const selectedStableId = stables[0]?.id;
 
   // Get threads for the first stable

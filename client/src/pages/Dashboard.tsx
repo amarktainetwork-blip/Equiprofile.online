@@ -239,6 +239,11 @@ function DashboardContent() {
     {},
     { retry: false },
   );
+  const { data: horses = [] } = trpc.horses.list.useQuery(undefined, {
+    retry: false,
+  });
+  const { data: upcomingAppointments = [] } =
+    trpc.appointments.list.useQuery(undefined, { retry: false });
 
   const getSubscriptionBadge = () => {
     if (!subscription) return null;
@@ -380,6 +385,86 @@ function DashboardContent() {
           </CardContent>
         </Card>
       </motion.div>
+
+      {/* Continue Where You Left Off + Upcoming */}
+      {(horses.length > 0 || upcomingAppointments.length > 0) && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.18 }}
+          className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+        >
+          {/* Horses */}
+          {horses.length > 0 && (
+            <Card className="border-muted/50 bg-card/50 backdrop-blur-sm">
+              <CardHeader className="pb-2">
+                <CardTitle className="font-serif text-sm flex items-center gap-2">
+                  <Heart className="w-4 h-4 text-rose-500" />
+                  Your Horses
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-1.5">
+                  {horses.slice(0, 3).map((horse: any) => (
+                    <Link key={horse.id} href={`/horses/${horse.id}`}>
+                      <div className="flex items-center gap-2 py-1.5 px-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
+                        <div className="w-7 h-7 rounded-full bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
+                          <Heart className="w-3.5 h-3.5 text-rose-500" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-medium truncate">{horse.name}</p>
+                          <p className="text-[10px] text-muted-foreground">{horse.breed || "No breed"}</p>
+                        </div>
+                        <ChevronRight className="w-3 h-3 text-muted-foreground ml-auto shrink-0" />
+                      </div>
+                    </Link>
+                  ))}
+                  {horses.length > 3 && (
+                    <Link href="/horses">
+                      <p className="text-xs text-primary text-center py-1 hover:underline cursor-pointer">
+                        View all {horses.length} horses →
+                      </p>
+                    </Link>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Upcoming appointments */}
+          {upcomingAppointments.length > 0 && (
+            <Card className="border-muted/50 bg-card/50 backdrop-blur-sm">
+              <CardHeader className="pb-2">
+                <CardTitle className="font-serif text-sm flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-purple-500" />
+                  Upcoming
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-1.5">
+                  {upcomingAppointments
+                    .filter((a: any) => new Date(a.appointmentDate) >= new Date())
+                    .sort((a: any, b: any) => new Date(a.appointmentDate).getTime() - new Date(b.appointmentDate).getTime())
+                    .slice(0, 3)
+                    .map((appt: any) => (
+                      <div key={appt.id} className="flex items-center gap-2 py-1.5 px-2 rounded-lg border border-muted/40">
+                        <div className="w-7 h-7 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center shrink-0">
+                          <Calendar className="w-3.5 h-3.5 text-purple-500" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-medium truncate">{appt.title}</p>
+                          <p className="text-[10px] text-muted-foreground">
+                            {new Date(appt.appointmentDate).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </motion.div>
+      )}
 
       {/* Module Navigation */}
       <div className="space-y-3">
