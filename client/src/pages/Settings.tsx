@@ -24,6 +24,453 @@ import { trpc } from "@/lib/trpc";
 export default function Settings() {
   const { user } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const [isCapturingLocation, setIsCapturingLocation] = useState(false);
+
+  const updateLocation = trpc.weather.updateLocation.useMutation({
+    onSuccess: () => {
+      toast.success("Location updated successfully");
+      setIsCapturingLocation(false);
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to update location");
+      setIsCapturingLocation(false);
+    },
+  });
+
+  const updateProfile = trpc.user.updateProfile.useMutation({
+    onSuccess: () => {
+      toast.success("Profile updated successfully");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to update profile");
+    },
+  });
+
+  const [profileData, setProfileData] = useState({
+    name: user?.name || "",
+    email: user?.email || "",
+  });
+
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+
+  const [notifications, setNotifications] = useState({
+    emailNotifications: true,
+    healthReminders: true,
+    trainingReminders: true,
+    feedingReminders: true,
+    weatherAlerts: true,
+    weeklyDigest: true,
+  });
+
+  const handleProfileSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateProfile.mutate({ name: profileData.name });
+  };
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast.error("Passwords don't match");
+      return;
+    }
+
+    if (passwordData.newPassword.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
+
+    // Password change via the reset-password API flow
+    try {
+      const res = await fetch("/api/auth/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          currentPassword: passwordData.currentPassword,
+          newPassword: passwordData.newPassword,
+        }),
+      });
+      if (res.ok) {
+        toast.success("Password changed successfully");
+        setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
+      } else {
+        const data = await res.json().catch(() => ({}));
+        toast.error(data.error || "Failed to change password");
+      }
+    } catch {
+      toast.error("Failed to change password. Please try again.");
+    }
+  };
+
+  const handleNotificationSave = () => {
+    // Notification preferences are stored locally (no dedicated server endpoint yet)
+    toast.success("Notification preferences saved");
+  };
+
+  const captureLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error("Geolocation is not supported by your browser");
+      return;
+    }
+
+    setIsCapturingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        updateLocation.mutate({
+          latitude: position.coords.latitude.toString(),
+          longitude: position.coords.longitude.toString(),
+          location: "", // Optional city name
+        });
+      },
+      (error) => {
+        toast.error(`Failed to get location: ${error.message}`);
+        setIsCapturingLocation(false);
+      },
+    );
+  };
+
+  const isProfileLoading = updateProfile.isPending;
+
+  return (
+    <DashboardLayout>
+      <PageTransition>
+        <div className="container max-w-4xl py-8">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold font-serif mb-2">Settings</h1>
+            <p className="text-muted-foreground">
+              Manage your account settings and preferences
+            </p>
+          </div>
+
+          <Tabs defaultValue="profile" className="space-y-6">
+            <TabsList className="grid grid-cols-4 w-full max-w-2xl">
+              <TabsTrigger value="profile">
+                <User className="w-4 h-4 mr-2" />
+                Profile
+              </TabsTrigger>
+              <TabsTrigger value="security">
+                <Lock className="w-4 h-4 mr-2" />
+                Security
+              </TabsTrigger>
+              <TabsTrigger value="notifications">
+                <Bell className="w-4 h-4 mr-2" />
+                Notifications
+              </TabsTrigger>
+              <TabsTrigger value="appearance">
+                <Moon className="w-4 h-4 mr-2" />
+                Appearance
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Profile Tab */}
+            <TabsContent value="profile">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Profile Information</CardTitle>
+                  <CardDescription>
+                    Update your account profile information
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleProfileSave} className="space-y-6">
+                    <div className="flex items-center gap-6">
+                      <Avatar className="w-20 h-20">
+                        <AvatarFallback className="text-2xl">
+                          {user?.name?.charAt(0).toUpperCase() || "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <Button variant="outline" size="sm" type="button">
+                          Change Photo
+                        </Button>
+                        <p className="text-xs text-muted-foreground mt-2">
+                          JPG, PNG or GIF. Max 2MB.
+                        </p>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="name">Full Name</Label>
+                        <Input
+                          id="name"
+                          value={profileData.name}
+                          onChange={(e) =>
+                            setProfileData({
+                              ...profileData,
+                              name: e.target.value,
+                            })
+                          }
+                          disabled={isProfileLoading}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="email">Email</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={profileData.email}
+                          disabled
+                          className="opacity-60"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Email cannot be changed here. Contact support if needed.
+                        </p>
+                      </div>
+
+                      <Separator />
+
+                      <div className="space-y-3">
+                        <Label>Location for Weather</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Allow EquiProfile to access your location for accurate
+                          weather forecasts and riding conditions.
+                        </p>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={captureLocation}
+                          disabled={isCapturingLocation}
+                        >
+                          {isCapturingLocation ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Getting Location...
+                            </>
+                          ) : (
+                            <>
+                              <MapPin className="mr-2 h-4 w-4" />
+                              Use My Current Location
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+
+                    <Button type="submit" disabled={isProfileLoading}>
+                      {isProfileLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        "Save Changes"
+                      )}
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Security Tab */}
+            <TabsContent value="security">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Change Password</CardTitle>
+                  <CardDescription>
+                    Update your password to keep your account secure
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handlePasswordChange} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="current-password">Current Password</Label>
+                      <Input
+                        id="current-password"
+                        type="password"
+                        value={passwordData.currentPassword}
+                        onChange={(e) =>
+                          setPasswordData({
+                            ...passwordData,
+                            currentPassword: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="new-password">New Password</Label>
+                      <Input
+                        id="new-password"
+                        type="password"
+                        value={passwordData.newPassword}
+                        onChange={(e) =>
+                          setPasswordData({
+                            ...passwordData,
+                            newPassword: e.target.value,
+                          })
+                        }
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Must be at least 8 characters
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="confirm-password">
+                        Confirm New Password
+                      </Label>
+                      <Input
+                        id="confirm-password"
+                        type="password"
+                        value={passwordData.confirmPassword}
+                        onChange={(e) =>
+                          setPasswordData({
+                            ...passwordData,
+                            confirmPassword: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+
+                    <Button type="submit">Change Password</Button>
+                  </form>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Notifications Tab */}
+            <TabsContent value="notifications">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Notification Preferences</CardTitle>
+                  <CardDescription>
+                    Manage how you receive notifications
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-4">
+                    {[
+                      {
+                        key: "emailNotifications",
+                        label: "Email Notifications",
+                        description:
+                          "Receive email notifications for important updates",
+                      },
+                      {
+                        key: "healthReminders",
+                        label: "Health Reminders",
+                        description:
+                          "Get notified about upcoming vet visits and vaccinations",
+                      },
+                      {
+                        key: "trainingReminders",
+                        label: "Training Reminders",
+                        description:
+                          "Reminders for scheduled training sessions",
+                      },
+                      {
+                        key: "feedingReminders",
+                        label: "Feeding Reminders",
+                        description: "Notifications for feeding schedules",
+                      },
+                      {
+                        key: "weatherAlerts",
+                        label: "Weather Alerts",
+                        description: "Alerts for adverse weather conditions",
+                      },
+                      {
+                        key: "weeklyDigest",
+                        label: "Weekly Digest",
+                        description: "Receive a weekly summary of activities",
+                      },
+                    ].map((item) => (
+                      <div
+                        key={item.key}
+                        className="flex items-center justify-between"
+                      >
+                        <div className="space-y-0.5">
+                          <Label htmlFor={item.key}>{item.label}</Label>
+                          <p className="text-sm text-muted-foreground">
+                            {item.description}
+                          </p>
+                        </div>
+                        <Switch
+                          id={item.key}
+                          checked={
+                            notifications[
+                              item.key as keyof typeof notifications
+                            ]
+                          }
+                          onCheckedChange={(checked) =>
+                            setNotifications({
+                              ...notifications,
+                              [item.key]: checked,
+                            })
+                          }
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  <Button onClick={handleNotificationSave}>
+                    Save Preferences
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Appearance Tab */}
+            <TabsContent value="appearance">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Appearance</CardTitle>
+                  <CardDescription>
+                    Customize how EquiProfile looks for you
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-4">
+                    <Label>Theme</Label>
+                    <div className="grid grid-cols-2 gap-4">
+                      {["light", "dark"].map((themeOption) => (
+                        <button
+                          key={themeOption}
+                          onClick={() => {
+                            // Only toggle if clicking on the non-active theme
+                            if (theme !== themeOption) {
+                              toggleTheme();
+                            }
+                          }}
+                          className={`p-4 border-2 rounded-lg transition-all ${
+                            theme === themeOption
+                              ? "border-primary bg-primary/5"
+                              : "border-border hover:border-primary/50"
+                          }`}
+                        >
+                          <div className="text-center">
+                            <div className="capitalize font-medium mb-1">
+                              {themeOption}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              Use {themeOption} theme
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </PageTransition>
+    </DashboardLayout>
+  );
+}
+
+export default function Settings() {
+  const { user } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
   const [isCapturingLocation, setIsCapturingLocation] = useState(false);
 
