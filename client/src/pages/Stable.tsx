@@ -1,7 +1,16 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import DashboardLayout from "@/components/DashboardLayout";
-import { Users, Settings, Plus, Mail, Loader2, Building2, MapPin, User } from "lucide-react";
+import {
+  Users,
+  Settings,
+  Plus,
+  Mail,
+  Loader2,
+  Building2,
+  MapPin,
+  User,
+} from "lucide-react";
 import {
   Card,
   CardContent,
@@ -119,11 +128,14 @@ export default function StablePage() {
   };
 
   const ROLE_COLORS: Record<string, string> = {
-    owner: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
+    owner:
+      "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
     admin: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-    trainer: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+    trainer:
+      "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
     member: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200",
-    viewer: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+    viewer:
+      "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
   };
 
   return (
@@ -145,10 +157,7 @@ export default function StablePage() {
                 {t("stable.createStable")}
               </Button>
             ) : (
-              <Button
-                variant="outline"
-                onClick={() => setIsInviteOpen(true)}
-              >
+              <Button variant="outline" onClick={() => setIsInviteOpen(true)}>
                 <Mail className="mr-2 h-4 w-4" />
                 {t("stable.inviteMembers")}
               </Button>
@@ -178,13 +187,11 @@ export default function StablePage() {
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-16 text-center">
               <Building2 className="h-16 w-16 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">
-                No stable yet
-              </h3>
+              <h3 className="text-lg font-semibold mb-2">No stable yet</h3>
               <p className="text-muted-foreground max-w-sm mb-6">
-                Create your stable to collaborate with trainers, vets, and
-                team members. Share horse records, schedule training, and
-                communicate in one place.
+                Create your stable to collaborate with trainers, vets, and team
+                members. Share horse records, schedule training, and communicate
+                in one place.
               </p>
               <Button onClick={() => setIsCreateOpen(true)}>
                 <Plus className="mr-2 h-4 w-4" />
@@ -288,10 +295,7 @@ export default function StablePage() {
                       Manage stable members and their roles
                     </CardDescription>
                   </div>
-                  <Button
-                    size="sm"
-                    onClick={() => setIsInviteOpen(true)}
-                  >
+                  <Button size="sm" onClick={() => setIsInviteOpen(true)}>
                     <Mail className="mr-2 h-4 w-4" />
                     Invite
                   </Button>
@@ -492,10 +496,7 @@ export default function StablePage() {
             <Button variant="outline" onClick={() => setIsInviteOpen(false)}>
               Cancel
             </Button>
-            <Button
-              onClick={handleInvite}
-              disabled={inviteMember.isPending}
-            >
+            <Button onClick={handleInvite} disabled={inviteMember.isPending}>
               {inviteMember.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

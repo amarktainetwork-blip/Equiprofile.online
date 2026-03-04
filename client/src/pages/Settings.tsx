@@ -248,7 +248,8 @@ export default function Settings() {
                           className="opacity-70"
                         />
                         <p className="text-xs text-muted-foreground">
-                          Email cannot be changed here. Contact support if needed.
+                          Email cannot be changed here. Contact support if
+                          needed.
                         </p>
                       </div>
 

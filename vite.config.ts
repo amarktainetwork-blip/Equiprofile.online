@@ -67,7 +67,10 @@ export default defineConfig({
       "@": path.resolve(import.meta.dirname, "client", "src"),
       "@shared": path.resolve(import.meta.dirname, "shared"),
       "@assets": path.resolve(import.meta.dirname, "attached_assets"),
-      "mermaid": path.resolve(import.meta.dirname, "node_modules/mermaid/dist/mermaid.core.mjs"),
+      mermaid: path.resolve(
+        import.meta.dirname,
+        "node_modules/mermaid/dist/mermaid.core.mjs",
+      ),
     },
   },
   envDir: path.resolve(import.meta.dirname),
@@ -86,11 +89,19 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           // React core
-          if (id.includes("node_modules/react/") || id.includes("node_modules/react-dom/") || id.includes("node_modules/react-hook-form/")) {
+          if (
+            id.includes("node_modules/react/") ||
+            id.includes("node_modules/react-dom/") ||
+            id.includes("node_modules/react-hook-form/")
+          ) {
             return "react-core";
           }
           // Routing + query
-          if (id.includes("node_modules/wouter") || id.includes("node_modules/@tanstack/react-query") || id.includes("node_modules/@trpc/")) {
+          if (
+            id.includes("node_modules/wouter") ||
+            id.includes("node_modules/@tanstack/react-query") ||
+            id.includes("node_modules/@trpc/")
+          ) {
             return "data-layer";
           }
           // Radix UI
@@ -98,7 +109,11 @@ export default defineConfig({
             return "radix-ui";
           }
           // Charts
-          if (id.includes("node_modules/recharts") || id.includes("node_modules/chart.js") || id.includes("node_modules/react-chartjs-2")) {
+          if (
+            id.includes("node_modules/recharts") ||
+            id.includes("node_modules/chart.js") ||
+            id.includes("node_modules/react-chartjs-2")
+          ) {
             return "charts";
           }
           // Animation
@@ -106,19 +121,32 @@ export default defineConfig({
             return "framer-motion";
           }
           // i18n
-          if (id.includes("node_modules/i18next") || id.includes("node_modules/react-i18next")) {
+          if (
+            id.includes("node_modules/i18next") ||
+            id.includes("node_modules/react-i18next")
+          ) {
             return "i18n";
           }
           // Date utilities
-          if (id.includes("node_modules/date-fns") || id.includes("node_modules/react-day-picker")) {
+          if (
+            id.includes("node_modules/date-fns") ||
+            id.includes("node_modules/react-day-picker")
+          ) {
             return "date-utils";
           }
           // PDF/export (rarely used, load lazily)
-          if (id.includes("node_modules/jspdf") || id.includes("node_modules/html2canvas") || id.includes("node_modules/qrcode")) {
+          if (
+            id.includes("node_modules/jspdf") ||
+            id.includes("node_modules/html2canvas") ||
+            id.includes("node_modules/qrcode")
+          ) {
             return "export-utils";
           }
           // tsParticles
-          if (id.includes("node_modules/@tsparticles") || id.includes("node_modules/tsparticles")) {
+          if (
+            id.includes("node_modules/@tsparticles") ||
+            id.includes("node_modules/tsparticles")
+          ) {
             return "tsparticles";
           }
         },

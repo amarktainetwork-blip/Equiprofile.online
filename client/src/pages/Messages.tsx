@@ -49,22 +49,18 @@ export default function MessagesPage() {
   const selectedStableId = stables[0]?.id;
 
   // Get threads for the first stable
-  const {
-    data: threads = [],
-    refetch: refetchThreads,
-  } = trpc.messages.getThreads.useQuery(
-    { stableId: selectedStableId! },
-    { enabled: !!selectedStableId },
-  );
+  const { data: threads = [], refetch: refetchThreads } =
+    trpc.messages.getThreads.useQuery(
+      { stableId: selectedStableId! },
+      { enabled: !!selectedStableId },
+    );
 
   // Get messages for selected thread
-  const {
-    data: threadMessages = [],
-    refetch: refetchMessages,
-  } = trpc.messages.getMessages.useQuery(
-    { threadId: selectedThreadId! },
-    { enabled: !!selectedThreadId },
-  );
+  const { data: threadMessages = [], refetch: refetchMessages } =
+    trpc.messages.getMessages.useQuery(
+      { threadId: selectedThreadId! },
+      { enabled: !!selectedThreadId },
+    );
 
   // Send message mutation
   const sendMutation = trpc.messages.sendMessage.useMutation({
@@ -221,7 +217,7 @@ export default function MessagesPage() {
                           <span className="text-sm font-medium truncate">
                             {thread.title || "General"}
                           </span>
-                          {thread.unreadCount > 0 && (
+                          {(thread.unreadCount ?? 0) > 0 && (
                             <Badge variant="default" className="text-xs ml-1">
                               {thread.unreadCount}
                             </Badge>
@@ -245,8 +241,9 @@ export default function MessagesPage() {
                 <>
                   <CardHeader className="pb-2 border-b">
                     <CardTitle className="text-base">
-                      {threads.find((th: MessageThread) => th.id === selectedThreadId)
-                        ?.title || "General"}
+                      {threads.find(
+                        (th: MessageThread) => th.id === selectedThreadId,
+                      )?.title || "General"}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
@@ -259,27 +256,29 @@ export default function MessagesPage() {
                         </div>
                       ) : (
                         <div className="space-y-3">
-                          {[...threadMessages].reverse().map((msg: ThreadMessage) => (
-                            <div key={msg.id} className="flex flex-col gap-1">
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs font-medium text-muted-foreground">
-                                  {msg.senderName ||
-                                    `User ${msg.senderId}`}
-                                </span>
-                                <span className="text-xs text-muted-foreground/60">
-                                  {new Date(
-                                    msg.createdAt,
-                                  ).toLocaleTimeString([], {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                  })}
-                                </span>
+                          {[...threadMessages]
+                            .reverse()
+                            .map((msg: ThreadMessage) => (
+                              <div key={msg.id} className="flex flex-col gap-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs font-medium text-muted-foreground">
+                                    {msg.senderName || `User ${msg.senderId}`}
+                                  </span>
+                                  <span className="text-xs text-muted-foreground/60">
+                                    {new Date(msg.createdAt).toLocaleTimeString(
+                                      [],
+                                      {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      },
+                                    )}
+                                  </span>
+                                </div>
+                                <p className="text-sm bg-muted rounded-lg px-3 py-2 w-fit max-w-[80%]">
+                                  {msg.content}
+                                </p>
                               </div>
-                              <p className="text-sm bg-muted rounded-lg px-3 py-2 w-fit max-w-[80%]">
-                                {msg.content}
-                              </p>
-                            </div>
-                          ))}
+                            ))}
                           <div ref={bottomRef} />
                         </div>
                       )}
@@ -289,9 +288,7 @@ export default function MessagesPage() {
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={() =>
-                          toast.info("File sharing coming soon")
-                        }
+                        onClick={() => toast.info("File sharing coming soon")}
                         title="Attach file"
                       >
                         <Paperclip className="h-4 w-4" />
@@ -304,9 +301,7 @@ export default function MessagesPage() {
                       />
                       <Button
                         onClick={handleSendMessage}
-                        disabled={
-                          !message.trim() || sendMutation.isPending
-                        }
+                        disabled={!message.trim() || sendMutation.isPending}
                       >
                         <Send className="h-4 w-4" />
                       </Button>

@@ -403,7 +403,9 @@ export default function Home() {
                       onClick={() => setActiveTestimonial(index)}
                       className={`relative flex items-center justify-center min-w-[44px] min-h-[44px] transition-all duration-300`}
                       aria-label={`Go to testimonial ${index + 1}`}
-                      aria-current={index === activeTestimonial ? "true" : undefined}
+                      aria-current={
+                        index === activeTestimonial ? "true" : undefined
+                      }
                     >
                       <span
                         className={`rounded-full transition-all duration-300 ${

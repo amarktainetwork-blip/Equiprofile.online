@@ -471,7 +471,9 @@ function DashboardLayoutContent({
                     <Icon
                       className={`h-5 w-5 ${isActive ? "text-primary" : ""}`}
                     />
-                    <span className="text-[10px] leading-none">{item.label}</span>
+                    <span className="text-[10px] leading-none">
+                      {item.label}
+                    </span>
                   </button>
                 );
               })}
@@ -486,9 +488,14 @@ function DashboardLayoutContent({
                     <span className="text-[10px] leading-none">More</span>
                   </button>
                 </SheetTrigger>
-                <SheetContent side="bottom" className="max-h-[80vh] overflow-y-auto rounded-t-xl">
+                <SheetContent
+                  side="bottom"
+                  className="max-h-[80vh] overflow-y-auto rounded-t-xl"
+                >
                   <SheetHeader className="pb-2">
-                    <SheetTitle className="font-serif text-left">All Modules</SheetTitle>
+                    <SheetTitle className="font-serif text-left">
+                      All Modules
+                    </SheetTitle>
                   </SheetHeader>
                   <div className="space-y-4 pb-6">
                     {moreModuleGroups.map((group) => (

@@ -596,9 +596,8 @@ export default function BillingPage() {
               <p>
                 Our platform supports up to{" "}
                 <strong className="text-foreground">10 total users</strong> and
-                up to{" "}
-                <strong className="text-foreground">20 horses</strong> on the
-                Stable plan.
+                up to <strong className="text-foreground">20 horses</strong> on
+                the Stable plan.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="rounded-lg border border-primary/20 bg-background p-3">

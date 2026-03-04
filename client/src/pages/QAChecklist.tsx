@@ -13,9 +13,12 @@ interface CheckItem {
 }
 
 function StatusIcon({ status }: { status: CheckItem["status"] }) {
-  if (status === "loading") return <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />;
-  if (status === "ok") return <CheckCircle className="h-4 w-4 text-green-500" />;
-  if (status === "warn") return <CheckCircle className="h-4 w-4 text-yellow-500" />;
+  if (status === "loading")
+    return <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />;
+  if (status === "ok")
+    return <CheckCircle className="h-4 w-4 text-green-500" />;
+  if (status === "warn")
+    return <CheckCircle className="h-4 w-4 text-yellow-500" />;
   return <XCircle className="h-4 w-4 text-red-500" />;
 }
 
@@ -28,7 +31,13 @@ function StatusBadge({ status }: { status: CheckItem["status"] }) {
   } as const;
   return (
     <Badge variant={variants[status]} className="text-xs capitalize">
-      {status === "ok" ? "Connected" : status === "warn" ? "Warning" : status === "loading" ? "Checking..." : "Error"}
+      {status === "ok"
+        ? "Connected"
+        : status === "warn"
+          ? "Warning"
+          : status === "loading"
+            ? "Checking..."
+            : "Error"}
     </Badge>
   );
 }
@@ -52,14 +61,19 @@ function Section({ title, checks }: { title: string; checks: CheckItem[] }) {
       </CardHeader>
       <CardContent className="space-y-2">
         {checks.map((check, i) => (
-          <div key={i} className="flex items-start justify-between gap-2 text-xs py-1 border-b border-border/50 last:border-0">
+          <div
+            key={i}
+            className="flex items-start justify-between gap-2 text-xs py-1 border-b border-border/50 last:border-0"
+          >
             <div className="flex items-center gap-2 min-w-0">
               <StatusIcon status={check.status} />
               <span className="font-medium truncate">{check.label}</span>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               {check.detail && (
-                <span className="text-muted-foreground hidden sm:inline truncate max-w-[200px]">{check.detail}</span>
+                <span className="text-muted-foreground hidden sm:inline truncate max-w-[200px]">
+                  {check.detail}
+                </span>
               )}
               <StatusBadge status={check.status} />
             </div>
@@ -74,17 +88,31 @@ export default function QAChecklistPage() {
   const [refetchKey, setRefetchKey] = useState(0);
 
   const authMe = trpc.auth.me.useQuery(undefined, { retry: false });
-  const dashStats = trpc.user.getDashboardStats.useQuery(undefined, { retry: false });
+  const dashStats = trpc.user.getDashboardStats.useQuery(undefined, {
+    retry: false,
+  });
   const horses = trpc.horses.list.useQuery(undefined, { retry: false });
   const stables = trpc.stables.list.useQuery(undefined, { retry: false });
   const calEvents = trpc.calendar.getEvents.useQuery(
-    { startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() },
-    { retry: false }
+    {
+      startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+      endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+    },
+    { retry: false },
   );
-  const adminStatus = trpc.adminUnlock.getStatus.useQuery(undefined, { retry: false });
-  const trainingStats = trpc.analytics.getTrainingStats.useQuery({}, { retry: false });
-  const profileQuery = trpc.user.getProfile.useQuery(undefined, { retry: false });
-  const subStatus = trpc.user.getSubscriptionStatus.useQuery(undefined, { retry: false });
+  const adminStatus = trpc.adminUnlock.getStatus.useQuery(undefined, {
+    retry: false,
+  });
+  const trainingStats = trpc.analytics.getTrainingStats.useQuery(
+    {},
+    { retry: false },
+  );
+  const profileQuery = trpc.user.getProfile.useQuery(undefined, {
+    retry: false,
+  });
+  const subStatus = trpc.user.getSubscriptionStatus.useQuery(undefined, {
+    retry: false,
+  });
 
   function qStatus(query: any): CheckItem["status"] {
     if (query.isLoading) return "loading";
@@ -96,25 +124,69 @@ export default function QAChecklistPage() {
     if (query.isError) return query.error?.message?.slice(0, 80);
     if (query.data === null) return "null (may be expected)";
     if (Array.isArray(query.data)) return `${query.data.length} item(s)`;
-    return typeof query.data === "object" ? "object received" : String(query.data);
+    return typeof query.data === "object"
+      ? "object received"
+      : String(query.data);
   }
 
   const authChecks: CheckItem[] = [
-    { label: "auth.me", status: qStatus(authMe), detail: authMe.data ? `${authMe.data.name || authMe.data.email}` : qDetail(authMe) },
-    { label: "user.getProfile", status: qStatus(profileQuery), detail: qDetail(profileQuery) },
-    { label: "user.getSubscriptionStatus", status: qStatus(subStatus), detail: subStatus.data ? `${subStatus.data.status}/${subStatus.data.plan || "none"}` : qDetail(subStatus) },
+    {
+      label: "auth.me",
+      status: qStatus(authMe),
+      detail: authMe.data
+        ? `${authMe.data.name || authMe.data.email}`
+        : qDetail(authMe),
+    },
+    {
+      label: "user.getProfile",
+      status: qStatus(profileQuery),
+      detail: qDetail(profileQuery),
+    },
+    {
+      label: "user.getSubscriptionStatus",
+      status: qStatus(subStatus),
+      detail: subStatus.data
+        ? `${subStatus.data.status}/${subStatus.data.plan || "none"}`
+        : qDetail(subStatus),
+    },
   ];
 
   const dashboardChecks: CheckItem[] = [
-    { label: "user.getDashboardStats", status: qStatus(dashStats), detail: dashStats.data ? `${dashStats.data.horseCount} horses, ${dashStats.data.upcomingSessionCount} sessions` : qDetail(dashStats) },
-    { label: "analytics.getTrainingStats", status: qStatus(trainingStats), detail: trainingStats.data ? `${trainingStats.data.totalSessions} sessions, ${trainingStats.data.totalDuration || 0}min` : qDetail(trainingStats) },
+    {
+      label: "user.getDashboardStats",
+      status: qStatus(dashStats),
+      detail: dashStats.data
+        ? `${dashStats.data.horseCount} horses, ${dashStats.data.upcomingSessionCount} sessions`
+        : qDetail(dashStats),
+    },
+    {
+      label: "analytics.getTrainingStats",
+      status: qStatus(trainingStats),
+      detail: trainingStats.data
+        ? `${trainingStats.data.totalSessions} sessions, ${trainingStats.data.totalDuration || 0}min`
+        : qDetail(trainingStats),
+    },
     { label: "horses.list", status: qStatus(horses), detail: qDetail(horses) },
   ];
 
   const featureChecks: CheckItem[] = [
-    { label: "stables.list", status: qStatus(stables), detail: qDetail(stables) },
-    { label: "calendar.getEvents", status: qStatus(calEvents), detail: qDetail(calEvents) },
-    { label: "adminUnlock.getStatus", status: qStatus(adminStatus), detail: adminStatus.data ? `unlocked=${adminStatus.data.isUnlocked}` : qDetail(adminStatus) },
+    {
+      label: "stables.list",
+      status: qStatus(stables),
+      detail: qDetail(stables),
+    },
+    {
+      label: "calendar.getEvents",
+      status: qStatus(calEvents),
+      detail: qDetail(calEvents),
+    },
+    {
+      label: "adminUnlock.getStatus",
+      status: qStatus(adminStatus),
+      detail: adminStatus.data
+        ? `unlocked=${adminStatus.data.isUnlocked}`
+        : qDetail(adminStatus),
+    },
   ];
 
   const routeChecks: CheckItem[] = [
@@ -178,7 +250,10 @@ export default function QAChecklistPage() {
 
         <Section title="Authentication & User" checks={authChecks} />
         <Section title="Dashboard Data" checks={dashboardChecks} />
-        <Section title="Features (Calendar / Stable / Admin)" checks={featureChecks} />
+        <Section
+          title="Features (Calendar / Stable / Admin)"
+          checks={featureChecks}
+        />
         <Section title="Routing & UI Fixes" checks={routeChecks} />
 
         <div className="text-xs text-muted-foreground text-center pt-2">

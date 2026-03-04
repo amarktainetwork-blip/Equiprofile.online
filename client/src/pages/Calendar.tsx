@@ -203,8 +203,7 @@ export default function CalendarPage() {
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
                 <CalendarIcon className="h-5 w-5" />
-                {monthNames[currentDate.getMonth()]}{" "}
-                {currentDate.getFullYear()}
+                {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
               </CardTitle>
               <div className="flex items-center gap-2">
                 <Button
@@ -318,7 +317,10 @@ export default function CalendarPage() {
                 <p className="text-sm text-muted-foreground mt-2">
                   Add events to your calendar to stay organized
                 </p>
-                <Button className="mt-4" onClick={() => setIsAddDialogOpen(true)}>
+                <Button
+                  className="mt-4"
+                  onClick={() => setIsAddDialogOpen(true)}
+                >
                   <Plus className="mr-2 h-4 w-4" />
                   Add Event
                 </Button>
@@ -394,7 +396,10 @@ export default function CalendarPage() {
               <Select
                 value={newEvent.eventType}
                 onValueChange={(v) =>
-                  setNewEvent({ ...newEvent, eventType: v as typeof newEvent.eventType })
+                  setNewEvent({
+                    ...newEvent,
+                    eventType: v as typeof newEvent.eventType,
+                  })
                 }
               >
                 <SelectTrigger>
@@ -431,16 +436,10 @@ export default function CalendarPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsAddDialogOpen(false)}
-            >
+            <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
               Cancel
             </Button>
-            <Button
-              onClick={handleAddEvent}
-              disabled={createEvent.isPending}
-            >
+            <Button onClick={handleAddEvent} disabled={createEvent.isPending}>
               {createEvent.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

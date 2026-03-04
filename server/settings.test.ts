@@ -83,16 +83,27 @@ async function handleChangePassword(
   currentPassword: string,
   newPassword: string,
   user: { id: number; passwordHash: string | null },
-  dbMock: { updateUser: (id: number, data: Record<string, unknown>) => Promise<void> },
+  dbMock: {
+    updateUser: (id: number, data: Record<string, unknown>) => Promise<void>;
+  },
 ): Promise<{ status: number; body: Record<string, unknown> }> {
   if (!currentPassword || !newPassword) {
-    return { status: 400, body: { error: "currentPassword and newPassword are required" } };
+    return {
+      status: 400,
+      body: { error: "currentPassword and newPassword are required" },
+    };
   }
   if (newPassword.length < 8) {
-    return { status: 400, body: { error: "New password must be at least 8 characters" } };
+    return {
+      status: 400,
+      body: { error: "New password must be at least 8 characters" },
+    };
   }
   if (!user.passwordHash) {
-    return { status: 400, body: { error: "No password set. Use forgot-password to create one." } };
+    return {
+      status: 400,
+      body: { error: "No password set. Use forgot-password to create one." },
+    };
   }
   const isValid = await bcrypt.compare(currentPassword, user.passwordHash);
   if (!isValid) {
@@ -108,29 +119,51 @@ async function handleChangePassword(
 describe("auth.changePassword", () => {
   const dbMock = { updateUser: vi.fn().mockResolvedValue(undefined) };
 
-  beforeEach(() => { dbMock.updateUser.mockClear(); });
+  beforeEach(() => {
+    dbMock.updateUser.mockClear();
+  });
 
   it("rejects when currentPassword is missing", async () => {
-    const result = await handleChangePassword("", "newPassword123", { id: 1, passwordHash: "hash" }, dbMock);
+    const result = await handleChangePassword(
+      "",
+      "newPassword123",
+      { id: 1, passwordHash: "hash" },
+      dbMock,
+    );
     expect(result.status).toBe(400);
     expect(result.body.error).toContain("required");
   });
 
   it("rejects when newPassword is too short", async () => {
-    const result = await handleChangePassword("oldpass", "short", { id: 1, passwordHash: "hash" }, dbMock);
+    const result = await handleChangePassword(
+      "oldpass",
+      "short",
+      { id: 1, passwordHash: "hash" },
+      dbMock,
+    );
     expect(result.status).toBe(400);
     expect(result.body.error).toContain("8 characters");
   });
 
   it("rejects when no password hash is set (OAuth user)", async () => {
-    const result = await handleChangePassword("oldpass", "newPassword123", { id: 1, passwordHash: null }, dbMock);
+    const result = await handleChangePassword(
+      "oldpass",
+      "newPassword123",
+      { id: 1, passwordHash: null },
+      dbMock,
+    );
     expect(result.status).toBe(400);
     expect(result.body.error).toContain("No password set");
   });
 
   it("rejects when current password is wrong", async () => {
     const correctHash = await bcrypt.hash("correctPassword", 10);
-    const result = await handleChangePassword("wrongPassword", "newPassword123", { id: 1, passwordHash: correctHash }, dbMock);
+    const result = await handleChangePassword(
+      "wrongPassword",
+      "newPassword123",
+      { id: 1, passwordHash: correctHash },
+      dbMock,
+    );
     expect(result.status).toBe(400);
     expect(result.body.error).toContain("incorrect");
     expect(dbMock.updateUser).not.toHaveBeenCalled();
@@ -139,7 +172,12 @@ describe("auth.changePassword", () => {
   it("succeeds with correct current password and updates hash", async () => {
     const currentPassword = "myCurrentPass1!";
     const correctHash = await bcrypt.hash(currentPassword, 10);
-    const result = await handleChangePassword(currentPassword, "myNewPassword1!", { id: 1, passwordHash: correctHash }, dbMock);
+    const result = await handleChangePassword(
+      currentPassword,
+      "myNewPassword1!",
+      { id: 1, passwordHash: correctHash },
+      dbMock,
+    );
     expect(result.status).toBe(200);
     expect(result.body.success).toBe(true);
     expect(dbMock.updateUser).toHaveBeenCalledOnce();
@@ -147,7 +185,10 @@ describe("auth.changePassword", () => {
     expect(callId).toBe(1);
     expect(callData).toHaveProperty("passwordHash");
     expect(callData.passwordHash).not.toBe(correctHash);
-    const isValid = await bcrypt.compare("myNewPassword1!", callData.passwordHash as string);
+    const isValid = await bcrypt.compare(
+      "myNewPassword1!",
+      callData.passwordHash as string,
+    );
     expect(isValid).toBe(true);
   });
 });

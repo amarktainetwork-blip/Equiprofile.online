@@ -16,6 +16,7 @@
 👉 **[docs/PROJECT_DOCUMENTATION.md](./docs/PROJECT_DOCUMENTATION.md)**
 
 It covers:
+
 - Architecture overview
 - Frontend & backend structure
 - Database models
@@ -75,14 +76,14 @@ npm run preflight  # Validate routes and dependencies
 
 ## 🔑 Key Environment Variables
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `DATABASE_URL` | ✅ | MySQL connection string |
-| `JWT_SECRET` | ✅ | Min 32-char random string |
-| `ADMIN_UNLOCK_PASSWORD` | ✅ | Admin section password |
-| `ENABLE_STRIPE` | Optional | Set `true` to activate billing |
-| `ENABLE_UPLOADS` | Optional | Set `true` to activate file uploads |
-| `OPENAI_API_KEY` | Optional | AI features |
+| Variable                | Required | Description                         |
+| ----------------------- | -------- | ----------------------------------- |
+| `DATABASE_URL`          | ✅       | MySQL connection string             |
+| `JWT_SECRET`            | ✅       | Min 32-char random string           |
+| `ADMIN_UNLOCK_PASSWORD` | ✅       | Admin section password              |
+| `ENABLE_STRIPE`         | Optional | Set `true` to activate billing      |
+| `ENABLE_UPLOADS`        | Optional | Set `true` to activate file uploads |
+| `OPENAI_API_KEY`        | Optional | AI features                         |
 
 See [docs/PROJECT_DOCUMENTATION.md](./docs/PROJECT_DOCUMENTATION.md#7-environment-variables) for the complete list.
 

@@ -242,8 +242,10 @@ function DashboardContent() {
   const { data: horses = [] } = trpc.horses.list.useQuery(undefined, {
     retry: false,
   });
-  const { data: upcomingAppointments = [] } =
-    trpc.appointments.list.useQuery(undefined, { retry: false });
+  const { data: upcomingAppointments = [] } = trpc.appointments.list.useQuery(
+    undefined,
+    { retry: false },
+  );
 
   const getSubscriptionBadge = () => {
     if (!subscription) return null;
@@ -412,8 +414,12 @@ function DashboardContent() {
                           <Heart className="w-3.5 h-3.5 text-rose-500" />
                         </div>
                         <div className="min-w-0">
-                          <p className="text-xs font-medium truncate">{horse.name}</p>
-                          <p className="text-[10px] text-muted-foreground">{horse.breed || "No breed"}</p>
+                          <p className="text-xs font-medium truncate">
+                            {horse.name}
+                          </p>
+                          <p className="text-[10px] text-muted-foreground">
+                            {horse.breed || "No breed"}
+                          </p>
                         </div>
                         <ChevronRight className="w-3 h-3 text-muted-foreground ml-auto shrink-0" />
                       </div>
@@ -443,18 +449,32 @@ function DashboardContent() {
               <CardContent>
                 <div className="space-y-1.5">
                   {upcomingAppointments
-                    .filter((a: any) => new Date(a.appointmentDate) >= new Date())
-                    .sort((a: any, b: any) => new Date(a.appointmentDate).getTime() - new Date(b.appointmentDate).getTime())
+                    .filter(
+                      (a: any) => new Date(a.appointmentDate) >= new Date(),
+                    )
+                    .sort(
+                      (a: any, b: any) =>
+                        new Date(a.appointmentDate).getTime() -
+                        new Date(b.appointmentDate).getTime(),
+                    )
                     .slice(0, 3)
                     .map((appt: any) => (
-                      <div key={appt.id} className="flex items-center gap-2 py-1.5 px-2 rounded-lg border border-muted/40">
+                      <div
+                        key={appt.id}
+                        className="flex items-center gap-2 py-1.5 px-2 rounded-lg border border-muted/40"
+                      >
                         <div className="w-7 h-7 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center shrink-0">
                           <Calendar className="w-3.5 h-3.5 text-purple-500" />
                         </div>
                         <div className="min-w-0">
-                          <p className="text-xs font-medium truncate">{appt.title}</p>
+                          <p className="text-xs font-medium truncate">
+                            {appt.title}
+                          </p>
                           <p className="text-[10px] text-muted-foreground">
-                            {new Date(appt.appointmentDate).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                            {new Date(appt.appointmentDate).toLocaleDateString(
+                              "en-GB",
+                              { day: "numeric", month: "short" },
+                            )}
                           </p>
                         </div>
                       </div>

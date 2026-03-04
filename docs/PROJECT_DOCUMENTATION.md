@@ -27,6 +27,7 @@
 EquiProfile is a comprehensive, production-grade web application for equestrian professionals. It enables horse owners, trainers, and stable managers to track horses' health records, training schedules, feeding plans, appointments, breeding, finances, and more — all from a single, mobile-first dashboard.
 
 **Tech Stack:**
+
 - **Frontend**: React 18 + TypeScript, Vite, Tailwind CSS, shadcn/ui, Framer Motion
 - **Backend**: Node.js + Express + tRPC
 - **Database**: MySQL 8 via Drizzle ORM
@@ -69,6 +70,7 @@ EquiProfile is a comprehensive, production-grade web application for equestrian 
 ```
 
 **Key decisions:**
+
 - Single-server monolith (Express serves both API and built React app)
 - tRPC for type-safe client↔server communication
 - Drizzle ORM for type-safe DB queries
@@ -173,46 +175,46 @@ server/
 
 All models are defined in `drizzle/schema.ts`.
 
-| Table | Purpose |
-|-------|---------|
-| `users` | User accounts with subscription, preferences, and profile |
-| `horses` | Horse profiles linked to users |
-| `healthRecords` | Health events (vet visits, injuries, etc.) |
-| `vaccinations` | Vaccination records per horse |
-| `dewormings` | Deworming records |
-| `treatments` | Medical treatments |
-| `dentalRecords` | Dental care records |
-| `hoofCareRecords` | Hoof care records |
-| `xrays` | X-ray attachments |
-| `trainingSessions` | Training log entries |
-| `trainingProgramTemplates` | Reusable training templates |
-| `trainingPrograms` | Active training programs |
-| `feedCosts` | Feeding cost tracking |
-| `appointments` | Scheduled vet/farrier/trainer appointments |
-| `events` | Calendar events |
-| `tasks` | Task/todo items |
-| `contacts` | Vet/farrier/trainer contact book |
-| `stables` | Stable/yard management |
-| `stableMembers` | Stable membership (up to 5 users) |
-| `stableInvites` | Pending stable invitations |
-| `messageThreads` | Message thread metadata |
-| `messages` | Individual messages in threads |
-| `documents` | Uploaded document metadata |
-| `reports` | Saved report definitions |
-| `reportSchedules` | Scheduled report delivery |
-| `notes` | AI assistant notes |
-| `chatLeads` | Sales chat lead capture |
-| `breeding` | Breeding program records |
-| `foals` | Foal profiles |
-| `lessonBookings` | Lesson scheduling |
-| `trainerAvailability` | Trainer schedule availability |
-| `competitions` | Competition entries and results |
-| `nutritionLogs` | Nutrition tracking logs |
-| `nutritionPlans` | Nutrition plan definitions |
-| `pedigree` | Pedigree tree nodes |
-| `weatherLogs` | Weather condition logs |
-| `activityLog` | Audit trail of user actions |
-| `siteSettings` | Admin-configurable site settings |
+| Table                      | Purpose                                                   |
+| -------------------------- | --------------------------------------------------------- |
+| `users`                    | User accounts with subscription, preferences, and profile |
+| `horses`                   | Horse profiles linked to users                            |
+| `healthRecords`            | Health events (vet visits, injuries, etc.)                |
+| `vaccinations`             | Vaccination records per horse                             |
+| `dewormings`               | Deworming records                                         |
+| `treatments`               | Medical treatments                                        |
+| `dentalRecords`            | Dental care records                                       |
+| `hoofCareRecords`          | Hoof care records                                         |
+| `xrays`                    | X-ray attachments                                         |
+| `trainingSessions`         | Training log entries                                      |
+| `trainingProgramTemplates` | Reusable training templates                               |
+| `trainingPrograms`         | Active training programs                                  |
+| `feedCosts`                | Feeding cost tracking                                     |
+| `appointments`             | Scheduled vet/farrier/trainer appointments                |
+| `events`                   | Calendar events                                           |
+| `tasks`                    | Task/todo items                                           |
+| `contacts`                 | Vet/farrier/trainer contact book                          |
+| `stables`                  | Stable/yard management                                    |
+| `stableMembers`            | Stable membership (up to 5 users)                         |
+| `stableInvites`            | Pending stable invitations                                |
+| `messageThreads`           | Message thread metadata                                   |
+| `messages`                 | Individual messages in threads                            |
+| `documents`                | Uploaded document metadata                                |
+| `reports`                  | Saved report definitions                                  |
+| `reportSchedules`          | Scheduled report delivery                                 |
+| `notes`                    | AI assistant notes                                        |
+| `chatLeads`                | Sales chat lead capture                                   |
+| `breeding`                 | Breeding program records                                  |
+| `foals`                    | Foal profiles                                             |
+| `lessonBookings`           | Lesson scheduling                                         |
+| `trainerAvailability`      | Trainer schedule availability                             |
+| `competitions`             | Competition entries and results                           |
+| `nutritionLogs`            | Nutrition tracking logs                                   |
+| `nutritionPlans`           | Nutrition plan definitions                                |
+| `pedigree`                 | Pedigree tree nodes                                       |
+| `weatherLogs`              | Weather condition logs                                    |
+| `activityLog`              | Audit trail of user actions                               |
+| `siteSettings`             | Admin-configurable site settings                          |
 
 ---
 
@@ -220,42 +222,42 @@ All models are defined in `drizzle/schema.ts`.
 
 ### REST Routes (Express)
 
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| POST | `/api/auth/signup` | None | Create new account |
-| POST | `/api/auth/login` | None | Email/password login |
-| POST | `/api/auth/logout` | None | Clear session cookie |
-| POST | `/api/auth/request-reset` | None | Send password reset email |
-| POST | `/api/auth/reset-password` | None | Complete password reset |
-| POST | `/api/auth/change-password` | Session | Change password (requires current password) |
-| POST | `/api/contact` | None | Contact form submission |
-| GET  | `/healthz` | None | Health check |
-| GET  | `/build` | None | Build info |
-| GET  | `/api/realtime/events` | Session | SSE event stream |
+| Method | Path                        | Auth    | Description                                 |
+| ------ | --------------------------- | ------- | ------------------------------------------- |
+| POST   | `/api/auth/signup`          | None    | Create new account                          |
+| POST   | `/api/auth/login`           | None    | Email/password login                        |
+| POST   | `/api/auth/logout`          | None    | Clear session cookie                        |
+| POST   | `/api/auth/request-reset`   | None    | Send password reset email                   |
+| POST   | `/api/auth/reset-password`  | None    | Complete password reset                     |
+| POST   | `/api/auth/change-password` | Session | Change password (requires current password) |
+| POST   | `/api/contact`              | None    | Contact form submission                     |
+| GET    | `/healthz`                  | None    | Health check                                |
+| GET    | `/build`                    | None    | Build info                                  |
+| GET    | `/api/realtime/events`      | Session | SSE event stream                            |
 
 ### tRPC Routers (all under `/api/trpc`)
 
-| Router | Key Procedures |
-|--------|----------------|
-| `auth` | `me`, `logout` |
-| `adminUnlock` | `unlock`, `getStatus`, `revoke` |
-| `user` | `getProfile`, `updateProfile`, `updateNotificationPreferences`, `getNotificationPreferences`, `getDashboardStats`, `getSubscriptionStatus` |
-| `horses` | `list`, `get`, `create`, `update`, `delete`, `getStats` |
-| `healthRecords` | `listAll`, `create`, `update`, `delete` |
-| `vaccinations` | `list`, `create`, `update`, `delete` |
-| `trainingSessions` | `list`, `create`, `update`, `delete` |
-| `appointments` | `list`, `create`, `update`, `delete` |
-| `calendar` | `getEvents`, `createEvent`, `updateEvent`, `deleteEvent` |
-| `tasks` | `list`, `create`, `update`, `delete`, `complete` |
-| `stables` | `list`, `get`, `create`, `update`, `addMember`, `removeMember`, `getActivity`, `getMemberHorses` |
-| `messages` | `getThreads`, `getMessages`, `createThread`, `sendMessage` |
-| `documents` | `list`, `upload`, `delete` |
-| `billing` | `getPricing`, `getStatus`, `createCheckout`, `createPortal` |
-| `analytics` | `getTrainingStats`, `getHealthStats`, `getOverview` |
-| `notes` | `list`, `create`, `delete` |
-| `ai` | `chat`, `getPromptSuggestions` |
-| `weather` | `getCurrent`, `updateLocation` |
-| `admin` | `getUsers`, `getStats`, `suspendUser`, `unsuspendUser` |
+| Router             | Key Procedures                                                                                                                             |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `auth`             | `me`, `logout`                                                                                                                             |
+| `adminUnlock`      | `unlock`, `getStatus`, `revoke`                                                                                                            |
+| `user`             | `getProfile`, `updateProfile`, `updateNotificationPreferences`, `getNotificationPreferences`, `getDashboardStats`, `getSubscriptionStatus` |
+| `horses`           | `list`, `get`, `create`, `update`, `delete`, `getStats`                                                                                    |
+| `healthRecords`    | `listAll`, `create`, `update`, `delete`                                                                                                    |
+| `vaccinations`     | `list`, `create`, `update`, `delete`                                                                                                       |
+| `trainingSessions` | `list`, `create`, `update`, `delete`                                                                                                       |
+| `appointments`     | `list`, `create`, `update`, `delete`                                                                                                       |
+| `calendar`         | `getEvents`, `createEvent`, `updateEvent`, `deleteEvent`                                                                                   |
+| `tasks`            | `list`, `create`, `update`, `delete`, `complete`                                                                                           |
+| `stables`          | `list`, `get`, `create`, `update`, `addMember`, `removeMember`, `getActivity`, `getMemberHorses`                                           |
+| `messages`         | `getThreads`, `getMessages`, `createThread`, `sendMessage`                                                                                 |
+| `documents`        | `list`, `upload`, `delete`                                                                                                                 |
+| `billing`          | `getPricing`, `getStatus`, `createCheckout`, `createPortal`                                                                                |
+| `analytics`        | `getTrainingStats`, `getHealthStats`, `getOverview`                                                                                        |
+| `notes`            | `list`, `create`, `delete`                                                                                                                 |
+| `ai`               | `chat`, `getPromptSuggestions`                                                                                                             |
+| `weather`          | `getCurrent`, `updateLocation`                                                                                                             |
+| `admin`            | `getUsers`, `getStats`, `suspendUser`, `unsuspendUser`                                                                                     |
 
 ---
 
@@ -320,10 +322,10 @@ Copy `.env.example` from the repo root for the full template.
 
 EquiProfile uses env-var feature flags so the app starts cleanly without external services:
 
-| Flag | Default | Controls |
-|------|---------|---------|
-| `ENABLE_STRIPE` | `false` | Billing UI, Stripe checkout, webhooks |
-| `ENABLE_UPLOADS` | `false` | File/document/image upload UI and S3 |
+| Flag             | Default | Controls                              |
+| ---------------- | ------- | ------------------------------------- |
+| `ENABLE_STRIPE`  | `false` | Billing UI, Stripe checkout, webhooks |
+| `ENABLE_UPLOADS` | `false` | File/document/image upload UI and S3  |
 
 When a flag is `false`, related tRPC procedures throw `PRECONDITION_FAILED` and the UI hides those options.
 
@@ -437,18 +439,18 @@ node_modules/.bin/vitest run server/settings.test.ts
 
 All tests live under `server/*.test.ts` and use **Vitest** with **vi.mock** for DB isolation.
 
-| File | Coverage |
-|------|---------|
-| `server/auth.login.test.ts` | Login flow |
-| `server/auth.logout.test.ts` | Logout flow |
-| `server/auth.reset.test.ts` | Password reset |
-| `server/admin.test.ts` | Admin procedures |
-| `server/horses.test.ts` | Horse CRUD |
-| `server/health.test.ts` | Health records |
-| `server/training.test.ts` | Training sessions |
-| `server/notes.test.ts` | Notes |
-| `server/api.test.ts` | API surface |
-| `server/settings.test.ts` | Settings mutations (changePassword, notification prefs) |
+| File                         | Coverage                                                |
+| ---------------------------- | ------------------------------------------------------- |
+| `server/auth.login.test.ts`  | Login flow                                              |
+| `server/auth.logout.test.ts` | Logout flow                                             |
+| `server/auth.reset.test.ts`  | Password reset                                          |
+| `server/admin.test.ts`       | Admin procedures                                        |
+| `server/horses.test.ts`      | Horse CRUD                                              |
+| `server/health.test.ts`      | Health records                                          |
+| `server/training.test.ts`    | Training sessions                                       |
+| `server/notes.test.ts`       | Notes                                                   |
+| `server/api.test.ts`         | API surface                                             |
+| `server/settings.test.ts`    | Settings mutations (changePassword, notification prefs) |
 
 ### Run Preflight Checks
 
@@ -490,6 +492,7 @@ npm run build
 ### Stale Service Worker / Old Assets
 
 Users may see stale content after deployment. Solutions:
+
 1. Hard refresh: `Ctrl+Shift+R`
 2. Clear in DevTools: Application → Service Workers → Unregister
 3. Bump version in `package.json` before deploying (service worker versioning is automated on build)
