@@ -342,9 +342,12 @@ export default function BillingPage() {
                         Current Plan
                       </Badge>
                     ) : (
-                      <Button variant="outline" className="w-full" disabled>
-                        Trial active on signup
-                      </Button>
+                      <Badge
+                        variant="outline"
+                        className="w-full justify-center py-2 text-muted-foreground"
+                      >
+                        Included automatically on signup
+                      </Badge>
                     )}
                   </CardContent>
                 </Card>

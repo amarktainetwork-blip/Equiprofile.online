@@ -89,7 +89,15 @@ function DocumentsContent() {
       });
       setSelectedFile(null);
     },
-    onError: (error) => toast.error(error.message),
+    onError: (error) => {
+      if (error.message?.toLowerCase().includes("disabled")) {
+        toast.error("Document uploads are temporarily unavailable", {
+          description: "Please contact support if this persists.",
+        });
+      } else {
+        toast.error(error.message);
+      }
+    },
   });
 
   const deleteMutation = trpc.documents.delete.useMutation({
