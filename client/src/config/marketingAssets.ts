@@ -42,7 +42,7 @@ export const marketingAssets = {
   // Hero Section
   // ========================================
   hero: {
-    video: `${MARKETING_BASE}/hero/hero.mp4`,
+    video: `${MARKETING_BASE}/hero/landingfinal.mp4`,
     heroHorse: `${MARKETING_BASE}/hero/hero-horse.jpg`,
     heroStable: `${MARKETING_BASE}/hero/hero-stable.jpg`,
   },

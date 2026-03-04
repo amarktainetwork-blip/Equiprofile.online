@@ -649,9 +649,7 @@ export function SalesChatWidget() {
             </div>
             <div data-equip-chat-header-info>
               <div data-equip-chat-header-name>EquiProfile Assistant</div>
-              <div data-equip-chat-header-status>
-                Online · Typically replies instantly
-              </div>
+              <div data-equip-chat-header-status>Online</div>
             </div>
             <button
               data-equip-chat-close

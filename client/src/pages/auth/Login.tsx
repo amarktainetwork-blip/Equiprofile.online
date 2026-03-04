@@ -89,7 +89,7 @@ export default function Login() {
 
   return (
     <>
-      <MarketingNav />
+      <MarketingNav alwaysDark />
       <PageTransition>
         <AuthSplitLayout>
           <motion.div

@@ -15,7 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { PageTransition } from "@/components/PageTransition";
 import DashboardLayout from "@/components/DashboardLayout";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Bell, Lock, User, Moon, MapPin, Loader2 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -24,7 +24,6 @@ import { trpc } from "@/lib/trpc";
 export default function Settings() {
   const { user } = useAuth();
   const { theme, toggleTheme } = useTheme();
-  const [isLoading, setIsLoading] = useState(false);
   const [isCapturingLocation, setIsCapturingLocation] = useState(false);
 
   const updateLocation = trpc.weather.updateLocation.useMutation({
@@ -38,6 +37,28 @@ export default function Settings() {
     },
   });
 
+  const updateProfile = trpc.user.updateProfile.useMutation({
+    onSuccess: () => {
+      toast.success("Profile updated successfully");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to update profile");
+    },
+  });
+
+  const updateNotificationPreferences =
+    trpc.user.updateNotificationPreferences.useMutation({
+      onSuccess: () => {
+        toast.success("Notification preferences saved");
+      },
+      onError: (error) => {
+        toast.error(error.message || "Failed to save preferences");
+      },
+    });
+
+  const { data: savedNotificationPrefs } =
+    trpc.user.getNotificationPreferences.useQuery();
+
   const [profileData, setProfileData] = useState({
     name: user?.name || "",
     email: user?.email || "",
@@ -48,6 +69,7 @@ export default function Settings() {
     newPassword: "",
     confirmPassword: "",
   });
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   const [notifications, setNotifications] = useState({
     emailNotifications: true,
@@ -58,15 +80,16 @@ export default function Settings() {
     weeklyDigest: true,
   });
 
-  const handleProfileSave = async (e: React.FormEvent) => {
+  // Sync notification prefs from server when loaded
+  useEffect(() => {
+    if (savedNotificationPrefs) {
+      setNotifications((prev) => ({ ...prev, ...savedNotificationPrefs }));
+    }
+  }, [savedNotificationPrefs]);
+
+  const handleProfileSave = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    toast.success("Profile updated successfully");
-    setIsLoading(false);
+    updateProfile.mutate({ name: profileData.name });
   };
 
   const handlePasswordChange = async (e: React.FormEvent) => {
@@ -82,28 +105,37 @@ export default function Settings() {
       return;
     }
 
-    setIsLoading(true);
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    toast.success("Password changed successfully");
-    setPasswordData({
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    });
-    setIsLoading(false);
+    setIsChangingPassword(true);
+    try {
+      const res = await fetch("/api/auth/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          currentPassword: passwordData.currentPassword,
+          newPassword: passwordData.newPassword,
+        }),
+      });
+      if (res.ok) {
+        toast.success("Password changed successfully");
+        setPasswordData({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+      } else {
+        const data = await res.json().catch(() => ({}));
+        toast.error(data.error || "Failed to change password");
+      }
+    } catch {
+      toast.error("Failed to change password. Please try again.");
+    } finally {
+      setIsChangingPassword(false);
+    }
   };
 
-  const handleNotificationSave = async () => {
-    setIsLoading(true);
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 800));
-
-    toast.success("Notification preferences saved");
-    setIsLoading(false);
+  const handleNotificationSave = () => {
+    updateNotificationPreferences.mutate(notifications);
   };
 
   const captureLocation = () => {
@@ -118,7 +150,7 @@ export default function Settings() {
         updateLocation.mutate({
           latitude: position.coords.latitude.toString(),
           longitude: position.coords.longitude.toString(),
-          location: "", // Optional city name
+          location: "",
         });
       },
       (error) => {
@@ -127,6 +159,8 @@ export default function Settings() {
       },
     );
   };
+
+  const isProfileLoading = updateProfile.isPending;
 
   return (
     <DashboardLayout>
@@ -177,7 +211,7 @@ export default function Settings() {
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" type="button">
                           Change Photo
                         </Button>
                         <p className="text-xs text-muted-foreground mt-2">
@@ -200,7 +234,7 @@ export default function Settings() {
                               name: e.target.value,
                             })
                           }
-                          disabled={isLoading}
+                          disabled={isProfileLoading}
                         />
                       </div>
 
@@ -210,14 +244,13 @@ export default function Settings() {
                           id="email"
                           type="email"
                           value={profileData.email}
-                          onChange={(e) =>
-                            setProfileData({
-                              ...profileData,
-                              email: e.target.value,
-                            })
-                          }
-                          disabled={isLoading}
+                          disabled
+                          className="opacity-70"
                         />
+                        <p className="text-xs text-muted-foreground">
+                          Email cannot be changed here. Contact support if
+                          needed.
+                        </p>
                       </div>
 
                       <Separator />
@@ -249,8 +282,15 @@ export default function Settings() {
                       </div>
                     </div>
 
-                    <Button type="submit" disabled={isLoading}>
-                      {isLoading ? "Saving..." : "Save Changes"}
+                    <Button type="submit" disabled={isProfileLoading}>
+                      {isProfileLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        "Save Changes"
+                      )}
                     </Button>
                   </form>
                 </CardContent>
@@ -280,7 +320,6 @@ export default function Settings() {
                             currentPassword: e.target.value,
                           })
                         }
-                        disabled={isLoading}
                       />
                     </div>
 
@@ -296,7 +335,6 @@ export default function Settings() {
                             newPassword: e.target.value,
                           })
                         }
-                        disabled={isLoading}
                       />
                       <p className="text-xs text-muted-foreground">
                         Must be at least 8 characters
@@ -317,12 +355,18 @@ export default function Settings() {
                             confirmPassword: e.target.value,
                           })
                         }
-                        disabled={isLoading}
                       />
                     </div>
 
-                    <Button type="submit" disabled={isLoading}>
-                      {isLoading ? "Changing..." : "Change Password"}
+                    <Button type="submit" disabled={isChangingPassword}>
+                      {isChangingPassword ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Changing...
+                        </>
+                      ) : (
+                        "Change Password"
+                      )}
                     </Button>
                   </form>
                 </CardContent>
@@ -403,8 +447,18 @@ export default function Settings() {
                     ))}
                   </div>
 
-                  <Button onClick={handleNotificationSave} disabled={isLoading}>
-                    {isLoading ? "Saving..." : "Save Preferences"}
+                  <Button
+                    onClick={handleNotificationSave}
+                    disabled={updateNotificationPreferences.isPending}
+                  >
+                    {updateNotificationPreferences.isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      "Save Preferences"
+                    )}
                   </Button>
                 </CardContent>
               </Card>
@@ -427,7 +481,6 @@ export default function Settings() {
                         <button
                           key={themeOption}
                           onClick={() => {
-                            // Only toggle if clicking on the non-active theme
                             if (theme !== themeOption) {
                               toggleTheme();
                             }

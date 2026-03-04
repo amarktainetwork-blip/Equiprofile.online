@@ -21,6 +21,7 @@ import {
   Plus,
   MessageSquare,
   FileText,
+  ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -29,7 +30,7 @@ export default function AIChat() {
     {
       role: "system",
       content:
-        "You are EquiProfile AI Assistant, an expert in horse care, training, and management.",
+        "You are the EquiProfile bot, an expert in horse care, training, and management.",
     },
   ]);
   const [showPasswordInput, setShowPasswordInput] = useState(false);
@@ -165,7 +166,7 @@ export default function AIChat() {
         ...prev,
         {
           role: "assistant",
-          content: `✅ **Admin mode unlocked!**\n\nYou now have full admin access until ${new Date(data.expiresAt).toLocaleString()}.\n\nNavigate to the Admin panel to manage users, system settings, and more.`,
+          content: `✅ **Admin mode unlocked!**\n\nYou now have full admin access until ${new Date(data.expiresAt).toLocaleString()}.\n\n👉 The **[Open Admin Panel]** button has appeared in the top right — click it to access user management, system settings, API keys, and more.`,
         },
       ]);
       toast.success("Admin mode unlocked successfully!");
@@ -211,14 +212,22 @@ export default function AIChat() {
         <div className="mb-4 flex items-center justify-between">
           <h1 className="text-3xl font-bold">AI Assistant & Notes</h1>
           {adminStatus.isUnlocked && (
-            <Alert className="w-auto">
-              <ShieldCheck className="h-4 w-4" />
-              <AlertDescription>
-                Admin unlocked until{" "}
-                {adminStatus.expiresAt &&
-                  new Date(adminStatus.expiresAt).toLocaleTimeString()}
-              </AlertDescription>
-            </Alert>
+            <div className="flex items-center gap-3">
+              <Alert className="w-auto border-green-500/50 bg-green-500/10">
+                <ShieldCheck className="h-4 w-4 text-green-500" />
+                <AlertDescription className="text-green-700 dark:text-green-400">
+                  Admin unlocked until{" "}
+                  {adminStatus.expiresAt &&
+                    new Date(adminStatus.expiresAt).toLocaleTimeString()}
+                </AlertDescription>
+              </Alert>
+              <a href="/admin">
+                <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white border-0">
+                  <ExternalLink className="mr-2 h-4 w-4" />
+                  Open Admin Panel
+                </Button>
+              </a>
+            </div>
           )}
         </div>
 

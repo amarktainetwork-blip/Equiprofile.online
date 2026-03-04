@@ -27,12 +27,18 @@ export function ProtectedRoute({
     if (loading) return;
 
     if (!isAuthenticated) {
-      // Redirect to login with return URL
+      // Redirect to login. If OAuth is configured use the OAuth URL,
+      // otherwise fall back to the built-in /login route so we never
+      // produce an invalid URL (which causes a 404).
+      const oauthUrl = getLoginUrl();
+      const baseUrl = oauthUrl || "/login";
       const returnUrl = encodeURIComponent(
         window.location.pathname + window.location.search,
       );
-      const loginUrl = getLoginUrl();
-      window.location.href = `${loginUrl}&returnUrl=${returnUrl}`;
+      const loginUrl = oauthUrl
+        ? `${oauthUrl}&returnUrl=${returnUrl}`
+        : `/login?returnUrl=${returnUrl}`;
+      window.location.href = loginUrl;
       return;
     }
 

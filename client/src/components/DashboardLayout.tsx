@@ -19,6 +19,13 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
 import { useAdminToggle } from "@/hooks/useAdminToggle";
@@ -40,6 +47,22 @@ import {
   Baby,
   Calendar,
   Users,
+  MoreHorizontal,
+  Dumbbell,
+  Apple,
+  BarChart3,
+  DollarSign,
+  Stethoscope,
+  Syringe,
+  Scissors,
+  Pill,
+  XCircle,
+  GitBranch,
+  BookOpen,
+  Tag,
+  Clock,
+  Brain,
+  Home,
 } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
@@ -68,7 +91,89 @@ const menuItems = [
   { icon: MessageSquare, label: "AI Chat", path: "/ai-chat" },
 ];
 
-const adminMenuItems = [{ icon: Shield, label: "Admin Panel", path: "/admin" }];
+const adminMenuItems = [
+  { icon: Shield, label: "Admin Panel", path: "/admin" },
+  { icon: Shield, label: "QA Checklist", path: "/qa-check" },
+];
+
+// Bottom nav tabs (5 max for mobile)
+const bottomNavItems = [
+  { icon: Home, label: "Home", path: "/dashboard" },
+  { icon: CircleDot, label: "Horses", path: "/horses" },
+  { icon: Calendar, label: "Calendar", path: "/calendar" },
+  { icon: MessageSquare, label: "Messages", path: "/messages" },
+];
+
+// All modules grouped for the "More" sheet
+const moreModuleGroups = [
+  {
+    label: "Health",
+    items: [
+      { icon: Stethoscope, label: "Health Hub", path: "/health" },
+      { icon: Syringe, label: "Vaccinations", path: "/vaccinations" },
+      { icon: Scissors, label: "Dental Care", path: "/dental" },
+      { icon: Activity, label: "Hoof Care", path: "/hoofcare" },
+      { icon: Pill, label: "Dewormings", path: "/dewormings" },
+      { icon: Heart, label: "Treatments", path: "/treatments" },
+      { icon: XCircle, label: "X-Rays", path: "/xrays" },
+    ],
+  },
+  {
+    label: "Training",
+    items: [
+      { icon: Dumbbell, label: "Training Log", path: "/training" },
+      { icon: BookOpen, label: "Templates", path: "/training-templates" },
+      { icon: Users, label: "Lessons", path: "/lessons" },
+      { icon: Baby, label: "Breeding", path: "/breeding" },
+    ],
+  },
+  {
+    label: "Nutrition",
+    items: [
+      { icon: Apple, label: "Feeding Plans", path: "/feeding" },
+      { icon: FileText, label: "Nutrition Plans", path: "/nutrition-plans" },
+      { icon: BookOpen, label: "Nutrition Logs", path: "/nutrition-logs" },
+    ],
+  },
+  {
+    label: "Schedule",
+    items: [
+      { icon: Clock, label: "Appointments", path: "/appointments" },
+      { icon: ListChecks, label: "Tasks", path: "/tasks" },
+    ],
+  },
+  {
+    label: "AI & Info",
+    items: [
+      { icon: Brain, label: "AI Assistant", path: "/ai-chat" },
+      { icon: Cloud, label: "Weather", path: "/weather" },
+      { icon: GitBranch, label: "Pedigree", path: "/pedigree" },
+    ],
+  },
+  {
+    label: "Data & Reports",
+    items: [
+      { icon: FileText, label: "Documents", path: "/documents" },
+      { icon: BarChart3, label: "Analytics", path: "/analytics" },
+      { icon: FileText, label: "Reports", path: "/reports" },
+      { icon: Tag, label: "Tags", path: "/tags" },
+    ],
+  },
+  {
+    label: "Stable & People",
+    items: [
+      { icon: Home, label: "Stable Management", path: "/stable" },
+      { icon: Users, label: "Contacts", path: "/contacts" },
+    ],
+  },
+  {
+    label: "Account",
+    items: [
+      { icon: Settings, label: "Settings", path: "/settings" },
+      { icon: DollarSign, label: "Billing", path: "/billing" },
+    ],
+  },
+];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
 const DEFAULT_WIDTH = 280;
@@ -154,12 +259,12 @@ function DashboardLayoutContent({
   const activeMenuItem = menuItems.find((item) => item.path === location);
   const isMobile = useIsMobile();
   const { isAdminVisible } = useAdminToggle();
+  const [moreSheetOpen, setMoreSheetOpen] = useState(false);
 
-  // Check admin unlock status
+  // Check admin unlock status — available to any authenticated user
   const { data: adminStatus } = trpc.adminUnlock.getStatus.useQuery(undefined, {
-    enabled: user?.role === "admin", // Only fetch if admin
-    staleTime: 60 * 1000, // Cache for 1 minute
-    refetchInterval: 60 * 1000, // Refresh every minute
+    staleTime: 60 * 1000,
+    refetchInterval: 60 * 1000,
   });
 
   useEffect(() => {
@@ -245,8 +350,8 @@ function DashboardLayoutContent({
                   </SidebarMenuItem>
                 );
               })}
-              {/* Admin menu items - shown to admin users who have unlocked admin mode */}
-              {user?.role === "admin" && adminStatus?.isUnlocked && (
+              {/* Admin menu items */}
+              {adminStatus?.isUnlocked && (
                 <>
                   <div className="my-2 px-2">
                     <div className="h-px bg-border" />
@@ -334,10 +439,103 @@ function DashboardLayoutContent({
             <ThemeToggle />
           </div>
         )}
-        <main className="flex-1 p-4">
+        <main className={`flex-1 p-4 ${isMobile ? "pb-20" : ""}`}>
           <TrialBanner />
           {children}
         </main>
+
+        {/* Mobile Bottom Navigation Bar */}
+        {isMobile && (
+          <nav
+            className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80"
+            aria-label="Mobile navigation"
+          >
+            <div className="flex items-stretch h-16">
+              {bottomNavItems.map((item) => {
+                const isActive =
+                  location === item.path ||
+                  (item.path === "/dashboard" && location === "/");
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.path}
+                    onClick={() => setLocation(item.path)}
+                    className={`flex-1 flex flex-col items-center justify-center gap-0.5 text-xs transition-colors min-h-[44px] ${
+                      isActive
+                        ? "text-primary"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                    aria-label={item.label}
+                    aria-current={isActive ? "page" : undefined}
+                  >
+                    <Icon
+                      className={`h-5 w-5 ${isActive ? "text-primary" : ""}`}
+                    />
+                    <span className="text-[10px] leading-none">
+                      {item.label}
+                    </span>
+                  </button>
+                );
+              })}
+              {/* More sheet trigger */}
+              <Sheet open={moreSheetOpen} onOpenChange={setMoreSheetOpen}>
+                <SheetTrigger asChild>
+                  <button
+                    className="flex-1 flex flex-col items-center justify-center gap-0.5 text-xs text-muted-foreground hover:text-foreground transition-colors min-h-[44px]"
+                    aria-label="More modules"
+                  >
+                    <MoreHorizontal className="h-5 w-5" />
+                    <span className="text-[10px] leading-none">More</span>
+                  </button>
+                </SheetTrigger>
+                <SheetContent
+                  side="bottom"
+                  className="max-h-[80vh] overflow-y-auto rounded-t-xl"
+                >
+                  <SheetHeader className="pb-2">
+                    <SheetTitle className="font-serif text-left">
+                      All Modules
+                    </SheetTitle>
+                  </SheetHeader>
+                  <div className="space-y-4 pb-6">
+                    {moreModuleGroups.map((group) => (
+                      <div key={group.label}>
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                          {group.label}
+                        </p>
+                        <div className="grid grid-cols-3 gap-2">
+                          {group.items.map((item) => {
+                            const Icon = item.icon;
+                            const isActive = location === item.path;
+                            return (
+                              <button
+                                key={item.path}
+                                onClick={() => {
+                                  setLocation(item.path);
+                                  setMoreSheetOpen(false);
+                                }}
+                                className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border transition-all text-center min-h-[64px] ${
+                                  isActive
+                                    ? "border-primary bg-primary/10 text-primary"
+                                    : "border-border bg-card hover:bg-accent"
+                                }`}
+                              >
+                                <Icon className="h-5 w-5 shrink-0" />
+                                <span className="text-[11px] leading-tight font-medium">
+                                  {item.label}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
+          </nav>
+        )}
       </SidebarInset>
     </>
   );

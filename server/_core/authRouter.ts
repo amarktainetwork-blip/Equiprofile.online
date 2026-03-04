@@ -297,4 +297,81 @@ router.post("/logout", (req, res) => {
   res.json({ success: true });
 });
 
+/**
+ * POST /api/auth/change-password
+ * Change password for the currently authenticated user.
+ * Requires a valid session cookie + current password for verification.
+ */
+router.post("/change-password", async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res
+        .status(400)
+        .json({ error: "currentPassword and newPassword are required" });
+    }
+
+    if (typeof newPassword !== "string" || newPassword.length < 8) {
+      return res
+        .status(400)
+        .json({ error: "New password must be at least 8 characters" });
+    }
+
+    // Verify the session cookie to get the current user
+    const cookieHeader = req.headers.cookie || "";
+    const cookiePairs = cookieHeader.split(";").map((c) => c.trim());
+    let sessionCookieValue: string | undefined;
+    for (const pair of cookiePairs) {
+      const [key, ...vals] = pair.split("=");
+      if (key.trim() === COOKIE_NAME) {
+        sessionCookieValue = vals.join("=");
+        break;
+      }
+    }
+
+    if (!sessionCookieValue) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+
+    // Use SDK to authenticate
+    let user;
+    try {
+      const { sdk } = await import("./sdk");
+      user = await sdk.authenticateRequest(req as any);
+    } catch {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+
+    if (!user) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+
+    // Verify current password
+    if (!user.passwordHash) {
+      return res.status(400).json({
+        error:
+          "No password set. Use forgot-password to create a password for your account.",
+      });
+    }
+
+    const isCurrentPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.passwordHash,
+    );
+    if (!isCurrentPasswordValid) {
+      return res.status(400).json({ error: "Current password is incorrect" });
+    }
+
+    // Hash and save the new password
+    const newPasswordHash = await bcrypt.hash(newPassword, 10);
+    await db.updateUser(user.id, { passwordHash: newPasswordHash });
+
+    res.json({ success: true, message: "Password changed successfully" });
+  } catch (error) {
+    console.error("[Auth] Change password error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 export default router;

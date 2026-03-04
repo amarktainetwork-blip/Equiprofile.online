@@ -13,6 +13,7 @@ import { useState, FormEvent } from "react";
 import { Loader2, ArrowLeft, CheckCircle, AlertCircle } from "lucide-react";
 import { PageTransition } from "@/components/PageTransition";
 import { MarketingNav } from "@/components/MarketingNav";
+import { Footer } from "@/components/Footer";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function ForgotPassword() {
@@ -51,7 +52,7 @@ export default function ForgotPassword() {
 
   return (
     <>
-      <MarketingNav />
+      <MarketingNav alwaysDark />
       <PageTransition>
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 px-4 pt-20">
           <div className="w-full max-w-md">
@@ -150,6 +151,7 @@ export default function ForgotPassword() {
           </div>
         </div>
       </PageTransition>
+      <Footer />
     </>
   );
 }

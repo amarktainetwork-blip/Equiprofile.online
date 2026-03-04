@@ -130,6 +130,8 @@ export default function Home() {
                 loop
                 muted
                 playsInline
+                preload="none"
+                poster={marketingAssets.hero.heroHorse}
                 className="w-full h-full object-cover"
               >
                 <source src={marketingAssets.hero.video} type="video/mp4" />
@@ -399,13 +401,20 @@ export default function Home() {
                     <button
                       key={index}
                       onClick={() => setActiveTestimonial(index)}
-                      className={`h-2 rounded-full transition-all duration-300 ${
-                        index === activeTestimonial
-                          ? "bg-gradient-to-r from-indigo-500 to-cyan-500 w-12"
-                          : "bg-white/30 w-2"
-                      }`}
+                      className={`relative flex items-center justify-center min-w-[44px] min-h-[44px] transition-all duration-300`}
                       aria-label={`Go to testimonial ${index + 1}`}
-                    />
+                      aria-current={
+                        index === activeTestimonial ? "true" : undefined
+                      }
+                    >
+                      <span
+                        className={`rounded-full transition-all duration-300 ${
+                          index === activeTestimonial
+                            ? "bg-gradient-to-r from-indigo-500 to-cyan-500 w-12 h-2"
+                            : "bg-white/30 w-2 h-2"
+                        }`}
+                      />
+                    </button>
                   ))}
                 </div>
                 <button

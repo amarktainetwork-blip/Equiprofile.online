@@ -20,6 +20,12 @@ interface MarketingNavProps {
    * and we need permanently visible black text.
    */
   alwaysLight?: boolean;
+  /**
+   * When true the nav is always transparent with white text regardless of
+   * scroll position. Use on auth pages (Login/Register/ForgotPassword/Reset)
+   * so the dark-themed pages never show a white bar on scroll.
+   */
+  alwaysDark?: boolean;
 }
 
 /**
@@ -32,7 +38,10 @@ interface MarketingNavProps {
  * - Login/Register buttons
  * - Logo on the left
  */
-export function MarketingNav({ alwaysLight = false }: MarketingNavProps) {
+export function MarketingNav({
+  alwaysLight = false,
+  alwaysDark = false,
+}: MarketingNavProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [location] = useLocation();
@@ -40,7 +49,8 @@ export function MarketingNav({ alwaysLight = false }: MarketingNavProps) {
 
   // showLight = true  → white bg + black/dark text  (scrolled or forced)
   // showLight = false → transparent bg + white text  (top of page, default)
-  const showLight = alwaysLight || isScrolled;
+  // alwaysDark overrides everything → always transparent/dark
+  const showLight = !alwaysDark && (alwaysLight || isScrolled);
 
   // Handle scroll for sticky header effect
   useEffect(() => {
