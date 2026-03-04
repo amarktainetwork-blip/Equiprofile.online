@@ -75,6 +75,48 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          // React core
+          if (id.includes("node_modules/react/") || id.includes("node_modules/react-dom/") || id.includes("node_modules/react-hook-form/")) {
+            return "react-core";
+          }
+          // Routing + query
+          if (id.includes("node_modules/wouter") || id.includes("node_modules/@tanstack/react-query") || id.includes("node_modules/@trpc/")) {
+            return "data-layer";
+          }
+          // Radix UI
+          if (id.includes("node_modules/@radix-ui/")) {
+            return "radix-ui";
+          }
+          // Charts
+          if (id.includes("node_modules/recharts") || id.includes("node_modules/chart.js") || id.includes("node_modules/react-chartjs-2")) {
+            return "charts";
+          }
+          // Animation
+          if (id.includes("node_modules/framer-motion")) {
+            return "framer-motion";
+          }
+          // i18n
+          if (id.includes("node_modules/i18next") || id.includes("node_modules/react-i18next")) {
+            return "i18n";
+          }
+          // Date utilities
+          if (id.includes("node_modules/date-fns") || id.includes("node_modules/react-day-picker")) {
+            return "date-utils";
+          }
+          // PDF/export (rarely used, load lazily)
+          if (id.includes("node_modules/jspdf") || id.includes("node_modules/html2canvas") || id.includes("node_modules/qrcode")) {
+            return "export-utils";
+          }
+          // tsParticles
+          if (id.includes("node_modules/@tsparticles") || id.includes("node_modules/tsparticles")) {
+            return "tsparticles";
+          }
+        },
+      },
+    },
   },
   server: {
     host: true,

@@ -83,7 +83,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-white/10 pt-8 text-center text-sm text-gray-500">
+        <div className="border-t border-white/10 pt-8 text-center text-sm text-gray-400">
           <p
             aria-label={`© ${new Date().getFullYear()} EquiProfile.online · Part of AmarktAI Network`}
           >
