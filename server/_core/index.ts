@@ -77,18 +77,32 @@ async function startServer() {
     next();
   });
 
-  // Security middleware with strict CSP including nonce support
+  // Security middleware with strict CSP including nonce support.
+  // All directives are listed explicitly so the policy is self-documenting
+  // and doesn't change if Helmet updates its defaults in a future release.
   app.use((req, res, next) => {
     const nonce = res.locals.cspNonce;
     helmet({
       contentSecurityPolicy: {
         directives: {
           defaultSrc: ["'self'"],
+          // Inline scripts must carry the per-request nonce.  The nonce is
+          // injected into every inline <script> in index.html by the SPA
+          // fallback / setupVite middleware before the HTML is sent.
           scriptSrc: ["'self'", `'nonce-${nonce}'`],
+          // script-src-attr 'none' blocks HTML attribute event handlers
+          // (onclick="…", etc.).  React/app code uses addEventListener so
+          // this is safe and intentional.
+          scriptSrcAttr: ["'none'"],
           styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles (Tailwind)
           imgSrc: ["'self'", "data:", "https:"],
           connectSrc: ["'self'"],
           fontSrc: ["'self'", "data:"], // Allow data: for embedded fonts
+          objectSrc: ["'none'"],
+          baseUri: ["'self'"],
+          formAction: ["'self'"],
+          frameAncestors: ["'self'"],
+          upgradeInsecureRequests: [],
         },
       },
       crossOriginEmbedderPolicy: false,

@@ -51,17 +51,19 @@ export async function setupVite(app: Express, server: Server) {
           `src="/src/main.tsx?v=${nanoid()}"`,
         );
 
-        // Inject CSP nonce if available
-        const nonce = res.locals.cspNonce;
-        if (nonce) {
-          // Add nonce to any inline scripts (for vite-plugin-manus-runtime or other plugins)
-          template = template.replace(
-            /<script(?!\s+src=)([^>]*)>/gi,
-            `<script$1 nonce="${nonce}">`,
-          );
-        }
+        // Transform first so Vite plugins (e.g. vite-plugin-manus-runtime) can
+        // inject their own inline <script> blocks, THEN apply the nonce so that
+        // ALL inline scripts (source + injected) carry the same per-request nonce.
+        const rawPage = await vite.transformIndexHtml(url, template);
 
-        const page = await vite.transformIndexHtml(url, template);
+        const nonce = res.locals.cspNonce;
+        const page = nonce
+          ? rawPage.replace(
+              /<script(?!\s+src=)([^>]*)>/gi,
+              `<script$1 nonce="${nonce}">`,
+            )
+          : rawPage;
+
         res.status(200).set({ "Content-Type": "text/html" }).end(page);
       } catch (e) {
         vite.ssrFixStacktrace(e as Error);
@@ -101,9 +103,25 @@ export function serveStatic(app: Express) {
     ".webm",
   ];
 
-  // Serve static files with explicit MIME types and cache headers
+  // Serve static files with explicit MIME types and cache headers.
+  // index:false is REQUIRED so that express.static does NOT auto-serve
+  // dist/public/index.html for the "/" route.  If it did, the response
+  // would bypass the SPA fallback below, meaning the per-request CSP nonce
+  // would never be injected into the inline scripts → blank white screen.
+  //
+  // Similarly, redirect direct requests to /index.html so they also go
+  // through the SPA fallback (nonce injection).
+  app.use((req, _res, next) => {
+    // Let the SPA fallback handle index.html directly so nonce injection runs.
+    if (req.path === "/index.html") {
+      req.url = "/";
+    }
+    next();
+  });
+
   app.use(
     express.static(distPath, {
+      index: false,
       setHeaders: (res, filePath) => {
         // Ensure correct MIME types for assets
         if (filePath.endsWith(".js")) {
@@ -121,12 +139,8 @@ export function serveStatic(app: Express) {
         }
 
         // Cache control headers
-        // NO CACHE for index.html and service-worker.js to prevent stale versions
-        if (filePath.endsWith("index.html")) {
-          res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
-          res.setHeader("Pragma", "no-cache");
-          res.setHeader("Expires", "0");
-        } else if (filePath.endsWith("service-worker.js")) {
+        // service-worker.js must not be cached (stale SW breaks offline functionality)
+        if (filePath.endsWith("service-worker.js")) {
           res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
           res.setHeader("Pragma", "no-cache");
           res.setHeader("Expires", "0");
@@ -143,6 +157,9 @@ export function serveStatic(app: Express) {
 
   // SPA fallback - serve index.html ONLY for navigation requests
   // NOT for asset requests (prevents CSS/JS returning HTML)
+  // NOTE: express.static above is configured with index:false so it does NOT
+  // serve index.html for directory requests (e.g. "/"). All HTML delivery
+  // goes through this fallback, which injects the per-request CSP nonce.
   app.use((req, res, next) => {
     // Skip if it's an API or tRPC route — must never serve HTML for these
     if (
@@ -166,13 +183,21 @@ export function serveStatic(app: Express) {
     const indexPath = path.resolve(distPath, "index.html");
     const nonce = res.locals.cspNonce;
 
+    // index.html must never be cached so users always get the latest version
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
+
     if (nonce && fs.existsSync(indexPath)) {
       fs.readFile(indexPath, "utf-8", (err, html) => {
         if (err) {
           return res.status(500).send("Internal Server Error");
         }
 
-        // Add nonce to any inline scripts (for manus-runtime or other plugins)
+        // Add nonce to every inline <script> tag (scripts without src=, e.g.
+        // the JSON-LD block and the vite-plugin-manus-runtime bundle).
+        // The regex excludes tags whose FIRST attribute is src= (external
+        // scripts) which are already permitted by CSP's 'self' directive.
         const modifiedHtml = html.replace(
           /<script(?!\s+src=)([^>]*)>/gi,
           `<script$1 nonce="${nonce}">`,
