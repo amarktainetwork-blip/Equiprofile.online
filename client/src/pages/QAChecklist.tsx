@@ -211,9 +211,21 @@ export default function QAChecklistPage() {
       detail: "No requireAdmin gate; server validates session",
     },
     {
-      label: "Messages namespace",
+      label: "Trial banner removed from dashboard",
       status: "ok",
-      detail: "trpc.stables.list (fixed from trpc.stable.list)",
+      detail: "TrialBanner removed from DashboardLayout main area",
+    },
+    {
+      label: "'show admin' stealth intercept",
+      status: "ok",
+      detail: "Command not shown in chat transcript; triggers password modal",
+    },
+    {
+      label: "Build fingerprint visible to admins",
+      status: adminStatus.data?.isUnlocked ? "ok" : "warn",
+      detail: adminStatus.data?.isUnlocked
+        ? "Visible in sidebar footer + Settings → System tab"
+        : "Unlock admin mode to verify",
     },
   ];
 

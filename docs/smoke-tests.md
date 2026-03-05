@@ -18,6 +18,25 @@ Expected response:
 }
 ```
 
+## Build Fingerprint Check
+
+```bash
+# Check build metadata
+curl -s https://equiprofile.online/build.txt
+# Expected: BUILD_SHA=<sha>, BUILD_TIME=<iso>, VERSION=<ver>
+```
+
+Build fingerprint is also visible to admins in:
+- **Dashboard**: sidebar footer shows "Dashboard v2 · sha:<hash> · v<version>"
+- **Settings → System tab** (unlocked admins only): shows version, SHA, build time
+
+## "show admin" Stealth Command Test
+
+1. Login and go to `/ai-chat`
+2. In the chat input, type exactly: `show admin` (or `show afmin`) and press Enter
+3. **Expected**: The text does NOT appear in the chat transcript. Instead, a password prompt appears below the chat box.
+4. **Failure**: If the text "show admin" appears as a user message bubble in the transcript, the stealth intercept is broken.
+
 ## Upload Endpoint
 
 To test the upload endpoint, authenticate first, then:

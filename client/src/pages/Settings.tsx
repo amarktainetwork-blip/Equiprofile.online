@@ -17,7 +17,7 @@ import { PageTransition } from "@/components/PageTransition";
 import DashboardLayout from "@/components/DashboardLayout";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Bell, Lock, User, Moon, MapPin, Loader2 } from "lucide-react";
+import { Bell, Lock, User, Moon, MapPin, Loader2, Info } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { trpc } from "@/lib/trpc";
 
@@ -25,6 +25,12 @@ export default function Settings() {
   const { user } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [isCapturingLocation, setIsCapturingLocation] = useState(false);
+
+  const adminStatus = trpc.adminUnlock.getStatus.useQuery(undefined, { staleTime: 60_000 });
+  const buildInfo = trpc.system.getBuildInfo.useQuery(undefined, {
+    enabled: !!adminStatus.data?.isUnlocked,
+    staleTime: Infinity,
+  });
 
   const updateLocation = trpc.weather.updateLocation.useMutation({
     onSuccess: () => {
@@ -174,7 +180,13 @@ export default function Settings() {
           </div>
 
           <Tabs defaultValue="profile" className="space-y-6">
-            <TabsList className="grid grid-cols-4 w-full max-w-2xl">
+            <TabsList
+              className={
+                adminStatus.data?.isUnlocked
+                  ? "grid grid-cols-5 w-full max-w-2xl"
+                  : "grid grid-cols-4 w-full max-w-2xl"
+              }
+            >
               <TabsTrigger value="profile">
                 <User className="w-4 h-4 mr-2" />
                 Profile
@@ -191,6 +203,12 @@ export default function Settings() {
                 <Moon className="w-4 h-4 mr-2" />
                 Appearance
               </TabsTrigger>
+              {adminStatus.data?.isUnlocked && (
+                <TabsTrigger value="system">
+                  <Info className="w-4 h-4 mr-2" />
+                  System
+                </TabsTrigger>
+              )}
             </TabsList>
 
             {/* Profile Tab */}
@@ -506,6 +524,47 @@ export default function Settings() {
                 </CardContent>
               </Card>
             </TabsContent>
+
+            {/* System Tab — admin only */}
+            {adminStatus.data?.isUnlocked && (
+              <TabsContent value="system">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>System Information</CardTitle>
+                    <CardDescription>
+                      Build fingerprint and deployment details (admin only)
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Version</p>
+                        <p className="font-mono text-sm">{buildInfo.data?.version ?? "—"}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Build SHA</p>
+                        <p className="font-mono text-sm">{buildInfo.data?.sha ?? "—"}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Build Time</p>
+                        <p className="font-mono text-sm">{buildInfo.data?.buildTime ?? "—"}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Dashboard</p>
+                        <p className="font-mono text-sm font-semibold text-primary">v2</p>
+                      </div>
+                    </div>
+                    <Separator />
+                    <p className="text-xs text-muted-foreground">
+                      Full build info is also available at{" "}
+                      <a href="/build.txt" target="_blank" className="underline hover:text-foreground">
+                        /build.txt
+                      </a>
+                    </p>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            )}
           </Tabs>
         </div>
       </PageTransition>
