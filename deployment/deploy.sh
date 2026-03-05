@@ -226,9 +226,22 @@ rollback() {
 
 # Run UI smoke test if available
 if command -v node &>/dev/null && [ -f "scripts/ui-smoke-test.mjs" ]; then
-    if npx --yes playwright install chromium --with-deps >/dev/null 2>&1; then
+    # Only try to install Playwright if chromium is not already available.
+    # Pre-installing Playwright on the deployment target is recommended:
+    #   npx playwright install chromium --with-deps
+    PLAYWRIGHT_AVAILABLE=false
+    if node -e "require('playwright')" 2>/dev/null; then
+        PLAYWRIGHT_AVAILABLE=true
+    elif npx --yes playwright install chromium --with-deps >/dev/null 2>&1; then
+        PLAYWRIGHT_AVAILABLE=true
+    fi
+
+    if $PLAYWRIGHT_AVAILABLE; then
         echo "Running UI smoke test..."
         BASE_URL="http://127.0.0.1:3000" node scripts/ui-smoke-test.mjs || rollback
+    else
+        echo "⚠️  Playwright not available — skipping UI smoke test."
+        echo "   To enable: run 'npx playwright install chromium --with-deps' on this server."
     fi
 fi
 

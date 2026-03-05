@@ -127,8 +127,10 @@ export async function storagePutLocal(
   const key = normalizeKey(relKey);
   const filePath = path.resolve(uploadsDir, key);
 
-  // Security: ensure the resolved path is inside the uploads directory
-  if (!filePath.startsWith(uploadsDir + path.sep) && filePath !== uploadsDir) {
+  // Security: ensure the resolved path is strictly inside the uploads directory.
+  // The `filePath === uploadsDir` case is intentionally excluded — writing a
+  // file that shadows the directory itself is not valid.
+  if (!filePath.startsWith(uploadsDir + path.sep)) {
     throw new Error("Invalid storage key: path traversal detected");
   }
 

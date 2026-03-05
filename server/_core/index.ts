@@ -73,14 +73,29 @@ async function startServer() {
   console.log("✅ CORS configured with allowed origins:", allowedOrigins);
 
   // Security headers via Helmet.
-  // CSP is intentionally disabled here — it is served as a static header by
-  // Nginx (deployment/nginx/equiprofile.conf) using 'unsafe-inline' so that
-  // Vite-generated inline scripts are always permitted regardless of caching.
-  // Nonce-based CSP was removed because stale nonces in SW-cached HTML caused
-  // blank white screens after deployments.
+  // CSP uses 'unsafe-inline' (no nonces) so that Vite-generated inline
+  // scripts are always permitted regardless of whether a service worker or
+  // Nginx cache returns a previously-seen HTML response.  Nonce-based CSP
+  // caused recurring blank white screens: stale HTML contained an old nonce
+  // that no longer matched the server-generated header.  Removing nonces
+  // permanently eliminates that failure mode while keeping all other
+  // directives enforced.  The same static CSP is also set by Nginx
+  // (deployment/nginx/equiprofile.conf) as a belt-and-suspenders measure.
   app.use(
     helmet({
-      contentSecurityPolicy: false,
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: ["'self'", "'unsafe-inline'"],
+          styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+          fontSrc: ["'self'", "data:", "https://fonts.gstatic.com"],
+          imgSrc: ["'self'", "data:", "https:"],
+          connectSrc: ["'self'"],
+          frameAncestors: ["'self'"],
+          baseUri: ["'self'"],
+          formAction: ["'self'"],
+        },
+      },
       crossOriginEmbedderPolicy: false,
     }),
   );
@@ -880,8 +895,9 @@ async function startServer() {
     const uploadsDir = resolve(ENV.storagePath);
     const filePath = resolve(uploadsDir, fileKey);
 
-    // Security: ensure the resolved path stays within the uploads directory
-    if (!filePath.startsWith(uploadsDir + path.sep) && filePath !== uploadsDir) {
+    // Security: ensure the resolved path stays strictly within the uploads directory.
+    // Excludes `filePath === uploadsDir` — that would serve the directory itself.
+    if (!filePath.startsWith(uploadsDir + path.sep)) {
       return res.status(403).json({ error: "Forbidden" });
     }
 

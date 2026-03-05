@@ -73,6 +73,9 @@ const ALLOWED_AVATAR_MIME_PREFIXES = [
   "data:image/gif;base64,",
 ] as const;
 
+/** Maximum avatar file size in bytes (2 MB) */
+const MAX_AVATAR_SIZE_BYTES = 2 * 1024 * 1024;
+
 // Subscription check middleware
 const subscribedProcedure = protectedProcedure.use(async ({ ctx, next }) => {
   const user = await db.getUserById(ctx.user.id);
@@ -502,7 +505,7 @@ export const appRouter = router({
           const mimeType = prefix.split(";")[0].replace("data:", "");
           const base64Data = avatarData.slice(prefix.length);
           const buffer = Buffer.from(base64Data, "base64");
-          if (buffer.length > 2 * 1024 * 1024) {
+          if (buffer.length > MAX_AVATAR_SIZE_BYTES) {
             throw new TRPCError({ code: "BAD_REQUEST", message: "Avatar image must be under 2MB" });
           }
           const ext = mimeType.split("/")[1];

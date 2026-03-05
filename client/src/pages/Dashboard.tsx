@@ -169,7 +169,7 @@ const moduleCategories = [
     modules: [
       { name: "Stable Management", href: "/stable", icon: Home },
       { name: "Contacts", href: "/contacts", icon: Users },
-      { name: "Client Portal", href: "/client-portal", icon: Shield },
+      { name: "Client Portal", href: "/stable", icon: Shield },
       { name: "Messages", href: "/messages", icon: MessageSquare },
     ],
   },
