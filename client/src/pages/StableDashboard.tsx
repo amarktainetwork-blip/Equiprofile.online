@@ -41,7 +41,8 @@ function StableDashboardContent() {
   const { data: horses = [] } = trpc.horses.list.useQuery(undefined, {
     retry: false,
   });
-  const { data: subscriptionStatus } = trpc.user.getSubscriptionStatus.useQuery();
+  const { data: subscriptionStatus } =
+    trpc.user.getSubscriptionStatus.useQuery();
   const isStablePlan = subscriptionStatus?.planTier === "stable";
 
   if (!isStablePlan) {
@@ -50,13 +51,19 @@ function StableDashboardContent() {
         <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center mb-4">
           <Shield className="w-8 h-8 text-white" />
         </div>
-        <h2 className="font-serif text-2xl font-bold mb-2">Stable Plan Required</h2>
+        <h2 className="font-serif text-2xl font-bold mb-2">
+          Stable Plan Required
+        </h2>
         <p className="text-muted-foreground mb-6 max-w-md">
-          The Stable Dashboard is available exclusively for Stable plan subscribers.
-          Upgrade to access horse roster management, staff tools, owner portal, and more.
+          The Stable Dashboard is available exclusively for Stable plan
+          subscribers. Upgrade to access horse roster management, staff tools,
+          owner portal, and more.
         </p>
         <Link href="/billing">
-          <Button size="lg" className="bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 text-white border-0">
+          <Button
+            size="lg"
+            className="bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 text-white border-0"
+          >
             Upgrade to Stable Plan
             <ChevronRight className="w-5 h-5 ml-2" />
           </Button>
@@ -178,13 +185,18 @@ function StableDashboardContent() {
                 Horse Roster
               </CardTitle>
               <Link href="/horses/new">
-                <Button size="sm" variant="outline" className="h-8 text-xs gap-1">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-8 text-xs gap-1"
+                >
                   <Plus className="w-3.5 h-3.5" /> Add Horse
                 </Button>
               </Link>
             </div>
             <CardDescription className="text-xs">
-              {horses.length} horse{horses.length !== 1 ? "s" : ""} registered in your stable
+              {horses.length} horse{horses.length !== 1 ? "s" : ""} registered
+              in your stable
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -193,7 +205,9 @@ function StableDashboardContent() {
                 <Heart className="w-10 h-10 mx-auto mb-2 opacity-30" />
                 <p className="text-sm">No horses registered yet</p>
                 <Link href="/horses/new">
-                  <Button variant="ghost" size="sm" className="mt-2">Add your first horse</Button>
+                  <Button variant="ghost" size="sm" className="mt-2">
+                    Add your first horse
+                  </Button>
                 </Link>
               </div>
             ) : (
@@ -219,7 +233,9 @@ function StableDashboardContent() {
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{horse.name}</p>
+                        <p className="text-sm font-medium truncate">
+                          {horse.name}
+                        </p>
                         <p className="text-xs text-muted-foreground truncate">
                           {horse.breed || "Unknown breed"}
                           {horse.age ? ` · ${horse.age}yr` : ""}
@@ -233,8 +249,13 @@ function StableDashboardContent() {
             )}
             {horses.length > 6 && (
               <Link href="/horses">
-                <Button variant="ghost" size="sm" className="w-full mt-3 text-xs text-muted-foreground hover:text-foreground">
-                  View all {horses.length} horses <ChevronRight className="w-3 h-3 ml-1" />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full mt-3 text-xs text-muted-foreground hover:text-foreground"
+                >
+                  View all {horses.length} horses{" "}
+                  <ChevronRight className="w-3 h-3 ml-1" />
                 </Button>
               </Link>
             )}
@@ -271,7 +292,9 @@ function StableDashboardContent() {
                         <Icon className="w-5 h-5 text-white" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <h3 className="font-semibold text-sm leading-tight">{module.title}</h3>
+                        <h3 className="font-semibold text-sm leading-tight">
+                          {module.title}
+                        </h3>
                         <p className="text-[11px] text-muted-foreground mt-0.5 leading-tight">
                           {module.description}
                         </p>

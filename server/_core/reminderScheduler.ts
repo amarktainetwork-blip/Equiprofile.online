@@ -67,13 +67,18 @@ export function startReminderScheduler() {
 
           // Send WhatsApp reminder if user has it enabled
           const waConfig = isWhatsAppEnabled();
-          if (waConfig.enabled && userHasWhatsAppEnabled(user.preferences || null)) {
+          if (
+            waConfig.enabled &&
+            userHasWhatsAppEnabled(user.preferences || null)
+          ) {
             const phone = user.phone;
             if (phone) {
               const hoursUntil = Math.round(
-                (new Date(event.startDate).getTime() - now.getTime()) / (1000 * 60 * 60),
+                (new Date(event.startDate).getTime() - now.getTime()) /
+                  (1000 * 60 * 60),
               );
-              const timeLabel = hoursUntil <= 1 ? "1 hour" : `${hoursUntil} hours`;
+              const timeLabel =
+                hoursUntil <= 1 ? "1 hour" : `${hoursUntil} hours`;
               await sendWhatsAppMessage({
                 to: phone,
                 template: "event_reminder",

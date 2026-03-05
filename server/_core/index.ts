@@ -211,7 +211,9 @@ async function startServer() {
                 PRICING_PLANS.stable.monthly.priceId,
                 PRICING_PLANS.stable.yearly.priceId,
               ].filter(Boolean);
-              const planTier = stablePriceIds.includes(priceId) ? "stable" : "pro";
+              const planTier = stablePriceIds.includes(priceId)
+                ? "stable"
+                : "pro";
 
               await db.updateUser(userId, {
                 stripeCustomerId: session.customer as string,

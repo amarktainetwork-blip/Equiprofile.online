@@ -22,7 +22,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Menu, X, ChevronDown, LayoutDashboard, LogOut, Settings, CreditCard, User } from "lucide-react";
+import {
+  Menu,
+  X,
+  ChevronDown,
+  LayoutDashboard,
+  LogOut,
+  Settings,
+  CreditCard,
+  User,
+} from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 
@@ -66,7 +75,10 @@ interface NavbarProps {
   alwaysLight?: boolean;
 }
 
-export function Navbar({ alwaysDark = false, alwaysLight = false }: NavbarProps) {
+export function Navbar({
+  alwaysDark = false,
+  alwaysLight = false,
+}: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [location] = useLocation();
@@ -143,7 +155,9 @@ export function Navbar({ alwaysDark = false, alwaysLight = false }: NavbarProps)
                 <DropdownMenuTrigger asChild>
                   <button
                     className={`flex items-center gap-1 text-sm font-medium transition-colors ${
-                      showLight ? "text-gray-700 hover:text-black" : "text-white/90 hover:text-white"
+                      showLight
+                        ? "text-gray-700 hover:text-black"
+                        : "text-white/90 hover:text-white"
                     }`}
                   >
                     More <ChevronDown className="w-3.5 h-3.5" />
@@ -162,7 +176,9 @@ export function Navbar({ alwaysDark = false, alwaysLight = false }: NavbarProps)
                       <DropdownMenuSeparator />
                       {stableNavLinks.map((link) => (
                         <DropdownMenuItem key={`stable-${link.label}`} asChild>
-                          <Link href={link.path} className="cursor-pointer">{link.label}</Link>
+                          <Link href={link.path} className="cursor-pointer">
+                            {link.label}
+                          </Link>
                         </DropdownMenuItem>
                       ))}
                     </>
@@ -179,31 +195,48 @@ export function Navbar({ alwaysDark = false, alwaysLight = false }: NavbarProps)
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center gap-2 hover:opacity-80 transition-opacity focus:outline-none">
                     <Avatar className="h-8 w-8 border border-white/20">
-                      <AvatarFallback className={`text-xs font-medium ${showLight ? "bg-gray-100 text-gray-700" : "bg-white/10 text-white"}`}>
+                      <AvatarFallback
+                        className={`text-xs font-medium ${showLight ? "bg-gray-100 text-gray-700" : "bg-white/10 text-white"}`}
+                      >
                         {user?.name?.charAt(0).toUpperCase() || "U"}
                       </AvatarFallback>
                     </Avatar>
-                    <ChevronDown className={`w-3.5 h-3.5 ${showLight ? "text-gray-700" : "text-white/80"}`} />
+                    <ChevronDown
+                      className={`w-3.5 h-3.5 ${showLight ? "text-gray-700" : "text-white/80"}`}
+                    />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   <div className="px-2 py-1.5">
-                    <p className="text-sm font-medium truncate">{user?.name || "User"}</p>
-                    <p className="text-xs text-muted-foreground truncate">{user?.email || ""}</p>
+                    <p className="text-sm font-medium truncate">
+                      {user?.name || "User"}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {user?.email || ""}
+                    </p>
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link href="/dashboard" className="cursor-pointer flex items-center gap-2">
+                    <Link
+                      href="/dashboard"
+                      className="cursor-pointer flex items-center gap-2"
+                    >
                       <LayoutDashboard className="w-4 h-4" /> Dashboard
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/settings" className="cursor-pointer flex items-center gap-2">
+                    <Link
+                      href="/settings"
+                      className="cursor-pointer flex items-center gap-2"
+                    >
                       <Settings className="w-4 h-4" /> Settings
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/billing" className="cursor-pointer flex items-center gap-2">
+                    <Link
+                      href="/billing"
+                      className="cursor-pointer flex items-center gap-2"
+                    >
                       <CreditCard className="w-4 h-4" /> Billing
                     </Link>
                   </DropdownMenuItem>
@@ -221,7 +254,11 @@ export function Navbar({ alwaysDark = false, alwaysLight = false }: NavbarProps)
                 <Link href="/login">
                   <Button
                     variant="ghost"
-                    className={showLight ? "" : "text-white hover:bg-white/10 hover:text-white"}
+                    className={
+                      showLight
+                        ? ""
+                        : "text-white hover:bg-white/10 hover:text-white"
+                    }
                   >
                     Log In
                   </Button>
@@ -249,7 +286,11 @@ export function Navbar({ alwaysDark = false, alwaysLight = false }: NavbarProps)
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle mobile menu"
           >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {mobileMenuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
           </button>
         </div>
       </div>
@@ -285,9 +326,18 @@ export function Navbar({ alwaysDark = false, alwaysLight = false }: NavbarProps)
               {isAuthenticated && isStablePlan && (
                 <>
                   <div className="border-t pt-2">
-                    <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2 font-semibold">Stable</p>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2 font-semibold">
+                      Stable
+                    </p>
                     {stableNavLinks.map((link) => (
-                      <Link key={`mobile-stable-${link.label}`} href={link.path} className="block py-2 text-base font-medium text-foreground/80 hover:text-foreground" onClick={() => setMobileMenuOpen(false)}>{link.label}</Link>
+                      <Link
+                        key={`mobile-stable-${link.label}`}
+                        href={link.path}
+                        className="block py-2 text-base font-medium text-foreground/80 hover:text-foreground"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        {link.label}
+                      </Link>
                     ))}
                   </div>
                 </>
@@ -303,22 +353,38 @@ export function Navbar({ alwaysDark = false, alwaysLight = false }: NavbarProps)
                       </Avatar>
                       <div>
                         <p className="text-sm font-medium">{user?.name}</p>
-                        <p className="text-xs text-muted-foreground">{user?.email}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {user?.email}
+                        </p>
                       </div>
                     </div>
-                    <Button variant="outline" onClick={() => { logout(); setMobileMenuOpen(false); }} className="w-full">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        logout();
+                        setMobileMenuOpen(false);
+                      }}
+                      className="w-full"
+                    >
                       Sign out
                     </Button>
                   </>
                 ) : (
                   <>
                     <Link href="/login">
-                      <Button variant="ghost" className="w-full" onClick={() => setMobileMenuOpen(false)}>
+                      <Button
+                        variant="ghost"
+                        className="w-full"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
                         Log In
                       </Button>
                     </Link>
                     <Link href="/register">
-                      <Button className="w-full" onClick={() => setMobileMenuOpen(false)}>
+                      <Button
+                        className="w-full"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
                         Get Started
                       </Button>
                     </Link>

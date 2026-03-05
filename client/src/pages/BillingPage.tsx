@@ -327,9 +327,7 @@ export default function BillingPage() {
                       <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-400 to-purple-400 flex items-center justify-center">
                         <Crown className="w-4 h-4 text-white" />
                       </div>
-                      <CardTitle className="text-lg">
-                        {"Starter"}
-                      </CardTitle>
+                      <CardTitle className="text-lg">{"Starter"}</CardTitle>
                     </div>
                     <CardDescription>
                       Perfect for individual horse owners
@@ -481,9 +479,13 @@ export default function BillingPage() {
                   <AlertDescription>
                     To upgrade or change your plan, use{" "}
                     <strong>Manage Subscription</strong> above or contact{" "}
-                    <a href="mailto:hello@equiprofile.online" className="underline">
+                    <a
+                      href="mailto:hello@equiprofile.online"
+                      className="underline"
+                    >
                       hello@equiprofile.online
-                    </a>.
+                    </a>
+                    .
                   </AlertDescription>
                 </Alert>
               </CardContent>

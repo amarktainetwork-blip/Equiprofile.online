@@ -291,8 +291,16 @@ function DashboardContent() {
 
   // Today's calendar events
   const today = new Date();
-  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+  const todayStart = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+  );
+  const todayEnd = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate() + 1,
+  );
   const { data: calendarEvents = [] } = trpc.calendar.getEvents.useQuery(
     {
       startDate: todayStart.toISOString(),
@@ -322,7 +330,9 @@ function DashboardContent() {
         return (
           <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 gap-1">
             <Zap className="w-3 h-3" />
-            {subscription.planTier === "stable" ? "Stable Plan" : "Starter Plan"}
+            {subscription.planTier === "stable"
+              ? "Stable Plan"
+              : "Starter Plan"}
           </Badge>
         );
       case "overdue":
@@ -701,7 +711,11 @@ function DashboardContent() {
               Today's Schedule
             </CardTitle>
             <CardDescription className="text-xs">
-              {today.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}
+              {today.toLocaleDateString("en-GB", {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+              })}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -710,7 +724,11 @@ function DashboardContent() {
                 <CalendarDays className="w-7 h-7 mx-auto mb-2 opacity-30" />
                 <p className="text-xs">No events scheduled today</p>
                 <Link href="/calendar">
-                  <Button variant="ghost" size="sm" className="mt-2 text-xs h-7">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="mt-2 text-xs h-7"
+                  >
                     Open calendar
                   </Button>
                 </Link>
@@ -718,16 +736,27 @@ function DashboardContent() {
             ) : (
               <div className="space-y-2">
                 {calendarEvents.slice(0, 4).map((event: any) => (
-                  <div key={event.id} className="flex items-center gap-3 p-2.5 rounded-lg border border-muted/40 bg-muted/20">
+                  <div
+                    key={event.id}
+                    className="flex items-center gap-3 p-2.5 rounded-lg border border-muted/40 bg-muted/20"
+                  >
                     <div className="w-2 h-2 rounded-full bg-primary shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium truncate">{event.title}</p>
-                      <p className="text-[10px] text-muted-foreground capitalize">{event.eventType}</p>
+                      <p className="text-xs font-medium truncate">
+                        {event.title}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground capitalize">
+                        {event.eventType}
+                      </p>
                     </div>
                   </div>
                 ))}
                 <Link href="/calendar">
-                  <Button variant="ghost" size="sm" className="w-full text-xs text-muted-foreground hover:text-foreground mt-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full text-xs text-muted-foreground hover:text-foreground mt-1"
+                  >
                     View calendar <ChevronRight className="w-3 h-3 ml-1" />
                   </Button>
                 </Link>
@@ -744,7 +773,8 @@ function DashboardContent() {
               Horse Overview
             </CardTitle>
             <CardDescription className="text-xs">
-              {horses.length} horse{horses.length !== 1 ? "s" : ""} in your stable
+              {horses.length} horse{horses.length !== 1 ? "s" : ""} in your
+              stable
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -753,7 +783,11 @@ function DashboardContent() {
                 <Heart className="w-7 h-7 mx-auto mb-2 opacity-30" />
                 <p className="text-xs">No horses added yet</p>
                 <Link href="/horses/new">
-                  <Button variant="ghost" size="sm" className="mt-2 text-xs h-7">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="mt-2 text-xs h-7"
+                  >
                     Add first horse
                   </Button>
                 </Link>
@@ -769,25 +803,37 @@ function DashboardContent() {
                           alt={horse.name}
                           className="w-8 h-8 rounded-full object-cover shrink-0 border border-border"
                           onError={(e) => {
-                            (e.target as HTMLImageElement).src = "/assets/marketing/hero/hero-horse.jpg";
+                            (e.target as HTMLImageElement).src =
+                              "/assets/marketing/hero/hero-horse.jpg";
                           }}
                         />
                       ) : (
                         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center shrink-0">
-                          <span className="text-[10px] text-white font-bold">{horse.name.charAt(0)}</span>
+                          <span className="text-[10px] text-white font-bold">
+                            {horse.name.charAt(0)}
+                          </span>
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium truncate">{horse.name}</p>
-                        <p className="text-[10px] text-muted-foreground truncate">{horse.breed || "Unknown breed"}</p>
+                        <p className="text-xs font-medium truncate">
+                          {horse.name}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground truncate">
+                          {horse.breed || "Unknown breed"}
+                        </p>
                       </div>
                     </div>
                   </Link>
                 ))}
                 {horses.length > 4 && (
                   <Link href="/horses">
-                    <Button variant="ghost" size="sm" className="w-full text-xs text-muted-foreground hover:text-foreground mt-1">
-                      View all {horses.length} horses <ChevronRight className="w-3 h-3 ml-1" />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-full text-xs text-muted-foreground hover:text-foreground mt-1"
+                    >
+                      View all {horses.length} horses{" "}
+                      <ChevronRight className="w-3 h-3 ml-1" />
                     </Button>
                   </Link>
                 )}
@@ -808,13 +854,17 @@ function DashboardContent() {
             </CardHeader>
             <CardContent>
               {healthAlerts.length === 0 ? (
-                <p className="text-xs text-muted-foreground text-center py-3">No alerts</p>
+                <p className="text-xs text-muted-foreground text-center py-3">
+                  No alerts
+                </p>
               ) : (
                 <div className="space-y-2">
                   {healthAlerts.map((alert) => (
                     <Link key={alert.id} href={alert.href}>
                       <div className="flex items-center justify-between p-2 rounded-lg hover:bg-amber-100/50 dark:hover:bg-amber-900/20 transition-colors cursor-pointer">
-                        <p className="text-xs font-medium text-amber-700 dark:text-amber-400">{alert.message}</p>
+                        <p className="text-xs font-medium text-amber-700 dark:text-amber-400">
+                          {alert.message}
+                        </p>
                         <ChevronRight className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                       </div>
                     </Link>
@@ -837,19 +887,36 @@ function DashboardContent() {
                 <div className="text-center py-4 text-muted-foreground">
                   <p className="text-xs">No pending tasks</p>
                   <Link href="/tasks">
-                    <Button variant="ghost" size="sm" className="mt-2 text-xs h-7">Add task</Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="mt-2 text-xs h-7"
+                    >
+                      Add task
+                    </Button>
                   </Link>
                 </div>
               ) : (
                 <div className="space-y-1.5">
                   {tasks.slice(0, 4).map((task: any) => (
-                    <div key={task.id} className="flex items-center gap-2 p-2 rounded-lg border border-muted/40 bg-muted/20">
-                      <div className={`w-2 h-2 rounded-full shrink-0 ${task.priority === "high" ? "bg-red-500" : task.priority === "medium" ? "bg-amber-500" : "bg-green-500"}`} />
-                      <p className="text-xs font-medium truncate flex-1">{task.title}</p>
+                    <div
+                      key={task.id}
+                      className="flex items-center gap-2 p-2 rounded-lg border border-muted/40 bg-muted/20"
+                    >
+                      <div
+                        className={`w-2 h-2 rounded-full shrink-0 ${task.priority === "high" ? "bg-red-500" : task.priority === "medium" ? "bg-amber-500" : "bg-green-500"}`}
+                      />
+                      <p className="text-xs font-medium truncate flex-1">
+                        {task.title}
+                      </p>
                     </div>
                   ))}
                   <Link href="/tasks">
-                    <Button variant="ghost" size="sm" className="w-full text-xs text-muted-foreground hover:text-foreground mt-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-full text-xs text-muted-foreground hover:text-foreground mt-1"
+                    >
                       View all tasks <ChevronRight className="w-3 h-3 ml-1" />
                     </Button>
                   </Link>

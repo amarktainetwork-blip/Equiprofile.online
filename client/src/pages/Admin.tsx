@@ -995,17 +995,33 @@ function AdminContent() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="rounded-lg border p-4 space-y-3">
-                <h3 className="font-semibold text-sm">Environment Variables Required</h3>
+                <h3 className="font-semibold text-sm">
+                  Environment Variables Required
+                </h3>
                 <div className="space-y-2 font-mono text-sm">
                   {[
-                    { name: "ENABLE_WHATSAPP", desc: "Set to 'true' to enable" },
-                    { name: "WHATSAPP_PHONE_NUMBER_ID", desc: "Meta phone number ID" },
-                    { name: "WHATSAPP_ACCESS_TOKEN", desc: "Meta access token (permanent)" },
+                    {
+                      name: "ENABLE_WHATSAPP",
+                      desc: "Set to 'true' to enable",
+                    },
+                    {
+                      name: "WHATSAPP_PHONE_NUMBER_ID",
+                      desc: "Meta phone number ID",
+                    },
+                    {
+                      name: "WHATSAPP_ACCESS_TOKEN",
+                      desc: "Meta access token (permanent)",
+                    },
                   ].map((item) => (
-                    <div key={item.name} className="flex items-center justify-between p-2 rounded bg-muted/50">
+                    <div
+                      key={item.name}
+                      className="flex items-center justify-between p-2 rounded bg-muted/50"
+                    >
                       <div>
                         <code className="text-primary">{item.name}</code>
-                        <p className="text-xs text-muted-foreground mt-0.5">{item.desc}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {item.desc}
+                        </p>
                       </div>
                     </div>
                   ))}
@@ -1014,8 +1030,8 @@ function AdminContent() {
               <div className="rounded-lg border p-4 space-y-2">
                 <h3 className="font-semibold text-sm">Reminder Templates</h3>
                 <p className="text-xs text-muted-foreground">
-                  The following WhatsApp message templates must be pre-approved in
-                  your Meta Business account:
+                  The following WhatsApp message templates must be pre-approved
+                  in your Meta Business account:
                 </p>
                 <ul className="text-sm space-y-1.5 mt-2">
                   {[
@@ -1035,10 +1051,10 @@ function AdminContent() {
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>Setup Required</AlertTitle>
                 <AlertDescription className="text-xs">
-                  WhatsApp reminders require a verified Meta Business account and
-                  approved message templates. See{" "}
-                  <code className="text-primary">docs/WHATSAPP_SETUP.md</code> for
-                  full setup instructions.
+                  WhatsApp reminders require a verified Meta Business account
+                  and approved message templates. See{" "}
+                  <code className="text-primary">docs/WHATSAPP_SETUP.md</code>{" "}
+                  for full setup instructions.
                 </AlertDescription>
               </Alert>
             </CardContent>
