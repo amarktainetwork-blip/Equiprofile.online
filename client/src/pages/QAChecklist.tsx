@@ -217,6 +217,57 @@ export default function QAChecklistPage() {
     },
   ];
 
+  const videoChecks: CheckItem[] = [
+    {
+      label: "Landing page video",
+      status: "ok",
+      detail: "/assets/marketing/hero/landingfinal.mp4",
+    },
+    {
+      label: "Login/Register video",
+      status: "ok",
+      detail: "/videos/LoginFinal2.mp4 (AuthSplitLayout)",
+    },
+    {
+      label: "Auth layout starts at top",
+      status: "ok",
+      detail: "pt-[72px] below fixed nav, no vertical centering offset",
+    },
+    {
+      label: "Login step-by-step form",
+      status: "ok",
+      detail: "AnimatePresence: step 1 = email, step 2 = password",
+    },
+    {
+      label: "Register step-by-step form",
+      status: "ok",
+      detail: "AnimatePresence: step 1 = name, step 2 = email/password",
+    },
+  ];
+
+  const uploadChecks: CheckItem[] = [
+    {
+      label: "Horse photo file picker",
+      status: "ok",
+      detail: "HorseForm: <input type=file> → trpc.documents.upload",
+    },
+    {
+      label: "Upload file type filter",
+      status: "ok",
+      detail: "accept=image/* enforced on input element",
+    },
+    {
+      label: "Upload size limit",
+      status: "ok",
+      detail: "5MB enforced client-side before upload",
+    },
+    {
+      label: "Upload returns URL",
+      status: "ok",
+      detail: "result.url stored in horse.photoUrl",
+    },
+  ];
+
   return (
     <DashboardLayout>
       <div className="container max-w-3xl py-6 space-y-5">
@@ -255,6 +306,8 @@ export default function QAChecklistPage() {
           checks={featureChecks}
         />
         <Section title="Routing & UI Fixes" checks={routeChecks} />
+        <Section title="Videos & Auth Layout" checks={videoChecks} />
+        <Section title="Image Uploads" checks={uploadChecks} />
 
         <div className="text-xs text-muted-foreground text-center pt-2">
           This page is accessible to any user with admin mode unlocked.
