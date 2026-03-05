@@ -1393,6 +1393,351 @@ export const TRAINING_TEMPLATES = [
         "IMPORTANT: This program assumes veterinary clearance has been given for return to work. Stop immediately if horse shows any signs of lameness, heat, swelling, or discomfort. Always err on the side of caution. Adjust timeline based on individual horse's response and vet recommendations.",
     }),
   },
+  {
+    name: "Dressage Foundation",
+    description:
+      "A 4-week program focused on classical dressage principles: rhythm, relaxation, contact, impulsion, straightness and collection. Suitable for horses at preliminary to elementary level.",
+    duration: 4,
+    discipline: "dressage",
+    level: "intermediate",
+    goals:
+      "Establish correct rhythm and tempo, develop relaxed acceptance of contact, improve lateral suppleness, introduce or consolidate school movements, build correct muscle development",
+    isPublic: true,
+    programData: JSON.stringify({
+      weeks: [
+        {
+          week: 1,
+          focus: "Rhythm, relaxation and forward movement",
+          sessions: [
+            {
+              day: "Monday",
+              type: "Flatwork",
+              duration: 45,
+              description:
+                "Warm up 10 mins walk. Trot work focusing on rhythm and relaxation. Large circles 20m. Finish with transitions walk-trot-walk.",
+              intensity: "low",
+            },
+            {
+              day: "Tuesday",
+              type: "Hacking/Relaxation",
+              duration: 30,
+              description:
+                "Light hack or relaxed arena work. Keep horse loose and forward.",
+              intensity: "low",
+            },
+            {
+              day: "Wednesday",
+              type: "Dressage Training",
+              duration: 50,
+              description:
+                "Focus on contact and acceptance of the bit. Serpentines, figure-of-eights. Introduce leg-yield at walk.",
+              intensity: "medium",
+            },
+            {
+              day: "Thursday",
+              type: "Rest/Turnout",
+              duration: 0,
+              description: "Rest day with free turnout.",
+              intensity: "none",
+            },
+            {
+              day: "Friday",
+              type: "Flatwork",
+              duration: 45,
+              description:
+                "Shoulder-fore at walk and trot to improve straightness. Transitions within the pace.",
+              intensity: "medium",
+            },
+            {
+              day: "Saturday",
+              type: "Schooling",
+              duration: 55,
+              description:
+                "Extended warm-up. Work on 10m circles in trot. Introduce rein-back 2-3 steps. Cooldown 10 mins walk.",
+              intensity: "medium",
+            },
+            {
+              day: "Sunday",
+              type: "Rest",
+              duration: 0,
+              description: "Complete rest day.",
+              intensity: "none",
+            },
+          ],
+        },
+        {
+          week: 2,
+          focus: "Lateral work and contact",
+          sessions: [
+            {
+              day: "Monday",
+              type: "Flatwork",
+              duration: 50,
+              description:
+                "Leg-yield at trot across the diagonal. Focus on crossing over behind.",
+              intensity: "medium",
+            },
+            {
+              day: "Tuesday",
+              type: "Light Hack",
+              duration: 30,
+              description: "Relaxation hack. Walk and trot.",
+              intensity: "low",
+            },
+            {
+              day: "Wednesday",
+              type: "Dressage Training",
+              duration: 55,
+              description:
+                "Work on shoulder-in at trot. Introduce travers at walk. Transitions trot-canter.",
+              intensity: "medium-high",
+            },
+            {
+              day: "Thursday",
+              type: "Rest/Turnout",
+              duration: 0,
+              description: "Rest day.",
+              intensity: "none",
+            },
+            {
+              day: "Friday",
+              type: "Schooling",
+              duration: 50,
+              description:
+                "Counter-canter on large loops. Simple changes through walk.",
+              intensity: "medium",
+            },
+            {
+              day: "Saturday",
+              type: "Long Schooling",
+              duration: 60,
+              description:
+                "Full test practice. Include all movements worked on this week.",
+              intensity: "medium-high",
+            },
+            {
+              day: "Sunday",
+              type: "Rest",
+              duration: 0,
+              description: "Rest day.",
+              intensity: "none",
+            },
+          ],
+        },
+      ],
+    }),
+  },
+  {
+    name: "Young Horse Development",
+    description:
+      "A gentle 4-week program for horses aged 3-4 years starting their education. Focuses on confidence, acceptance of aids, and basic movement without over-stressing young joints.",
+    duration: 4,
+    discipline: "general",
+    level: "beginner",
+    goals:
+      "Build confidence and trust, accept saddle and rider, walk and trot calmly, accept basic leg and rein aids, introduce canter, handle different environments without anxiety",
+    isPublic: true,
+    programData: JSON.stringify({
+      weeks: [
+        {
+          week: 1,
+          focus: "Acceptance and confidence",
+          sessions: [
+            {
+              day: "Monday",
+              type: "In-Hand Work",
+              duration: 20,
+              description:
+                "Ground work: leading, standing, accepting brushing and equipment. Build trust through calm handling.",
+              intensity: "very low",
+            },
+            {
+              day: "Tuesday",
+              type: "Lunging",
+              duration: 20,
+              description:
+                "10 mins each rein on large circle. Walk and trot only. Loose side-reins if accepted.",
+              intensity: "low",
+            },
+            {
+              day: "Wednesday",
+              type: "Backing/Walk Under Saddle",
+              duration: 25,
+              description:
+                "Short ridden session at walk. Straight lines and large circles. Rider sits quietly.",
+              intensity: "low",
+            },
+            {
+              day: "Thursday",
+              type: "Rest/Turnout",
+              duration: 0,
+              description: "Free turnout. Social time with other horses.",
+              intensity: "none",
+            },
+            {
+              day: "Friday",
+              type: "Walk and Trot",
+              duration: 25,
+              description:
+                "Ridden work walk and trot. Large figures. Reward frequently.",
+              intensity: "low",
+            },
+            {
+              day: "Saturday",
+              type: "Hacking",
+              duration: 30,
+              description:
+                "Short hack with experienced horse for confidence. Walk only outside.",
+              intensity: "low",
+            },
+            {
+              day: "Sunday",
+              type: "Rest",
+              duration: 0,
+              description: "Rest day.",
+              intensity: "none",
+            },
+          ],
+        },
+        {
+          week: 2,
+          focus: "Rhythm and acceptance of leg",
+          sessions: [
+            {
+              day: "Monday",
+              type: "Ridden Flatwork",
+              duration: 30,
+              description:
+                "Focus on forward, rhythmical trot. Large 20m circles. Introduce leg pressure.",
+              intensity: "low",
+            },
+            {
+              day: "Tuesday",
+              type: "Lunging",
+              duration: 25,
+              description:
+                "Trot work on circle. Introduce canter transitions if ready.",
+              intensity: "low-medium",
+            },
+            {
+              day: "Wednesday",
+              type: "Ridden Work",
+              duration: 30,
+              description:
+                "Introduce canter on 20m circle. One transition each rein. Keep session positive.",
+              intensity: "medium",
+            },
+            {
+              day: "Thursday",
+              type: "Rest/Turnout",
+              duration: 0,
+              description: "Rest day.",
+              intensity: "none",
+            },
+            {
+              day: "Friday",
+              type: "Flatwork",
+              duration: 35,
+              description:
+                "Trot serpentines. Canter 20m circle each rein. Transitions.",
+              intensity: "medium",
+            },
+            {
+              day: "Saturday",
+              type: "Varied Work",
+              duration: 35,
+              description:
+                "Mix of lunging and ridden work. Introduce simple pole work at walk.",
+              intensity: "low-medium",
+            },
+            {
+              day: "Sunday",
+              type: "Rest",
+              duration: 0,
+              description: "Rest day.",
+              intensity: "none",
+            },
+          ],
+        },
+      ],
+    }),
+  },
+  {
+    name: "Competition Warmup",
+    description:
+      "A focused 1-week pre-competition preparation program. Designed to peak performance, reduce tension, and ensure the horse arrives at the competition in optimal physical and mental condition.",
+    duration: 1,
+    discipline: "general",
+    level: "intermediate",
+    goals:
+      "Peak physical readiness, reduce pre-competition tension, sharpen responses, maintain fitness without fatigue, arrive at competition relaxed and focused",
+    isPublic: true,
+    programData: JSON.stringify({
+      weeks: [
+        {
+          week: 1,
+          focus: "Peak and taper",
+          sessions: [
+            {
+              day: "Monday",
+              type: "Active Recovery",
+              duration: 40,
+              description:
+                "Light hack or relaxed arena work. Stretch and loosen. No demanding work.",
+              intensity: "low",
+            },
+            {
+              day: "Tuesday",
+              type: "Sharpening",
+              duration: 50,
+              description:
+                "Work through your competition test or course once at 80%. Focus on problem areas. Finish on a good note.",
+              intensity: "medium-high",
+            },
+            {
+              day: "Wednesday",
+              type: "Light Flatwork",
+              duration: 35,
+              description:
+                "Relaxed quality work. Confirm aids are sharp. Keep horse forward and willing.",
+              intensity: "medium",
+            },
+            {
+              day: "Thursday",
+              type: "Easy Hack or Rest",
+              duration: 25,
+              description:
+                "Very light work or rest depending on travel day. Keep horse calm and comfortable.",
+              intensity: "very low",
+            },
+            {
+              day: "Friday",
+              type: "Competition Warmup",
+              duration: 30,
+              description:
+                "Competition day warmup. 10 mins walk, 10 mins trot/canter, practice key movements. Save energy for the ring.",
+              intensity: "medium",
+            },
+            {
+              day: "Saturday",
+              type: "Competition",
+              duration: 0,
+              description: "Competition day. Good luck!",
+              intensity: "high",
+            },
+            {
+              day: "Sunday",
+              type: "Recovery",
+              duration: 30,
+              description:
+                "Post-competition: light walk hack or turnout. Check for soreness. Reward your horse.",
+              intensity: "very low",
+            },
+          ],
+        },
+      ],
+    }),
+  },
 ];
 
 /**

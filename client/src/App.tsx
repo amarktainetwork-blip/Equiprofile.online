@@ -48,6 +48,7 @@ const Contacts = lazy(() => import("./pages/Contacts"));
 const Admin = lazy(() => import("./pages/Admin"));
 const QAChecklist = lazy(() => import("./pages/QAChecklist"));
 const Stable = lazy(() => import("./pages/Stable"));
+const StableDashboard = lazy(() => import("./pages/StableDashboard"));
 const Messages = lazy(() => import("./pages/Messages"));
 const Analytics = lazy(() => import("./pages/Analytics"));
 const Reports = lazy(() => import("./pages/Reports"));
@@ -262,6 +263,13 @@ function Router() {
             <Route path="/stable">
               <ProtectedRoute>
                 <Stable />
+              </ProtectedRoute>
+            </Route>
+
+            {/* Stable Dashboard (Stable plan users) */}
+            <Route path="/stable-dashboard">
+              <ProtectedRoute>
+                <StableDashboard />
               </ProtectedRoute>
             </Route>
 

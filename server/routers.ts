@@ -3128,11 +3128,11 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         }),
       )
       .mutation(async ({ ctx, input }) => {
-        const db = await getDb();
-        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+        const drizzleDb = await getDb();
+        if (!drizzleDb) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
 
         const startDate = new Date(input.startDate);
-        const result = await db.insert(events).values({
+        const result = await drizzleDb.insert(events).values({
           ...input,
           userId: ctx.user!.id,
           startDate,
@@ -3141,15 +3141,12 @@ Format your response as JSON with keys: recommendation, explanation, precautions
 
         const eventId = result[0].insertId;
 
-        // Schedule automatic reminders (24h and 1h before event) using the db module
+        // Schedule automatic reminders (24h and 1h before event)
         // Fire-and-forget — don't block the response
-        import("./db").then((dbModule) => {
-          dbModule
-            .createEventReminders(eventId, ctx.user!.id, startDate)
-            .catch((err: unknown) =>
-              console.error("[Calendar] Failed to create reminders:", err),
-            );
-        });
+        db.createEventReminders(eventId, ctx.user!.id, startDate).catch(
+          (err: unknown) =>
+            console.error("[Calendar] Failed to create reminders:", err),
+        );
 
         // Log WhatsApp availability for reminders
         const waConfig = isWhatsAppEnabled();

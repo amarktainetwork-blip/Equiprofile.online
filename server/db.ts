@@ -2366,11 +2366,11 @@ export async function createEventReminders(
   const db = await getDb();
   if (!db) return;
 
+  const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
+  const ONE_HOUR_MS = 60 * 60 * 1000;
+
   // Schedule reminders for 24h before and 1h before the event
-  const reminderOffsets = [
-    24 * 60 * 60 * 1000, // 24 hours
-    60 * 60 * 1000,      // 1 hour
-  ];
+  const reminderOffsets = [TWENTY_FOUR_HOURS_MS, ONE_HOUR_MS];
 
   for (const offset of reminderOffsets) {
     const reminderTime = new Date(eventStartDate.getTime() - offset);

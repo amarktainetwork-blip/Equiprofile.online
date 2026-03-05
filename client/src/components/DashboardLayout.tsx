@@ -64,6 +64,9 @@ import {
   Clock,
   Brain,
   Home,
+  Building2,
+  Briefcase,
+  UserCog,
 } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
@@ -99,9 +102,10 @@ const menuItems = [
 
 // Extra menu items for Stable plan subscribers
 const stableMenuItems = [
+  { icon: Building2, label: "Stable Dashboard", path: "/stable-dashboard" },
   { icon: Home, label: "Stable", path: "/stable" },
-  { icon: Users, label: "Staff", path: "/contacts" },
-  { icon: Users, label: "Owners", path: "/contacts" },
+  { icon: UserCog, label: "Staff", path: "/contacts" },
+  { icon: Briefcase, label: "Owners", path: "/contacts" },
 ];
 
 const adminMenuItems = [

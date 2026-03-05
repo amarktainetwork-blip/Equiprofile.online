@@ -322,7 +322,7 @@ function DashboardContent() {
         return (
           <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 gap-1">
             <Zap className="w-3 h-3" />
-            {subscription.planTier === "stable" ? "Stable Plan" : "Pro Plan"}
+            {subscription.planTier === "stable" ? "Stable Plan" : "Starter Plan"}
           </Badge>
         );
       case "overdue":

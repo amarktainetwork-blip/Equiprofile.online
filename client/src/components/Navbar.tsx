@@ -46,6 +46,14 @@ const appNavLinks = [
   { label: "Messages", path: "/messages" },
 ];
 
+// Stable plan additional navigation links
+const stableNavLinks = [
+  { label: "Stable Dashboard", path: "/stable-dashboard" },
+  { label: "Stable", path: "/stable" },
+  { label: "Staff", path: "/contacts" },
+  { label: "Owners", path: "/contacts" },
+];
+
 interface NavbarProps {
   /**
    * Force dark style (transparent bg + white text) regardless of scroll.
@@ -152,15 +160,11 @@ export function Navbar({ alwaysDark = false, alwaysLight = false }: NavbarProps)
                   {isStablePlan && (
                     <>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem asChild>
-                        <Link href="/stable" className="cursor-pointer">Stable</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href="/contacts" className="cursor-pointer">Staff</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href="/contacts" className="cursor-pointer">Owners</Link>
-                      </DropdownMenuItem>
+                      {stableNavLinks.map((link) => (
+                        <DropdownMenuItem key={`stable-${link.label}`} asChild>
+                          <Link href={link.path} className="cursor-pointer">{link.label}</Link>
+                        </DropdownMenuItem>
+                      ))}
                     </>
                   )}
                 </DropdownMenuContent>
@@ -282,9 +286,9 @@ export function Navbar({ alwaysDark = false, alwaysLight = false }: NavbarProps)
                 <>
                   <div className="border-t pt-2">
                     <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2 font-semibold">Stable</p>
-                    <Link href="/stable" className="block py-2 text-base font-medium text-foreground/80 hover:text-foreground" onClick={() => setMobileMenuOpen(false)}>Stable</Link>
-                    <Link href="/contacts" className="block py-2 text-base font-medium text-foreground/80 hover:text-foreground" onClick={() => setMobileMenuOpen(false)}>Staff</Link>
-                    <Link href="/contacts" className="block py-2 text-base font-medium text-foreground/80 hover:text-foreground" onClick={() => setMobileMenuOpen(false)}>Owners</Link>
+                    {stableNavLinks.map((link) => (
+                      <Link key={`mobile-stable-${link.label}`} href={link.path} className="block py-2 text-base font-medium text-foreground/80 hover:text-foreground" onClick={() => setMobileMenuOpen(false)}>{link.label}</Link>
+                    ))}
                   </div>
                 </>
               )}

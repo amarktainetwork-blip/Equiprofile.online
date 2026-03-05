@@ -314,56 +314,8 @@ export default function BillingPage() {
                 </div>
               </div>
 
-              <div className="grid md:grid-cols-3 gap-6 mb-8">
-                {/* Free Trial */}
-                <Card
-                  className={`border-2 ${isCurrentPlan("trial") ? "border-primary" : "border-muted"}`}
-                >
-                  <CardHeader>
-                    <div className="flex items-center gap-2 mb-1">
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center">
-                        <Sparkles className="w-4 h-4 text-white" />
-                      </div>
-                      <CardTitle className="text-lg">Free Trial</CardTitle>
-                    </div>
-                    <CardDescription>
-                      Try all features with 1 horse
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="mb-5">
-                      <div className="text-3xl font-bold">Free</div>
-                      <div className="text-muted-foreground text-sm">
-                        for {pricing?.trial?.duration ?? 7} days
-                      </div>
-                    </div>
-                    <ul className="space-y-2 mb-5">
-                      {trialFeatures.map((f) => (
-                        <li key={f} className="flex items-start gap-2">
-                          <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                          <span className="text-sm">{f}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    {isCurrentPlan("trial") ? (
-                      <Badge
-                        variant="secondary"
-                        className="w-full justify-center py-2"
-                      >
-                        Current Plan
-                      </Badge>
-                    ) : (
-                      <Badge
-                        variant="outline"
-                        className="w-full justify-center py-2 text-muted-foreground"
-                      >
-                        Included automatically on signup
-                      </Badge>
-                    )}
-                  </CardContent>
-                </Card>
-
-                {/* Pro Plan */}
+              <div className="grid md:grid-cols-2 gap-6 mb-8 max-w-3xl mx-auto">
+                {/* Starter Plan */}
                 <Card className="border-2 border-primary relative">
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                     <Badge className="bg-primary text-primary-foreground px-3">
@@ -376,11 +328,11 @@ export default function BillingPage() {
                         <Crown className="w-4 h-4 text-white" />
                       </div>
                       <CardTitle className="text-lg">
-                        {pricing?.pro?.name ?? "Pro"}
+                        {"Starter"}
                       </CardTitle>
                     </div>
                     <CardDescription>
-                      For individual horse owners
+                      Perfect for individual horse owners
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -429,7 +381,7 @@ export default function BillingPage() {
                             Processing...
                           </>
                         ) : (
-                          "Choose Pro"
+                          "Choose Starter"
                         )}
                       </Button>
                     )}
@@ -450,7 +402,7 @@ export default function BillingPage() {
                       </CardTitle>
                     </div>
                     <CardDescription>
-                      For professional operations
+                      Full stable management suite
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -510,60 +462,6 @@ export default function BillingPage() {
                 </Card>
               </div>
 
-              {/* FAQ */}
-              <Card className="mb-8">
-                <CardHeader>
-                  <CardTitle className="text-lg">Pricing FAQ</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4 text-sm text-muted-foreground">
-                  <div>
-                    <p className="font-medium text-foreground mb-1">
-                      What happens after my free trial?
-                    </p>
-                    <p>
-                      After 7 days your trial ends and you&apos;ll need to
-                      subscribe to continue. Your data is safe — read-only
-                      access remains for 30 days.
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-medium text-foreground mb-1">
-                      Can I add more horses beyond my plan limit?
-                    </p>
-                    <p>
-                      Pro users on the 5-horse limit can upgrade to the Stable
-                      plan for up to 20 horses. Need even more? Contact us at{" "}
-                      <a
-                        href="mailto:hello@equiprofile.online"
-                        className="text-primary underline"
-                      >
-                        hello@equiprofile.online
-                      </a>
-                      .
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-medium text-foreground mb-1">
-                      How do the 5 users on Stable work?
-                    </p>
-                    <p>
-                      The Stable plan supports up to 5 team members. The stable
-                      owner can invite managers and members via the Stable
-                      Management page. Need more than 5 users? Contact us.
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-medium text-foreground mb-1">
-                      Can I cancel anytime?
-                    </p>
-                    <p>
-                      Yes. Cancel via &quot;Manage Subscription&quot; above. No
-                      questions, no penalties.
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
               <div className="text-center text-sm text-muted-foreground">
                 <p>All plans include a secure checkout powered by Stripe.</p>
                 <p className="mt-2">Cancel anytime. No questions asked.</p>
@@ -577,69 +475,20 @@ export default function BillingPage() {
               <CardHeader>
                 <CardTitle className="text-lg">Plan Details</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent>
                 <Alert>
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
-                    To upgrade, downgrade, or add horses beyond your plan limit,
-                    use <strong>Manage Subscription</strong> above or contact{" "}
-                    <a
-                      href="mailto:hello@equiprofile.online"
-                      className="underline"
-                    >
+                    To upgrade or change your plan, use{" "}
+                    <strong>Manage Subscription</strong> above or contact{" "}
+                    <a href="mailto:hello@equiprofile.online" className="underline">
                       hello@equiprofile.online
-                    </a>
-                    .
+                    </a>.
                   </AlertDescription>
                 </Alert>
               </CardContent>
             </Card>
           )}
-
-          {/* Need more? upgrade CTA — always visible */}
-          <Card className="border-dashed border-2 border-primary/30 bg-primary/5">
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <span>🐴</span> Need more horses or users?
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
-              <p>
-                Our platform supports up to{" "}
-                <strong className="text-foreground">10 total users</strong> and
-                up to <strong className="text-foreground">20 horses</strong> on
-                the Stable plan.
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="rounded-lg border border-primary/20 bg-background p-3">
-                  <p className="font-semibold text-foreground mb-1">
-                    &gt; 5 Horses
-                  </p>
-                  <p className="text-xs">
-                    Upgrade to the <strong>Stable plan</strong> for up to 20
-                    horses.
-                  </p>
-                </div>
-                <div className="rounded-lg border border-primary/20 bg-background p-3">
-                  <p className="font-semibold text-foreground mb-1">
-                    &gt; 5 Users
-                  </p>
-                  <p className="text-xs">
-                    Contact us to discuss custom arrangements for your team.
-                  </p>
-                </div>
-              </div>
-              <p className="text-xs">
-                Need more than 10 users or a custom enterprise setup?{" "}
-                <a
-                  href="mailto:hello@equiprofile.online"
-                  className="text-primary underline font-medium"
-                >
-                  Contact hello@equiprofile.online
-                </a>
-              </p>
-            </CardContent>
-          </Card>
         </div>
       </PageTransition>
     </AppLayout>

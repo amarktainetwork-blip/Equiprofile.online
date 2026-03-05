@@ -113,9 +113,13 @@ function HorseDetailContent() {
                 src={horse.photoUrl}
                 alt={horse.name}
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = "/assets/marketing/hero/hero-horse.jpg";
+                }}
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center">
+              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-rose-900/20 to-pink-900/20">
                 <Heart className="w-24 h-24 text-muted-foreground/30" />
               </div>
             )}
