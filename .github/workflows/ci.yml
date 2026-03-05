@@ -171,16 +171,23 @@ jobs:
         env:
           NODE_ENV: production
 
-      - name: Install Playwright browsers
-        run: npx playwright install chromium --with-deps
+      - name: Install Playwright browsers and package
+        # `npx playwright install` only downloads the browser binaries.
+        # We also need the `playwright` Node.js package in node_modules so
+        # that `import { chromium } from "playwright"` resolves at runtime.
+        run: |
+          npx playwright install chromium --with-deps
+          npm install --no-save playwright
 
       - name: Start server and run UI smoke test
         run: |
-          # Start server in background (no DB needed for public pages)
-          NODE_ENV=production JWT_SECRET=smoke-test-secret-min-32-chars-here ADMIN_UNLOCK_PASSWORD=test node dist/index.js &
+          # Start server in background.
+          # DATABASE_URL must be non-empty to pass startup env validation;
+          # the smoke test only visits public HTML pages so no real DB is used.
+          node dist/index.js &
           SERVER_PID=$!
 
-          # Wait for server to be ready
+          # Wait for server to be ready (up to 30s)
           echo "Waiting for server..."
           for i in $(seq 1 30); do
             if curl -sf http://localhost:3000/healthz > /dev/null 2>&1; then
@@ -199,3 +206,8 @@ jobs:
           exit $EXIT_CODE
         env:
           NODE_ENV: production
+          JWT_SECRET: smoke-test-secret-min-32-chars-here
+          ADMIN_UNLOCK_PASSWORD: test
+          # Needs to be set (non-empty) to pass startup validation;
+          # no actual DB connection is made for public-page smoke tests.
+          DATABASE_URL: mysql://smoke:smoke@127.0.0.1:3306/smoke_db

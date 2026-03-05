@@ -246,7 +246,9 @@ export default function Settings() {
                     <div className="flex items-center gap-6">
                       <Avatar className="w-20 h-20">
                         <AvatarImage
-                          src={avatarPreview ?? user?.profileImageUrl ?? undefined}
+                          src={
+                            avatarPreview ?? user?.profileImageUrl ?? undefined
+                          }
                           alt={user?.name ?? "Avatar"}
                         />
                         <AvatarFallback className="text-2xl">

@@ -48,7 +48,10 @@ export function registerServiceWorker() {
         for (const registration of registrations) {
           registration.unregister().then((success) => {
             if (success) {
-              console.log("[SW] Unregistered stale service worker:", registration.scope);
+              console.log(
+                "[SW] Unregistered stale service worker:",
+                registration.scope,
+              );
             }
           });
         }

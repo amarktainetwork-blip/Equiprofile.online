@@ -57,13 +57,18 @@ import {
 
 // Allowed MIME types for document and avatar uploads
 const ALLOWED_UPLOAD_MIME_TYPES = [
-  "image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml",
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+  "image/svg+xml",
   "application/pdf",
   "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   "application/vnd.ms-excel",
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-  "text/plain", "text/csv",
+  "text/plain",
+  "text/csv",
 ] as const;
 
 const ALLOWED_AVATAR_MIME_PREFIXES = [
@@ -498,15 +503,23 @@ export const appRouter = router({
 
         // If base64 avatar data provided, upload it and store the URL
         if (avatarData) {
-          const prefix = ALLOWED_AVATAR_MIME_PREFIXES.find((p) => avatarData.startsWith(p));
+          const prefix = ALLOWED_AVATAR_MIME_PREFIXES.find((p) =>
+            avatarData.startsWith(p),
+          );
           if (!prefix) {
-            throw new TRPCError({ code: "BAD_REQUEST", message: "Avatar must be a JPEG, PNG, WebP or GIF image" });
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Avatar must be a JPEG, PNG, WebP or GIF image",
+            });
           }
           const mimeType = prefix.split(";")[0].replace("data:", "");
           const base64Data = avatarData.slice(prefix.length);
           const buffer = Buffer.from(base64Data, "base64");
           if (buffer.length > MAX_AVATAR_SIZE_BYTES) {
-            throw new TRPCError({ code: "BAD_REQUEST", message: "Avatar image must be under 2MB" });
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Avatar image must be under 2MB",
+            });
           }
           const ext = mimeType.split("/")[1];
           const fileKey = `${ctx.user.id}/avatars/${nanoid()}.${ext}`;

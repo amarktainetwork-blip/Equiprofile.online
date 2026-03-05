@@ -35,14 +35,20 @@ function log(status, name, detail = "") {
 async function checkPage(page, url, name, checks) {
   const cspViolations = [];
   page.on("console", (msg) => {
-    if (msg.type() === "error" && msg.text().toLowerCase().includes("content security policy")) {
+    if (
+      msg.type() === "error" &&
+      msg.text().toLowerCase().includes("content security policy")
+    ) {
       cspViolations.push(msg.text());
     }
   });
 
   try {
-    const response = await page.goto(url, { waitUntil: "domcontentloaded", timeout: TIMEOUT });
-    
+    const response = await page.goto(url, {
+      waitUntil: "domcontentloaded",
+      timeout: TIMEOUT,
+    });
+
     // HTTP status check
     if (response && response.status() === 200) {
       log("pass", `${name} HTTP 200`);
@@ -64,7 +70,11 @@ async function checkPage(page, url, name, checks) {
     if (cspViolations.length === 0) {
       log("pass", `${name} no CSP violations`);
     } else {
-      log("fail", `${name} CSP violations detected`, cspViolations.slice(0, 2).join("; "));
+      log(
+        "fail",
+        `${name} CSP violations detected`,
+        cspViolations.slice(0, 2).join("; "),
+      );
     }
   } catch (e) {
     log("fail", `${name} navigation failed`, e.message);
@@ -102,7 +112,9 @@ async function main() {
       await checkPage(page, `${BASE_URL}/login`, "Login", [
         async (p) => {
           // Wait for form to appear
-          const form = p.locator("form, [role=form], input[type=email]").first();
+          const form = p
+            .locator("form, [role=form], input[type=email]")
+            .first();
           try {
             await form.waitFor({ timeout: 10000 });
             log("pass", "Login form rendered");
@@ -119,7 +131,9 @@ async function main() {
       const page = await context.newPage();
       await checkPage(page, `${BASE_URL}/register`, "Register", [
         async (p) => {
-          const form = p.locator("form, [role=form], input[type=email]").first();
+          const form = p
+            .locator("form, [role=form], input[type=email]")
+            .first();
           try {
             await form.waitFor({ timeout: 10000 });
             log("pass", "Register form rendered");
@@ -136,7 +150,10 @@ async function main() {
       const page = await context.newPage();
       const jsErrors = [];
       page.on("pageerror", (e) => jsErrors.push(e.message));
-      await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle", timeout: TIMEOUT });
+      await page.goto(`${BASE_URL}/`, {
+        waitUntil: "networkidle",
+        timeout: TIMEOUT,
+      });
       if (jsErrors.length === 0) {
         log("pass", "Home no JS runtime errors");
       } else {

@@ -106,11 +106,12 @@ export async function storagePut(
   }
 
   // Fall back to local disk storage
-  const buf = data instanceof Buffer
-    ? data
-    : data instanceof Uint8Array
-      ? Buffer.from(data.buffer, data.byteOffset, data.byteLength)
-      : Buffer.from(data as string);
+  const buf =
+    data instanceof Buffer
+      ? data
+      : data instanceof Uint8Array
+        ? Buffer.from(data.buffer, data.byteOffset, data.byteLength)
+        : Buffer.from(data as string);
   return storagePutLocal(relKey, buf, contentType);
 }
 
