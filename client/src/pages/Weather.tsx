@@ -1,15 +1,6 @@
-import { useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { trpc } from "@/lib/trpc";
@@ -18,32 +9,16 @@ import {
   Thermometer,
   Droplets,
   Wind,
-  Eye,
-  Sun,
   CloudRain,
-  Loader2,
   MapPin,
   RefreshCw,
   CheckCircle,
   AlertTriangle,
   XCircle,
 } from "lucide-react";
-import { toast } from "sonner";
-import { Streamdown } from "streamdown";
 
 function WeatherContent() {
-  const [location, setLocation] = useState("");
-  const [weatherData, setWeatherData] = useState({
-    temperature: 15,
-    humidity: 60,
-    windSpeed: 10,
-    precipitation: 0,
-    conditions: "partly cloudy",
-    uvIndex: 4,
-    visibility: 10,
-  });
-
-  // New Open-Meteo endpoints
+  // Open-Meteo live weather endpoints
   const {
     data: currentWeather,
     isLoading: currentLoading,
@@ -59,47 +34,20 @@ function WeatherContent() {
       refetchOnWindowFocus: false,
     });
 
-  const { data: latestWeather, isLoading: weatherLoading } =
-    trpc.weather.getLatest.useQuery();
-  const { data: weatherHistory } = trpc.weather.getHistory.useQuery({
-    limit: 5,
-  });
-
-  const analyzeMutation = trpc.weather.analyze.useMutation({
-    onSuccess: (data) => {
-      toast.success("Weather analysis complete!");
-    },
-    onError: (error) => {
-      toast.error(error.message || "Failed to analyze weather");
-    },
-  });
-
-  const handleAnalyze = () => {
-    if (!location.trim()) {
-      toast.error("Please enter a location");
-      return;
-    }
-
-    analyzeMutation.mutate({
-      location,
-      ...weatherData,
-    });
-  };
-
   const getRecommendationColor = (rec: string) => {
     switch (rec) {
       case "excellent":
-        return "bg-green-100 text-green-700 border-green-200";
+        return "bg-green-100 text-green-700 border-green-200 dark:bg-green-950/30 dark:text-green-300 dark:border-green-800";
       case "good":
-        return "bg-blue-100 text-blue-700 border-blue-200";
+        return "bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-800";
       case "fair":
-        return "bg-yellow-100 text-yellow-700 border-yellow-200";
+        return "bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-950/30 dark:text-yellow-300 dark:border-yellow-800";
       case "poor":
-        return "bg-orange-100 text-orange-700 border-orange-200";
+        return "bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-950/30 dark:text-orange-300 dark:border-orange-800";
       case "not_recommended":
-        return "bg-red-100 text-red-700 border-red-200";
+        return "bg-red-100 text-red-700 border-red-200 dark:bg-red-950/30 dark:text-red-300 dark:border-red-800";
       default:
-        return "bg-gray-100 text-gray-700 border-gray-200";
+        return "bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700";
     }
   };
 
@@ -122,7 +70,7 @@ function WeatherContent() {
     <div className="space-y-6">
       <div>
         <h1 className="font-serif text-3xl font-bold text-foreground">
-          Weather & Riding Conditions
+          Weather &amp; Riding Conditions
         </h1>
         <p className="text-muted-foreground mt-1">
           Real-time weather data with intelligent riding recommendations
@@ -229,7 +177,7 @@ function WeatherContent() {
             </div>
 
             <div className="text-xs text-muted-foreground">
-              Condition: {currentWeather.weather.condition} • Last updated:{" "}
+              Condition: {currentWeather.weather.condition} &bull; Last updated:{" "}
               {new Date(currentWeather.weather.timestamp).toLocaleString()}
             </div>
           </CardContent>
@@ -252,7 +200,20 @@ function WeatherContent() {
       )}
 
       {/* 7-Day Forecast */}
-      {forecast && forecast.length > 0 && (
+      {forecastLoading ? (
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-6 w-36" />
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-7 gap-3">
+              {Array.from({ length: 7 }).map((_, i) => (
+                <Skeleton key={i} className="h-24" />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      ) : forecast && forecast.length > 0 ? (
         <Card>
           <CardHeader>
             <CardTitle>7-Day Forecast</CardTitle>
@@ -283,296 +244,45 @@ function WeatherContent() {
             </div>
           </CardContent>
         </Card>
-      )}
+      ) : null}
 
-      <div className="grid lg:grid-cols-3 gap-6">
-        {/* Weather Input Form */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Check Riding Conditions</CardTitle>
-            <CardDescription>
-              Enter current weather conditions for AI analysis
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
+      {/* Riding Tips */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CheckCircle className="w-5 h-5 text-green-500" />
+            General Riding Safety Tips
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-2 gap-4 text-sm text-muted-foreground">
             <div className="space-y-2">
-              <Label htmlFor="location">Location</Label>
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    id="location"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    placeholder="Enter your location (e.g., London, UK)"
-                    className="pl-10"
-                  />
-                </div>
-              </div>
+              <p className="flex items-start gap-2">
+                <Thermometer className="w-4 h-4 text-orange-500 mt-0.5 shrink-0" />
+                Avoid intense work when temperatures exceed 30°C or drop below
+                5°C — warm up and cool down gradually.
+              </p>
+              <p className="flex items-start gap-2">
+                <Wind className="w-4 h-4 text-blue-500 mt-0.5 shrink-0" />
+                Strong winds (above 40 km/h) can spook horses — consider
+                lungeing before mounting.
+              </p>
             </div>
-
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="space-y-2">
-                <Label
-                  htmlFor="temperature"
-                  className="flex items-center gap-2"
-                >
-                  <Thermometer className="w-4 h-4" />
-                  Temperature (°C)
-                </Label>
-                <Input
-                  id="temperature"
-                  type="number"
-                  value={weatherData.temperature}
-                  onChange={(e) =>
-                    setWeatherData({
-                      ...weatherData,
-                      temperature: parseInt(e.target.value) || 0,
-                    })
-                  }
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="humidity" className="flex items-center gap-2">
-                  <Droplets className="w-4 h-4" />
-                  Humidity (%)
-                </Label>
-                <Input
-                  id="humidity"
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={weatherData.humidity}
-                  onChange={(e) =>
-                    setWeatherData({
-                      ...weatherData,
-                      humidity: parseInt(e.target.value) || 0,
-                    })
-                  }
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="windSpeed" className="flex items-center gap-2">
-                  <Wind className="w-4 h-4" />
-                  Wind (km/h)
-                </Label>
-                <Input
-                  id="windSpeed"
-                  type="number"
-                  min="0"
-                  value={weatherData.windSpeed}
-                  onChange={(e) =>
-                    setWeatherData({
-                      ...weatherData,
-                      windSpeed: parseInt(e.target.value) || 0,
-                    })
-                  }
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label
-                  htmlFor="precipitation"
-                  className="flex items-center gap-2"
-                >
-                  <CloudRain className="w-4 h-4" />
-                  Rain (mm)
-                </Label>
-                <Input
-                  id="precipitation"
-                  type="number"
-                  min="0"
-                  value={weatherData.precipitation}
-                  onChange={(e) =>
-                    setWeatherData({
-                      ...weatherData,
-                      precipitation: parseInt(e.target.value) || 0,
-                    })
-                  }
-                />
-              </div>
+            <div className="space-y-2">
+              <p className="flex items-start gap-2">
+                <CloudRain className="w-4 h-4 text-blue-500 mt-0.5 shrink-0" />
+                Wet footing increases slip risk — reduce speed and avoid sharp
+                turns on muddy ground.
+              </p>
+              <p className="flex items-start gap-2">
+                <Droplets className="w-4 h-4 text-cyan-500 mt-0.5 shrink-0" />
+                High humidity (above 80%) combined with heat stresses horses
+                quickly — shorten sessions and hydrate frequently.
+              </p>
             </div>
-
-            <div className="grid sm:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="conditions" className="flex items-center gap-2">
-                  <CloudSun className="w-4 h-4" />
-                  Conditions
-                </Label>
-                <Input
-                  id="conditions"
-                  value={weatherData.conditions}
-                  onChange={(e) =>
-                    setWeatherData({
-                      ...weatherData,
-                      conditions: e.target.value,
-                    })
-                  }
-                  placeholder="e.g., sunny, cloudy, rainy"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="uvIndex" className="flex items-center gap-2">
-                  <Sun className="w-4 h-4" />
-                  UV Index
-                </Label>
-                <Input
-                  id="uvIndex"
-                  type="number"
-                  min="0"
-                  max="11"
-                  value={weatherData.uvIndex}
-                  onChange={(e) =>
-                    setWeatherData({
-                      ...weatherData,
-                      uvIndex: parseInt(e.target.value) || 0,
-                    })
-                  }
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="visibility" className="flex items-center gap-2">
-                  <Eye className="w-4 h-4" />
-                  Visibility (km)
-                </Label>
-                <Input
-                  id="visibility"
-                  type="number"
-                  min="0"
-                  value={weatherData.visibility}
-                  onChange={(e) =>
-                    setWeatherData({
-                      ...weatherData,
-                      visibility: parseInt(e.target.value) || 0,
-                    })
-                  }
-                />
-              </div>
-            </div>
-
-            <Button
-              onClick={handleAnalyze}
-              disabled={analyzeMutation.isPending}
-              className="w-full"
-              size="lg"
-            >
-              {analyzeMutation.isPending ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Analyzing...
-                </>
-              ) : (
-                <>
-                  <RefreshCw className="w-4 h-4 mr-2" />
-                  Analyze Riding Conditions
-                </>
-              )}
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Latest Result */}
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Current Recommendation</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {analyzeMutation.data ? (
-                <div className="space-y-4">
-                  <div
-                    className={`p-4 rounded-lg border ${getRecommendationColor(analyzeMutation.data.recommendation)}`}
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      {getRecommendationIcon(
-                        analyzeMutation.data.recommendation,
-                      )}
-                      <span className="font-semibold capitalize text-lg">
-                        {analyzeMutation.data.recommendation.replace("_", " ")}
-                      </span>
-                    </div>
-                  </div>
-
-                  {analyzeMutation.data.analysis && (
-                    <div className="prose prose-sm max-w-none">
-                      <Streamdown>{analyzeMutation.data.analysis}</Streamdown>
-                    </div>
-                  )}
-                </div>
-              ) : latestWeather ? (
-                <div className="space-y-4">
-                  <div
-                    className={`p-4 rounded-lg border ${getRecommendationColor(latestWeather.ridingRecommendation || "fair")}`}
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      {getRecommendationIcon(
-                        latestWeather.ridingRecommendation || "fair",
-                      )}
-                      <span className="font-semibold capitalize text-lg">
-                        {(latestWeather.ridingRecommendation || "fair").replace(
-                          "_",
-                          " ",
-                        )}
-                      </span>
-                    </div>
-                    <p className="text-sm opacity-80">
-                      Last checked:{" "}
-                      {new Date(latestWeather.checkedAt).toLocaleString()}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <CloudSun className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-                  <p className="text-muted-foreground">
-                    Enter weather conditions and click analyze
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Recent History */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Checks</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {!weatherHistory || weatherHistory.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  No weather history yet
-                </p>
-              ) : (
-                <div className="space-y-2">
-                  {weatherHistory.map((log) => (
-                    <div
-                      key={log.id}
-                      className="flex items-center justify-between p-2 rounded-lg bg-muted/30"
-                    >
-                      <div>
-                        <p className="text-sm font-medium">{log.location}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(log.checkedAt).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <Badge
-                        variant="outline"
-                        className={`capitalize ${getRecommendationColor(log.ridingRecommendation || "fair")}`}
-                      >
-                        {(log.ridingRecommendation || "fair").replace("_", " ")}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
