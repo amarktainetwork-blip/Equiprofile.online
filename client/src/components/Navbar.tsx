@@ -11,4 +11,7 @@
  * `import Navbar from "@/components/Navbar"` and get consistent
  * navigation across the entire public-facing site.
  */
-export { MarketingNav as default, MarketingNav as Navbar } from "./MarketingNav";
+export {
+  MarketingNav as default,
+  MarketingNav as Navbar,
+} from "./MarketingNav";

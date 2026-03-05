@@ -228,10 +228,7 @@ async function main() {
               `Dashboard route — handled (${url.includes("/login") ? "redirected to login" : "serves dashboard"})`,
             );
           } else {
-            log(
-              "fail",
-              `Dashboard route — unexpected redirect to ${url}`,
-            );
+            log("fail", `Dashboard route — unexpected redirect to ${url}`);
           }
         },
       ]);
