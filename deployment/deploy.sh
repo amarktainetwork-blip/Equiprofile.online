@@ -73,6 +73,15 @@ sudo -u www-data npm ci
 # Step 5: Build application
 echo ""
 echo "[5/9] Building application..."
+
+# Backup previous dist before building (keep last 2 for rollback)
+if [ -d "dist" ]; then
+    if [ -d "dist.prev2" ]; then rm -rf dist.prev2; fi
+    if [ -d "dist.prev" ]; then mv dist.prev dist.prev2; fi
+    cp -r dist dist.prev
+    echo "Previous dist backed up to dist.prev"
+fi
+
 sudo -u www-data npm run build
 
 # Verify build output exists
@@ -201,6 +210,28 @@ if [ -n "$DOMAIN" ] && [ "$DOMAIN" != "YOUR_DOMAIN_HERE" ]; then
     fi
 fi
 
+# Rollback function — restores dist.prev and restarts the service
+rollback() {
+    echo "⚠️  ROLLING BACK to previous build..."
+    if [ -d "dist.prev" ]; then
+        rm -rf dist
+        mv dist.prev dist
+        systemctl restart equiprofile
+        echo "✓ Rollback complete"
+    else
+        echo "✗ No previous build available for rollback"
+    fi
+    exit 1
+}
+
+# Run UI smoke test if available
+if command -v node &>/dev/null && [ -f "scripts/ui-smoke-test.mjs" ]; then
+    if npx --yes playwright install chromium --with-deps >/dev/null 2>&1; then
+        echo "Running UI smoke test..."
+        BASE_URL="http://127.0.0.1:3000" node scripts/ui-smoke-test.mjs || rollback
+    fi
+fi
+
 echo ""
 echo "======================================"
 echo "Deployment Complete!"
@@ -211,4 +242,5 @@ echo "Next steps:"
 echo "  - View logs: journalctl -u equiprofile -f"
 echo "  - Check status: systemctl status equiprofile"
 echo "  - View this log: cat $LOG_FILE"
+echo "  - Rollback if needed: bash deployment/deploy.sh --rollback"
 echo ""

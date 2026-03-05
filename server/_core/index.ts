@@ -24,6 +24,7 @@ import { getStripe, validatePricingConfig } from "../stripe";
 import * as email from "./email";
 import { ENV } from "./env";
 import { resolve } from "path";
+import path from "path";
 import fs from "fs";
 
 // Module-level server reference used by the graceful-shutdown handler below.
@@ -71,43 +72,18 @@ async function startServer() {
   );
   console.log("✅ CORS configured with allowed origins:", allowedOrigins);
 
-  // CSP nonce middleware - generate unique nonce per request
-  app.use((req, res, next) => {
-    res.locals.cspNonce = nanoid();
-    next();
-  });
-
-  // Security middleware with strict CSP including nonce support.
-  // All directives are listed explicitly so the policy is self-documenting
-  // and doesn't change if Helmet updates its defaults in a future release.
-  app.use((req, res, next) => {
-    const nonce = res.locals.cspNonce;
+  // Security headers via Helmet.
+  // CSP is intentionally disabled here — it is served as a static header by
+  // Nginx (deployment/nginx/equiprofile.conf) using 'unsafe-inline' so that
+  // Vite-generated inline scripts are always permitted regardless of caching.
+  // Nonce-based CSP was removed because stale nonces in SW-cached HTML caused
+  // blank white screens after deployments.
+  app.use(
     helmet({
-      contentSecurityPolicy: {
-        directives: {
-          defaultSrc: ["'self'"],
-          // Inline scripts must carry the per-request nonce.  The nonce is
-          // injected into every inline <script> in index.html by the SPA
-          // fallback / setupVite middleware before the HTML is sent.
-          scriptSrc: ["'self'", `'nonce-${nonce}'`],
-          // script-src-attr 'none' blocks HTML attribute event handlers
-          // (onclick="…", etc.).  React/app code uses addEventListener so
-          // this is safe and intentional.
-          scriptSrcAttr: ["'none'"],
-          styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"], // Allow inline styles (Tailwind) + Google Fonts CSS
-          imgSrc: ["'self'", "data:", "https:"],
-          connectSrc: ["'self'"],
-          fontSrc: ["'self'", "data:", "https://fonts.gstatic.com"], // Allow data: for embedded fonts + Google Fonts
-          objectSrc: ["'none'"],
-          baseUri: ["'self'"],
-          formAction: ["'self'"],
-          frameAncestors: ["'self'"],
-          upgradeInsecureRequests: [],
-        },
-      },
+      contentSecurityPolicy: false,
       crossOriginEmbedderPolicy: false,
-    })(req, res, next);
-  });
+    }),
+  );
 
   // Request ID middleware for logging
   app.use((req, res, next) => {
@@ -890,7 +866,31 @@ async function startServer() {
   // REST API v1 (for third-party integrations)
   app.use("/api/v1", apiRouter);
 
-  // ── API SAFETY NET ─────────────────────────────────────────────────────────
+  // ── Local file serving ────────────────────────────────────────────────────
+  // Serves files uploaded to local disk storage (when Forge is not configured).
+  // Authentication is NOT required here because the file URLs are unguessable
+  // (nanoid-prefixed keys).  Path traversal is prevented by resolve() check.
+  app.get(/^\/api\/files\/(.+)$/, async (req, res) => {
+    const match = req.path.match(/^\/api\/files\/(.+)$/);
+    const fileKey = match?.[1];
+    if (!fileKey) {
+      return res.status(400).json({ error: "Missing file key" });
+    }
+
+    const uploadsDir = resolve(ENV.storagePath);
+    const filePath = resolve(uploadsDir, fileKey);
+
+    // Security: ensure the resolved path stays within the uploads directory
+    if (!filePath.startsWith(uploadsDir + path.sep) && filePath !== uploadsDir) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ error: "File not found" });
+    }
+
+    res.sendFile(filePath);
+  });
   // Any request that starts with /api/ and has NOT been handled by a route
   // above must return JSON, never the SPA index.html.
   // This prevents the "login returns HTML 200" bug where an unmatched API path
