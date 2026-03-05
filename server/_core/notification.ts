@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Amarktai Network. All rights reserved.
 import { TRPCError } from "@trpc/server";
 import { ENV } from "./env";
 
@@ -56,7 +57,7 @@ const validatePayload = (input: NotificationPayload): NotificationPayload => {
 };
 
 /**
- * Dispatches a project-owner notification through the Manus Notification Service.
+ * Dispatches a project-owner notification.
  * Returns `true` if the request was accepted, `false` when the upstream service
  * cannot be reached (callers can fall back to email/slack). Validation errors
  * bubble up as TRPC errors so callers can fix the payload.

@@ -1,4 +1,5 @@
-// Preconfigured storage helpers for Manus WebDev templates
+// Copyright (c) 2025-2026 Amarktai Network. All rights reserved.
+// Preconfigured storage helpers for EquiProfile
 // Uses the Biz-provided storage proxy (Authorization: Bearer <token>)
 // Falls back to local disk when Forge credentials are not configured.
 

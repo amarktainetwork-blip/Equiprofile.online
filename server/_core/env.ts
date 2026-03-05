@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Amarktai Network. All rights reserved.
 import { config } from "dotenv";
 import { existsSync } from "fs";
 import { resolve } from "path";

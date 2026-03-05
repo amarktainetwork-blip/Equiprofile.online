@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Amarktai Network. All rights reserved.
 import "dotenv/config";
 import express from "express";
 import { createServer } from "http";

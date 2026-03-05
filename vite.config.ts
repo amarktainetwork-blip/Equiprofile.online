@@ -1,9 +1,9 @@
+// Copyright (c) 2025-2026 Amarktai Network. All rights reserved.
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import fs from "node:fs";
 import path from "path";
 import { defineConfig, Plugin } from "vite";
-import { vitePluginManusRuntime } from "vite-plugin-manus-runtime";
 
 // Check if PWA is enabled via environment variable
 const PWA_ENABLED =
@@ -56,7 +56,6 @@ function injectServiceWorkerVersion(): Plugin {
 const plugins = [
   react(),
   tailwindcss(),
-  vitePluginManusRuntime(),
   injectServiceWorkerVersion(),
 ];
 
@@ -88,51 +87,15 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          // React core
-          if (
-            id.includes("node_modules/react/") ||
-            id.includes("node_modules/react-dom/") ||
-            id.includes("node_modules/react-hook-form/")
-          ) {
-            return "react-core";
-          }
-          // Routing + query
-          if (
-            id.includes("node_modules/wouter") ||
-            id.includes("node_modules/@tanstack/react-query") ||
-            id.includes("node_modules/@trpc/")
-          ) {
-            return "data-layer";
-          }
-          // Radix UI
-          if (id.includes("node_modules/@radix-ui/")) {
-            return "radix-ui";
-          }
-          // Charts — intentionally NOT assigned to a manual chunk.
-          // recharts (the only chart library imported) is only used in the
-          // lazy-loaded Analytics page, so Rollup will bundle it there
-          // naturally.  Assigning it to a separate chunk caused a circular
-          // dependency with react-core (shared CJS interop helpers) that
-          // produced an "Cannot access 'S' before initialization" TDZ crash.
-          // Animation
-          if (id.includes("node_modules/framer-motion")) {
-            return "framer-motion";
-          }
-          // i18n
-          if (
-            id.includes("node_modules/i18next") ||
-            id.includes("node_modules/react-i18next")
-          ) {
-            return "i18n";
-          }
-          // Date utilities
-          if (
-            id.includes("node_modules/date-fns") ||
-            id.includes("node_modules/react-day-picker")
-          ) {
-            return "date-utils";
-          }
-          // PDF/export (rarely used, load lazily)
+          // Only split truly heavy, infrequently-used libraries into separate
+          // chunks.  Eagerly-loaded framework packages (React, Radix, framer,
+          // i18n, tRPC, TanStack Query …) are intentionally NOT assigned here.
+          // Splitting them caused Rollup to place shared CJS-interop helpers
+          // in different chunks, creating circular dependencies that made
+          // React undefined at module-init time and crashed the app with:
+          //   "Cannot read properties of undefined (reading 'createContext')"
+          //
+          // PDF/export (rarely used, lazy-loaded)
           if (
             id.includes("node_modules/jspdf") ||
             id.includes("node_modules/html2canvas") ||
@@ -140,7 +103,7 @@ export default defineConfig({
           ) {
             return "export-utils";
           }
-          // tsParticles
+          // tsParticles (heavy, optional)
           if (
             id.includes("node_modules/@tsparticles") ||
             id.includes("node_modules/tsparticles")
@@ -154,11 +117,7 @@ export default defineConfig({
   server: {
     host: true,
     allowedHosts: [
-      ".manuspre.computer",
-      ".manus.computer",
-      ".manus-asia.computer",
-      ".manuscomputer.ai",
-      ".manusvm.computer",
+      ".equiprofile.online",
       "localhost",
       "127.0.0.1",
     ],
