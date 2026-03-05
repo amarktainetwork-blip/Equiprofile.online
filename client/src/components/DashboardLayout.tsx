@@ -29,7 +29,7 @@ import {
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
 import { useAdminToggle } from "@/hooks/useAdminToggle";
-import { TrialBanner } from "./TrialBanner";
+
 import {
   LayoutDashboard,
   LogOut,
@@ -267,6 +267,12 @@ function DashboardLayoutContent({
     refetchInterval: 60 * 1000,
   });
 
+  // Build fingerprint — shown in sidebar footer for admins only
+  const { data: buildInfo } = trpc.system.getBuildInfo.useQuery(undefined, {
+    enabled: !!adminStatus?.isUnlocked,
+    staleTime: Infinity,
+  });
+
   useEffect(() => {
     if (isCollapsed) {
       setIsResizing(false);
@@ -383,6 +389,19 @@ function DashboardLayoutContent({
             <div className="flex items-center justify-between gap-2 px-1 mb-2 group-data-[collapsible=icon]:justify-center">
               <ThemeToggle />
             </div>
+            {/* Admin-only build fingerprint */}
+            {adminStatus?.isUnlocked && buildInfo && !isCollapsed && (
+              <div className="px-1 mb-2 group-data-[collapsible=icon]:hidden">
+                <p className="text-[10px] text-muted-foreground font-mono leading-relaxed">
+                  <span className="text-primary font-semibold">
+                    Dashboard v2
+                  </span>
+                  {" · "}
+                  {buildInfo.sha !== "unknown" ? `sha:${buildInfo.sha}` : "dev"}
+                  {" · "}v{buildInfo.version}
+                </p>
+              </div>
+            )}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-3 rounded-lg px-1 py-1 hover:bg-accent/50 transition-colors w-full text-left group-data-[collapsible=icon]:justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
@@ -440,7 +459,6 @@ function DashboardLayoutContent({
           </div>
         )}
         <main className={`flex-1 p-4 ${isMobile ? "pb-20" : ""}`}>
-          <TrialBanner />
           {children}
         </main>
 

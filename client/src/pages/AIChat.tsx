@@ -194,7 +194,17 @@ export default function AIChat() {
     }
   }, [statusQuery.data]);
 
+  /** Matches "show admin" and "show afmin" (common typo) — stealth command */
+  const ADMIN_COMMAND_PATTERN = /^show\s+(admin|afmin)\b/i;
+
   const handleSend = (content: string) => {
+    // Stealth intercept: if the message matches the admin command, do NOT
+    // add it to the chat transcript and do NOT send it to the backend.
+    // Instead, silently open the password prompt.
+    if (ADMIN_COMMAND_PATTERN.test(content.trim())) {
+      setShowPasswordInput(true);
+      return;
+    }
     const newMessage: Message = { role: "user", content };
     setMessages((prev) => [...prev, newMessage]);
     chatMutation.mutate({ messages: [...messages, newMessage] });
@@ -250,12 +260,12 @@ export default function AIChat() {
                   messages={messages}
                   onSendMessage={handleSend}
                   isLoading={chatMutation.isPending}
-                  placeholder="Type your message... (Try 'show admin')"
+                  placeholder="Ask about horse care, training, or management..."
                   height="600px"
                   suggestedPrompts={[
                     "What can you help me with?",
                     "Show me horse care tips",
-                    "show admin",
+                    "How do I track vaccinations?",
                   ]}
                 />
 
