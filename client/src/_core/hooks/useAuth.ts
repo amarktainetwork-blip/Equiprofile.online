@@ -45,10 +45,7 @@ export function useAuth(options?: UseAuthOptions) {
   }, [logoutMutation, utils]);
 
   const state = useMemo(() => {
-    localStorage.setItem(
-      "equiprofile-user-info",
-      JSON.stringify(meQuery.data),
-    );
+    localStorage.setItem("equiprofile-user-info", JSON.stringify(meQuery.data));
     return {
       user: meQuery.data ?? null,
       loading: meQuery.isLoading || logoutMutation.isPending,

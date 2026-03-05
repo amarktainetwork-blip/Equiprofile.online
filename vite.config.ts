@@ -53,11 +53,7 @@ function injectServiceWorkerVersion(): Plugin {
   };
 }
 
-const plugins = [
-  react(),
-  tailwindcss(),
-  injectServiceWorkerVersion(),
-];
+const plugins = [react(), tailwindcss(), injectServiceWorkerVersion()];
 
 export default defineConfig({
   plugins,
@@ -116,11 +112,7 @@ export default defineConfig({
   },
   server: {
     host: true,
-    allowedHosts: [
-      ".equiprofile.online",
-      "localhost",
-      "127.0.0.1",
-    ],
+    allowedHosts: [".equiprofile.online", "localhost", "127.0.0.1"],
     fs: {
       strict: true,
       deny: ["**/.*"],
