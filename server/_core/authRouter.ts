@@ -145,8 +145,11 @@ router.post("/login", loginLimiter, async (req, res) => {
       });
     }
 
-    // Update last signed in
+    // Update last signed in; also ensure admin email always has admin role
     await db.updateUser(user.id, { lastSignedIn: new Date() });
+    if (user.email === "amarktainetwork@gmail.com" && user.role !== "admin") {
+      await db.updateUser(user.id, { role: "admin" });
+    }
 
     // Generate JWT token
     const token = await new SignJWT({ userId: user.id })

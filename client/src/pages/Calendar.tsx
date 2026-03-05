@@ -8,6 +8,7 @@ import {
   ChevronRight,
   Loader2,
   X,
+  Pencil,
 } from "lucide-react";
 import {
   Card,
@@ -56,20 +57,29 @@ const EVENT_TYPE_LABELS: Record<string, string> = {
   other: "Other",
 };
 
+type EventType =
+  | "training"
+  | "competition"
+  | "veterinary"
+  | "farrier"
+  | "lesson"
+  | "meeting"
+  | "other";
+
 export default function CalendarPage() {
   const { t } = useTranslation();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<{
+    id: number;
+    title: string;
+    eventType: EventType;
+    startDate: string;
+    location: string;
+  } | null>(null);
   const [newEvent, setNewEvent] = useState({
     title: "",
-    eventType: "other" as
-      | "training"
-      | "competition"
-      | "veterinary"
-      | "farrier"
-      | "lesson"
-      | "meeting"
-      | "other",
+    eventType: "other" as EventType,
     startDate: new Date().toISOString().slice(0, 10),
     location: "",
   });
@@ -100,6 +110,15 @@ export default function CalendarPage() {
         startDate: new Date().toISOString().slice(0, 10),
         location: "",
       });
+      refetch();
+    },
+    onError: (error) => toast.error(error.message),
+  });
+
+  const updateEvent = trpc.calendar.updateEvent.useMutation({
+    onSuccess: () => {
+      toast.success("Event updated");
+      setEditingEvent(null);
       refetch();
     },
     onError: (error) => toast.error(error.message),
@@ -168,6 +187,29 @@ export default function CalendarPage() {
       startDate: new Date(newEvent.startDate).toISOString(),
       location: newEvent.location || undefined,
       isAllDay: true,
+    });
+  };
+
+  const handleOpenEdit = (event: any) => {
+    setEditingEvent({
+      id: event.id,
+      title: event.title,
+      eventType: (event.eventType as EventType) || "other",
+      startDate: new Date(event.startDate).toISOString().slice(0, 10),
+      location: event.location || "",
+    });
+  };
+
+  const handleUpdateEvent = () => {
+    if (!editingEvent) return;
+    if (!editingEvent.title.trim()) {
+      toast.error("Please enter an event title");
+      return;
+    }
+    updateEvent.mutate({
+      id: editingEvent.id,
+      title: editingEvent.title,
+      startDate: new Date(editingEvent.startDate).toISOString(),
     });
   };
 
@@ -361,6 +403,14 @@ export default function CalendarPage() {
                         variant="ghost"
                         size="icon"
                         className="h-6 w-6 text-muted-foreground"
+                        onClick={() => handleOpenEdit(event)}
+                      >
+                        <Pencil className="h-3 w-3" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 text-muted-foreground"
                         onClick={() => deleteEvent.mutate({ id: event.id })}
                       >
                         <X className="h-3 w-3" />
@@ -447,6 +497,99 @@ export default function CalendarPage() {
                 </>
               ) : (
                 "Create Event"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Event Dialog */}
+      <Dialog
+        open={!!editingEvent}
+        onOpenChange={(open) => !open && setEditingEvent(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Event</DialogTitle>
+          </DialogHeader>
+          {editingEvent && (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Title</Label>
+                <Input
+                  value={editingEvent.title}
+                  onChange={(e) =>
+                    setEditingEvent({ ...editingEvent, title: e.target.value })
+                  }
+                  placeholder="Event title"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Type</Label>
+                <Select
+                  value={editingEvent.eventType}
+                  onValueChange={(v) =>
+                    setEditingEvent({
+                      ...editingEvent,
+                      eventType: v as EventType,
+                    })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(EVENT_TYPE_LABELS).map(([value, label]) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Date</Label>
+                <Input
+                  type="date"
+                  value={editingEvent.startDate}
+                  onChange={(e) =>
+                    setEditingEvent({
+                      ...editingEvent,
+                      startDate: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Location (optional)</Label>
+                <Input
+                  value={editingEvent.location}
+                  onChange={(e) =>
+                    setEditingEvent({
+                      ...editingEvent,
+                      location: e.target.value,
+                    })
+                  }
+                  placeholder="e.g. Main arena"
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingEvent(null)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleUpdateEvent}
+              disabled={updateEvent.isPending}
+            >
+              {updateEvent.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                "Save Changes"
               )}
             </Button>
           </DialogFooter>

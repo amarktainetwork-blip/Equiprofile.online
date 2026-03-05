@@ -131,6 +131,9 @@ function HorseFormContent() {
       toast.error("Photo must be under 5MB");
       return;
     }
+    // Show instant preview before upload begins
+    const objectUrl = URL.createObjectURL(file);
+    setPhotoPreview(objectUrl);
     setPhotoUploading(true);
     try {
       const reader = new FileReader();
@@ -152,21 +155,24 @@ function HorseFormContent() {
             description: "Horse profile photo",
           });
           setFormData((prev) => ({ ...prev, photoUrl: result.url }));
-          setPhotoPreview(URL.createObjectURL(file));
           toast.success("Photo uploaded");
         } catch (err: any) {
           toast.error(err.message || "Failed to upload photo");
+          // Revert preview if upload fails
+          setPhotoPreview("");
         } finally {
           setPhotoUploading(false);
         }
       };
       reader.onerror = () => {
         toast.error("Failed to read file");
+        setPhotoPreview("");
         setPhotoUploading(false);
       };
       reader.readAsDataURL(file);
     } catch (err: any) {
       toast.error(err.message || "Failed to upload photo");
+      setPhotoPreview("");
       setPhotoUploading(false);
     }
   };

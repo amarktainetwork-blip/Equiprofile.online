@@ -77,6 +77,8 @@ function AdminContent() {
     id: number;
     key: string;
   } | null>(null);
+  const [whatsappApiKey, setWhatsappApiKey] = useState("");
+  const [whatsappBusinessNumber, setWhatsappBusinessNumber] = useState("");
 
   // Check admin session status
   const statusQuery = trpc.adminUnlock.getStatus.useQuery();
@@ -125,6 +127,28 @@ function AdminContent() {
     refetchInterval: 30000, // Refresh every 30s
   });
   const leadsQuery = trpc.admin.getLeads.useQuery();
+  const siteSettingsQuery = trpc.admin.getSiteSettings.useQuery();
+  const setSiteSettingMutation = trpc.admin.setSiteSetting.useMutation({
+    onSuccess: () => {
+      toast.success("Setting saved");
+      siteSettingsQuery.refetch();
+    },
+    onError: (error) => toast.error(error.message),
+  });
+
+  // Initialise WhatsApp fields from siteSettings when loaded
+  useEffect(() => {
+    if (siteSettingsQuery.data) {
+      setWhatsappApiKey(
+        (siteSettingsQuery.data as Record<string, string>).whatsapp_api_key ||
+          "",
+      );
+      setWhatsappBusinessNumber(
+        (siteSettingsQuery.data as Record<string, string>)
+          .whatsapp_business_number || "",
+      );
+    }
+  }, [siteSettingsQuery.data]);
 
   const suspendMutation = trpc.admin.suspendUser.useMutation({
     onSuccess: () => {
@@ -441,6 +465,36 @@ function AdminContent() {
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex items-center justify-end gap-2">
+                              {/* Grant / Remove admin role */}
+                              {user.role === "admin" ? (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  title="Remove admin role"
+                                  onClick={() =>
+                                    updateRoleMutation.mutate({
+                                      userId: user.id,
+                                      role: "user",
+                                    })
+                                  }
+                                >
+                                  <Shield className="w-4 h-4 text-primary" />
+                                </Button>
+                              ) : (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  title="Grant admin role"
+                                  onClick={() =>
+                                    updateRoleMutation.mutate({
+                                      userId: user.id,
+                                      role: "admin",
+                                    })
+                                  }
+                                >
+                                  <Shield className="w-4 h-4 text-muted-foreground" />
+                                </Button>
+                              )}
                               {user.isSuspended ? (
                                 <Button
                                   variant="ghost"
@@ -989,14 +1043,71 @@ function AdminContent() {
             <CardHeader>
               <CardTitle>WhatsApp Business Configuration</CardTitle>
               <CardDescription>
-                Configure WhatsApp Business API for event reminders. Set
-                ENABLE_WHATSAPP=true and add credentials to your environment.
+                Configure WhatsApp API key and business number for event
+                reminders (24h and 1h before events).
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
+              {/* Configurable fields stored in siteSettings */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-sm">API Configuration</h3>
+                <div className="space-y-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="wa-api-key">WhatsApp API Key</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="wa-api-key"
+                        type="password"
+                        value={whatsappApiKey}
+                        onChange={(e) => setWhatsappApiKey(e.target.value)}
+                        placeholder="Meta access token (permanent)"
+                        className="flex-1"
+                      />
+                      <Button
+                        variant="outline"
+                        disabled={setSiteSettingMutation.isPending}
+                        onClick={() =>
+                          setSiteSettingMutation.mutate({
+                            key: "whatsapp_api_key",
+                            value: whatsappApiKey,
+                          })
+                        }
+                      >
+                        Save
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="wa-number">WhatsApp Business Number</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="wa-number"
+                        value={whatsappBusinessNumber}
+                        onChange={(e) =>
+                          setWhatsappBusinessNumber(e.target.value)
+                        }
+                        placeholder="Meta phone number ID"
+                        className="flex-1"
+                      />
+                      <Button
+                        variant="outline"
+                        disabled={setSiteSettingMutation.isPending}
+                        onClick={() =>
+                          setSiteSettingMutation.mutate({
+                            key: "whatsapp_business_number",
+                            value: whatsappBusinessNumber,
+                          })
+                        }
+                      >
+                        Save
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
               <div className="rounded-lg border p-4 space-y-3">
                 <h3 className="font-semibold text-sm">
-                  Environment Variables Required
+                  Environment Variables (server-side)
                 </h3>
                 <div className="space-y-2 font-mono text-sm">
                   {[
