@@ -21,7 +21,7 @@ import Stripe from "stripe";
 import * as db from "../db";
 import { getDb } from "../db";
 import { contactSubmissions } from "../../drizzle/schema";
-import { getStripe, validatePricingConfig } from "../stripe";
+import { getStripe, validatePricingConfig, PRICING_PLANS } from "../stripe";
 import * as email from "./email";
 import { ENV } from "./env";
 import { resolve } from "path";
@@ -205,6 +205,14 @@ async function startServer() {
                   ? "yearly"
                   : "monthly";
 
+              // Determine plan tier (pro vs stable) by matching price ID
+              const priceId = subscription.items.data[0]?.price.id || "";
+              const stablePriceIds = [
+                PRICING_PLANS.stable.monthly.priceId,
+                PRICING_PLANS.stable.yearly.priceId,
+              ].filter(Boolean);
+              const planTier = stablePriceIds.includes(priceId) ? "stable" : "pro";
+
               await db.updateUser(userId, {
                 stripeCustomerId: session.customer as string,
                 stripeSubscriptionId: session.subscription as string,
@@ -213,11 +221,18 @@ async function startServer() {
                 lastPaymentAt: new Date(),
               });
 
-              // Send payment success email
-              const user = await db.getUserById(userId);
-              if (user) {
+              // Store plan tier in user preferences
+              const userForPrefs = await db.getUserById(userId);
+              if (userForPrefs) {
+                const existingPrefs = userForPrefs.preferences
+                  ? JSON.parse(userForPrefs.preferences)
+                  : {};
+                await db.updateUser(userId, {
+                  preferences: JSON.stringify({ ...existingPrefs, planTier }),
+                });
+
                 email
-                  .sendPaymentSuccessEmail(user, plan)
+                  .sendPaymentSuccessEmail(userForPrefs, plan)
                   .catch((err) =>
                     console.error(
                       "[Stripe Webhook] Failed to send payment email:",
@@ -227,7 +242,7 @@ async function startServer() {
               }
 
               console.log(
-                `[Stripe Webhook] User ${userId} subscription activated`,
+                `[Stripe Webhook] User ${userId} subscription activated (tier: ${planTier})`,
               );
             }
             break;

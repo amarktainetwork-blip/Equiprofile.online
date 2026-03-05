@@ -32,6 +32,7 @@ import {
 import { eq, and, desc, sql, gte, lte, or, inArray } from "drizzle-orm";
 import { getDb } from "./db";
 import { ENV } from "./_core/env";
+import { isWhatsAppEnabled } from "./_core/whatsapp";
 import {
   stables,
   stableMembers,
@@ -582,9 +583,14 @@ export const appRouter = router({
       const user = await db.getUserById(ctx.user.id);
       if (!user) return null;
 
+      // Determine plan tier from preferences (set at checkout)
+      const prefs = user.preferences ? JSON.parse(user.preferences) : {};
+      const planTier: "pro" | "stable" = prefs.planTier || "pro";
+
       return {
         status: user.subscriptionStatus,
         plan: user.subscriptionPlan,
+        planTier,
         trialEndsAt: user.trialEndsAt,
         subscriptionEndsAt: user.subscriptionEndsAt,
         lastPaymentAt: user.lastPaymentAt,
@@ -3125,14 +3131,35 @@ Format your response as JSON with keys: recommendation, explanation, precautions
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
 
+        const startDate = new Date(input.startDate);
         const result = await db.insert(events).values({
           ...input,
           userId: ctx.user!.id,
-          startDate: new Date(input.startDate),
+          startDate,
           endDate: input.endDate ? new Date(input.endDate) : null,
         });
 
-        return { id: result[0].insertId };
+        const eventId = result[0].insertId;
+
+        // Schedule automatic reminders (24h and 1h before event) using the db module
+        // Fire-and-forget — don't block the response
+        import("./db").then((dbModule) => {
+          dbModule
+            .createEventReminders(eventId, ctx.user!.id, startDate)
+            .catch((err: unknown) =>
+              console.error("[Calendar] Failed to create reminders:", err),
+            );
+        });
+
+        // Log WhatsApp availability for reminders
+        const waConfig = isWhatsAppEnabled();
+        if (waConfig.enabled) {
+          console.log(
+            `[Calendar] WhatsApp enabled — reminders queued for event ${eventId}`,
+          );
+        }
+
+        return { id: eventId };
       }),
 
     updateEvent: subscribedProcedure

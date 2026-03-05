@@ -97,6 +97,13 @@ const menuItems = [
   { icon: Settings, label: "Settings", path: "/settings" },
 ];
 
+// Extra menu items for Stable plan subscribers
+const stableMenuItems = [
+  { icon: Home, label: "Stable", path: "/stable" },
+  { icon: Users, label: "Staff", path: "/contacts" },
+  { icon: Users, label: "Owners", path: "/contacts" },
+];
+
 const adminMenuItems = [
   { icon: Shield, label: "Admin Panel", path: "/admin" },
   { icon: Shield, label: "QA Checklist", path: "/qa-check" },
@@ -273,6 +280,13 @@ function DashboardLayoutContent({
     refetchInterval: 60 * 1000,
   });
 
+  // Check subscription tier for stable plan features
+  const { data: subscriptionStatus } = trpc.user.getSubscriptionStatus.useQuery(
+    undefined,
+    { staleTime: 5 * 60 * 1000 },
+  );
+  const isStablePlan = subscriptionStatus?.planTier === "stable";
+
   // Build fingerprint — shown in sidebar footer for admins only
   const { data: buildInfo } = trpc.system.getBuildInfo.useQuery(undefined, {
     enabled: !!adminStatus?.isUnlocked,
@@ -372,6 +386,37 @@ function DashboardLayoutContent({
                     const isActive = location === item.path;
                     return (
                       <SidebarMenuItem key={item.path}>
+                        <SidebarMenuButton
+                          isActive={isActive}
+                          onClick={() => setLocation(item.path)}
+                          tooltip={item.label}
+                          className="h-10 transition-all font-normal"
+                        >
+                          <item.icon
+                            className={`h-4 w-4 ${isActive ? "text-primary" : ""}`}
+                          />
+                          <span>{item.label}</span>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    );
+                  })}
+                </>
+              )}
+              {/* Stable plan menu items */}
+              {isStablePlan && (
+                <>
+                  <div className="my-2 px-2">
+                    <div className="h-px bg-border" />
+                    {!isCollapsed && (
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider mt-2 px-2 font-semibold">
+                        Stable
+                      </p>
+                    )}
+                  </div>
+                  {stableMenuItems.map((item) => {
+                    const isActive = location === item.path;
+                    return (
+                      <SidebarMenuItem key={`stable-${item.label}`}>
                         <SidebarMenuButton
                           isActive={isActive}
                           onClick={() => setLocation(item.path)}
@@ -518,7 +563,7 @@ function DashboardLayoutContent({
                 >
                   <SheetHeader className="pb-2">
                     <SheetTitle className="font-serif text-left">
-                      All Modules
+                      Modules
                     </SheetTitle>
                   </SheetHeader>
                   <div className="space-y-4 pb-6">

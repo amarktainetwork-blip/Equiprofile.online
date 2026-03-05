@@ -2357,3 +2357,32 @@ export async function getEventById(eventId: number) {
   const results = await db.select().from(events).where(eq(events.id, eventId));
   return results[0] || null;
 }
+
+export async function createEventReminders(
+  eventId: number,
+  userId: number,
+  eventStartDate: Date,
+): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+
+  // Schedule reminders for 24h before and 1h before the event
+  const reminderOffsets = [
+    24 * 60 * 60 * 1000, // 24 hours
+    60 * 60 * 1000,      // 1 hour
+  ];
+
+  for (const offset of reminderOffsets) {
+    const reminderTime = new Date(eventStartDate.getTime() - offset);
+    // Only create reminder if it's in the future
+    if (reminderTime > new Date()) {
+      await db.insert(eventReminders).values({
+        eventId,
+        userId,
+        reminderTime,
+        reminderType: "email",
+        isSent: false,
+      });
+    }
+  }
+}

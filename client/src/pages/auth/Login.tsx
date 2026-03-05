@@ -15,7 +15,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { PageTransition } from "@/components/PageTransition";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AuthSplitLayout } from "@/components/AuthSplitLayout";
-import { MarketingNav } from "@/components/MarketingNav";
+import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -89,7 +89,7 @@ export default function Login() {
 
   return (
     <>
-      <MarketingNav alwaysDark />
+      <Navbar alwaysDark />
       <PageTransition>
         <AuthSplitLayout>
           <motion.div

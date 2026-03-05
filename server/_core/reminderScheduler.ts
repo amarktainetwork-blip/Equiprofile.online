@@ -1,9 +1,15 @@
 import cron from "node-cron";
 import * as db from "../db";
+import {
+  isWhatsAppEnabled,
+  sendWhatsAppMessage,
+  formatDateForWhatsApp,
+  userHasWhatsAppEnabled,
+} from "./whatsapp";
 
 /**
  * Reminder Scheduler
- * Checks for due reminders every hour and sends notifications
+ * Checks for due reminders every hour and sends email + WhatsApp notifications
  */
 
 let isRunning = false;
@@ -58,6 +64,28 @@ export function startReminderScheduler() {
             new Date(event.startDate),
             undefined, // horse name if applicable
           );
+
+          // Send WhatsApp reminder if user has it enabled
+          const waConfig = isWhatsAppEnabled();
+          if (waConfig.enabled && userHasWhatsAppEnabled(user.preferences || null)) {
+            const phone = user.phone;
+            if (phone) {
+              const hoursUntil = Math.round(
+                (new Date(event.startDate).getTime() - now.getTime()) / (1000 * 60 * 60),
+              );
+              const timeLabel = hoursUntil <= 1 ? "1 hour" : `${hoursUntil} hours`;
+              await sendWhatsAppMessage({
+                to: phone,
+                template: "event_reminder",
+                parameters: [
+                  user.name || "there",
+                  event.title,
+                  formatDateForWhatsApp(new Date(event.startDate)),
+                  timeLabel,
+                ],
+              });
+            }
+          }
 
           // Mark reminder as sent
           await db.markEventReminderSent(reminder.id);
