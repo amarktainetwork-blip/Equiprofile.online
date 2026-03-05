@@ -12,7 +12,7 @@ import { Link, useLocation } from "wouter";
 import { useState, FormEvent, useEffect } from "react";
 import { Loader2, CheckCircle, AlertCircle } from "lucide-react";
 import { PageTransition } from "@/components/PageTransition";
-import { MarketingNav } from "@/components/MarketingNav";
+import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
@@ -80,7 +80,7 @@ export default function ResetPassword() {
 
   return (
     <>
-      <MarketingNav alwaysDark />
+      <Navbar alwaysDark />
       <PageTransition>
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 px-4 pt-20">
           <div className="w-full max-w-md">

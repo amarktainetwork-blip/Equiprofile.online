@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MarketingNav } from "@/components/MarketingNav";
+import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { PageTransition } from "@/components/PageTransition";
 import { ScrollReveal, Stagger, StaggerItem } from "@/components/ScrollReveal";
@@ -118,7 +118,7 @@ export default function Home() {
 
   return (
     <>
-      <MarketingNav />
+      <Navbar />
       <PageTransition>
         <div className="min-h-screen overflow-hidden bg-black">
           {/* Hero Section with Video Background */}
