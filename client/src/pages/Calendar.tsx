@@ -57,26 +57,21 @@ const EVENT_TYPE_LABELS: Record<string, string> = {
   other: "Other",
 };
 
-type EventType =
-  | "training"
-  | "competition"
-  | "veterinary"
-  | "farrier"
-  | "lesson"
-  | "meeting"
-  | "other";
+type EventType = keyof typeof EVENT_TYPE_LABELS;
+
+interface EditEventState {
+  id: number;
+  title: string;
+  eventType: EventType;
+  startDate: string;
+  location: string;
+}
 
 export default function CalendarPage() {
   const { t } = useTranslation();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [editingEvent, setEditingEvent] = useState<{
-    id: number;
-    title: string;
-    eventType: EventType;
-    startDate: string;
-    location: string;
-  } | null>(null);
+  const [editEvent, setEditEvent] = useState<EditEventState | null>(null);
   const [newEvent, setNewEvent] = useState({
     title: "",
     eventType: "other" as EventType,
@@ -115,15 +110,6 @@ export default function CalendarPage() {
     onError: (error) => toast.error(error.message),
   });
 
-  const updateEvent = trpc.calendar.updateEvent.useMutation({
-    onSuccess: () => {
-      toast.success("Event updated");
-      setEditingEvent(null);
-      refetch();
-    },
-    onError: (error) => toast.error(error.message),
-  });
-
   const deleteEvent = trpc.calendar.deleteEvent.useMutation({
     onSuccess: () => {
       toast.success("Event deleted");
@@ -131,6 +117,38 @@ export default function CalendarPage() {
     },
     onError: (error) => toast.error(error.message),
   });
+
+  const updateEvent = trpc.calendar.updateEvent.useMutation({
+    onSuccess: () => {
+      toast.success("Event updated");
+      setEditEvent(null);
+      refetch();
+    },
+    onError: (error) => toast.error(error.message),
+  });
+
+  const handleEditClick = (event: any) => {
+    setEditEvent({
+      id: event.id,
+      title: event.title,
+      eventType: (event.eventType as EventType) || "other",
+      startDate: new Date(event.startDate).toISOString().slice(0, 10),
+      location: event.location || "",
+    });
+  };
+
+  const handleUpdateEvent = () => {
+    if (!editEvent || !editEvent.title.trim()) {
+      toast.error("Please enter an event title");
+      return;
+    }
+    updateEvent.mutate({
+      id: editEvent.id,
+      title: editEvent.title,
+      startDate: new Date(editEvent.startDate).toISOString(),
+      location: editEvent.location || undefined,
+    });
+  };
 
   const monthNames = [
     "January",
@@ -183,33 +201,17 @@ export default function CalendarPage() {
     }
     createEvent.mutate({
       title: newEvent.title,
-      eventType: newEvent.eventType,
+      eventType: newEvent.eventType as
+        | "training"
+        | "competition"
+        | "veterinary"
+        | "farrier"
+        | "lesson"
+        | "meeting"
+        | "other",
       startDate: new Date(newEvent.startDate).toISOString(),
       location: newEvent.location || undefined,
       isAllDay: true,
-    });
-  };
-
-  const handleOpenEdit = (event: any) => {
-    setEditingEvent({
-      id: event.id,
-      title: event.title,
-      eventType: (event.eventType as EventType) || "other",
-      startDate: new Date(event.startDate).toISOString().slice(0, 10),
-      location: event.location || "",
-    });
-  };
-
-  const handleUpdateEvent = () => {
-    if (!editingEvent) return;
-    if (!editingEvent.title.trim()) {
-      toast.error("Please enter an event title");
-      return;
-    }
-    updateEvent.mutate({
-      id: editingEvent.id,
-      title: editingEvent.title,
-      startDate: new Date(editingEvent.startDate).toISOString(),
     });
   };
 
@@ -403,7 +405,7 @@ export default function CalendarPage() {
                         variant="ghost"
                         size="icon"
                         className="h-6 w-6 text-muted-foreground"
-                        onClick={() => handleOpenEdit(event)}
+                        onClick={() => handleEditClick(event)}
                       >
                         <Pencil className="h-3 w-3" />
                       </Button>
@@ -505,70 +507,41 @@ export default function CalendarPage() {
 
       {/* Edit Event Dialog */}
       <Dialog
-        open={!!editingEvent}
-        onOpenChange={(open) => !open && setEditingEvent(null)}
+        open={!!editEvent}
+        onOpenChange={(open) => !open && setEditEvent(null)}
       >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Event</DialogTitle>
           </DialogHeader>
-          {editingEvent && (
+          {editEvent && (
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label>Title</Label>
                 <Input
-                  value={editingEvent.title}
+                  value={editEvent.title}
                   onChange={(e) =>
-                    setEditingEvent({ ...editingEvent, title: e.target.value })
+                    setEditEvent({ ...editEvent, title: e.target.value })
                   }
                   placeholder="Event title"
                 />
               </div>
               <div className="space-y-2">
-                <Label>Type</Label>
-                <Select
-                  value={editingEvent.eventType}
-                  onValueChange={(v) =>
-                    setEditingEvent({
-                      ...editingEvent,
-                      eventType: v as EventType,
-                    })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(EVENT_TYPE_LABELS).map(([value, label]) => (
-                      <SelectItem key={value} value={value}>
-                        {label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
                 <Label>Date</Label>
                 <Input
                   type="date"
-                  value={editingEvent.startDate}
+                  value={editEvent.startDate}
                   onChange={(e) =>
-                    setEditingEvent({
-                      ...editingEvent,
-                      startDate: e.target.value,
-                    })
+                    setEditEvent({ ...editEvent, startDate: e.target.value })
                   }
                 />
               </div>
               <div className="space-y-2">
                 <Label>Location (optional)</Label>
                 <Input
-                  value={editingEvent.location}
+                  value={editEvent.location}
                   onChange={(e) =>
-                    setEditingEvent({
-                      ...editingEvent,
-                      location: e.target.value,
-                    })
+                    setEditEvent({ ...editEvent, location: e.target.value })
                   }
                   placeholder="e.g. Main arena"
                 />
@@ -576,7 +549,7 @@ export default function CalendarPage() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditingEvent(null)}>
+            <Button variant="outline" onClick={() => setEditEvent(null)}>
               Cancel
             </Button>
             <Button

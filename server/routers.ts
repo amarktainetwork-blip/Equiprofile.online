@@ -3167,6 +3167,7 @@ Format your response as JSON with keys: recommendation, explanation, precautions
           description: z.string().max(10000).optional(),
           startDate: z.string().optional(),
           endDate: z.string().optional(),
+          location: z.string().max(500).optional(),
           isCompleted: z.boolean().optional(),
         }),
       )

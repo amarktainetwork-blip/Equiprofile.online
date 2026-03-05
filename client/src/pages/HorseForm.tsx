@@ -54,6 +54,7 @@ function HorseFormContent() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [photoPreview, setPhotoPreview] = useState<string>("");
   const [photoUploading, setPhotoUploading] = useState(false);
+  const objectUrlRef = useRef<string | null>(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -123,6 +124,15 @@ function HorseFormContent() {
     }
   }, [horse]);
 
+  // Cleanup object URL on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+      }
+    };
+  }, []);
+
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -131,8 +141,13 @@ function HorseFormContent() {
       toast.error("Photo must be under 5MB");
       return;
     }
-    // Show instant preview before upload begins
+    // Show instant preview before upload completes
+    // Revoke any previous object URL to prevent memory leaks
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(objectUrlRef.current);
+    }
     const objectUrl = URL.createObjectURL(file);
+    objectUrlRef.current = objectUrl;
     setPhotoPreview(objectUrl);
     setPhotoUploading(true);
     try {
@@ -158,21 +173,21 @@ function HorseFormContent() {
           toast.success("Photo uploaded");
         } catch (err: any) {
           toast.error(err.message || "Failed to upload photo");
-          // Revert preview if upload fails
-          setPhotoPreview("");
+          // Revert preview on error
+          setPhotoPreview(formData.photoUrl || "");
         } finally {
           setPhotoUploading(false);
         }
       };
       reader.onerror = () => {
         toast.error("Failed to read file");
-        setPhotoPreview("");
+        setPhotoPreview(formData.photoUrl || "");
         setPhotoUploading(false);
       };
       reader.readAsDataURL(file);
     } catch (err: any) {
       toast.error(err.message || "Failed to upload photo");
-      setPhotoPreview("");
+      setPhotoPreview(formData.photoUrl || "");
       setPhotoUploading(false);
     }
   };

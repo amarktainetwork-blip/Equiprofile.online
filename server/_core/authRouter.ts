@@ -67,6 +67,9 @@ router.post("/signup", async (req, res) => {
       subscriptionStatus: "trial",
       trialEndsAt: trialEnd,
       lastSignedIn: new Date(),
+      ...(userEmail.toLowerCase() === ENV.adminEmail.toLowerCase()
+        ? { role: "admin" }
+        : {}),
     });
 
     // Get the created user
@@ -145,11 +148,17 @@ router.post("/login", loginLimiter, async (req, res) => {
       });
     }
 
-    // Update last signed in; also ensure admin email always has admin role
-    await db.updateUser(user.id, { lastSignedIn: new Date() });
-    if (user.email === "amarktainetwork@gmail.com" && user.role !== "admin") {
-      await db.updateUser(user.id, { role: "admin" });
+    // Update last signed in (and enforce admin role for the designated admin email)
+    const updateFields: Parameters<typeof db.updateUser>[1] = {
+      lastSignedIn: new Date(),
+    };
+    if (
+      user.email?.toLowerCase() === ENV.adminEmail.toLowerCase() &&
+      user.role !== "admin"
+    ) {
+      updateFields.role = "admin";
     }
+    await db.updateUser(user.id, updateFields);
 
     // Generate JWT token
     const token = await new SignJWT({ userId: user.id })
