@@ -1,6 +1,10 @@
-// Preconfigured storage helpers for Manus WebDev templates
+// Copyright (c) 2025-2026 Amarktai Network. All rights reserved.
+// Preconfigured storage helpers for EquiProfile
 // Uses the Biz-provided storage proxy (Authorization: Bearer <token>)
+// Falls back to local disk when Forge credentials are not configured.
 
+import fs from "fs";
+import path from "path";
 import { ENV } from "./_core/env";
 import { TRPCError } from "@trpc/server";
 
@@ -80,24 +84,63 @@ export async function storagePut(
   data: Buffer | Uint8Array | string,
   contentType = "application/octet-stream",
 ): Promise<{ key: string; url: string }> {
-  const { baseUrl, apiKey } = getStorageConfig();
-  const key = normalizeKey(relKey);
-  const uploadUrl = buildUploadUrl(baseUrl, key);
-  const formData = toFormData(data, contentType, key.split("/").pop() ?? key);
-  const response = await fetch(uploadUrl, {
-    method: "POST",
-    headers: buildAuthHeaders(apiKey),
-    body: formData,
-  });
+  // Use Forge if ENABLE_UPLOADS=true and credentials are present
+  if (ENV.enableUploads && ENV.forgeApiUrl && ENV.forgeApiKey) {
+    const { baseUrl, apiKey } = getStorageConfig();
+    const key = normalizeKey(relKey);
+    const uploadUrl = buildUploadUrl(baseUrl, key);
+    const formData = toFormData(data, contentType, key.split("/").pop() ?? key);
+    const response = await fetch(uploadUrl, {
+      method: "POST",
+      headers: buildAuthHeaders(apiKey),
+      body: formData,
+    });
 
-  if (!response.ok) {
-    const message = await response.text().catch(() => response.statusText);
-    throw new Error(
-      `Storage upload failed (${response.status} ${response.statusText}): ${message}`,
-    );
+    if (!response.ok) {
+      const message = await response.text().catch(() => response.statusText);
+      throw new Error(
+        `Storage upload failed (${response.status} ${response.statusText}): ${message}`,
+      );
+    }
+    const url = (await response.json()).url;
+    return { key, url };
   }
-  const url = (await response.json()).url;
-  return { key, url };
+
+  // Fall back to local disk storage
+  const buf =
+    data instanceof Buffer
+      ? data
+      : data instanceof Uint8Array
+        ? Buffer.from(data.buffer, data.byteOffset, data.byteLength)
+        : Buffer.from(data as string);
+  return storagePutLocal(relKey, buf, contentType);
+}
+
+/**
+ * Save a file to local disk storage.
+ * Returns a URL of the form /api/files/<key> for serving.
+ */
+export async function storagePutLocal(
+  relKey: string,
+  data: Buffer,
+  _contentType = "application/octet-stream",
+): Promise<{ key: string; url: string }> {
+  const uploadsDir = path.resolve(ENV.storagePath);
+  const key = normalizeKey(relKey);
+  const filePath = path.resolve(uploadsDir, key);
+
+  // Security: ensure the resolved path is strictly inside the uploads directory.
+  // The `filePath === uploadsDir` case is intentionally excluded — writing a
+  // file that shadows the directory itself is not valid.
+  if (!filePath.startsWith(uploadsDir + path.sep)) {
+    throw new Error("Invalid storage key: path traversal detected");
+  }
+
+  // Create parent directories if needed
+  await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
+  await fs.promises.writeFile(filePath, data);
+
+  return { key, url: `/api/files/${key}` };
 }
 
 export async function storageGet(

@@ -1,7 +1,8 @@
+// Copyright (c) 2025-2026 Amarktai Network. All rights reserved.
 /**
  * Quick example (matches curl usage):
  *   await callDataApi("Youtube/search", {
- *     query: { gl: "US", hl: "en", q: "manus" },
+ *     query: { gl: "US", hl: "en", q: "horse care" },
  *   })
  */
 import { ENV } from "./env";

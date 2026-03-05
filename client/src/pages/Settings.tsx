@@ -12,10 +12,10 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PageTransition } from "@/components/PageTransition";
 import DashboardLayout from "@/components/DashboardLayout";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { Bell, Lock, User, Moon, MapPin, Loader2, Info } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -168,6 +168,25 @@ export default function Settings() {
     );
   };
 
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Avatar image must be under 2MB");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const dataUrl = ev.target?.result as string;
+      setAvatarPreview(dataUrl);
+      updateProfile.mutate({ avatarData: dataUrl });
+    };
+    reader.readAsDataURL(file);
+  };
+
   const isProfileLoading = updateProfile.isPending;
 
   return (
@@ -226,12 +245,31 @@ export default function Settings() {
                   <form onSubmit={handleProfileSave} className="space-y-6">
                     <div className="flex items-center gap-6">
                       <Avatar className="w-20 h-20">
+                        <AvatarImage
+                          src={
+                            avatarPreview ?? user?.profileImageUrl ?? undefined
+                          }
+                          alt={user?.name ?? "Avatar"}
+                        />
                         <AvatarFallback className="text-2xl">
                           {user?.name?.charAt(0).toUpperCase() || "U"}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <Button variant="outline" size="sm" type="button">
+                        <input
+                          ref={avatarInputRef}
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp,image/gif"
+                          className="hidden"
+                          onChange={handleAvatarChange}
+                        />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          type="button"
+                          onClick={() => avatarInputRef.current?.click()}
+                          disabled={isProfileLoading}
+                        >
                           Change Photo
                         </Button>
                         <p className="text-xs text-muted-foreground mt-2">

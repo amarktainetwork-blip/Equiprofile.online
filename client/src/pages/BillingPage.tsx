@@ -39,6 +39,7 @@ export default function BillingPage() {
     "monthly",
   );
 
+  const { data: featureFlags } = trpc.system.getFeatureFlags.useQuery();
   const { data: pricing } = trpc.billing.getPricing.useQuery();
   const { data: subscriptionStatus } = trpc.billing.getStatus.useQuery();
 
@@ -173,6 +174,16 @@ export default function BillingPage() {
               Manage your subscription and billing information
             </p>
           </div>
+
+          {/* Stripe disabled state */}
+          {featureFlags && !featureFlags.enableStripe && (
+            <Alert className="mb-8">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                Billing is not configured. Contact your administrator.
+              </AlertDescription>
+            </Alert>
+          )}
 
           {/* Current Status Card */}
           <Card className="mb-8">

@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Amarktai Network. All rights reserved.
 import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import type { Express, Request, Response } from "express";
 import * as db from "../db";

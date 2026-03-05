@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Amarktai Network. All rights reserved.
 import { config } from "dotenv";
 import { existsSync } from "fs";
 import { resolve } from "path";
@@ -218,6 +219,13 @@ export const ENV = {
   isProduction: process.env.NODE_ENV === "production",
   forgeApiUrl: process.env.BUILT_IN_FORGE_API_URL ?? "",
   forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
+
+  // Local file storage path (used when ENABLE_UPLOADS=false or Forge is not configured)
+  storagePath:
+    process.env.STORAGE_PATH ??
+    (process.env.NODE_ENV === "production"
+      ? "/var/www/equiprofile/uploads"
+      : "./uploads"),
 
   // Admin unlock (no default - must be set via env var)
   adminUnlockPassword: process.env.ADMIN_UNLOCK_PASSWORD ?? "",

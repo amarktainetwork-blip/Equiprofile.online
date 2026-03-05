@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Amarktai Network. All rights reserved.
 import { eq, and, desc, sql, gte, lte, isNull, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import type { ResultSetHeader } from "mysql2";

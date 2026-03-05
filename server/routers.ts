@@ -1,3 +1,4 @@
+// Copyright (c) 2025-2026 Amarktai Network. All rights reserved.
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
@@ -54,6 +55,32 @@ import {
   siteSettings,
   chatLeads,
 } from "../drizzle/schema";
+
+// Allowed MIME types for document and avatar uploads
+const ALLOWED_UPLOAD_MIME_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+  "image/svg+xml",
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "text/plain",
+  "text/csv",
+] as const;
+
+const ALLOWED_AVATAR_MIME_PREFIXES = [
+  "data:image/jpeg;base64,",
+  "data:image/png;base64,",
+  "data:image/webp;base64,",
+  "data:image/gif;base64,",
+] as const;
+
+/** Maximum avatar file size in bytes (2 MB) */
+const MAX_AVATAR_SIZE_BYTES = 2 * 1024 * 1024;
 
 // Subscription check middleware
 const subscribedProcedure = protectedProcedure.use(async ({ ctx, next }) => {
@@ -469,16 +496,45 @@ export const appRouter = router({
           phone: z.string().max(50).optional(),
           location: z.string().max(500).optional(),
           profileImageUrl: z.string().max(2000).optional(),
+          avatarData: z.string().optional(), // base64-encoded image for upload
         }),
       )
       .mutation(async ({ ctx, input }) => {
-        await db.updateUser(ctx.user.id, input);
+        const { avatarData, ...profileFields } = input;
+
+        // If base64 avatar data provided, upload it and store the URL
+        if (avatarData) {
+          const prefix = ALLOWED_AVATAR_MIME_PREFIXES.find((p) =>
+            avatarData.startsWith(p),
+          );
+          if (!prefix) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Avatar must be a JPEG, PNG, WebP or GIF image",
+            });
+          }
+          const mimeType = prefix.split(";")[0].replace("data:", "");
+          const base64Data = avatarData.slice(prefix.length);
+          const buffer = Buffer.from(base64Data, "base64");
+          if (buffer.length > MAX_AVATAR_SIZE_BYTES) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Avatar image must be under 2MB",
+            });
+          }
+          const ext = mimeType.split("/")[1];
+          const fileKey = `${ctx.user.id}/avatars/${nanoid()}.${ext}`;
+          const { url } = await storagePut(fileKey, buffer, mimeType);
+          profileFields.profileImageUrl = url;
+        }
+
+        await db.updateUser(ctx.user.id, profileFields);
         await db.logActivity({
           userId: ctx.user!.id,
           action: "profile_updated",
           entityType: "user",
           entityId: ctx.user.id,
-          details: JSON.stringify(input),
+          details: JSON.stringify(profileFields),
         });
         return { success: true };
       }),
@@ -1748,17 +1804,29 @@ export const appRouter = router({
         }),
       )
       .mutation(async ({ ctx, input }) => {
-        // Check if uploads are enabled
-        if (!ENV.enableUploads) {
+        // Validate MIME type — allow images, PDFs, common document types only
+        if (!ALLOWED_UPLOAD_MIME_TYPES.includes(input.fileType as any)) {
           throw new TRPCError({
-            code: "PRECONDITION_FAILED",
-            message: "Uploads are disabled",
+            code: "BAD_REQUEST",
+            message: `File type not allowed: ${input.fileType}`,
           });
         }
 
-        // Decode base64 and upload to S3
+        // Enforce 10MB limit
+        const MAX_FILE_SIZE = 10 * 1024 * 1024;
+        if (input.fileSize > MAX_FILE_SIZE) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "File size exceeds 10MB limit",
+          });
+        }
+
+        // Sanitize filename — strip path separators
+        const safeFileName = input.fileName.replace(/[/\\]/g, "_");
+
+        // Decode base64 and upload (Forge if enabled, otherwise local disk)
         const buffer = Buffer.from(input.fileData, "base64");
-        const fileKey = `${ctx.user.id}/documents/${nanoid()}-${input.fileName}`;
+        const fileKey = `${ctx.user.id}/documents/${nanoid()}-${safeFileName}`;
         const { url } = await storagePut(fileKey, buffer, input.fileType);
 
         const id = await db.createDocument({
