@@ -26,7 +26,9 @@ export default function Settings() {
   const { theme, toggleTheme } = useTheme();
   const [isCapturingLocation, setIsCapturingLocation] = useState(false);
 
-  const adminStatus = trpc.adminUnlock.getStatus.useQuery(undefined, { staleTime: 60_000 });
+  const adminStatus = trpc.adminUnlock.getStatus.useQuery(undefined, {
+    staleTime: 60_000,
+  });
   const buildInfo = trpc.system.getBuildInfo.useQuery(undefined, {
     enabled: !!adminStatus.data?.isUnlocked,
     staleTime: Infinity,
@@ -538,26 +540,46 @@ export default function Settings() {
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Version</p>
-                        <p className="font-mono text-sm">{buildInfo.data?.version ?? "—"}</p>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
+                          Version
+                        </p>
+                        <p className="font-mono text-sm">
+                          {buildInfo.data?.version ?? "—"}
+                        </p>
                       </div>
                       <div>
-                        <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Build SHA</p>
-                        <p className="font-mono text-sm">{buildInfo.data?.sha ?? "—"}</p>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
+                          Build SHA
+                        </p>
+                        <p className="font-mono text-sm">
+                          {buildInfo.data?.sha ?? "—"}
+                        </p>
                       </div>
                       <div>
-                        <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Build Time</p>
-                        <p className="font-mono text-sm">{buildInfo.data?.buildTime ?? "—"}</p>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
+                          Build Time
+                        </p>
+                        <p className="font-mono text-sm">
+                          {buildInfo.data?.buildTime ?? "—"}
+                        </p>
                       </div>
                       <div>
-                        <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Dashboard</p>
-                        <p className="font-mono text-sm font-semibold text-primary">v2</p>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
+                          Dashboard
+                        </p>
+                        <p className="font-mono text-sm font-semibold text-primary">
+                          v2
+                        </p>
                       </div>
                     </div>
                     <Separator />
                     <p className="text-xs text-muted-foreground">
                       Full build info is also available at{" "}
-                      <a href="/build.txt" target="_blank" className="underline hover:text-foreground">
+                      <a
+                        href="/build.txt"
+                        target="_blank"
+                        className="underline hover:text-foreground"
+                      >
                         /build.txt
                       </a>
                     </p>

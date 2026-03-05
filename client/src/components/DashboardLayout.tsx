@@ -393,11 +393,12 @@ function DashboardLayoutContent({
             {adminStatus?.isUnlocked && buildInfo && !isCollapsed && (
               <div className="px-1 mb-2 group-data-[collapsible=icon]:hidden">
                 <p className="text-[10px] text-muted-foreground font-mono leading-relaxed">
-                  <span className="text-primary font-semibold">Dashboard v2</span>
+                  <span className="text-primary font-semibold">
+                    Dashboard v2
+                  </span>
                   {" · "}
                   {buildInfo.sha !== "unknown" ? `sha:${buildInfo.sha}` : "dev"}
-                  {" · "}
-                  v{buildInfo.version}
+                  {" · "}v{buildInfo.version}
                 </p>
               </div>
             )}

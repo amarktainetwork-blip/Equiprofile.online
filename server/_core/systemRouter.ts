@@ -6,7 +6,11 @@ import fs from "fs";
 import { resolve } from "path";
 
 // Cache build info at module load time
-let _buildInfoCache: { sha: string; buildTime: string; version: string } | null = null;
+let _buildInfoCache: {
+  sha: string;
+  buildTime: string;
+  version: string;
+} | null = null;
 
 function readBuildInfo() {
   if (_buildInfoCache) return _buildInfoCache;
@@ -14,11 +18,16 @@ function readBuildInfo() {
   let buildTime = new Date().toISOString();
   let version = "1.0.0";
   try {
-    const pkg = JSON.parse(fs.readFileSync(resolve(process.cwd(), "package.json"), "utf-8"));
+    const pkg = JSON.parse(
+      fs.readFileSync(resolve(process.cwd(), "package.json"), "utf-8"),
+    );
     version = pkg.version || "1.0.0";
   } catch {}
   try {
-    const txt = fs.readFileSync(resolve(process.cwd(), "dist/public/build.txt"), "utf-8");
+    const txt = fs.readFileSync(
+      resolve(process.cwd(), "dist/public/build.txt"),
+      "utf-8",
+    );
     for (const line of txt.split("\n")) {
       const eqIdx = line.indexOf("=");
       if (eqIdx < 0) continue;
