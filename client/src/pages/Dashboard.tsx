@@ -44,15 +44,21 @@ import {
   Tag,
   Sparkles,
   BookOpen,
+  TrendingUp,
+  Zap,
+  Star,
 } from "lucide-react";
 
-// Module categories with all features
+// Module categories with richer descriptions for premium grid
 const moduleCategories = [
   {
     id: "horses",
     name: "Horses",
+    description: "Profiles, pedigrees & records",
     icon: Heart,
     color: "from-rose-500 to-pink-600",
+    accent: "border-rose-500/30",
+    href: "/horses",
     modules: [
       { name: "All Horses", href: "/horses", icon: Heart },
       { name: "Add Horse", href: "/horses/new", icon: Plus },
@@ -62,8 +68,11 @@ const moduleCategories = [
   {
     id: "health",
     name: "Health",
+    description: "Vets, vaccines & treatments",
     icon: Stethoscope,
     color: "from-blue-500 to-cyan-600",
+    accent: "border-blue-500/30",
+    href: "/health",
     modules: [
       { name: "Health Hub", href: "/health", icon: Stethoscope },
       { name: "Vaccinations", href: "/vaccinations", icon: Syringe },
@@ -77,8 +86,11 @@ const moduleCategories = [
   {
     id: "training",
     name: "Training",
+    description: "Sessions, templates & lessons",
     icon: Dumbbell,
     color: "from-green-500 to-emerald-600",
+    accent: "border-green-500/30",
+    href: "/training",
     modules: [
       { name: "Training Log", href: "/training", icon: Dumbbell },
       { name: "Templates", href: "/training-templates", icon: BookOpen },
@@ -88,8 +100,11 @@ const moduleCategories = [
   {
     id: "nutrition",
     name: "Nutrition",
+    description: "Feed plans & diet tracking",
     icon: Apple,
     color: "from-orange-500 to-amber-600",
+    accent: "border-orange-500/30",
+    href: "/feeding",
     modules: [
       { name: "Feeding Plans", href: "/feeding", icon: Apple },
       { name: "Nutrition Plans", href: "/nutrition-plans", icon: FileText },
@@ -99,8 +114,11 @@ const moduleCategories = [
   {
     id: "schedule",
     name: "Schedule",
+    description: "Calendar, tasks & appointments",
     icon: CalendarDays,
     color: "from-purple-500 to-violet-600",
+    accent: "border-purple-500/30",
+    href: "/calendar",
     modules: [
       { name: "Calendar", href: "/calendar", icon: Calendar },
       { name: "Appointments", href: "/appointments", icon: Clock },
@@ -110,8 +128,11 @@ const moduleCategories = [
   {
     id: "ai",
     name: "AI Tools",
+    description: "Smart assistant & weather insights",
     icon: Brain,
     color: "from-indigo-500 to-blue-600",
+    accent: "border-indigo-500/30",
+    href: "/ai-chat",
     modules: [
       { name: "AI Assistant", href: "/ai-chat", icon: Brain },
       { name: "Weather", href: "/weather", icon: CloudSun },
@@ -120,41 +141,56 @@ const moduleCategories = [
   {
     id: "documents",
     name: "Documents",
+    description: "Secure file & record vault",
     icon: FileText,
     color: "from-slate-500 to-gray-600",
+    accent: "border-slate-500/30",
+    href: "/documents",
     modules: [{ name: "Document Vault", href: "/documents", icon: FileText }],
   },
   {
     id: "breeding",
     name: "Breeding",
+    description: "Foaling records & lineage",
     icon: Baby,
     color: "from-pink-500 to-rose-600",
+    accent: "border-pink-500/30",
+    href: "/breeding",
     modules: [{ name: "Breeding Manager", href: "/breeding", icon: Baby }],
   },
   {
     id: "stable",
     name: "Stable",
+    description: "Team, contacts & messaging",
     icon: Home,
     color: "from-yellow-500 to-orange-600",
+    accent: "border-yellow-500/30",
+    href: "/stable",
     modules: [
       { name: "Stable Management", href: "/stable", icon: Home },
       { name: "Contacts", href: "/contacts", icon: Users },
-      { name: "Client Portal", href: "/client/:clientId", icon: Shield },
+      { name: "Client Portal", href: "/client-portal", icon: Shield },
       { name: "Messages", href: "/messages", icon: MessageSquare },
     ],
   },
   {
     id: "financial",
     name: "Financial",
+    description: "Billing, costs & invoices",
     icon: DollarSign,
     color: "from-emerald-500 to-teal-600",
+    accent: "border-emerald-500/30",
+    href: "/billing",
     modules: [{ name: "Billing", href: "/billing", icon: DollarSign }],
   },
   {
     id: "reports",
     name: "Reports",
+    description: "Analytics, tags & exports",
     icon: BarChart3,
     color: "from-cyan-500 to-blue-600",
+    accent: "border-cyan-500/30",
+    href: "/analytics",
     modules: [
       { name: "Analytics", href: "/analytics", icon: BarChart3 },
       { name: "Reports", href: "/reports", icon: FileText },
@@ -164,8 +200,11 @@ const moduleCategories = [
   {
     id: "settings",
     name: "Settings",
+    description: "Account, security & admin",
     icon: Settings,
     color: "from-gray-500 to-slate-600",
+    accent: "border-gray-500/30",
+    href: "/settings",
     modules: [
       { name: "Settings", href: "/settings", icon: Settings },
       { name: "Admin", href: "/admin", icon: Shield },
@@ -173,7 +212,7 @@ const moduleCategories = [
   },
 ];
 
-function ModuleCard({
+function PremiumModuleCard({
   category,
   index,
 }: {
@@ -186,45 +225,45 @@ function ModuleCard({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: index * 0.05 }}
+      transition={{ duration: 0.3, delay: index * 0.04 }}
     >
-      <Card className="group hover:shadow-lg transition-all duration-300 border-muted/50 bg-card/50 backdrop-blur-sm h-full">
-        <CardHeader className="pb-3">
-          <div className="flex items-center gap-3">
+      <Link href={category.href}>
+        <div
+          className={`group relative rounded-xl border ${category.accent} bg-card/60 backdrop-blur-sm p-4 h-full cursor-pointer hover:shadow-md hover:bg-card/80 transition-all duration-200 hover:-translate-y-0.5`}
+        >
+          <div className="flex items-start gap-3">
             <div
-              className={`w-10 h-10 rounded-lg bg-gradient-to-br ${category.color} flex items-center justify-center`}
+              className={`w-10 h-10 rounded-xl bg-gradient-to-br ${category.color} flex items-center justify-center shadow-sm shrink-0`}
             >
               <Icon className="w-5 h-5 text-white" />
             </div>
-            <div>
-              <CardTitle className="font-serif text-lg">
+            <div className="min-w-0 flex-1">
+              <h3 className="font-semibold text-sm leading-tight">
                 {category.name}
-              </CardTitle>
-              <CardDescription className="text-xs">
-                {category.modules.length} module
-                {category.modules.length > 1 ? "s" : ""}
-              </CardDescription>
+              </h3>
+              <p className="text-[11px] text-muted-foreground mt-0.5 leading-tight">
+                {category.description}
+              </p>
             </div>
+            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/40 group-hover:text-muted-foreground shrink-0 mt-0.5 transition-colors" />
           </div>
-        </CardHeader>
-        <CardContent className="space-y-1">
-          {category.modules.map((module) => {
-            const ModuleIcon = module.icon;
-            return (
-              <Link key={module.href} href={module.href}>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start h-auto py-2 px-3 hover:bg-muted/50 transition-colors"
-                >
-                  <ModuleIcon className="w-4 h-4 mr-2 text-muted-foreground" />
-                  <span className="text-sm">{module.name}</span>
-                  <ChevronRight className="w-3 h-3 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
-                </Button>
-              </Link>
-            );
-          })}
-        </CardContent>
-      </Card>
+          <div className="mt-3 flex flex-wrap gap-1">
+            {category.modules.slice(0, 3).map((m) => (
+              <span
+                key={m.href}
+                className="text-[10px] px-1.5 py-0.5 rounded-md bg-muted/50 text-muted-foreground"
+              >
+                {m.name}
+              </span>
+            ))}
+            {category.modules.length > 3 && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-muted/50 text-muted-foreground">
+                +{category.modules.length - 3} more
+              </span>
+            )}
+          </div>
+        </div>
+      </Link>
     </motion.div>
   );
 }
@@ -258,33 +297,38 @@ function DashboardContent() {
             )
           : 0;
         return (
-          <Badge
-            variant="secondary"
-            className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
-          >
+          <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 border-blue-200 dark:border-blue-800 gap-1">
+            <Star className="w-3 h-3" />
             {trialDays} days left in trial
           </Badge>
         );
       }
       case "active":
         return (
-          <Badge
-            variant="secondary"
-            className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
-          >
-            Active Subscription
+          <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 gap-1">
+            <Zap className="w-3 h-3" />
+            Pro Plan
           </Badge>
         );
       case "overdue":
-        return <Badge variant="destructive">Payment Overdue</Badge>;
+        return (
+          <Badge variant="destructive" className="gap-1">
+            <AlertCircle className="w-3 h-3" />
+            Payment Overdue
+          </Badge>
+        );
       case "expired":
-        return <Badge variant="destructive">Subscription Expired</Badge>;
+        return (
+          <Badge variant="destructive" className="gap-1">
+            <AlertCircle className="w-3 h-3" />
+            Subscription Expired
+          </Badge>
+        );
       default:
         return null;
     }
   };
 
-  // Quick action buttons for most common tasks
   const quickActions = [
     {
       label: "Add Horse",
@@ -310,36 +354,102 @@ function DashboardContent() {
       icon: Sparkles,
       color: "from-indigo-500 to-blue-600",
     },
+    {
+      label: "Analytics",
+      href: "/analytics",
+      icon: TrendingUp,
+      color: "from-cyan-500 to-blue-600",
+    },
   ];
 
+  // Build a chronological activity feed from horses + appointments
+  const activityFeed: Array<{
+    id: string;
+    type: "horse" | "appointment" | "training";
+    title: string;
+    subtitle: string;
+    date: Date;
+    icon: typeof Heart;
+    color: string;
+  }> = [
+    ...horses.slice(0, 3).map((h: any) => ({
+      id: `horse-${h.id}`,
+      type: "horse" as const,
+      title: h.name,
+      subtitle: h.breed ? `${h.breed} · Added to stable` : "Added to stable",
+      date: new Date(h.createdAt || Date.now()),
+      icon: Heart,
+      color: "from-rose-500 to-pink-600",
+    })),
+    ...upcomingAppointments.slice(0, 3).map((a: any) => ({
+      id: `appt-${a.id}`,
+      type: "appointment" as const,
+      title: a.title,
+      subtitle: a.appointmentType || "Appointment",
+      date: new Date(a.appointmentDate),
+      icon: Calendar,
+      color: "from-purple-500 to-violet-600",
+    })),
+  ]
+    .sort((a, b) => b.date.getTime() - a.date.getTime())
+    .slice(0, 5);
+
+  const futureAppointments = upcomingAppointments
+    .filter((a: any) => new Date(a.appointmentDate) >= new Date())
+    .sort(
+      (a: any, b: any) =>
+        new Date(a.appointmentDate).getTime() -
+        new Date(b.appointmentDate).getTime(),
+    )
+    .slice(0, 4);
+
+  const healthAlerts =
+    (stats?.reminderCount || 0) > 0
+      ? [
+          {
+            id: "health-reminder",
+            message: `${stats?.reminderCount} health reminder${(stats?.reminderCount || 0) > 1 ? "s" : ""} due`,
+            href: "/health",
+          },
+        ]
+      : [];
+
   return (
-    <div className="space-y-5 pb-4">
-      {/* Welcome Header */}
+    <div className="space-y-6 pb-6">
+      {/* ── Hero Section ─────────────────────────────────────── */}
       <motion.div
-        initial={{ opacity: 0, y: -20 }}
+        initial={{ opacity: 0, y: -16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+        className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600 via-blue-600 to-cyan-500 p-6 text-white shadow-lg shadow-indigo-500/20"
       >
-        <div>
-          <h1 className="font-serif text-2xl sm:text-3xl font-bold text-foreground leading-tight">
-            Welcome back,{" "}
-            <span className="bg-gradient-to-r from-indigo-600 to-cyan-600 bg-clip-text text-transparent">
-              {user?.name?.split(" ")[0] || "Rider"}
-            </span>
-          </h1>
-          <p className="text-muted-foreground text-sm mt-0.5">
-            Your equestrian command centre
-          </p>
+        {/* decorative circles */}
+        <div className="pointer-events-none absolute -right-12 -top-12 h-48 w-48 rounded-full bg-white/10" />
+        <div className="pointer-events-none absolute -bottom-8 right-16 h-32 w-32 rounded-full bg-white/5" />
+
+        <div className="relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-medium text-indigo-100 mb-1">
+              Welcome back
+            </p>
+            <h1 className="font-serif text-2xl sm:text-3xl font-bold leading-tight">
+              {user?.name?.split(" ")[0] || "Rider"}&apos;s Dashboard
+            </h1>
+            <p className="text-indigo-200 text-sm mt-1">
+              Your equestrian command centre
+            </p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            {getSubscriptionBadge()}
+          </div>
         </div>
-        <div className="flex items-center gap-2">{getSubscriptionBadge()}</div>
       </motion.div>
 
-      {/* Stats Overview */}
+      {/* ── KPI Stats Row ─────────────────────────────────────── */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.1 }}
+        transition={{ duration: 0.4, delay: 0.08 }}
       >
         <StatsOverview
           totalHorses={stats?.horseCount || 0}
@@ -349,145 +459,225 @@ function DashboardContent() {
         />
       </motion.div>
 
-      {/* Quick Actions */}
+      {/* ── Quick Action Pills ────────────────────────────────── */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.15 }}
+        transition={{ duration: 0.4, delay: 0.14 }}
       >
-        <Card className="border-muted/50 bg-card/50 backdrop-blur-sm">
-          <CardHeader className="pb-3">
-            <CardTitle className="font-serif text-base">
-              Quick Actions
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-4 gap-2">
-              {quickActions.map((action) => {
-                const ActionIcon = action.icon;
-                return (
-                  <Link key={action.href} href={action.href}>
-                    <button
-                      className="w-full flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl border border-muted/50 hover:bg-muted/50 active:scale-95 transition-all touch-manipulation min-h-[72px]"
-                      aria-label={action.label}
-                    >
-                      <div
-                        className={`w-8 h-8 rounded-lg bg-gradient-to-br ${action.color} flex items-center justify-center shrink-0`}
-                      >
-                        <ActionIcon className="w-4 h-4 text-white" />
-                      </div>
-                      <span className="text-[11px] font-medium leading-tight text-center">
-                        {action.label}
-                      </span>
-                    </button>
-                  </Link>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+          {quickActions.map((action) => {
+            const ActionIcon = action.icon;
+            return (
+              <Link key={action.href} href={action.href}>
+                <button className="flex items-center gap-2 shrink-0 px-4 py-2.5 rounded-full border border-muted/60 bg-card/60 hover:bg-card hover:shadow-sm active:scale-95 transition-all text-sm font-medium">
+                  <div
+                    className={`w-5 h-5 rounded-full bg-gradient-to-br ${action.color} flex items-center justify-center`}
+                  >
+                    <ActionIcon className="w-3 h-3 text-white" />
+                  </div>
+                  {action.label}
+                </button>
+              </Link>
+            );
+          })}
+        </div>
       </motion.div>
 
-      {/* Continue Where You Left Off + Upcoming */}
-      {(horses.length > 0 || upcomingAppointments.length > 0) && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.18 }}
-          className="grid grid-cols-1 sm:grid-cols-2 gap-3"
-        >
-          {/* Horses */}
-          {horses.length > 0 && (
-            <Card className="border-muted/50 bg-card/50 backdrop-blur-sm">
-              <CardHeader className="pb-2">
-                <CardTitle className="font-serif text-sm flex items-center gap-2">
-                  <Heart className="w-4 h-4 text-rose-500" />
-                  Your Horses
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-1.5">
-                  {horses.slice(0, 3).map((horse: any) => (
-                    <Link key={horse.id} href={`/horses/${horse.id}`}>
-                      <div className="flex items-center gap-2 py-1.5 px-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
-                        <div className="w-7 h-7 rounded-full bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0">
-                          <Heart className="w-3.5 h-3.5 text-rose-500" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-xs font-medium truncate">
-                            {horse.name}
-                          </p>
-                          <p className="text-[10px] text-muted-foreground">
-                            {horse.breed || "No breed"}
-                          </p>
-                        </div>
-                        <ChevronRight className="w-3 h-3 text-muted-foreground ml-auto shrink-0" />
-                      </div>
-                    </Link>
-                  ))}
-                  {horses.length > 3 && (
-                    <Link href="/horses">
-                      <p className="text-xs text-primary text-center py-1 hover:underline cursor-pointer">
-                        View all {horses.length} horses →
-                      </p>
-                    </Link>
-                  )}
+      {/* ── Two-Column Body ───────────────────────────────────── */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.2 }}
+        className="grid grid-cols-1 lg:grid-cols-5 gap-4"
+      >
+        {/* LEFT — Recent Activity (60%) */}
+        <div className="lg:col-span-3 space-y-4">
+          <Card className="border-muted/50 bg-card/60 backdrop-blur-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="font-serif text-base flex items-center gap-2">
+                <Activity className="w-4 h-4 text-primary" />
+                Recent Activity
+              </CardTitle>
+              <CardDescription className="text-xs">
+                Your horses, appointments and events
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {activityFeed.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Activity className="w-8 h-8 mx-auto mb-2 opacity-30" />
+                  <p className="text-sm">No activity yet</p>
+                  <p className="text-xs mt-1">
+                    Add a horse or schedule an appointment to get started
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
-          )}
+              ) : (
+                <div className="space-y-0">
+                  {activityFeed.map((item, i) => {
+                    const ItemIcon = item.icon;
+                    return (
+                      <div key={item.id} className="flex gap-3 group">
+                        {/* timeline line */}
+                        <div className="flex flex-col items-center">
+                          <div
+                            className={`w-8 h-8 rounded-full bg-gradient-to-br ${item.color} flex items-center justify-center shadow-sm shrink-0`}
+                          >
+                            <ItemIcon className="w-3.5 h-3.5 text-white" />
+                          </div>
+                          {i < activityFeed.length - 1 && (
+                            <div className="w-px flex-1 bg-border/50 my-1" />
+                          )}
+                        </div>
+                        <div className="flex-1 pb-4 min-w-0">
+                          <p className="text-sm font-medium truncate">
+                            {item.title}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {item.subtitle}
+                          </p>
+                          <p className="text-[10px] text-muted-foreground/60 mt-0.5">
+                            {item.date.toLocaleDateString("en-GB", {
+                              day: "numeric",
+                              month: "short",
+                              year:
+                                item.date.getFullYear() !==
+                                new Date().getFullYear()
+                                  ? "numeric"
+                                  : undefined,
+                            })}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              {horses.length > 0 && (
+                <Link href="/horses">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full mt-1 text-xs text-muted-foreground hover:text-foreground"
+                  >
+                    View all horses
+                    <ChevronRight className="w-3 h-3 ml-1" />
+                  </Button>
+                </Link>
+              )}
+            </CardContent>
+          </Card>
+        </div>
 
-          {/* Upcoming appointments */}
-          {upcomingAppointments.length > 0 && (
-            <Card className="border-muted/50 bg-card/50 backdrop-blur-sm">
-              <CardHeader className="pb-2">
-                <CardTitle className="font-serif text-sm flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-purple-500" />
-                  Upcoming
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-1.5">
-                  {upcomingAppointments
-                    .filter(
-                      (a: any) => new Date(a.appointmentDate) >= new Date(),
-                    )
-                    .sort(
-                      (a: any, b: any) =>
-                        new Date(a.appointmentDate).getTime() -
-                        new Date(b.appointmentDate).getTime(),
-                    )
-                    .slice(0, 3)
-                    .map((appt: any) => (
+        {/* RIGHT — Upcoming Events + Health Alerts (40%) */}
+        <div className="lg:col-span-2 space-y-4">
+          {/* Upcoming Events */}
+          <Card className="border-muted/50 bg-card/60 backdrop-blur-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="font-serif text-base flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-purple-500" />
+                Upcoming
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {futureAppointments.length === 0 ? (
+                <div className="text-center py-6 text-muted-foreground">
+                  <Calendar className="w-7 h-7 mx-auto mb-2 opacity-30" />
+                  <p className="text-xs">No upcoming appointments</p>
+                  <Link href="/appointments">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="mt-2 text-xs h-7"
+                    >
+                      Schedule one
+                    </Button>
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {futureAppointments.map((appt: any) => {
+                    const d = new Date(appt.appointmentDate);
+                    const isToday =
+                      d.toDateString() === new Date().toDateString();
+                    return (
                       <div
                         key={appt.id}
-                        className="flex items-center gap-2 py-1.5 px-2 rounded-lg border border-muted/40"
+                        className={`flex items-center gap-3 p-2.5 rounded-lg border ${isToday ? "border-purple-500/30 bg-purple-50/50 dark:bg-purple-900/10" : "border-muted/40 bg-muted/20"}`}
                       >
-                        <div className="w-7 h-7 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center shrink-0">
-                          <Calendar className="w-3.5 h-3.5 text-purple-500" />
+                        <div className="text-center shrink-0 w-9">
+                          <p className="text-[10px] text-muted-foreground font-medium uppercase">
+                            {d.toLocaleDateString("en-GB", { month: "short" })}
+                          </p>
+                          <p className="text-base font-bold leading-tight">
+                            {d.getDate()}
+                          </p>
                         </div>
-                        <div className="min-w-0">
+                        <div className="min-w-0 flex-1">
                           <p className="text-xs font-medium truncate">
                             {appt.title}
                           </p>
-                          <p className="text-[10px] text-muted-foreground">
-                            {new Date(appt.appointmentDate).toLocaleDateString(
-                              "en-GB",
-                              { day: "numeric", month: "short" },
-                            )}
+                          <p className="text-[10px] text-muted-foreground truncate">
+                            {appt.appointmentType || "Appointment"}
+                            {appt.providerName ? ` · ${appt.providerName}` : ""}
                           </p>
                         </div>
+                        {isToday && (
+                          <Badge className="text-[9px] h-4 px-1.5 bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300 shrink-0">
+                            Today
+                          </Badge>
+                        )}
                       </div>
-                    ))}
+                    );
+                  })}
+                  <Link href="/calendar">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-full text-xs text-muted-foreground hover:text-foreground mt-1"
+                    >
+                      Open calendar
+                      <ChevronRight className="w-3 h-3 ml-1" />
+                    </Button>
+                  </Link>
                 </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Health Alerts */}
+          {healthAlerts.length > 0 && (
+            <Card className="border-amber-500/30 bg-amber-50/50 dark:bg-amber-900/10 backdrop-blur-sm">
+              <CardHeader className="pb-2">
+                <CardTitle className="font-serif text-sm flex items-center gap-2 text-amber-700 dark:text-amber-400">
+                  <AlertCircle className="w-4 h-4" />
+                  Health Alerts
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {healthAlerts.map((alert) => (
+                  <Link key={alert.id} href={alert.href}>
+                    <div className="flex items-center justify-between p-2 rounded-lg hover:bg-amber-100/50 dark:hover:bg-amber-900/20 transition-colors cursor-pointer">
+                      <p className="text-xs font-medium text-amber-700 dark:text-amber-400">
+                        {alert.message}
+                      </p>
+                      <ChevronRight className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                    </div>
+                  </Link>
+                ))}
               </CardContent>
             </Card>
           )}
-        </motion.div>
-      )}
+        </div>
+      </motion.div>
 
-      {/* Module Navigation */}
-      <div className="space-y-3">
+      {/* ── Module Navigation Grid ────────────────────────────── */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.28 }}
+        className="space-y-3"
+      >
         <div>
           <h2 className="font-serif text-xl font-bold text-foreground">
             All Modules
@@ -499,40 +689,13 @@ function DashboardContent() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
           {moduleCategories.map((category, index) => (
-            <ModuleCard key={category.id} category={category} index={index} />
+            <PremiumModuleCard
+              key={category.id}
+              category={category}
+              index={index}
+            />
           ))}
         </div>
-      </div>
-
-      {/* Footer Help */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.5 }}
-      >
-        <Card className="border-muted/50 bg-gradient-to-br from-primary/5 to-primary/10 backdrop-blur-sm">
-          <CardContent className="pt-5 pb-5">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                  <Brain className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-sm">Need Help?</h3>
-                  <p className="text-xs text-muted-foreground">
-                    Try our AI assistant for instant guidance
-                  </p>
-                </div>
-              </div>
-              <Link href="/ai-chat">
-                <Button size="sm" className="shrink-0">
-                  <Sparkles className="w-3.5 h-3.5 mr-1.5" />
-                  Open AI Chat
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
       </motion.div>
     </div>
   );
@@ -545,3 +708,4 @@ export default function Dashboard() {
     </DashboardLayout>
   );
 }
+

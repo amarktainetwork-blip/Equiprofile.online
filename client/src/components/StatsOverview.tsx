@@ -1,5 +1,5 @@
-import { Heart, Activity, Calendar, Bell } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Heart, Activity, Calendar, Bell, TrendingUp } from "lucide-react";
+import { Card, CardContent } from "./ui/card";
 import { useTranslation } from "react-i18next";
 
 interface StatsOverviewProps {
@@ -20,31 +20,39 @@ export function StatsOverview({
   const stats = [
     {
       title: t("dashboard.stats.totalHorses"),
-      value: totalHorses,
+      display: String(totalHorses),
       icon: Heart,
-      color: "text-blue-600 dark:text-blue-400",
-      bgColor: "bg-blue-100 dark:bg-blue-900",
+      gradient: "from-rose-500 to-pink-600",
+      shadow: "shadow-rose-500/20",
+      trend: totalHorses > 0,
+      sub: totalHorses === 0 ? "Add your first horse" : "In your stable",
     },
     {
       title: t("dashboard.stats.trainingHours"),
-      value: `${trainingHours}h`,
+      display: `${trainingHours}h`,
       icon: Activity,
-      color: "text-green-600 dark:text-green-400",
-      bgColor: "bg-green-100 dark:bg-green-900",
+      gradient: "from-emerald-500 to-green-600",
+      shadow: "shadow-emerald-500/20",
+      trend: trainingHours > 0,
+      sub: trainingHours === 0 ? "Log your first session" : "This month",
     },
     {
       title: t("dashboard.stats.upcomingEvents"),
-      value: upcomingEvents,
+      display: String(upcomingEvents),
       icon: Calendar,
-      color: "text-purple-600 dark:text-purple-400",
-      bgColor: "bg-purple-100 dark:bg-purple-900",
+      gradient: "from-violet-500 to-purple-600",
+      shadow: "shadow-violet-500/20",
+      trend: upcomingEvents > 0,
+      sub: upcomingEvents === 0 ? "Nothing scheduled" : "Upcoming",
     },
     {
       title: t("dashboard.stats.healthReminders"),
-      value: healthReminders,
+      display: String(healthReminders),
       icon: Bell,
-      color: "text-orange-600 dark:text-orange-400",
-      bgColor: "bg-orange-100 dark:bg-orange-900",
+      gradient: "from-amber-500 to-orange-600",
+      shadow: "shadow-amber-500/20",
+      trend: healthReminders > 0,
+      sub: healthReminders === 0 ? "All clear" : "Need attention",
     },
   ];
 
@@ -53,19 +61,29 @@ export function StatsOverview({
       {stats.map((stat) => {
         const Icon = stat.icon;
         return (
-          <Card key={stat.title}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 pt-4 px-4">
-              <CardTitle className="text-xs font-medium leading-tight">
-                {stat.title}
-              </CardTitle>
-              <div className={`p-1.5 rounded-lg ${stat.bgColor} shrink-0`}>
-                <Icon className={`h-3.5 w-3.5 ${stat.color}`} />
+          <Card
+            key={stat.title}
+            className={`border-muted/50 shadow-md ${stat.shadow} transition-shadow hover:shadow-lg`}
+          >
+            <CardContent className="p-4 pt-5">
+              <div className="flex items-start justify-between mb-3">
+                <div
+                  className={`w-10 h-10 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center shadow-sm`}
+                >
+                  <Icon className="h-5 w-5 text-white" />
+                </div>
+                {stat.trend && (
+                  <TrendingUp className="h-3.5 w-3.5 text-emerald-500 mt-1" />
+                )}
               </div>
-            </CardHeader>
-            <CardContent className="px-4 pb-4">
-              <div className="text-xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {stat.value === 0 ? "No data yet" : "This month"}
+              <div className="text-2xl font-bold tracking-tight">
+                {stat.display}
+              </div>
+              <p className="text-[11px] font-medium text-muted-foreground mt-0.5 truncate">
+                {stat.title}
+              </p>
+              <p className="text-[10px] text-muted-foreground/70 mt-0.5">
+                {stat.sub}
               </p>
             </CardContent>
           </Card>

@@ -44,6 +44,7 @@ import {
   Shield,
   MessageSquare,
   ListChecks,
+  BookTemplate,
   Baby,
   Calendar,
   Users,
@@ -77,7 +78,7 @@ const menuItems = [
   { icon: Heart, label: "Health Records", path: "/health" },
   { icon: Activity, label: "Training", path: "/training" },
   {
-    icon: ListChecks,
+    icon: BookTemplate,
     label: "Training Templates",
     path: "/training-templates",
   },

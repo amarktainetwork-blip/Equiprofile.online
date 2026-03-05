@@ -94,10 +94,10 @@ async function startServer() {
           // (onclick="…", etc.).  React/app code uses addEventListener so
           // this is safe and intentional.
           scriptSrcAttr: ["'none'"],
-          styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles (Tailwind)
+          styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"], // Allow inline styles (Tailwind) + Google Fonts CSS
           imgSrc: ["'self'", "data:", "https:"],
           connectSrc: ["'self'"],
-          fontSrc: ["'self'", "data:"], // Allow data: for embedded fonts
+          fontSrc: ["'self'", "data:", "https://fonts.gstatic.com"], // Allow data: for embedded fonts + Google Fonts
           objectSrc: ["'none'"],
           baseUri: ["'self'"],
           formAction: ["'self'"],

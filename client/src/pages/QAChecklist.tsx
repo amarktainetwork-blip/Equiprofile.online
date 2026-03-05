@@ -4,7 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, XCircle, Loader2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 
 interface CheckItem {
   label: string;
@@ -86,6 +87,18 @@ function Section({ title, checks }: { title: string; checks: CheckItem[] }) {
 
 export default function QAChecklistPage() {
   const [refetchKey, setRefetchKey] = useState(0);
+  const [, navigate] = useLocation();
+
+  const adminStatus = trpc.adminUnlock.getStatus.useQuery(undefined, {
+    retry: false,
+  });
+
+  // Guard: redirect non-admin users away from this dev-only page
+  useEffect(() => {
+    if (adminStatus.data && !adminStatus.data.isUnlocked) {
+      navigate("/dashboard");
+    }
+  }, [adminStatus.data, navigate]);
 
   const authMe = trpc.auth.me.useQuery(undefined, { retry: false });
   const dashStats = trpc.user.getDashboardStats.useQuery(undefined, {
@@ -100,9 +113,6 @@ export default function QAChecklistPage() {
     },
     { retry: false },
   );
-  const adminStatus = trpc.adminUnlock.getStatus.useQuery(undefined, {
-    retry: false,
-  });
   const trainingStats = trpc.analytics.getTrainingStats.useQuery(
     {},
     { retry: false },

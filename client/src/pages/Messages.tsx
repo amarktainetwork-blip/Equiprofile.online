@@ -288,7 +288,11 @@ export default function MessagesPage() {
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={() => toast.info("File sharing coming soon")}
+                        onClick={() =>
+                          toast.warning(
+                            "File attachments require storage configuration. Please contact your administrator.",
+                          )
+                        }
                         title="Attach file"
                       >
                         <Paperclip className="h-4 w-4" />

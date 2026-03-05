@@ -110,13 +110,34 @@ fi
 echo ""
 echo "[7/9] Checking nginx configuration..."
 if [ ! -f /etc/nginx/sites-available/equiprofile ]; then
-    echo "WARNING: Nginx config not installed at /etc/nginx/sites-available/equiprofile"
-    echo "Please:"
-    echo "  1. Edit deployment/nginx/equiprofile.conf"
-    echo "  2. Replace ALL instances of YOUR_DOMAIN_HERE with your actual domain"
-    echo "  3. Copy to /etc/nginx/sites-available/equiprofile"
-    echo "  4. Create symlink: ln -s /etc/nginx/sites-available/equiprofile /etc/nginx/sites-enabled/"
-    echo "  5. Run certbot: certbot --nginx -d yourdomain.com"
+    if command -v nginx &>/dev/null; then
+        # nginx is installed — auto-deploy the config if the source exists
+        if [ -f deployment/nginx/equiprofile.conf ]; then
+            echo "Auto-installing nginx config from deployment/nginx/equiprofile.conf..."
+            cp deployment/nginx/equiprofile.conf /etc/nginx/sites-available/equiprofile
+            # Create symlink if not already present
+            if [ ! -L /etc/nginx/sites-enabled/equiprofile ]; then
+                ln -s /etc/nginx/sites-available/equiprofile /etc/nginx/sites-enabled/equiprofile
+                echo "Symlink created: /etc/nginx/sites-enabled/equiprofile"
+            fi
+            # Test and reload
+            if nginx -t 2>/dev/null; then
+                systemctl reload nginx
+                echo "Nginx configuration installed and reloaded"
+            else
+                echo "WARNING: Auto-installed nginx config failed validation"
+                echo "Please check /etc/nginx/sites-available/equiprofile manually"
+            fi
+        else
+            echo "WARNING: deployment/nginx/equiprofile.conf not found"
+            echo "Please:"
+            echo "  1. Edit deployment/nginx/equiprofile.conf"
+            echo "  2. Replace ALL instances of YOUR_DOMAIN_HERE with your actual domain"
+            echo "  3. Re-run this script, or copy manually and reload nginx"
+        fi
+    else
+        echo "INFO: Nginx is not installed — skipping nginx configuration"
+    fi
 else
     # Check if placeholder still exists
     if grep -q "YOUR_DOMAIN_HERE" /etc/nginx/sites-available/equiprofile 2>/dev/null; then
